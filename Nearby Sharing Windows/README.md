@@ -1,0 +1,2 @@
+﻿# Nearby Sharing (Windows)
+This application is a port of the [nearsharestandalone example](https://github.com/microsoft/project-rome/tree/master/Android/samples/nearsharestandalone/app/src/main/java/com/microsoft/connecteddevices/nearshare) of Microsofts ""Project Rome"

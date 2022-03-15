@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31911.196
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nearby Sharing Windows", "Nearby Sharing Windows\Nearby Sharing Windows.csproj", "{081AC55E-14D3-42A9-A742-29818E649650}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShortDev.Microsoft.ConnectedDevices.AndroidSdk", "ShortDev.Microsoft.ConnectedDevices.AndroidSdk\ShortDev.Microsoft.ConnectedDevices.AndroidSdk.csproj", "{9CD32CF6-76DC-46DE-AFA6-47B008AD17A7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{081AC55E-14D3-42A9-A742-29818E649650}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{081AC55E-14D3-42A9-A742-29818E649650}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{081AC55E-14D3-42A9-A742-29818E649650}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{081AC55E-14D3-42A9-A742-29818E649650}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{081AC55E-14D3-42A9-A742-29818E649650}.Release|Any CPU.Build.0 = Release|Any CPU
+		{081AC55E-14D3-42A9-A742-29818E649650}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{9CD32CF6-76DC-46DE-AFA6-47B008AD17A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9CD32CF6-76DC-46DE-AFA6-47B008AD17A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9CD32CF6-76DC-46DE-AFA6-47B008AD17A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9CD32CF6-76DC-46DE-AFA6-47B008AD17A7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {86DED607-FA3F-4D8A-B226-8AE9C9F08F84}
+	EndGlobalSection
+EndGlobal
