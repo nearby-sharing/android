@@ -1,4 +1,6 @@
-﻿using Android.App;
+﻿#nullable enable
+
+using Android.App;
 using Android.Content;
 using Android.OS;
 using Android.Widget;
@@ -13,6 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ManifestPermission = Android.Manifest.Permission;
 using AndroidUri = Android.Net.Uri;
+using Google.Android.Material.ProgressIndicator;
 
 namespace Nearby_Sharing_Windows
 {
@@ -34,7 +37,7 @@ namespace Nearby_Sharing_Windows
             BottomSheet.SetBottomSheetCallback(new Layout.BottomSheetBehaviorCallback(this));
             BottomSheet.State = BottomSheetBehavior.StateHalfExpanded;
 
-            DeviceDiscoveryListView = FindViewById<ListView>(Resource.Id.listView1);
+            DeviceDiscoveryListView = FindViewById<ListView>(Resource.Id.listView1)!;
             DeviceDiscoveryListView.ItemClick += DeviceDiscoveryListView_ItemClick;
 
             RequestPermissions(new[] { ManifestPermission.AccessCoarseLocation }, 0);
@@ -58,12 +61,14 @@ namespace Nearby_Sharing_Windows
             Platform.Start();
 
             ConnectedDevicesAccount account = ConnectedDevicesAccount.AnonymousAccount;
-            ConnectedDevicesAddAccountResult result = (await Platform.AccountManager.AddAccountAsync(account).GetAsync()) as ConnectedDevicesAddAccountResult;
+            await Platform.AccountManager.AddAccountAsync(account).GetAsync();
         }
 
         RemoteSystemWatcher Watcher { get; set; }
         void StartWatcher()
         {
+            System.Diagnostics.Debug.Assert(Watcher == null, "Watcher already has been started!");
+
             List<IRemoteSystemFilter> filters = new List<IRemoteSystemFilter>();
             filters.Add(new RemoteSystemDiscoveryTypeFilter(RemoteSystemDiscoveryType.Proximal));
             filters.Add(new RemoteSystemStatusTypeFilter(RemoteSystemStatusType.Any));
@@ -98,8 +103,8 @@ namespace Nearby_Sharing_Windows
         private void UpdateUI()
         {
             DeviceDiscoveryListView.Adapter = new ArrayAdapter<string>(
-                this, 
-                Android.Resource.Layout.SimpleListItem1, 
+                this,
+                Android.Resource.Layout.SimpleListItem1,
                 RemoteSystems.Select((x) => $"{x.DisplayName} [{x.Status}]").ToArray()
             );
         }
@@ -111,43 +116,62 @@ namespace Nearby_Sharing_Windows
         }
         #endregion
 
-        private void SendData(RemoteSystem remoteSystem)
+        private async void SendData(RemoteSystem remoteSystem)
         {
             RemoteSystemConnectionRequest connectionRequest = new RemoteSystemConnectionRequest(remoteSystem);
             if (NearShareSender.IsNearShareSupported(connectionRequest))
             {
-                CancellationToken cancellationToken;
-                if (Intent.Action == Intent.ActionSend)
+                AsyncOperationWithProgress? fileTransferOperation = null;
+                if (Intent?.Action == Intent.ActionSend)
                 {
                     if (Intent.HasExtra(Intent.ExtraStream))
                     {
-                        AndroidUri file = Intent.GetParcelableExtra(Intent.ExtraStream) as AndroidUri;
-                        NearShareSender.SendFileAsync(
+                        AndroidUri file = (Intent.GetParcelableExtra(Intent.ExtraStream) as AndroidUri)!;
+                        fileTransferOperation = NearShareSender.SendFileAsync(
                             connectionRequest,
                             NearShareHelper.CreateNearShareFileFromContentUri(file, ApplicationContext)
                         );
                     }
                     else
                     {
-                        NearShareSender.SendUriAsync(
+                        await NearShareSender.SendUriAsync(
                             connectionRequest,
                             Intent.GetStringExtra(Intent.ExtraText)
-                        );
+                        ).GetAsync();
                     }
                 }
-                else if (Intent.Action == Intent.ActionSend)
+                else if (Intent?.Action == Intent.ActionSend)
                 {
-                    IList files = Intent.GetParcelableArrayListExtra(Intent.ExtraStream);
+                    IList files = (Intent.GetParcelableArrayListExtra(Intent.ExtraStream))!;
 
                     List<INearShareFileProvider> fileProviders = new List<INearShareFileProvider>();
                     foreach (AndroidUri file in files)
                         fileProviders.Add(NearShareHelper.CreateNearShareFileFromContentUri(file, ApplicationContext));
 
-                    NearShareSender.SendFilesAsync(
+                    fileTransferOperation = NearShareSender.SendFilesAsync(
                         connectionRequest,
                         fileProviders.ToArray()
                     );
                 }
+
+                if (fileTransferOperation != null)
+                {
+                    FindViewById<ListView>(Resource.Id.listView1)!.Visibility = Android.Views.ViewStates.Gone;
+                    FindViewById<LinearLayout>(Resource.Id.progressUILayout)!.Visibility = Android.Views.ViewStates.Visible;
+
+                    LinearProgressIndicator progressIndicator = FindViewById<LinearProgressIndicator>(Resource.Id.sendProgressIndicator)!;
+                    new EventListener<AsyncOperationWithProgress, NearShareProgress>(fileTransferOperation.Progress()).Event += (AsyncOperationWithProgress sender, NearShareProgress args) =>
+                    {
+                        RunOnUiThread(() =>
+                        {                            
+                            progressIndicator.Max = (int)args.TotalBytesToSend;
+                            progressIndicator.Progress = (int)args.BytesSent;
+                        });
+                    };
+                    await fileTransferOperation.GetAsync();
+                }
+
+                this.Finish();
             }
         }
 
