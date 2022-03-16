@@ -34,7 +34,7 @@ namespace Nearby_Sharing_Windows
             SetContentView(Resource.Layout.activity_share);
 
             BottomSheet = BottomSheetBehavior.From(FindViewById(Resource.Id.standard_bottom_sheet));
-            BottomSheet.SetBottomSheetCallback(new Layout.BottomSheetBehaviorCallback(this));
+            BottomSheet.AddBottomSheetCallback(new Layout.BottomSheetBehaviorCallback(this));
             BottomSheet.State = BottomSheetBehavior.StateHalfExpanded;
 
             DeviceDiscoveryListView = FindViewById<ListView>(Resource.Id.listView1)!;
@@ -122,6 +122,7 @@ namespace Nearby_Sharing_Windows
             if (NearShareSender.IsNearShareSupported(connectionRequest))
             {
                 AsyncOperationWithProgress? fileTransferOperation = null;
+                AsyncOperation? uriTransferOperation = null;
                 if (Intent?.Action == Intent.ActionSend)
                 {
                     if (Intent.HasExtra(Intent.ExtraStream))
@@ -134,10 +135,10 @@ namespace Nearby_Sharing_Windows
                     }
                     else
                     {
-                        await NearShareSender.SendUriAsync(
+                        uriTransferOperation = NearShareSender.SendUriAsync(
                             connectionRequest,
                             Intent.GetStringExtra(Intent.ExtraText)
-                        ).GetAsync();
+                        );
                     }
                 }
                 else if (Intent?.Action == Intent.ActionSend)
@@ -154,21 +155,36 @@ namespace Nearby_Sharing_Windows
                     );
                 }
 
+                FindViewById<ListView>(Resource.Id.listView1)!.Visibility = Android.Views.ViewStates.Gone;
+                FindViewById<LinearLayout>(Resource.Id.progressUILayout)!.Visibility = Android.Views.ViewStates.Visible;
+
+                LinearProgressIndicator progressIndicator = FindViewById<LinearProgressIndicator>(Resource.Id.sendProgressIndicator)!;
                 if (fileTransferOperation != null)
                 {
-                    FindViewById<ListView>(Resource.Id.listView1)!.Visibility = Android.Views.ViewStates.Gone;
-                    FindViewById<LinearLayout>(Resource.Id.progressUILayout)!.Visibility = Android.Views.ViewStates.Visible;
-
-                    LinearProgressIndicator progressIndicator = FindViewById<LinearProgressIndicator>(Resource.Id.sendProgressIndicator)!;
                     new EventListener<AsyncOperationWithProgress, NearShareProgress>(fileTransferOperation.Progress()).Event += (AsyncOperationWithProgress sender, NearShareProgress args) =>
                     {
                         RunOnUiThread(() =>
-                        {                            
+                        {
+#if !DEBUG
+                            try
+                            {
+#endif
                             progressIndicator.Max = (int)args.TotalBytesToSend;
                             progressIndicator.Progress = (int)args.BytesSent;
+#if !DEBUG
+                            }
+                            catch { }
+#endif
                         });
                     };
                     await fileTransferOperation.GetAsync();
+                }
+                else
+                {
+                    System.Diagnostics.Debug.Assert(uriTransferOperation != null, "\"uriTransferOperation\" is null!");
+
+                    // ToDo: progressIndicator.Indeterminate = true;
+                    await uriTransferOperation!.GetAsync();
                 }
 
                 this.Finish();
