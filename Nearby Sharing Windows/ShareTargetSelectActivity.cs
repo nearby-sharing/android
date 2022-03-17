@@ -16,6 +16,7 @@ using System.Linq;
 using ManifestPermission = Android.Manifest.Permission;
 using AndroidUri = Android.Net.Uri;
 using Google.Android.Material.ProgressIndicator;
+using System.Threading.Tasks;
 
 namespace Nearby_Sharing_Windows
 {
@@ -28,7 +29,7 @@ namespace Nearby_Sharing_Windows
 
         ListView DeviceDiscoveryListView;
         BottomSheetBehavior BottomSheet;
-        protected override void OnCreate(Bundle savedInstanceState)
+        protected override async void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_share);
@@ -42,14 +43,14 @@ namespace Nearby_Sharing_Windows
 
             RequestPermissions(new[] { ManifestPermission.AccessCoarseLocation }, 0);
 
-            InitializePlatform();
+            await InitializePlatform();
             StartWatcher();
 
             NearShareSender = new NearShareSender();
         }
 
         ConnectedDevicesPlatform Platform { get; set; }
-        async void InitializePlatform()
+        async Task InitializePlatform()
         {
             Platform = new ConnectedDevicesPlatform(ApplicationContext);
 
