@@ -42,26 +42,18 @@ namespace Nearby_Sharing_Windows
             DeviceDiscoveryListView = FindViewById<ListView>(Resource.Id.listView1)!;
             DeviceDiscoveryListView.ItemClick += DeviceDiscoveryListView_ItemClick;
 
-            RequestPermissions();
+            RequestPermissions(new[] {
+                ManifestPermission.AccessFineLocation,
+                ManifestPermission.AccessCoarseLocation
+            }, 0);
             InitializePlatform();
 
             NearShareSender = new NearShareSender();
         }
 
-        void RequestPermissions()
-        {
-            RequestPermissions(new[] {
-                ManifestPermission.AccessFineLocation,
-                ManifestPermission.AccessCoarseLocation
-            }, 0);
-        }
-
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
         {
-            RunOnUiThread(() =>
-            {
-                StartWatcher();
-            });
+            RunOnUiThread(() => StartWatcher());
         }
 
         ConnectedDevicesPlatform Platform { get; set; }
@@ -86,7 +78,6 @@ namespace Nearby_Sharing_Windows
             System.Diagnostics.Debug.Assert(Watcher == null, "Watcher already has been started!");
 
             List<IRemoteSystemFilter> filters = new List<IRemoteSystemFilter>();
-            //filters.Add(new RemoteSystemDiscoveryTypeFilter(RemoteSystemDiscoveryType.Proximal));
             filters.Add(new RemoteSystemStatusTypeFilter(RemoteSystemStatusType.Any));
             filters.Add(new RemoteSystemAuthorizationKindFilter(RemoteSystemAuthorizationKind.Anonymous));
 
@@ -116,10 +107,7 @@ namespace Nearby_Sharing_Windows
 
         private void OnRemoteSystemUpdated(RemoteSystemWatcher sender, RemoteSystemUpdatedEventArgs args)
         {
-            RunOnUiThread(() =>
-            {
-                UpdateUI();
-            });
+            RunOnUiThread(() => UpdateUI());
         }
 
         private void OnRemoteSystemRemoved(RemoteSystemWatcher sender, RemoteSystemRemovedEventArgs args)
