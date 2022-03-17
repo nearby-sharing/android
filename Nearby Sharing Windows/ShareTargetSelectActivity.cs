@@ -3,33 +3,34 @@
 using Android.App;
 using Android.Content;
 using Android.OS;
+using Android.Runtime;
 using Android.Widget;
+using AndroidX.AppCompat.App;
 using Com.Microsoft.Connecteddevices;
 using Com.Microsoft.Connecteddevices.Remotesystems;
 using Com.Microsoft.Connecteddevices.Remotesystems.Commanding;
 using Com.Microsoft.Connecteddevices.Remotesystems.Commanding.Nearshare;
 using Google.Android.Material.BottomSheet;
+using Google.Android.Material.ProgressIndicator;
 using Java.Util.Concurrent;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using ManifestPermission = Android.Manifest.Permission;
 using AndroidUri = Android.Net.Uri;
-using Google.Android.Material.ProgressIndicator;
-using System.Threading.Tasks;
+using ManifestPermission = Android.Manifest.Permission;
 
 namespace Nearby_Sharing_Windows
 {
     [IntentFilter(new[] { Intent.ActionSend, Intent.ActionSendMultiple }, Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable }, DataMimeType = "*/*", Label = "File")]
     [IntentFilter(new[] { Intent.ActionSend }, Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable }, DataMimeType = "text/plain", Label = "Url / Text")]
     [Activity(Label = "@string/app_name", Theme = "@style/AppTheme.TranslucentOverlay", ConfigurationChanges = Android.Content.PM.ConfigChanges.Orientation | Android.Content.PM.ConfigChanges.ScreenSize)]
-    public class ShareTargetSelectActivity : Activity
+    public class ShareTargetSelectActivity : AppCompatActivity
     {
         NearShareSender NearShareSender;
 
         ListView DeviceDiscoveryListView;
         BottomSheetBehavior BottomSheet;
-        protected override async void OnCreate(Bundle savedInstanceState)
+        protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_share);
@@ -41,16 +42,30 @@ namespace Nearby_Sharing_Windows
             DeviceDiscoveryListView = FindViewById<ListView>(Resource.Id.listView1)!;
             DeviceDiscoveryListView.ItemClick += DeviceDiscoveryListView_ItemClick;
 
-            RequestPermissions(new[] { ManifestPermission.AccessCoarseLocation }, 0);
-
-            await InitializePlatform();
-            StartWatcher();
+            RequestPermissions();
+            InitializePlatform();
 
             NearShareSender = new NearShareSender();
         }
 
+        void RequestPermissions()
+        {
+            RequestPermissions(new[] {
+                ManifestPermission.AccessFineLocation,
+                ManifestPermission.AccessCoarseLocation
+            }, 0);
+        }
+
+        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
+        {
+            RunOnUiThread(() =>
+            {
+                StartWatcher();
+            });
+        }
+
         ConnectedDevicesPlatform Platform { get; set; }
-        async Task InitializePlatform()
+        async void InitializePlatform()
         {
             Platform = new ConnectedDevicesPlatform(ApplicationContext);
 
@@ -71,14 +86,21 @@ namespace Nearby_Sharing_Windows
             System.Diagnostics.Debug.Assert(Watcher == null, "Watcher already has been started!");
 
             List<IRemoteSystemFilter> filters = new List<IRemoteSystemFilter>();
-            filters.Add(new RemoteSystemDiscoveryTypeFilter(RemoteSystemDiscoveryType.Proximal));
+            //filters.Add(new RemoteSystemDiscoveryTypeFilter(RemoteSystemDiscoveryType.Proximal));
             filters.Add(new RemoteSystemStatusTypeFilter(RemoteSystemStatusType.Any));
             filters.Add(new RemoteSystemAuthorizationKindFilter(RemoteSystemAuthorizationKind.Anonymous));
 
             Watcher = new RemoteSystemWatcher(filters);
             new EventListener<RemoteSystemWatcher, RemoteSystemAddedEventArgs>(Watcher.RemoteSystemAdded()).Event += OnRemoteSystemAdded;
+            new EventListener<RemoteSystemWatcher, RemoteSystemUpdatedEventArgs>(Watcher.RemoteSystemUpdated()).Event += OnRemoteSystemUpdated;
             new EventListener<RemoteSystemWatcher, RemoteSystemRemovedEventArgs>(Watcher.RemoteSystemRemoved()).Event += OnRemoteSystemRemoved;
+            new EventListener<RemoteSystemWatcher, RemoteSystemWatcherErrorOccurredEventArgs>(Watcher.ErrorOccurred()).Event += OnWatcherErrorOccurred;
             Watcher.Start();
+        }
+
+        private void OnWatcherErrorOccurred(RemoteSystemWatcher sender, RemoteSystemWatcherErrorOccurredEventArgs args)
+        {
+            string msg = args.Error.Name();
         }
 
         #region RemoteSystemUI
@@ -88,6 +110,14 @@ namespace Nearby_Sharing_Windows
             RunOnUiThread(() =>
             {
                 RemoteSystems.Add(args.RemoteSystem);
+                UpdateUI();
+            });
+        }
+
+        private void OnRemoteSystemUpdated(RemoteSystemWatcher sender, RemoteSystemUpdatedEventArgs args)
+        {
+            RunOnUiThread(() =>
+            {
                 UpdateUI();
             });
         }
@@ -159,6 +189,7 @@ namespace Nearby_Sharing_Windows
                 FindViewById<ListView>(Resource.Id.listView1)!.Visibility = Android.Views.ViewStates.Gone;
                 FindViewById<LinearLayout>(Resource.Id.progressUILayout)!.Visibility = Android.Views.ViewStates.Visible;
 
+                NearShareStatus result;
                 LinearProgressIndicator progressIndicator = FindViewById<LinearProgressIndicator>(Resource.Id.sendProgressIndicator)!;
                 if (fileTransferOperation != null)
                 {
@@ -178,14 +209,14 @@ namespace Nearby_Sharing_Windows
 #endif
                         });
                     };
-                    await fileTransferOperation.GetAsync();
+                    result = (await fileTransferOperation.GetAsync() as NearShareStatus)!;
                 }
                 else
                 {
                     System.Diagnostics.Debug.Assert(uriTransferOperation != null, "\"uriTransferOperation\" is null!");
 
                     // ToDo: progressIndicator.Indeterminate = true;
-                    await uriTransferOperation!.GetAsync();
+                    result = (await uriTransferOperation!.GetAsync() as NearShareStatus)!;
                 }
 
                 this.Finish();
