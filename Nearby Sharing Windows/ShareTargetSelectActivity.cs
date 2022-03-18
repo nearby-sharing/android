@@ -160,7 +160,7 @@ namespace Nearby_Sharing_Windows
                         );
                     }
                 }
-                else if (Intent?.Action == Intent.ActionSend)
+                else if (Intent?.Action == Intent.ActionSendMultiple)
                 {
                     IList files = (Intent.GetParcelableArrayListExtra(Intent.ExtraStream))!;
 
