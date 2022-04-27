@@ -124,7 +124,7 @@ namespace Nearby_Sharing_Windows
             DeviceDiscoveryListView.Adapter = new ArrayAdapter<string>(
                 this,
                 Android.Resource.Layout.SimpleListItem1,
-                RemoteSystems.Select((x) => $"{x.DisplayName} [{x.Status}]").ToArray()
+                RemoteSystems.Select((x) => $"{x.DisplayName} [{x.Kind}, {(x.Apps.FirstOrDefault()?.IsAvailableBySpatialProximity == true ? "Spacial" : "Fast")}]").ToArray()
             );
         }
 
@@ -140,71 +140,78 @@ namespace Nearby_Sharing_Windows
             RemoteSystemConnectionRequest connectionRequest = new RemoteSystemConnectionRequest(remoteSystem);
             if (NearShareSender.IsNearShareSupported(connectionRequest))
             {
-                AsyncOperationWithProgress? fileTransferOperation = null;
-                AsyncOperation? uriTransferOperation = null;
-                if (Intent?.Action == Intent.ActionSend)
+                try
                 {
-                    if (Intent.HasExtra(Intent.ExtraStream))
+                    AsyncOperationWithProgress? fileTransferOperation = null;
+                    AsyncOperation? uriTransferOperation = null;
+                    if (Intent?.Action == Intent.ActionSend)
                     {
-                        AndroidUri file = (Intent.GetParcelableExtra(Intent.ExtraStream) as AndroidUri)!;
-                        fileTransferOperation = NearShareSender.SendFileAsync(
-                            connectionRequest,
-                            NearShareHelper.CreateNearShareFileFromContentUri(file, ApplicationContext)
-                        );
-                    }
-                    else
-                    {
-                        uriTransferOperation = NearShareSender.SendUriAsync(
-                            connectionRequest,
-                            Intent.GetStringExtra(Intent.ExtraText)
-                        );
-                    }
-                }
-                else if (Intent?.Action == Intent.ActionSendMultiple)
-                {
-                    IList files = (Intent.GetParcelableArrayListExtra(Intent.ExtraStream))!;
-
-                    List<INearShareFileProvider> fileProviders = new List<INearShareFileProvider>();
-                    foreach (AndroidUri file in files)
-                        fileProviders.Add(NearShareHelper.CreateNearShareFileFromContentUri(file, ApplicationContext));
-
-                    fileTransferOperation = NearShareSender.SendFilesAsync(
-                        connectionRequest,
-                        fileProviders.ToArray()
-                    );
-                }
-
-                FindViewById<ListView>(Resource.Id.listView1)!.Visibility = Android.Views.ViewStates.Gone;
-                FindViewById<LinearLayout>(Resource.Id.progressUILayout)!.Visibility = Android.Views.ViewStates.Visible;
-
-                NearShareStatus result;
-                LinearProgressIndicator progressIndicator = FindViewById<LinearProgressIndicator>(Resource.Id.sendProgressIndicator)!;
-                if (fileTransferOperation != null)
-                {
-                    new EventListener<AsyncOperationWithProgress, NearShareProgress>(fileTransferOperation.Progress()).Event += (AsyncOperationWithProgress sender, NearShareProgress args) =>
-                    {
-                        RunOnUiThread(() =>
+                        if (Intent.HasExtra(Intent.ExtraStream))
                         {
+                            AndroidUri file = (Intent.GetParcelableExtra(Intent.ExtraStream) as AndroidUri)!;
+                            fileTransferOperation = NearShareSender.SendFileAsync(
+                                connectionRequest,
+                                NearShareHelper.CreateNearShareFileFromContentUri(file, ApplicationContext)
+                            );
+                        }
+                        else
+                        {
+                            uriTransferOperation = NearShareSender.SendUriAsync(
+                                connectionRequest,
+                                Intent.GetStringExtra(Intent.ExtraText)
+                            );
+                        }
+                    }
+                    else if (Intent?.Action == Intent.ActionSendMultiple)
+                    {
+                        IList files = (Intent.GetParcelableArrayListExtra(Intent.ExtraStream))!;
+
+                        List<INearShareFileProvider> fileProviders = new List<INearShareFileProvider>();
+                        foreach (AndroidUri file in files)
+                            fileProviders.Add(NearShareHelper.CreateNearShareFileFromContentUri(file, ApplicationContext));
+
+                        fileTransferOperation = NearShareSender.SendFilesAsync(
+                            connectionRequest,
+                            fileProviders.ToArray()
+                        );
+                    }
+
+                    FindViewById<ListView>(Resource.Id.listView1)!.Visibility = Android.Views.ViewStates.Gone;
+                    FindViewById<LinearLayout>(Resource.Id.progressUILayout)!.Visibility = Android.Views.ViewStates.Visible;
+
+                    NearShareStatus result;
+                    LinearProgressIndicator progressIndicator = FindViewById<LinearProgressIndicator>(Resource.Id.sendProgressIndicator)!;
+                    if (fileTransferOperation != null)
+                    {
+                        new EventListener<AsyncOperationWithProgress, NearShareProgress>(fileTransferOperation.Progress()).Event += (AsyncOperationWithProgress sender, NearShareProgress args) =>
+                        {
+                            RunOnUiThread(() =>
+                            {
 #if !DEBUG
                             try
                             {
 #endif
-                            progressIndicator.Max = (int)args.TotalBytesToSend;
-                            progressIndicator.Progress = (int)args.BytesSent;
+                                progressIndicator.Max = (int)args.TotalBytesToSend;
+                                progressIndicator.Progress = (int)args.BytesSent;
 #if !DEBUG
                             }
                             catch { }
 #endif
-                        });
-                    };
-                    result = (await fileTransferOperation.GetAsync() as NearShareStatus)!;
-                }
-                else
-                {
-                    System.Diagnostics.Debug.Assert(uriTransferOperation != null, "\"uriTransferOperation\" is null!");
+                            });
+                        };
+                        result = (await fileTransferOperation.GetAsync() as NearShareStatus)!;
+                    }
+                    else
+                    {
+                        System.Diagnostics.Debug.Assert(uriTransferOperation != null, "\"uriTransferOperation\" is null!");
 
-                    // ToDo: progressIndicator.Indeterminate = true;
-                    result = (await uriTransferOperation!.GetAsync() as NearShareStatus)!;
+                        // ToDo: progressIndicator.Indeterminate = true;
+                        result = (await uriTransferOperation!.GetAsync() as NearShareStatus)!;
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    System.Diagnostics.Debugger.Break();
                 }
 
                 this.Finish();
