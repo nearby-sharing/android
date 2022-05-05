@@ -4,15 +4,17 @@ using Android.App;
 using Android.Content;
 using Android.OS;
 using Android.Runtime;
+using Android.Views;
 using Android.Widget;
 using AndroidX.AppCompat.App;
 using Com.Microsoft.Connecteddevices;
 using Com.Microsoft.Connecteddevices.Remotesystems;
 using Com.Microsoft.Connecteddevices.Remotesystems.Commanding;
 using Com.Microsoft.Connecteddevices.Remotesystems.Commanding.Nearshare;
-using Google.Android.Material.BottomSheet;
 using Google.Android.Material.ProgressIndicator;
+using Google.Android.Material.Snackbar;
 using Java.Util.Concurrent;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,15 +31,16 @@ namespace Nearby_Sharing_Windows
         NearShareSender NearShareSender;
 
         ListView DeviceDiscoveryListView;
-        BottomSheetBehavior BottomSheet;
+        TextView StatusTextView;
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_share);
 
-            BottomSheet = BottomSheetBehavior.From(FindViewById(Resource.Id.standard_bottom_sheet));
-            BottomSheet.AddBottomSheetCallback(new Layout.BottomSheetBehaviorCallback(this));
-            BottomSheet.State = BottomSheetBehavior.StateHalfExpanded;
+            if (Build.VERSION.SdkInt >= BuildVersionCodes.Kitkat)
+                Window!.SetFlags(WindowManagerFlags.LayoutNoLimits, WindowManagerFlags.LayoutNoLimits);
+
+            StatusTextView = FindViewById<TextView>(Resource.Id.statusTextView)!;
 
             DeviceDiscoveryListView = FindViewById<ListView>(Resource.Id.listView1)!;
             DeviceDiscoveryListView.ItemClick += DeviceDiscoveryListView_ItemClick;
@@ -176,7 +179,7 @@ namespace Nearby_Sharing_Windows
                         );
                     }
 
-                    FindViewById<ListView>(Resource.Id.listView1)!.Visibility = Android.Views.ViewStates.Gone;
+                    FindViewById<View>(Resource.Id.selectDeviceLayout)!.Visibility = Android.Views.ViewStates.Gone;
                     FindViewById<LinearLayout>(Resource.Id.progressUILayout)!.Visibility = Android.Views.ViewStates.Visible;
 
                     NearShareStatus result;
@@ -193,6 +196,9 @@ namespace Nearby_Sharing_Windows
 #endif
                                 progressIndicator.Max = (int)args.TotalBytesToSend;
                                 progressIndicator.Progress = (int)args.BytesSent;
+
+                                if (args.TotalFilesToSend != 0 && args.TotalBytesToSend != 0)
+                                    StatusTextView.Text = $"Sending ... {args.FilesSent}/{args.TotalFilesToSend} files ... {Math.Round((decimal)args.BytesSent / args.TotalBytesToSend * 100)}%";
 #if !DEBUG
                             }
                             catch { }
@@ -216,6 +222,8 @@ namespace Nearby_Sharing_Windows
 
                 this.Finish();
             }
+            else
+                Snackbar.Make(Window.DecorView, "Not supported", Snackbar.LengthLong).Show();
         }
 
         public override void OnBackPressed()

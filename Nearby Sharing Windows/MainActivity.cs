@@ -3,12 +3,12 @@ using Android.Content;
 using Android.OS;
 using Android.Runtime;
 using AndroidX.AppCompat.App;
-using AndroidX.AppCompat.Widget;
+using Google.Android.Material.AppBar;
 using Google.Android.Material.FloatingActionButton;
 
 namespace Nearby_Sharing_Windows
 {
-    [Activity(Label = "@string/app_name", Theme = "@style/AppTheme.NoActionBar", MainLauncher = true)]
+    [Activity(Label = "@string/app_name", Theme = "@style/AppTheme", MainLauncher = true)]
     public class MainActivity : AppCompatActivity
     {
         protected override void OnCreate(Bundle savedInstanceState)
@@ -16,7 +16,7 @@ namespace Nearby_Sharing_Windows
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_main);
 
-            Toolbar toolbar = FindViewById<Toolbar>(Resource.Id.toolbar);
+            MaterialToolbar toolbar = FindViewById<MaterialToolbar>(Resource.Id.toolbar);
             SetSupportActionBar(toolbar);
             SupportActionBar.Title = "Nearby Sharing";
             SupportActionBar.Subtitle = "Send data to Windows 10 / 11";
