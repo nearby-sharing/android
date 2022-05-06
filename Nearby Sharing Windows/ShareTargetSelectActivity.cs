@@ -38,7 +38,10 @@ namespace Nearby_Sharing_Windows
             SetContentView(Resource.Layout.activity_share);
 
             if (Build.VERSION.SdkInt >= BuildVersionCodes.Kitkat)
+            {
                 Window!.SetFlags(WindowManagerFlags.LayoutNoLimits, WindowManagerFlags.LayoutNoLimits);
+                Window.DecorView.SystemUiVisibility = (StatusBarVisibility)SystemUiFlags.LightNavigationBar;
+            }
 
             StatusTextView = FindViewById<TextView>(Resource.Id.statusTextView)!;
 

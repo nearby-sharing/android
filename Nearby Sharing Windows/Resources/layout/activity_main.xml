@@ -25,7 +25,7 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <RelativeLayout
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
@@ -98,9 +98,39 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:text=" - Allow connections by anyone (You'll still get prompted)" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center">
+                <Button
+                    android:id="@+id/sendButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:text="Send"
+                    app:icon="@drawable/file_upload_48"
+                    app:iconTint="#fff"
+                    style="@style/Widget.Material3.Button.Icon"
+                    app:backgroundTint="#0B57D0" />
+                <Button
+                    android:id="@+id/receiveButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:enabled="false"
+                    android:text="Send"
+                    app:icon="@drawable/file_download_48"
+                    app:iconTint="#fff"
+                    style="@style/Widget.Material3.Button.Icon"
+                    app:backgroundTint="#0B57D0" />
+            </LinearLayout>
         </LinearLayout>
 
-    </RelativeLayout>
+    </androidx.core.widget.NestedScrollView>
+
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/floating_action_button"
@@ -111,5 +141,15 @@
         android:src="@drawable/outline_share_24"
         app:tint="?attr/colorOnPrimary"
         app:backgroundTint="?attr/colorPrimary"/>
+
+    <!-- <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/open_nearby_share_android_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|left"
+        android:layout_margin="16dp"
+        android:src="@drawable/nearby_share_48"
+        app:tint="?attr/colorOnPrimary"
+        app:backgroundTint="?attr/colorPrimary"/> -->
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

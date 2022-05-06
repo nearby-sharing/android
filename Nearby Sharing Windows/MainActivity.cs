@@ -2,6 +2,7 @@
 using Android.Content;
 using Android.OS;
 using Android.Runtime;
+using Android.Widget;
 using AndroidX.AppCompat.App;
 using Google.Android.Material.AppBar;
 using Google.Android.Material.FloatingActionButton;
@@ -21,12 +22,23 @@ namespace Nearby_Sharing_Windows
             SupportActionBar.Title = "Nearby Sharing";
             SupportActionBar.Subtitle = "Send data to Windows 10 / 11";
 
+            //FloatingActionButton openNearbySharingFab = FindViewById<FloatingActionButton>(Resource.Id.open_nearby_share_android_fab);
+            //openNearbySharingFab.Click += delegate
+            //{
+            //    Intent intent = new Intent("com.google.android.gms.SHARE_NEARBY");
+            //    intent.SetPackage("com.google.android.gms");
+            //    StartActivity(intent);
+            //};
+
             FloatingActionButton fab = FindViewById<FloatingActionButton>(Resource.Id.floating_action_button);
-            fab.Click += Fab_Click;
+            fab.Click += SendButton_Click;
+
+            Button sendButton = FindViewById<Button>(Resource.Id.sendButton);
+            sendButton.Click += SendButton_Click;
         }
 
         const int FilePickCode = 0x1;
-        private void Fab_Click(object sender, System.EventArgs e)
+        private void SendButton_Click(object sender, System.EventArgs e)
         {
             StartActivityForResult(
                 new Intent(Intent.ActionOpenDocument)
