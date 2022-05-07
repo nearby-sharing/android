@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="1" android:versionName="0.1.0" package="de.shortdev.nearby_sharing_windows" android:installLocation="auto">
-	<uses-sdk android:minSdkVersion="19" android:targetSdkVersion="30" />
+	<uses-sdk android:minSdkVersion="19" android:targetSdkVersion="31" />
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.BLUETOOTH" />
 	<uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />

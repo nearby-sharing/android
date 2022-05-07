@@ -112,9 +112,7 @@
                     android:layout_margin="10dp"
                     android:text="Send"
                     app:icon="@drawable/file_upload_48"
-                    app:iconTint="#fff"
-                    style="@style/Widget.Material3.Button.Icon"
-                    app:backgroundTint="#0B57D0" />
+                    style="@style/AppTheme.NearbyShareButton" />
                 <Button
                     android:id="@+id/receiveButton"
                     android:layout_width="wrap_content"
@@ -123,9 +121,7 @@
                     android:enabled="false"
                     android:text="Send"
                     app:icon="@drawable/file_download_48"
-                    app:iconTint="#fff"
-                    style="@style/Widget.Material3.Button.Icon"
-                    app:backgroundTint="#0B57D0" />
+                    style="@style/AppTheme.NearbyShareButton" />
             </LinearLayout>
         </LinearLayout>
 

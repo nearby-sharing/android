@@ -25,7 +25,7 @@ namespace Nearby_Sharing_Windows
 {
     [IntentFilter(new[] { Intent.ActionSend, Intent.ActionSendMultiple }, Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable }, DataMimeType = "*/*", Label = "Share file")]
     [IntentFilter(new[] { Intent.ActionSend }, Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable }, DataMimeType = "text/plain", Label = "Share url")]
-    [Activity(Label = "@string/app_name", Theme = "@style/AppTheme.TranslucentOverlay", ConfigurationChanges = Android.Content.PM.ConfigChanges.Orientation | Android.Content.PM.ConfigChanges.ScreenSize)]
+    [Activity(Label = "@string/app_name", Exported = true, Theme = "@style/AppTheme.TranslucentOverlay", ConfigurationChanges = Android.Content.PM.ConfigChanges.Orientation | Android.Content.PM.ConfigChanges.ScreenSize)]
     public class ShareTargetSelectActivity : AppCompatActivity
     {
         NearShareSender NearShareSender;
@@ -55,6 +55,7 @@ namespace Nearby_Sharing_Windows
             InitializePlatform();
 
             NearShareSender = new NearShareSender();
+
         }
 
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
@@ -182,13 +183,16 @@ namespace Nearby_Sharing_Windows
                         );
                     }
 
-                    FindViewById<View>(Resource.Id.selectDeviceLayout)!.Visibility = Android.Views.ViewStates.Gone;
-                    FindViewById<LinearLayout>(Resource.Id.progressUILayout)!.Visibility = Android.Views.ViewStates.Visible;
+                    FindViewById<View>(Resource.Id.selectDeviceLayout)!.Visibility = ViewStates.Gone;
+                    FindViewById<View>(Resource.Id.sendingDataLayout)!.Visibility = ViewStates.Visible;
+
+                    FindViewById<TextView>(Resource.Id.currentDeviceTextView)!.Text = remoteSystem.DisplayName;
 
                     NearShareStatus result;
-                    LinearProgressIndicator progressIndicator = FindViewById<LinearProgressIndicator>(Resource.Id.sendProgressIndicator)!;
+                    CircularProgressIndicator progressIndicator = FindViewById<CircularProgressIndicator>(Resource.Id.sendProgressIndicator)!;
                     if (fileTransferOperation != null)
                     {
+                        bool requestAccepted = false;
                         new EventListener<AsyncOperationWithProgress, NearShareProgress>(fileTransferOperation.Progress()).Event += (AsyncOperationWithProgress sender, NearShareProgress args) =>
                         {
                             RunOnUiThread(() =>
@@ -201,7 +205,15 @@ namespace Nearby_Sharing_Windows
                                 progressIndicator.Progress = (int)args.BytesSent;
 
                                 if (args.TotalFilesToSend != 0 && args.TotalBytesToSend != 0)
+                                {
                                     StatusTextView.Text = $"Sending ... {args.FilesSent}/{args.TotalFilesToSend} files ... {Math.Round((decimal)args.BytesSent / args.TotalBytesToSend * 100)}%";
+                                    if (!requestAccepted)
+                                    {
+                                        requestAccepted = true;
+                                        FindViewById(Resource.Id.materialCardView1)!.Visibility = ViewStates.Gone;
+                                        FindViewById(Resource.Id.progressUILayout)!.Visibility = ViewStates.Visible;
+                                    }
+                                }
 #if !DEBUG
                             }
                             catch { }
