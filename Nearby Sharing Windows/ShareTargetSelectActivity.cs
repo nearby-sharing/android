@@ -26,12 +26,13 @@ namespace Nearby_Sharing_Windows
     [IntentFilter(new[] { Intent.ActionSend, Intent.ActionSendMultiple }, Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable }, DataMimeType = "*/*", Label = "Share file")]
     [IntentFilter(new[] { Intent.ActionSend }, Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable }, DataMimeType = "text/plain", Label = "Share url")]
     [Activity(Label = "@string/app_name", Exported = true, Theme = "@style/AppTheme.TranslucentOverlay", ConfigurationChanges = Android.Content.PM.ConfigChanges.Orientation | Android.Content.PM.ConfigChanges.ScreenSize)]
-    public class ShareTargetSelectActivity : AppCompatActivity
+    public class ShareTargetSelectActivity : AppCompatActivity, View.IOnApplyWindowInsetsListener
     {
         NearShareSender NearShareSender;
 
         ListView DeviceDiscoveryListView;
         TextView StatusTextView;
+        FrameLayout bottomSheetFrame;
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -40,12 +41,14 @@ namespace Nearby_Sharing_Windows
             if (Build.VERSION.SdkInt >= BuildVersionCodes.Kitkat)
             {
                 Window!.SetFlags(WindowManagerFlags.LayoutNoLimits, WindowManagerFlags.LayoutNoLimits);
-                Window.DecorView.SystemUiVisibility = (StatusBarVisibility)SystemUiFlags.LightNavigationBar;
+                Window!.DecorView.SystemUiVisibility = (StatusBarVisibility)SystemUiFlags.LightNavigationBar;
+                Window!.DecorView.SetOnApplyWindowInsetsListener(this);
             }
 
             StatusTextView = FindViewById<TextView>(Resource.Id.statusTextView)!;
-
             DeviceDiscoveryListView = FindViewById<ListView>(Resource.Id.listView1)!;
+            bottomSheetFrame = FindViewById<FrameLayout>(Resource.Id.standard_bottom_sheet)!;
+
             DeviceDiscoveryListView.ItemClick += DeviceDiscoveryListView_ItemClick;
 
             RequestPermissions(new[] {
@@ -55,12 +58,31 @@ namespace Nearby_Sharing_Windows
             InitializePlatform();
 
             NearShareSender = new NearShareSender();
-
         }
+
+        #region UI
+        public WindowInsets? OnApplyWindowInsets(View? v, WindowInsets? windowInsets)
+        {
+            if (windowInsets != null)
+            {
+                var insets = windowInsets.GetInsetsIgnoringVisibility(WindowInsets.Type.SystemBars());
+                bottomSheetFrame.SetPadding(
+                    insets.Left,
+                    /* insets.Top */ 0,
+                    insets.Right,
+                    insets.Bottom
+                );
+            }
+            return windowInsets;
+        }
+        #endregion
 
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
         {
-            RunOnUiThread(() => StartWatcher());
+            if (grantResults.Contains(Android.Content.PM.Permission.Denied))
+                Snackbar.Make(Window!.DecorView, "Error: Missing permission!", Snackbar.LengthLong).Show();
+            else
+                RunOnUiThread(() => StartWatcher());
         }
 
         ConnectedDevicesPlatform Platform { get; set; }
@@ -99,6 +121,7 @@ namespace Nearby_Sharing_Windows
         private void OnWatcherErrorOccurred(RemoteSystemWatcher sender, RemoteSystemWatcherErrorOccurredEventArgs args)
         {
             string msg = args.Error.Name();
+            Snackbar.Make(Window!.DecorView, $"Error: {msg}", Snackbar.LengthLong).Show();
         }
 
         #region RemoteSystemUI

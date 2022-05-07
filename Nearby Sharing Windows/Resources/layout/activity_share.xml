@@ -6,122 +6,124 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/transparent"
-    android:fitsSystemWindows="false">
+    android:fitsSystemWindows="true">
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_gravity="bottom"
         android:id="@+id/standard_bottom_sheet"
-        android:layout_height="300dp"
-        android:padding="16dp"
+        android:layout_height="350dp"
         android:elevation="20dp"
         android:background="@drawable/bottom_sheet_header">
 
-        <LinearLayout
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <ProgressBar
-                style="@android:style/Widget.Material.ProgressBar.Small"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:minWidth="25px"
-                android:minHeight="25px"
-                android:indeterminate="true" />
-            <TextView
+            android:padding="16dp">
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Loading ..."
-                android:layout_marginLeft="10dp"
-                android:id="@+id/statusTextView" />
-        </LinearLayout>
-
-        <RelativeLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
-            android:id="@+id/sendingDataLayout">
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/materialCardView1"
-                android:layout_marginTop="5dp"
-                style="?attr/materialCardViewFilledStyle">
+                android:orientation="horizontal">
+                <ProgressBar
+                    style="@android:style/Widget.Material.ProgressBar.Small"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minWidth="25px"
+                    android:minHeight="25px"
+                    android:indeterminate="true" />
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    android:text="Waiting for acceptance..." />
-            </com.google.android.material.card.MaterialCardView>
+                    android:text="Loading ..."
+                    android:layout_marginLeft="10dp"
+                    android:id="@+id/statusTextView" />
+            </LinearLayout>
 
+            <RelativeLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                android:id="@+id/sendingDataLayout">
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/materialCardView1"
+                    android:layout_marginTop="5dp"
+                    style="?attr/materialCardViewFilledStyle">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="10dp"
+                        android:text="Waiting for acceptance..." />
+                </com.google.android.material.card.MaterialCardView>
+
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:id="@+id/progressUILayout"
+                    android:visibility="gone">
+                    <RelativeLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+                        <com.google.android.material.progressindicator.CircularProgressIndicator
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:layout_marginBottom="5dp"
+                            android:id="@+id/sendProgressIndicator"
+                            android:progress="0"
+                            app:indicatorSize="70dp"
+                            android:layout_centerInParent="true" />
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            app:cardCornerRadius="50dp"
+                            app:cardElevation="0dp"
+                            android:background="@android:color/transparent">
+                            <ImageView
+                                android:layout_width="50dp"
+                                android:layout_height="50dp"
+                                android:scaleType="centerCrop"
+                                android:src="@drawable/user"/>
+                        </androidx.cardview.widget.CardView>
+                    </RelativeLayout>
+                    <TextView
+                        android:id="@+id/currentDeviceTextView"
+                        android:layout_marginTop="5dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:textAppearance="?attr/textAppearanceSubtitle2"
+                        android:text="Device"/>
+                </LinearLayout>
+
+                <Button
+                    android:id="@id/cancel_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Cancel"
+                    android:layout_alignParentBottom="true"
+                    android:enabled="false"
+                    style="?attr/materialButtonOutlinedStyle" />
+            </RelativeLayout>
 
             <LinearLayout
                 android:orientation="vertical"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:id="@+id/progressUILayout"
-                android:visibility="gone">
-                <RelativeLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-                    <com.google.android.material.progressindicator.CircularProgressIndicator
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="5dp"
-                        android:layout_marginBottom="5dp"
-                        android:id="@+id/sendProgressIndicator"
-                        android:progress="0"
-                        app:indicatorSize="70dp"
-                        android:layout_centerInParent="true" />
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerInParent="true"
-                        app:cardCornerRadius="50dp"
-                        app:cardElevation="0dp"
-                        android:background="@android:color/transparent">
-                        <ImageView
-                            android:layout_width="50dp"
-                            android:layout_height="50dp"
-                            android:scaleType="centerCrop"
-                            android:src="@drawable/user"/>
-                    </androidx.cardview.widget.CardView>
-                </RelativeLayout>
-                <TextView
-                    android:id="@+id/currentDeviceTextView"
-                    android:layout_marginTop="5dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:textAppearance="?attr/textAppearanceSubtitle2"
-                    android:text="Device"/>
-            </LinearLayout>
-
-            <Button
-                android:id="@id/cancel_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Cancel"
-                android:layout_alignParentBottom="true"
-                android:enabled="false"
-                style="?attr/materialButtonOutlinedStyle" />
-        </RelativeLayout>
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="40dp"
-            android:id="@+id/selectDeviceLayout">
-            <ListView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:id="@+id/listView1"
-                android:background="#fff"/>
-        </LinearLayout>
-
+                android:layout_marginTop="40dp"
+                android:id="@+id/selectDeviceLayout">
+                <ListView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/listView1"
+                    android:background="#fff"/>
+            </LinearLayout>
+        </FrameLayout>
     </FrameLayout>
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
