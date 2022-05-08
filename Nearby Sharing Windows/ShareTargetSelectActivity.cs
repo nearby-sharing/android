@@ -65,13 +65,27 @@ namespace Nearby_Sharing_Windows
         {
             if (windowInsets != null)
             {
-                var insets = windowInsets.GetInsetsIgnoringVisibility(WindowInsets.Type.SystemBars());
-                bottomSheetFrame.SetPadding(
-                    insets.Left,
-                    /* insets.Top */ 0,
-                    insets.Right,
-                    insets.Bottom
-                );
+                if(Build.VERSION.SdkInt >= BuildVersionCodes.R)
+                {
+                    var insets = windowInsets.GetInsetsIgnoringVisibility(WindowInsets.Type.SystemBars());
+                    bottomSheetFrame.SetPadding(
+                        insets.Left,
+                        /* insets.Top */ 0,
+                        insets.Right,
+                        insets.Bottom
+                    );
+                }
+                else
+                {
+#pragma warning disable CS0618 // Type or member is obsolete
+                    bottomSheetFrame.SetPadding(
+                        windowInsets.StableInsetLeft,
+                        /* insets.Top */ 0,
+                        windowInsets.StableInsetRight,
+                        windowInsets.StableInsetBottom
+                    );
+#pragma warning restore CS0618 // Type or member is obsolete
+                }
             }
             return windowInsets;
         }

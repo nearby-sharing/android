@@ -119,7 +119,7 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
                     android:enabled="false"
-                    android:text="Send"
+                    android:text="Receive"
                     app:icon="@drawable/file_download_48"
                     style="@style/AppTheme.NearbyShareButton" />
             </LinearLayout>
