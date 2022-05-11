@@ -271,7 +271,12 @@ namespace Nearby_Sharing_Windows
                         result = (await uriTransferOperation!.GetAsync() as NearShareStatus)!;
                     }
 
-                    Snackbar.Make(Window.DecorView, $"Status: {result.Name()}", Snackbar.LengthLong).Show();
+                    if (result == NearShareStatus.Completed)
+                    {
+                        FindViewById(Resource.Id.doneIndicatorImageView)!.Visibility = ViewStates.Visible;
+                    }
+                    else
+                        Snackbar.Make(Window.DecorView, $"Status: {result.Name()}", Snackbar.LengthLong).Show();
                 }
                 catch (Exception ex)
                 {
