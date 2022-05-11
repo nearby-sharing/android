@@ -17,7 +17,9 @@ using Java.Util.Concurrent;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Threading.Tasks;
 using AndroidUri = Android.Net.Uri;
 using ManifestPermission = Android.Manifest.Permission;
 
@@ -30,13 +32,19 @@ namespace Nearby_Sharing_Windows
     {
         NearShareSender NearShareSender;
 
-        ListView DeviceDiscoveryListView;
-        TextView StatusTextView;
-        FrameLayout bottomSheetFrame;
-        protected override void OnCreate(Bundle savedInstanceState)
+        [AllowNull] ListView DeviceDiscoveryListView;
+        [AllowNull] TextView StatusTextView;
+        [AllowNull] FrameLayout bottomSheetFrame;
+        [AllowNull] Button cancelButton;
+        protected override void OnCreate(Bundle? savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_share);
+
+            StatusTextView = FindViewById<TextView>(Resource.Id.statusTextView)!;
+            DeviceDiscoveryListView = FindViewById<ListView>(Resource.Id.listView1)!;
+            bottomSheetFrame = FindViewById<FrameLayout>(Resource.Id.standard_bottom_sheet)!;
+            cancelButton = FindViewById<Button>(Resource.Id.cancel_button)!;
 
             if (Build.VERSION.SdkInt >= BuildVersionCodes.Kitkat)
             {
@@ -44,10 +52,6 @@ namespace Nearby_Sharing_Windows
                 Window!.DecorView.SystemUiVisibility = (StatusBarVisibility)SystemUiFlags.LightNavigationBar;
                 Window!.DecorView.SetOnApplyWindowInsetsListener(this);
             }
-
-            StatusTextView = FindViewById<TextView>(Resource.Id.statusTextView)!;
-            DeviceDiscoveryListView = FindViewById<ListView>(Resource.Id.listView1)!;
-            bottomSheetFrame = FindViewById<FrameLayout>(Resource.Id.standard_bottom_sheet)!;
 
             DeviceDiscoveryListView.ItemClick += DeviceDiscoveryListView_ItemClick;
 
@@ -65,7 +69,7 @@ namespace Nearby_Sharing_Windows
         {
             if (windowInsets != null)
             {
-                if(Build.VERSION.SdkInt >= BuildVersionCodes.R)
+                if (Build.VERSION.SdkInt >= BuildVersionCodes.R)
                 {
                     var insets = windowInsets.GetInsetsIgnoringVisibility(WindowInsets.Type.SystemBars());
                     bottomSheetFrame.SetPadding(
@@ -266,11 +270,15 @@ namespace Nearby_Sharing_Windows
                         // ToDo: progressIndicator.Indeterminate = true;
                         result = (await uriTransferOperation!.GetAsync() as NearShareStatus)!;
                     }
+
+                    Snackbar.Make(Window.DecorView, $"Status: {result.Name()}", Snackbar.LengthLong).Show();
                 }
-                catch (System.Exception ex)
+                catch (Exception ex)
                 {
-                    System.Diagnostics.Debugger.Break();
+                    Snackbar.Make(Window.DecorView, $"Error: {ex.Message}", Snackbar.LengthLong).Show();
                 }
+
+                await Task.Delay(1500);
 
                 this.Finish();
             }
