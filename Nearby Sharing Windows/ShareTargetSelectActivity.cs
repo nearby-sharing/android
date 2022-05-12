@@ -57,7 +57,9 @@ namespace Nearby_Sharing_Windows
 
             RequestPermissions(new[] {
                 ManifestPermission.AccessFineLocation,
-                ManifestPermission.AccessCoarseLocation
+                ManifestPermission.AccessCoarseLocation,
+                ManifestPermission.BluetoothScan,
+                ManifestPermission.BluetoothConnect
             }, 0);
             InitializePlatform();
 
