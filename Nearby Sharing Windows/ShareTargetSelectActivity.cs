@@ -55,12 +55,22 @@ namespace Nearby_Sharing_Windows
 
             DeviceDiscoveryListView.ItemClick += DeviceDiscoveryListView_ItemClick;
 
-            RequestPermissions(new[] {
-                ManifestPermission.AccessFineLocation,
-                ManifestPermission.AccessCoarseLocation,
-                ManifestPermission.BluetoothScan,
-                ManifestPermission.BluetoothConnect
-            }, 0);
+            if (Build.VERSION.SdkInt >= BuildVersionCodes.R)
+            {
+                RequestPermissions(new[] {
+                    ManifestPermission.AccessFineLocation,
+                    ManifestPermission.AccessCoarseLocation,
+                    ManifestPermission.BluetoothScan,
+                    ManifestPermission.BluetoothConnect
+                }, 0);
+            }
+            else
+            {
+                RequestPermissions(new[] {
+                    ManifestPermission.AccessFineLocation,
+                    ManifestPermission.AccessCoarseLocation
+                }, 0);
+            }
             InitializePlatform();
 
             NearShareSender = new NearShareSender();
