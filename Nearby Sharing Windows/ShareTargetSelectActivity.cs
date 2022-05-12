@@ -55,7 +55,7 @@ namespace Nearby_Sharing_Windows
 
             DeviceDiscoveryListView.ItemClick += DeviceDiscoveryListView_ItemClick;
 
-            if (Build.VERSION.SdkInt >= BuildVersionCodes.R)
+            if (Build.VERSION.SdkInt >= BuildVersionCodes.S)
             {
                 RequestPermissions(new[] {
                     ManifestPermission.AccessFineLocation,
