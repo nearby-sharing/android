@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="4" android:versionName="0.3.0" package="de.shortdev.nearby_sharing_windows" android:installLocation="auto">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="5" android:versionName="0.3.1" package="de.shortdev.nearby_sharing_windows" android:installLocation="auto">
 	<uses-sdk android:minSdkVersion="19" android:targetSdkVersion="31" />
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.BLUETOOTH" />
