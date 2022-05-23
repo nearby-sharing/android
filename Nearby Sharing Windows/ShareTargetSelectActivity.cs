@@ -313,7 +313,7 @@ namespace Nearby_Sharing_Windows
 
         private void CancelButton_Click(object sender, EventArgs e)
         {
-            fileTransferOperation?.Cancel(false);
+            fileTransferOperation?.Cancel(true);
         }
 
         #region Finish
