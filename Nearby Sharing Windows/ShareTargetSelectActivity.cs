@@ -30,7 +30,7 @@ namespace Nearby_Sharing_Windows
     [Activity(Label = "@string/app_name", Exported = true, Theme = "@style/AppTheme.TranslucentOverlay", ConfigurationChanges = Android.Content.PM.ConfigChanges.Orientation | Android.Content.PM.ConfigChanges.ScreenSize)]
     public class ShareTargetSelectActivity : AppCompatActivity, View.IOnApplyWindowInsetsListener
     {
-        NearShareSender NearShareSender;
+        [AllowNull] NearShareSender NearShareSender;
 
         [AllowNull] ListView DeviceDiscoveryListView;
         [AllowNull] TextView StatusTextView;
@@ -54,6 +54,7 @@ namespace Nearby_Sharing_Windows
             }
 
             DeviceDiscoveryListView.ItemClick += DeviceDiscoveryListView_ItemClick;
+            cancelButton.Click += CancelButton_Click;
 
             if (Build.VERSION.SdkInt >= BuildVersionCodes.S)
             {
@@ -115,7 +116,8 @@ namespace Nearby_Sharing_Windows
                 RunOnUiThread(() => StartWatcher());
         }
 
-        ConnectedDevicesPlatform Platform { get; set; }
+        #region Initialization
+        [AllowNull] ConnectedDevicesPlatform Platform { get; set; }
         async void InitializePlatform()
         {
             Platform = new ConnectedDevicesPlatform(ApplicationContext);
@@ -130,8 +132,10 @@ namespace Nearby_Sharing_Windows
             ConnectedDevicesAccount account = ConnectedDevicesAccount.AnonymousAccount;
             await Platform.AccountManager.AddAccountAsync(account).GetAsync();
         }
+        #endregion
 
-        RemoteSystemWatcher Watcher { get; set; }
+        #region Watcher
+        [AllowNull] RemoteSystemWatcher Watcher { get; set; }
         void StartWatcher()
         {
             System.Diagnostics.Debug.Assert(Watcher == null, "Watcher already has been started!");
@@ -153,6 +157,7 @@ namespace Nearby_Sharing_Windows
             string msg = args.Error.Name();
             Snackbar.Make(Window!.DecorView, $"Error: {msg}", Snackbar.LengthLong).Show();
         }
+        #endregion
 
         #region RemoteSystemUI
         List<RemoteSystem> RemoteSystems = new List<RemoteSystem>();
@@ -195,6 +200,7 @@ namespace Nearby_Sharing_Windows
         }
         #endregion
 
+        AsyncOperationWithProgress? fileTransferOperation = null;
         private async void SendData(RemoteSystem remoteSystem)
         {
             RemoteSystemConnectionRequest connectionRequest = new RemoteSystemConnectionRequest(remoteSystem);
@@ -202,7 +208,6 @@ namespace Nearby_Sharing_Windows
             {
                 try
                 {
-                    AsyncOperationWithProgress? fileTransferOperation = null;
                     AsyncOperation? uriTransferOperation = null;
                     if (Intent?.Action == Intent.ActionSend)
                     {
@@ -251,8 +256,8 @@ namespace Nearby_Sharing_Windows
                             RunOnUiThread(() =>
                             {
 #if !DEBUG
-                            try
-                            {
+                                try
+                                {
 #endif
                                 progressIndicator.Max = (int)args.TotalBytesToSend;
                                 progressIndicator.Progress = (int)args.BytesSent;
@@ -268,12 +273,15 @@ namespace Nearby_Sharing_Windows
                                     }
                                 }
 #if !DEBUG
-                            }
-                            catch { }
+                                }
+                                catch { }
 #endif
                             });
                         };
+                        cancelButton.Enabled = true;
                         result = (await fileTransferOperation.GetAsync() as NearShareStatus)!;
+                        cancelButton.Enabled = false;
+                        fileTransferOperation = null;
                     }
                     else
                     {
@@ -288,11 +296,11 @@ namespace Nearby_Sharing_Windows
                         FindViewById(Resource.Id.doneIndicatorImageView)!.Visibility = ViewStates.Visible;
                     }
                     else
-                        Snackbar.Make(Window.DecorView, $"Status: {result.Name()}", Snackbar.LengthLong).Show();
+                        Snackbar.Make(Window!.DecorView, $"Status: {result.Name()}", Snackbar.LengthLong).Show();
                 }
                 catch (Exception ex)
                 {
-                    Snackbar.Make(Window.DecorView, $"Error: {ex.Message}", Snackbar.LengthLong).Show();
+                    Snackbar.Make(Window!.DecorView, $"Error: {ex.Message}", Snackbar.LengthLong).Show();
                 }
 
                 await Task.Delay(1500);
@@ -300,12 +308,17 @@ namespace Nearby_Sharing_Windows
                 this.Finish();
             }
             else
-                Snackbar.Make(Window.DecorView, "Not supported", Snackbar.LengthLong).Show();
+                Snackbar.Make(Window!.DecorView, "Not supported", Snackbar.LengthLong).Show();
         }
 
+        private void CancelButton_Click(object sender, EventArgs e)
+        {
+            fileTransferOperation?.Cancel(false);
+        }
+
+        #region Finish
         public override void OnBackPressed()
             => Finish();
-
         public override void Finish()
         {
             try
@@ -318,5 +331,6 @@ namespace Nearby_Sharing_Windows
             catch { }
             base.Finish();
         }
+        #endregion
     }
 }
