@@ -109,8 +109,8 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Xamarin.AndroidX.AppCompat" Version="1.4.1.1" />
-    <PackageReference Include="Xamarin.Google.Android.Material" Version="1.5.0.2" />
-    <PackageReference Include="Xamarin.Essentials" Version="1.7.2" />
+    <PackageReference Include="Xamarin.Google.Android.Material" Version="1.6.0" />
+    <PackageReference Include="Xamarin.Essentials" Version="1.7.3" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\bottom_sheet_header.xml">
