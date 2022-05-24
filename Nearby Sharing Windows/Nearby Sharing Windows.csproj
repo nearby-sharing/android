@@ -108,6 +108,9 @@
     </AndroidResource>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Sentry.Xamarin">
+      <Version>1.4.1</Version>
+    </PackageReference>
     <PackageReference Include="Xamarin.AndroidX.AppCompat" Version="1.4.1.1" />
     <PackageReference Include="Xamarin.Google.Android.Material" Version="1.6.0" />
     <PackageReference Include="Xamarin.Essentials" Version="1.7.3" />

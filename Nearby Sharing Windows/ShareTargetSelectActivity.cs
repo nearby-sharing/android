@@ -14,6 +14,7 @@ using Com.Microsoft.Connecteddevices.Remotesystems.Commanding.Nearshare;
 using Google.Android.Material.ProgressIndicator;
 using Google.Android.Material.Snackbar;
 using Java.Util.Concurrent;
+using Sentry;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -39,6 +40,12 @@ namespace Nearby_Sharing_Windows
         protected override void OnCreate(Bundle? savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
+            SentryXamarin.Init(options =>
+            {
+                options.Dsn = "https://47f9f6c3642149a5af942e8484e64fe1@o646413.ingest.sentry.io/6437134";
+                options.Debug = true;
+                options.TracesSampleRate = 1.0;
+            });
             SetContentView(Resource.Layout.activity_share);
 
             StatusTextView = FindViewById<TextView>(Resource.Id.statusTextView)!;
@@ -259,19 +266,19 @@ namespace Nearby_Sharing_Windows
                                 try
                                 {
 #endif
-                                progressIndicator.Max = (int)args.TotalBytesToSend;
-                                progressIndicator.Progress = (int)args.BytesSent;
+                                    progressIndicator.Max = (int)args.TotalBytesToSend;
+                                    progressIndicator.Progress = (int)args.BytesSent;
 
-                                if (args.TotalFilesToSend != 0 && args.TotalBytesToSend != 0)
-                                {
-                                    StatusTextView.Text = $"Sending ... {args.FilesSent}/{args.TotalFilesToSend} files ... {Math.Round((decimal)args.BytesSent / args.TotalBytesToSend * 100)}%";
-                                    if (!requestAccepted)
+                                    if (args.TotalFilesToSend != 0 && args.TotalBytesToSend != 0)
                                     {
-                                        requestAccepted = true;
-                                        FindViewById(Resource.Id.materialCardView1)!.Visibility = ViewStates.Gone;
-                                        FindViewById(Resource.Id.progressUILayout)!.Visibility = ViewStates.Visible;
+                                        StatusTextView.Text = $"Sending ... {args.FilesSent}/{args.TotalFilesToSend} files ... {Math.Round((decimal)args.BytesSent / args.TotalBytesToSend * 100)}%";
+                                        if (!requestAccepted)
+                                        {
+                                            requestAccepted = true;
+                                            FindViewById(Resource.Id.materialCardView1)!.Visibility = ViewStates.Gone;
+                                            FindViewById(Resource.Id.progressUILayout)!.Visibility = ViewStates.Visible;
+                                        }
                                     }
-                                }
 #if !DEBUG
                                 }
                                 catch { }
