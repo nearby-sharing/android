@@ -99,6 +99,19 @@
                 android:layout_centerInParent="true"
                 android:text=" - Allow connections by anyone (You'll still get prompted)" />
 
+            <TextView
+                style="@style/TextAppearance.AppCompat.Title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="3dp"
+                android:text="Receive files" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="Sadly, the app currently isn’t able to receive files, but I’m working on it!" />
+
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
@@ -120,6 +133,7 @@
                     android:layout_margin="10dp"
                     android:enabled="false"
                     android:text="Receive"
+                    android:visibility="gone"
                     app:icon="@drawable/file_download_48"
                     style="@style/AppTheme.NearbyShareButton" />
             </LinearLayout>
