@@ -7,6 +7,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nearby Sharing Windows", "N
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShortDev.Microsoft.ConnectedDevices.AndroidSdk", "ShortDev.Microsoft.ConnectedDevices.AndroidSdk\ShortDev.Microsoft.ConnectedDevices.AndroidSdk.csproj", "{9CD32CF6-76DC-46DE-AFA6-47B008AD17A7}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShortDev.Microsoft.ConnectedDevices.Protocol", "ShortDev.Microsoft.ConnectedDevices.Protocol\ShortDev.Microsoft.ConnectedDevices.Protocol.csproj", "{6EBE41DB-AEFB-45C0-A5E1-8A4352CC4B8E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{CB6EAF2F-0357-4C96-8A88-190E6CF3FC2A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShortDev.Networking", "ShortDev.Networking\ShortDev.Networking.csproj", "{18FCC134-71CC-4BE9-9271-3839A6FFE380}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,6 +29,18 @@ Global
 		{9CD32CF6-76DC-46DE-AFA6-47B008AD17A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9CD32CF6-76DC-46DE-AFA6-47B008AD17A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9CD32CF6-76DC-46DE-AFA6-47B008AD17A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6EBE41DB-AEFB-45C0-A5E1-8A4352CC4B8E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6EBE41DB-AEFB-45C0-A5E1-8A4352CC4B8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6EBE41DB-AEFB-45C0-A5E1-8A4352CC4B8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6EBE41DB-AEFB-45C0-A5E1-8A4352CC4B8E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CB6EAF2F-0357-4C96-8A88-190E6CF3FC2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CB6EAF2F-0357-4C96-8A88-190E6CF3FC2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CB6EAF2F-0357-4C96-8A88-190E6CF3FC2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CB6EAF2F-0357-4C96-8A88-190E6CF3FC2A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{18FCC134-71CC-4BE9-9271-3839A6FFE380}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18FCC134-71CC-4BE9-9271-3839A6FFE380}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18FCC134-71CC-4BE9-9271-3839A6FFE380}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18FCC134-71CC-4BE9-9271-3839A6FFE380}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

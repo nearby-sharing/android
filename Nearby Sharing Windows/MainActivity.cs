@@ -6,6 +6,7 @@ using Android.Widget;
 using AndroidX.AppCompat.App;
 using Google.Android.Material.AppBar;
 using Google.Android.Material.FloatingActionButton;
+using ShortDev.Microsoft.ConnectedDevices.Protocol.Discovery;
 
 namespace Nearby_Sharing_Windows
 {
@@ -35,6 +36,8 @@ namespace Nearby_Sharing_Windows
 
             Button sendButton = FindViewById<Button>(Resource.Id.sendButton);
             sendButton.Click += SendButton_Click;
+
+            StartActivity(new Intent(this, typeof(ReceiveActivity)));
         }
 
         const int FilePickCode = 0x1;
