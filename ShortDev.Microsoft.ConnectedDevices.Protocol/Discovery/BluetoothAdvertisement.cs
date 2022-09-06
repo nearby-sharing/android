@@ -1,6 +1,9 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms;
+using ShortDev.Networking;
 using System;
 using System.IO;
+using System.Net.NetworkInformation;
+using System.Text;
 using System.Threading;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Discovery
@@ -21,7 +24,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Discovery
 
             await Handler.ScanForDevicesAsync(new()
             {
-                ScanTime = TimeSpan.FromSeconds(10),
+                ScanTime = TimeSpan.FromSeconds(30),
                 OnDeviceDiscovered = (device) =>
                 {
                     if (cancellationTokenSource.IsCancellationRequested)
@@ -30,7 +33,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Discovery
                     if (!TryParseBLeData(device, out var data))
                         return;
 
-
+                    System.Diagnostics.Debug.Print(data!.ToString());
                 }
             }, cancellationTokenSource.Token);
         }
@@ -45,7 +48,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Discovery
             }
         }
 
-        bool TryParseBLeData(CdpBluetoothDevice device, out BeaconData? data)
+        public static bool TryParseBLeData(CdpBluetoothDevice device, out BeaconData? data)
         {
             data = null;
 
@@ -53,47 +56,48 @@ namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Discovery
                 return false;
 
             using (MemoryStream stream = new(device.BeaconData))
-            using (BinaryReader reader = new(stream))
+            using (BigEndianBinaryReader reader = new(stream))
             {
-                var length = reader.ReadByte();
-                if (length != 30)
-                    return false;
-
-                var verifyByte = reader.ReadByte();
-                if (verifyByte != 0xff)
-                    return false;
-
-                var msId = reader.ReadInt16();
-                if (msId != 6)
-                    return false;
-
                 var scenarioType = reader.ReadByte();
                 if (scenarioType != 1)
                     return false;
 
                 var versionAndDeviceType = reader.ReadByte();
                 var deviceType = (DeviceType)versionAndDeviceType;
+
                 var versionAndFlags = reader.ReadByte();
                 /* Reserved */
                 reader.ReadByte();
-                byte[] salt = reader.ReadBytes(4);
-                byte[] deviceHash = reader.ReadBytes(16);
 
-                data = new()
-                {
-                    DeviceType = deviceType,
-                    Salt = salt,
-                    DeviceHash = deviceHash
-                };
+                data = new(
+                    deviceType,
+                    new PhysicalAddress(BinaryConvert.Reverse(reader.ReadBytes(6))),
+                    Encoding.UTF8.GetString(reader.ReadBytes((int)(stream.Length - stream.Position)))
+                );
             }
             return true;
         }
 
-        class BeaconData
+        public static byte[] GenerateAdvertisement(PhysicalAddress macAddress, DeviceType deviceType, string deviceName)
         {
-            public DeviceType DeviceType { get; set; }
-            public byte[]? Salt { get; set; }
-            public byte[]? DeviceHash { get; set; }
+            using (MemoryStream stream = new())
+            using (BinaryWriter writer = new(stream))
+            {
+                writer.Write((byte)0x1);
+                writer.Write((byte)deviceType);
+                writer.Write((byte)0x21);
+                writer.Write((byte)0x0a);
+                writer.Write(BinaryConvert.Reverse(macAddress.GetAddressBytes()));
+                writer.Write(Encoding.UTF8.GetBytes(deviceName));
+
+                return stream.ToArray();
+            }
         }
+
+        public const int ManufacturerId = 0x6; // Microsoft
+        public const string ServiceId = "c7f94713-891e-496a-a0e7-983a0946126e";
+        public const string ServiceName = "CDP Proximal Transport";
+
+        public record BeaconData(DeviceType DeviceType, PhysicalAddress? MacAddress, string? DeviceName);
     }
 }

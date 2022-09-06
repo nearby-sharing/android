@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using ShortDev.Microsoft.ConnectedDevices.Protocol.Connection;
+using System.IO;
 using System.Text;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Discovery

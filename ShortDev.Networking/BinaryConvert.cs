@@ -22,7 +22,15 @@ namespace ShortDev.Networking
                 buffer[i] = (byte)((GetHexVal(hex[i << 1]) << 4) + GetHexVal(hex[(i << 1) + 1]));
         }
 
-        public static int GetHexVal(char hex)
+        public static byte[] ToBytes(string hex)
+        {
+            AsBytes(hex, out var length, null);
+            byte[] buffer = new byte[length];
+            AsBytes(hex, out _, buffer);
+            return buffer;
+        }
+
+        static int GetHexVal(char hex)
         {
             int val = hex;
             //For uppercase A-F letters:
@@ -31,6 +39,15 @@ namespace ShortDev.Networking
             //return val - (val < 58 ? 48 : 87);
             //Or the two combined, but a bit slower:
             return val - (val < 58 ? 48 : (val < 97 ? 55 : 87));
+        }
+
+        public static string ToString(byte[] data)
+            => BitConverter.ToString(data).Replace("-", "");
+
+        public static byte[] Reverse(byte[] data)
+        {
+            Array.Reverse(data);
+            return data;
         }
     }
 }

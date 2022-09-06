@@ -7,6 +7,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms
     public interface ICdpBluetoothHandler
     {
         Task ScanForDevicesAsync(CdpScanOptions<CdpBluetoothDevice> scanOptions, CancellationToken cancellationToken = default);
+        Task ConnectAsync(CdpBluetoothDevice device, CancellationToken cancellationToken = default);
     }
 }
 

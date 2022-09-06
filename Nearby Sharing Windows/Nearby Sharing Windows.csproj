@@ -144,6 +144,10 @@
       <Project>{6ebe41db-aefb-45c0-a5e1-8a4352cc4b8e}</Project>
       <Name>ShortDev.Microsoft.ConnectedDevices.Protocol</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ShortDev.Networking\ShortDev.Networking.csproj">
+      <Project>{18fcc134-71cc-4be9-9271-3839a6ffe380}</Project>
+      <Name>ShortDev.Networking</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\nearby_share_48.xml">

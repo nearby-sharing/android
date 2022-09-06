@@ -37,6 +37,13 @@ namespace ShortDev.Microsoft.ConnectedDevices.Protocol
             NextHeader = (NextHeaderType)reader.ReadByte();
             NextHeaderSize = reader.ReadByte();
 
+            reader.ReadBytes(NextHeaderSize);
+
+            if (Flags.HasFlag(MessageFlags.HasHMAC))
+            {
+                //reader.ReadBytes(64);
+            }
+
             ex = null;
             return true;
         }
