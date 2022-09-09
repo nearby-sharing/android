@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="10dp"
+    android:gravity="center">
+
+    <RelativeLayout
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:padding="7dp"
+        android:clipToPadding="false">
+        <ImageView
+            android:id="@+id/deviceTypeImageView"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:tint="#000"
+            android:src="@drawable/fluent_desktop" />
+        <ImageView
+            android:id="@+id/transportTypeImageView"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:padding="3dp"
+            android:background="@drawable/round_outline"
+            android:tint="#000"
+            android:src="@drawable/fluent_bluetooth" />
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/deviceNameTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?attr/textAppearanceTitleMedium"
+        android:text="DeviceName" />
+
+</LinearLayout>

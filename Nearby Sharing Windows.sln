@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nearby Sharing Windows", "N
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShortDev.Microsoft.ConnectedDevices.AndroidSdk", "ShortDev.Microsoft.ConnectedDevices.AndroidSdk\ShortDev.Microsoft.ConnectedDevices.AndroidSdk.csproj", "{9CD32CF6-76DC-46DE-AFA6-47B008AD17A7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShortDev.Android", "ShortDev.Android\ShortDev.Android.csproj", "{195C941F-5EEF-45A9-A65C-16186E4BB131}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,6 +25,10 @@ Global
 		{9CD32CF6-76DC-46DE-AFA6-47B008AD17A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9CD32CF6-76DC-46DE-AFA6-47B008AD17A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9CD32CF6-76DC-46DE-AFA6-47B008AD17A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{195C941F-5EEF-45A9-A65C-16186E4BB131}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{195C941F-5EEF-45A9-A65C-16186E4BB131}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{195C941F-5EEF-45A9-A65C-16186E4BB131}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{195C941F-5EEF-45A9-A65C-16186E4BB131}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

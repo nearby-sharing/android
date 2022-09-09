@@ -7,6 +7,7 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using AndroidX.AppCompat.App;
+using AndroidX.RecyclerView.Widget;
 using Com.Microsoft.Connecteddevices;
 using Com.Microsoft.Connecteddevices.Remotesystems;
 using Com.Microsoft.Connecteddevices.Remotesystems.Commanding;
@@ -15,6 +16,7 @@ using Google.Android.Material.ProgressIndicator;
 using Google.Android.Material.Snackbar;
 using Java.Util.Concurrent;
 using Sentry;
+using ShortDev.Android.UI;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -33,7 +35,7 @@ namespace Nearby_Sharing_Windows
     {
         [AllowNull] NearShareSender NearShareSender;
 
-        [AllowNull] ListView DeviceDiscoveryListView;
+        [AllowNull] RecyclerView DeviceDiscoveryListView;
         [AllowNull] TextView StatusTextView;
         [AllowNull] FrameLayout bottomSheetFrame;
         [AllowNull] Button cancelButton;
@@ -49,9 +51,25 @@ namespace Nearby_Sharing_Windows
             SetContentView(Resource.Layout.activity_share);
 
             StatusTextView = FindViewById<TextView>(Resource.Id.statusTextView)!;
-            DeviceDiscoveryListView = FindViewById<ListView>(Resource.Id.listView1)!;
             bottomSheetFrame = FindViewById<FrameLayout>(Resource.Id.standard_bottom_sheet)!;
             cancelButton = FindViewById<Button>(Resource.Id.cancel_button)!;
+
+            DeviceDiscoveryListView = FindViewById<RecyclerView>(Resource.Id.deviceSelector)!;
+            DeviceDiscoveryListView.SetLayoutManager(new GridLayoutManager(this, 2));
+            adapterDescriptor = new AdapterDescriptor<RemoteSystem>(
+                Resource.Layout.item_device,
+                (view, device) =>
+                {
+                    view.FindViewById<ImageView>(Resource.Id.deviceTypeImageView)?.SetImageResource(
+                        device.Kind == "Desktop" ? Resource.Drawable.fluent_desktop : Resource.Drawable.fluent_phone
+                    );
+                    view.FindViewById<ImageView>(Resource.Id.transportTypeImageView)?.SetImageResource(
+                        device.Apps.FirstOrDefault()?.IsAvailableBySpatialProximity == true ? Resource.Drawable.fluent_bluetooth : Resource.Drawable.fluent_wifi
+                    );
+                    view.FindViewById<TextView>(Resource.Id.deviceNameTextView)!.Text = device.DisplayName;
+                    view.Click += (s, e) => SendData(device);
+                }
+            );
 
             if (Build.VERSION.SdkInt >= BuildVersionCodes.Kitkat)
             {
@@ -60,7 +78,6 @@ namespace Nearby_Sharing_Windows
                 Window!.DecorView.SetOnApplyWindowInsetsListener(this);
             }
 
-            DeviceDiscoveryListView.ItemClick += DeviceDiscoveryListView_ItemClick;
             cancelButton.Click += CancelButton_Click;
 
             if (Build.VERSION.SdkInt >= BuildVersionCodes.S)
@@ -191,25 +208,19 @@ namespace Nearby_Sharing_Windows
             });
         }
 
+        [MaybeNull] AdapterDescriptor<RemoteSystem> adapterDescriptor;
         private void UpdateUI()
         {
-            DeviceDiscoveryListView.Adapter = new ArrayAdapter<string>(
-                this,
-                Android.Resource.Layout.SimpleListItem1,
-                RemoteSystems.Select((x) => $"{x.DisplayName} [{x.Kind}, {(x.Apps.FirstOrDefault()?.IsAvailableBySpatialProximity == true ? "Spacial" : "Fast")}]").ToArray()
-            );
-        }
-
-        private void DeviceDiscoveryListView_ItemClick(object sender, AdapterView.ItemClickEventArgs e)
-        {
-            RemoteSystem remoteSystem = RemoteSystems[e.Position];
-            SendData(remoteSystem);
+            FindViewById<View>(Resource.Id.emptyDeviceListView)!.Visibility = RemoteSystems.Count == 0 ? ViewStates.Visible : ViewStates.Gone;
+            DeviceDiscoveryListView.SetAdapter(adapterDescriptor!.CreateRecyclerViewAdapter(RemoteSystems));
         }
         #endregion
 
         AsyncOperationWithProgress? fileTransferOperation = null;
         private async void SendData(RemoteSystem remoteSystem)
         {
+            StatusTextView.Text = "Waiting for acceptance...";
+
             RemoteSystemConnectionRequest connectionRequest = new RemoteSystemConnectionRequest(remoteSystem);
             if (NearShareSender.IsNearShareSupported(connectionRequest))
             {
@@ -266,19 +277,20 @@ namespace Nearby_Sharing_Windows
                                 try
                                 {
 #endif
-                                    progressIndicator.Max = (int)args.TotalBytesToSend;
-                                    progressIndicator.Progress = (int)args.BytesSent;
+                                progressIndicator.Max = (int)args.TotalBytesToSend;
+                                progressIndicator.Progress = (int)args.BytesSent;
 
-                                    if (args.TotalFilesToSend != 0 && args.TotalBytesToSend != 0)
+                                if (args.TotalFilesToSend != 0 && args.TotalBytesToSend != 0)
+                                {
+                                    StatusTextView.Text = $"Sending ... {args.FilesSent}/{args.TotalFilesToSend} files ... {Math.Round((decimal)args.BytesSent / args.TotalBytesToSend * 100)}%";
+                                    if (!requestAccepted)
                                     {
-                                        StatusTextView.Text = $"Sending ... {args.FilesSent}/{args.TotalFilesToSend} files ... {Math.Round((decimal)args.BytesSent / args.TotalBytesToSend * 100)}%";
-                                        if (!requestAccepted)
-                                        {
-                                            requestAccepted = true;
-                                            FindViewById(Resource.Id.materialCardView1)!.Visibility = ViewStates.Gone;
-                                            FindViewById(Resource.Id.progressUILayout)!.Visibility = ViewStates.Visible;
-                                        }
+                                        requestAccepted = true;
+                                        FindViewById(Resource.Id.loadingProgressIndicator)!.Visibility = ViewStates.Gone;
+                                        FindViewById(Resource.Id.waitForAcceptanceView)!.Visibility = ViewStates.Gone;
+                                        FindViewById(Resource.Id.progressUILayout)!.Visibility = ViewStates.Visible;
                                     }
+                                }
 #if !DEBUG
                                 }
                                 catch { }
