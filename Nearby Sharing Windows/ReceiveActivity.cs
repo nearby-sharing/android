@@ -4,9 +4,7 @@ using Android.App;
 using Android.Bluetooth;
 using Android.Bluetooth.LE;
 using Android.OS;
-using Android.Runtime;
 using AndroidX.AppCompat.App;
-using Nearby_Sharing_Windows.Bluetooth;
 using ShortDev.Microsoft.ConnectedDevices.Protocol;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Discovery;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms;
@@ -14,6 +12,7 @@ using ShortDev.Networking;
 using System;
 using System.Collections.Generic;
 using System.Net.NetworkInformation;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using ManifestPermission = Android.Manifest.Permission;
@@ -38,12 +37,16 @@ namespace Nearby_Sharing_Windows
                 ManifestPermission.AccessBackgroundLocation
             }, 0);
 
-            UdpAdvertisement advertisement = new();
-            advertisement.StartDiscovery();
+            //UdpAdvertisement advertisement = new();
+            //advertisement.StartDiscovery();
 
-            BluetoothAdvertisement bluetoothAdvertisement = new(this);
-            //bluetoothAdvertisement.StartDiscovery();
-            //return;
+            //BluetoothAdvertisement bluetoothAdvertisement = new(this);
+            //bluetoothAdvertisement.OnDeviceConnected += BluetoothAdvertisement_OnDeviceConnected;
+            //bluetoothAdvertisement.StartAdvertisement(new CdpDeviceAdvertiseOptions(
+            //    DeviceType.Android,
+            //    PhysicalAddress.Parse("00:fa:21:3e:fb:18".Replace(":", "").ToUpper()),
+            //    adapter.Name!
+            //));
 
             var service = (BluetoothManager)GetSystemService(BluetoothService)!;
             var adapter = service.Adapter!;
@@ -56,31 +59,40 @@ namespace Nearby_Sharing_Windows
 
             var data = new AdvertiseData.Builder()
                 .AddManufacturerData(
-                    BluetoothAdvertisement.ManufacturerId, 
-                    BluetoothAdvertisement.GenerateAdvertisement(
-                        PhysicalAddress.Parse("00:fa:21:3e:fb:18".Replace(":", "").ToUpper()), 
-                        DeviceType.Android, 
+                    Constants.BLeBeaconManufacturerId,
+                    BluetoothAdvertisement.GenerateAdvertisement(new(
+                        DeviceType.Android,
+                        PhysicalAddress.Parse("00:fa:21:3e:fb:18".Replace(":", "").ToUpper()),                        
                         adapter.Name!
-                    ))!
+                    )))!
                 .Build();
 
-            adapter.BluetoothLeAdvertiser!.StartAdvertising(settings, data, new Callback());
+            adapter.BluetoothLeAdvertiser!.StartAdvertising(settings, data, new BLeAdvertiseCallback());
 
-            var rfcommListener = adapter.ListenUsingRfcommWithServiceRecord(BluetoothAdvertisement.ServiceName, Java.Util.UUID.FromString(BluetoothAdvertisement.ServiceId))!;
-            _ = Task.Run(async () =>
+            var rfcommListener = adapter.ListenUsingInsecureRfcommWithServiceRecord(Constants.RfcommServiceName, Java.Util.UUID.FromString(Constants.RfcommServiceId))!;
+            while (true)
             {
-                while (true)
-                {
-                    var socket = await rfcommListener.AcceptAsync();
-                    PrintStreamData(socket.InputStream);
-                }
-            });
+                var socket = await rfcommListener.AcceptAsync();
+                PrintStreamData(socket.InputStream);
+            }
+        }
+
+        private void BluetoothAdvertisement_OnDeviceConnected(CdpRfcommSocket socket)
+        {
+            PrintStreamData(socket.InputStream!);
         }
 
         public static void PrintStreamData(Stream stream)
         {
+            List<byte> data = new();
             using (BigEndianBinaryReader reader = new(stream))
             {
+                data.AddRange(reader.ReadBytes(4));
+                var msgLength = data[2] << 8 | data[3];
+                data.AddRange(reader.ReadBytes(msgLength - 4));
+                System.Diagnostics.Debug.Print(BinaryConvert.ToString(data.ToArray()));
+
+                return;
                 CommonHeaders headers = new();
                 if (headers.TryRead(reader))
                 {
@@ -89,63 +101,85 @@ namespace Nearby_Sharing_Windows
             }
         }
 
-        class Callback : AdvertiseCallback { }
-
-        public async Task ScanForDevicesAsync(CdpScanOptions<CdpBluetoothDevice> scanOptions, CancellationToken cancellationToken = default)
+        BluetoothAdapter GetBTAdapter()
         {
             var service = (BluetoothManager)GetSystemService(BluetoothService)!;
-            var adapter = service.Adapter!;
-            {
-                var scanner = adapter.BluetoothLeScanner!;
-
-                BluetoothLeScannerCallback scanningCallback = new();
-                scanningCallback.OnFoundDevice += (result) =>
-                {
-                    var device = adapter.GetRemoteDevice(result.Device!.Address)!;
-                    var beaconData = result.ScanRecord!.GetBytes();
-                    beaconData = result.ScanRecord.GetManufacturerSpecificData(6);
-                    scanOptions.OnDeviceDiscovered?.Invoke(new()
-                    {
-                        Name = device.Name,
-                        Alias = device.Alias,
-                        Address = device.Address,
-                        BeaconData = beaconData
-                    });
-                };
-
-                scanner.StartScan(scanningCallback);
-                scanner.FlushPendingScanResults(scanningCallback);
-                //await Task.Delay(scanOptions.ScanTime);
-                //scanner.StopScan(scanningCallback);
-            }
+            return service.Adapter!;
         }
 
-        public async Task ConnectAsync(CdpBluetoothDevice device, CancellationToken cancellationToken = default)
+        public Task ScanBLeAsync(CdpScanOptions<CdpBluetoothDevice> scanOptions, CancellationToken cancellationToken = default)
+            => throw new NotImplementedException();
+
+        public Task<CdpRfcommSocket> ConnectRfcommAsync(CdpBluetoothDevice device, CdpRfcommOptions options, CancellationToken cancellationToken = default)
+            => throw new NotImplementedException();
+
+        public async Task AdvertiseBLeBeaconAsync(CdpAdvertiseOptions options, CancellationToken cancellationToken = default)
         {
-            var service = await BluetoothLeServiceConnection.ConnectToServiceAsync(this);
-            if (!service.TryInitialize())
-                return;
+            var adapter = GetBTAdapter();
+            var settings = new AdvertiseSettings.Builder()
+                .SetAdvertiseMode(AdvertiseMode.LowLatency)!
+                .SetTxPowerLevel(AdvertiseTx.PowerHigh)!
+                .SetConnectable(false)!
+                .Build();
 
-            service.Connect(device.Address);
+            var data = new AdvertiseData.Builder()
+                .AddManufacturerData(options.ManufacturerId, options.BeaconData!)!
+                .Build();
+
+            BLeAdvertiseCallback callback = new();
+            adapter.BluetoothLeAdvertiser!.StartAdvertising(settings, data, callback);
+
+            await AwaitCancellation(cancellationToken);
+
+            adapter.BluetoothLeAdvertiser.StopAdvertising(callback);
         }
+        class BLeAdvertiseCallback : AdvertiseCallback { }
 
-        class BluetoothLeScannerCallback : ScanCallback
+        public async Task ListenRfcommAsync(CdpRfcommOptions options, CancellationToken cancellationToken = default)
         {
-            public event Action<ScanResult>? OnFoundDevice;
-
-            public override void OnScanResult([GeneratedEnum] ScanCallbackType callbackType, ScanResult? result)
+            return;
+            var adapter = GetBTAdapter();
+            var listener = adapter.ListenUsingInsecureRfcommWithServiceRecord(
+                options.ServiceName,
+                Java.Util.UUID.FromString(options.ServiceId)
+            )!;
+            while (true)
             {
-                if (result != null)
-                    OnFoundDevice?.Invoke(result);
-            }
+                var socket = await listener.AcceptAsync();
+                if (cancellationToken.IsCancellationRequested)
+                    return;
 
-            public override void OnBatchScanResults(IList<ScanResult>? results)
-            {
-                if (results != null)
-                    foreach (var result in results)
-                        if (result != null)
-                            OnFoundDevice?.Invoke(result);
+                if (socket != null)
+                    options!.OnSocketConnected!(socket.ToCdp());
             }
         }
+
+        Task AwaitCancellation(CancellationToken cancellationToken)
+        {
+            TaskCompletionSource<bool> promise = new();
+            cancellationToken.Register(() => promise.SetResult(true));
+            return promise.Task;
+        }
+    }
+
+    static class Extensions
+    {
+        public static CdpBluetoothDevice ToCdp(this BluetoothDevice @this, byte[]? beaconData = null)
+            => new()
+            {
+                Address = @this.Address,
+                Alias = @this.Alias,
+                Name = @this.Name,
+                BeaconData = beaconData
+            };
+
+        public static CdpRfcommSocket ToCdp(this BluetoothSocket @this)
+            => new()
+            {
+                InputStream = @this.InputStream,
+                OutputStream = @this.OutputStream,
+                RemoteDevice = @this.RemoteDevice!.ToCdp(),
+                Close = () => @this.Close()
+            };
     }
 }

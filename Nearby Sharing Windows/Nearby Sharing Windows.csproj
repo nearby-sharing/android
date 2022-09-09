@@ -78,8 +78,6 @@
     <Reference Include="System.Numerics.Vectors" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Bluetooth\BluetoothLeServiceConnection.cs" />
-    <Compile Include="Bluetooth\BluetoothLeService.cs" />
     <Compile Include="Layout\BottomSheetBehaviorCallback.cs" />
     <Compile Include="MainActivity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

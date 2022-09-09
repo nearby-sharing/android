@@ -8,7 +8,7 @@ using System.Threading;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Discovery
 {
-    public sealed class BluetoothAdvertisement : IDiscovery
+    public sealed class BluetoothAdvertisement : IAdvertiser
     {
         public ICdpBluetoothHandler Handler { get; }
         public BluetoothAdvertisement(ICdpBluetoothHandler handler)
@@ -16,39 +16,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Discovery
             Handler = handler;
         }
 
-        CancellationTokenSource? cancellationTokenSource;
-        public async void StartDiscovery()
-        {
-            StopDiscovery();
-            cancellationTokenSource = new();
-
-            await Handler.ScanForDevicesAsync(new()
-            {
-                ScanTime = TimeSpan.FromSeconds(30),
-                OnDeviceDiscovered = (device) =>
-                {
-                    if (cancellationTokenSource.IsCancellationRequested)
-                        return;
-
-                    if (!TryParseBLeData(device, out var data))
-                        return;
-
-                    System.Diagnostics.Debug.Print(data!.ToString());
-                }
-            }, cancellationTokenSource.Token);
-        }
-
-        public void StopDiscovery()
-        {
-            // Called from "StartDiscovery"!
-            if (cancellationTokenSource != null)
-            {
-                cancellationTokenSource.Cancel();
-                cancellationTokenSource.Dispose();
-            }
-        }
-
-        public static bool TryParseBLeData(CdpBluetoothDevice device, out BeaconData? data)
+        static bool TryParseBLeData(CdpBluetoothDevice device, out BeaconData? data)
         {
             data = null;
 
@@ -78,26 +46,60 @@ namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Discovery
             return true;
         }
 
-        public static byte[] GenerateAdvertisement(PhysicalAddress macAddress, DeviceType deviceType, string deviceName)
+       public static byte[] GenerateAdvertisement(CdpDeviceAdvertiseOptions options)
         {
             using (MemoryStream stream = new())
             using (BinaryWriter writer = new(stream))
             {
                 writer.Write((byte)0x1);
-                writer.Write((byte)deviceType);
+                writer.Write((byte)options.DeviceType);
                 writer.Write((byte)0x21);
                 writer.Write((byte)0x0a);
-                writer.Write(BinaryConvert.Reverse(macAddress.GetAddressBytes()));
-                writer.Write(Encoding.UTF8.GetBytes(deviceName));
+                writer.Write(BinaryConvert.Reverse(options.MacAddress.GetAddressBytes()));
+                writer.Write(Encoding.UTF8.GetBytes(options.DeviceName));
 
                 return stream.ToArray();
             }
         }
 
-        public const int ManufacturerId = 0x6; // Microsoft
-        public const string ServiceId = "c7f94713-891e-496a-a0e7-983a0946126e";
-        public const string ServiceName = "CDP Proximal Transport";
+        CancellationTokenSource? cancellationTokenSource;
+        public void StartAdvertisement(CdpDeviceAdvertiseOptions options)
+        {
+            StopAdvertisement();
+            cancellationTokenSource = new();
 
-        public record BeaconData(DeviceType DeviceType, PhysicalAddress? MacAddress, string? DeviceName);
+            _ = Handler.AdvertiseBLeBeaconAsync(
+                new CdpAdvertiseOptions()
+                {
+                    ManufacturerId = Constants.BLeBeaconManufacturerId,
+                    BeaconData = GenerateAdvertisement(options)
+                },
+                cancellationTokenSource.Token
+            );
+
+            _ = Handler.ListenRfcommAsync(
+                new CdpRfcommOptions()
+                {
+                    ServiceId = Constants.RfcommServiceId,
+                    ServiceName = Constants.RfcommServiceName,
+                    OnSocketConnected = (socket) => OnDeviceConnected?.Invoke(socket)
+                },
+                cancellationTokenSource.Token
+            );
+        }
+
+        public event Action<CdpRfcommSocket>? OnDeviceConnected;
+
+        public void StopAdvertisement()
+        {
+            // Called from "StartAdvertisement"!
+            if (cancellationTokenSource != null)
+            {
+                cancellationTokenSource.Cancel();
+                cancellationTokenSource.Dispose();
+            }
+        }
+
+        record BeaconData(DeviceType DeviceType, PhysicalAddress? MacAddress, string? DeviceName);
     }
 }

@@ -4,14 +4,15 @@
 		<TargetFramework>netstandard2.1</TargetFramework>
 		<LangVersion>latest</LangVersion>
 		<Nullable>enable</Nullable>
+		<Version>0.1.0</Version>
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="System.Memory" Version="4.5.5" />
+		<PackageReference Include="System.Memory" Version="4.5.5" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\ShortDev.Networking\ShortDev.Networking.csproj" />
+		<ProjectReference Include="..\ShortDev.Networking\ShortDev.Networking.csproj" />
 	</ItemGroup>
 
 </Project>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Protocol
@@ -34,14 +35,30 @@ namespace ShortDev.Microsoft.ConnectedDevices.Protocol
             FragmentCount = reader.ReadUInt16();
             SessionID = reader.ReadUInt64();
             ChannelID = reader.ReadUInt64();
-            NextHeader = (NextHeaderType)reader.ReadByte();
-            NextHeaderSize = reader.ReadByte();
 
-            reader.ReadBytes(NextHeaderSize);
+            NextHeaderType nextHeaderType;
+            byte nextHeaderSize;
+            List<AdditionalMessageHeader> additionalHeaders = new();
+            do
+            {
+                nextHeaderType = (NextHeaderType)reader.ReadByte();
+                nextHeaderSize = reader.ReadByte();
+
+                var value = reader.ReadBytes(nextHeaderSize);
+                additionalHeaders.Add(new(nextHeaderType, value));
+            } while (nextHeaderType != NextHeaderType.None);
+
+            if (nextHeaderSize != 0)
+            {
+                ex = new InvalidDataException("Invalid header size, end-of-header cannot have a size greather than 0");
+                return false;
+            }
+
+            AdditionalHeaders = additionalHeaders.ToArray();
 
             if (Flags.HasFlag(MessageFlags.HasHMAC))
             {
-                //reader.ReadBytes(64);
+                // ToDo: HMAC ?!
             }
 
             ex = null;
@@ -61,8 +78,14 @@ namespace ShortDev.Microsoft.ConnectedDevices.Protocol
             writer.Write(FragmentCount);
             writer.Write(SessionID);
             writer.Write(ChannelID);
-            writer.Write((byte)NextHeader);
-            writer.Write(NextHeaderSize);
+
+            foreach (var header in AdditionalHeaders)
+            {
+                writer.Write((byte)header.Type);
+                writer.Write(header.Value);
+            }
+            writer.Write((byte)NextHeaderType.None);
+            writer.Write((byte)0);
         }
 
         public uint MessageLength { get; set; }
@@ -75,7 +98,8 @@ namespace ShortDev.Microsoft.ConnectedDevices.Protocol
         public ushort FragmentCount { get; set; }
         public ulong SessionID { get; set; }
         public ulong ChannelID { get; set; }
-        public NextHeaderType NextHeader { get; set; }
-        public byte NextHeaderSize { get; set; }
+
+        public AdditionalMessageHeader[] AdditionalHeaders { get; set; }
+        public record AdditionalMessageHeader(NextHeaderType Type, byte[] Value);
     }
 }

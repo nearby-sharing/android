@@ -2,7 +2,7 @@
 {
     public interface IAdvertiser
     {
-        void StartAdvertisement();
+        void StartAdvertisement(CdpDeviceAdvertiseOptions options);
         void StopAdvertisement();
     }
 }

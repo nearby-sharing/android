@@ -9,7 +9,7 @@
         /// <summary>
         /// If included, the payload would contain a Next Header Size-sized ID of the message to which this message responds.
         /// </summary>
-        ReplyTold,
+        ReplyToId,
         /// <summary>
         /// A uniquely identifiable payload meant to identify communication over devices.
         /// </summary>
@@ -17,6 +17,7 @@
         /// <summary>
         /// Identifies the last seen message that both participants can agree upon.
         /// </summary>
-        WatermarkId
+        WatermarkId,
+        UserMessageRequestId = 5
     }
 }

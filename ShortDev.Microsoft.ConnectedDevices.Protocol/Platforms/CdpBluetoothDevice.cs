@@ -7,9 +7,5 @@
         public string? Address { get; init; }
 
         public byte[]? BeaconData { get; init; }
-
-        public object? Tag { get; init; }
-        public T? GetTag<T>()
-            => (T?)Tag;
     }
 }
