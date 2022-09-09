@@ -268,7 +268,6 @@ namespace Nearby_Sharing_Windows
                     CircularProgressIndicator progressIndicator = FindViewById<CircularProgressIndicator>(Resource.Id.sendProgressIndicator)!;
                     if (fileTransferOperation != null)
                     {
-                        bool requestAccepted = false;
                         new EventListener<AsyncOperationWithProgress, NearShareProgress>(fileTransferOperation.Progress()).Event += (AsyncOperationWithProgress sender, NearShareProgress args) =>
                         {
                             RunOnUiThread(() =>
@@ -283,13 +282,7 @@ namespace Nearby_Sharing_Windows
                                 if (args.TotalFilesToSend != 0 && args.TotalBytesToSend != 0)
                                 {
                                     StatusTextView.Text = $"Sending ... {args.FilesSent}/{args.TotalFilesToSend} files ... {Math.Round((decimal)args.BytesSent / args.TotalBytesToSend * 100)}%";
-                                    if (!requestAccepted)
-                                    {
-                                        requestAccepted = true;
-                                        FindViewById(Resource.Id.loadingProgressIndicator)!.Visibility = ViewStates.Gone;
-                                        FindViewById(Resource.Id.waitForAcceptanceView)!.Visibility = ViewStates.Gone;
-                                        FindViewById(Resource.Id.progressUILayout)!.Visibility = ViewStates.Visible;
-                                    }
+                                    OnRequestAccepted();
                                 }
 #if !DEBUG
                                 }
@@ -305,8 +298,8 @@ namespace Nearby_Sharing_Windows
                     else
                     {
                         System.Diagnostics.Debug.Assert(uriTransferOperation != null, "\"uriTransferOperation\" is null!");
-
-                        // ToDo: progressIndicator.Indeterminate = true;
+                        
+                        OnRequestAccepted();
                         result = (await uriTransferOperation!.GetAsync() as NearShareStatus)!;
                     }
 
@@ -328,6 +321,13 @@ namespace Nearby_Sharing_Windows
             }
             else
                 Snackbar.Make(Window!.DecorView, "Not supported", Snackbar.LengthLong).Show();
+        }
+
+        void OnRequestAccepted()
+        {
+            FindViewById(Resource.Id.loadingProgressIndicator)!.Visibility = ViewStates.Gone;
+            FindViewById(Resource.Id.waitForAcceptanceView)!.Visibility = ViewStates.Gone;
+            FindViewById(Resource.Id.progressUILayout)!.Visibility = ViewStates.Visible;
         }
 
         private void CancelButton_Click(object sender, EventArgs e)
