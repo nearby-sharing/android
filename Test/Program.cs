@@ -34,9 +34,9 @@ using (BigEndianBinaryReader reader = new(stream))
     CommonHeaders headers = new();
     if (!headers.TryRead(reader))
         throw new InvalidDataException();
-
-    ConnectionHeader connectionHeader = new(reader);
     reader.ReadByte();
+    ConnectionHeader connectionHeader = new(reader);
+    
     ConnectionRequest connectionRequest = new(reader);
     // DiscoveryHeaders discoveryHeaders = new(reader);
     // PresenceResponse presenceResponse = new(reader);

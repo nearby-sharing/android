@@ -39,14 +39,19 @@ namespace ShortDev.Microsoft.ConnectedDevices.Protocol
             NextHeaderType nextHeaderType;
             byte nextHeaderSize;
             List<AdditionalMessageHeader> additionalHeaders = new();
-            do
+            while (true)
             {
                 nextHeaderType = (NextHeaderType)reader.ReadByte();
                 nextHeaderSize = reader.ReadByte();
 
-                var value = reader.ReadBytes(nextHeaderSize);
-                additionalHeaders.Add(new(nextHeaderType, value));
-            } while (nextHeaderType != NextHeaderType.None);
+                if (nextHeaderType != NextHeaderType.None)
+                {
+                    var value = reader.ReadBytes(nextHeaderSize);
+                    additionalHeaders.Add(new(nextHeaderType, value));
+                }
+                else
+                    break;
+            }
 
             if (nextHeaderSize != 0)
             {
