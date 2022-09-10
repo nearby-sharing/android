@@ -1,3 +1,15 @@
 <resources>
 	<string name="app_name">Nearby Sharing (Windows)</string>
+	<string name="warning_exp">
+		This functionality is currently experimental.
+		\nThe app might crash or the data transfer might abort at any time without warning.
+		\nIf you encounter an issue, please report it directly via GitHub!
+		\nhttps://github.com/ShortDevelopment/Nearby-Sharing-Windows/issues
+	</string>
+	<string name="settings_mac_addr">
+		Because of privacy concerns (ads), android does not allow apps to read the bluetooth mac address any more.
+		\nThe mac address is required to tell the other device where to send your data.
+		\nTo proceed, please insert your bluetooth mac address below.
+		\nIf this address is invalid, you will not be able to receive any data.
+	</string>
 </resources>

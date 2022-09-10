@@ -1,6 +1,14 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Protocol;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Connection;
+using ShortDev.Microsoft.ConnectedDevices.Protocol.Discovery;
 using ShortDev.Networking;
+using Windows.Devices.Bluetooth;
+using Windows.Devices.Bluetooth.Rfcomm;
+
+//var device = await BluetoothDevice.FromBluetoothAddressAsync(0x00fa213efb18);
+//var result = await device.GetRfcommServicesForIdAsync(RfcommServiceId.FromUuid(new(Constants.RfcommServiceId)), BluetoothCacheMode.Uncached);
+//var services = result.Services.ToArray();
+//var service = services[0];
 
 //Thread thread = new(() =>
 //{

@@ -11,9 +11,8 @@ using ShortDev.Microsoft.ConnectedDevices.Protocol.Discovery;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms;
 using ShortDev.Networking;
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Net.NetworkInformation;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using ManifestPermission = Android.Manifest.Permission;
@@ -28,6 +27,7 @@ namespace Nearby_Sharing_Windows
         protected override async void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
+            SetContentView(Resource.Layout.activity_mac_address);
 
             RequestPermissions(new[] {
                 ManifestPermission.AccessFineLocation,
@@ -45,13 +45,50 @@ namespace Nearby_Sharing_Windows
             var service = (BluetoothManager)GetSystemService(BluetoothService)!;
             _btAdapter = service.Adapter!;
 
+            string address = TryGetBtAddress(_btAdapter, out var exception) ?? "00:fa:21:3e:fb:19";
+
             BluetoothAdvertisement bluetoothAdvertisement = new(this);
             bluetoothAdvertisement.OnDeviceConnected += BluetoothAdvertisement_OnDeviceConnected;
             bluetoothAdvertisement.StartAdvertisement(new CdpDeviceAdvertiseOptions(
                 DeviceType.Android,
-                PhysicalAddress.Parse("00:fa:21:3e:fb:18".Replace(":", "").ToUpper()),
+                PhysicalAddress.Parse(address.Replace(":", "").ToUpper()),
                 _btAdapter.Name!
             ));
+        }
+
+        public string? TryGetBtAddress(BluetoothAdapter adapter, out System.Exception? exception)
+        {
+            exception = null;
+
+            try
+            {
+                var mServiceField = adapter.Class.GetDeclaredFields().FirstOrDefault((x) => x.Name.Contains("service", StringComparison.OrdinalIgnoreCase));
+                if (mServiceField == null)
+                    throw new MissingFieldException("No service field found!");
+
+                mServiceField.Accessible = true;
+                var serviceProxy = mServiceField.Get(adapter)!;
+                var method = serviceProxy.Class.GetDeclaredMethod("getAddress");
+                if (method == null)
+                    throw new MissingMethodException("No method \"getAddress\"");
+
+                method.Accessible = true;
+                try
+                {
+                    return (string?)method.Invoke(serviceProxy);
+                }
+                catch (Java.Lang.Reflect.InvocationTargetException ex)
+                {
+                    if (ex.Cause == null)
+                        throw;
+                    throw ex.Cause;
+                }
+            }
+            catch (System.Exception ex)
+            {
+                exception = ex;
+            }
+            return null;
         }
 
         private void BluetoothAdvertisement_OnDeviceConnected(CdpRfcommSocket socket)
@@ -67,7 +104,7 @@ namespace Nearby_Sharing_Windows
                 if (!headers.TryRead(reader))
                     return;
 
-                if(headers.Type == MessageType.Connect)
+                if (headers.Type == MessageType.Connect)
                 {
                     ConnectionHeader connectionHeader = new(reader);
                     switch (connectionHeader.ConnectMessageType)
