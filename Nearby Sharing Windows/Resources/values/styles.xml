@@ -11,7 +11,7 @@
 
 	<style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.Material3.ActionBar" />
 
-	<style name="AppTheme.TranslucentOverlay" parent="Theme.Material3.Light.NoActionBar">
+	<style name="AppTheme.TranslucentOverlay" parent="AppTheme">
 		<item name="android:windowIsTranslucent">true</item>
 		<item name="android:windowBackground">@android:color/transparent</item>
 		<item name="android:backgroundDimEnabled">true</item>

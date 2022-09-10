@@ -207,6 +207,1742 @@ namespace Nearby_Sharing_Windows
 			global::Sentry.Resource.Styleable.GradientColor_android_tileMode = global::Nearby_Sharing_Windows.Resource.Styleable.GradientColor_android_tileMode;
 			global::Sentry.Resource.Styleable.GradientColor_android_type = global::Nearby_Sharing_Windows.Resource.Styleable.GradientColor_android_type;
 			global::Sentry.Resource.Xml.xamarin_essentials_fileprovider_file_paths = global::Nearby_Sharing_Windows.Resource.Xml.xamarin_essentials_fileprovider_file_paths;
+			global::ShortDev.Android.Resource.Animation.abc_fade_in = global::Nearby_Sharing_Windows.Resource.Animation.abc_fade_in;
+			global::ShortDev.Android.Resource.Animation.abc_fade_out = global::Nearby_Sharing_Windows.Resource.Animation.abc_fade_out;
+			global::ShortDev.Android.Resource.Animation.abc_grow_fade_in_from_bottom = global::Nearby_Sharing_Windows.Resource.Animation.abc_grow_fade_in_from_bottom;
+			global::ShortDev.Android.Resource.Animation.abc_popup_enter = global::Nearby_Sharing_Windows.Resource.Animation.abc_popup_enter;
+			global::ShortDev.Android.Resource.Animation.abc_popup_exit = global::Nearby_Sharing_Windows.Resource.Animation.abc_popup_exit;
+			global::ShortDev.Android.Resource.Animation.abc_shrink_fade_out_from_bottom = global::Nearby_Sharing_Windows.Resource.Animation.abc_shrink_fade_out_from_bottom;
+			global::ShortDev.Android.Resource.Animation.abc_slide_in_bottom = global::Nearby_Sharing_Windows.Resource.Animation.abc_slide_in_bottom;
+			global::ShortDev.Android.Resource.Animation.abc_slide_in_top = global::Nearby_Sharing_Windows.Resource.Animation.abc_slide_in_top;
+			global::ShortDev.Android.Resource.Animation.abc_slide_out_bottom = global::Nearby_Sharing_Windows.Resource.Animation.abc_slide_out_bottom;
+			global::ShortDev.Android.Resource.Animation.abc_slide_out_top = global::Nearby_Sharing_Windows.Resource.Animation.abc_slide_out_top;
+			global::ShortDev.Android.Resource.Animation.abc_tooltip_enter = global::Nearby_Sharing_Windows.Resource.Animation.abc_tooltip_enter;
+			global::ShortDev.Android.Resource.Animation.abc_tooltip_exit = global::Nearby_Sharing_Windows.Resource.Animation.abc_tooltip_exit;
+			global::ShortDev.Android.Resource.Animation.btn_checkbox_to_checked_box_inner_merged_animation = global::Nearby_Sharing_Windows.Resource.Animation.btn_checkbox_to_checked_box_inner_merged_animation;
+			global::ShortDev.Android.Resource.Animation.btn_checkbox_to_checked_box_outer_merged_animation = global::Nearby_Sharing_Windows.Resource.Animation.btn_checkbox_to_checked_box_outer_merged_animation;
+			global::ShortDev.Android.Resource.Animation.btn_checkbox_to_checked_icon_null_animation = global::Nearby_Sharing_Windows.Resource.Animation.btn_checkbox_to_checked_icon_null_animation;
+			global::ShortDev.Android.Resource.Animation.btn_checkbox_to_unchecked_box_inner_merged_animation = global::Nearby_Sharing_Windows.Resource.Animation.btn_checkbox_to_unchecked_box_inner_merged_animation;
+			global::ShortDev.Android.Resource.Animation.btn_checkbox_to_unchecked_check_path_merged_animation = global::Nearby_Sharing_Windows.Resource.Animation.btn_checkbox_to_unchecked_check_path_merged_animation;
+			global::ShortDev.Android.Resource.Animation.btn_checkbox_to_unchecked_icon_null_animation = global::Nearby_Sharing_Windows.Resource.Animation.btn_checkbox_to_unchecked_icon_null_animation;
+			global::ShortDev.Android.Resource.Animation.btn_radio_to_off_mtrl_dot_group_animation = global::Nearby_Sharing_Windows.Resource.Animation.btn_radio_to_off_mtrl_dot_group_animation;
+			global::ShortDev.Android.Resource.Animation.btn_radio_to_off_mtrl_ring_outer_animation = global::Nearby_Sharing_Windows.Resource.Animation.btn_radio_to_off_mtrl_ring_outer_animation;
+			global::ShortDev.Android.Resource.Animation.btn_radio_to_off_mtrl_ring_outer_path_animation = global::Nearby_Sharing_Windows.Resource.Animation.btn_radio_to_off_mtrl_ring_outer_path_animation;
+			global::ShortDev.Android.Resource.Animation.btn_radio_to_on_mtrl_dot_group_animation = global::Nearby_Sharing_Windows.Resource.Animation.btn_radio_to_on_mtrl_dot_group_animation;
+			global::ShortDev.Android.Resource.Animation.btn_radio_to_on_mtrl_ring_outer_animation = global::Nearby_Sharing_Windows.Resource.Animation.btn_radio_to_on_mtrl_ring_outer_animation;
+			global::ShortDev.Android.Resource.Animation.btn_radio_to_on_mtrl_ring_outer_path_animation = global::Nearby_Sharing_Windows.Resource.Animation.btn_radio_to_on_mtrl_ring_outer_path_animation;
+			global::ShortDev.Android.Resource.Animation.fragment_fast_out_extra_slow_in = global::Nearby_Sharing_Windows.Resource.Animation.fragment_fast_out_extra_slow_in;
+			global::ShortDev.Android.Resource.Attribute.actionBarDivider = global::Nearby_Sharing_Windows.Resource.Attribute.actionBarDivider;
+			global::ShortDev.Android.Resource.Attribute.actionBarItemBackground = global::Nearby_Sharing_Windows.Resource.Attribute.actionBarItemBackground;
+			global::ShortDev.Android.Resource.Attribute.actionBarPopupTheme = global::Nearby_Sharing_Windows.Resource.Attribute.actionBarPopupTheme;
+			global::ShortDev.Android.Resource.Attribute.actionBarSize = global::Nearby_Sharing_Windows.Resource.Attribute.actionBarSize;
+			global::ShortDev.Android.Resource.Attribute.actionBarSplitStyle = global::Nearby_Sharing_Windows.Resource.Attribute.actionBarSplitStyle;
+			global::ShortDev.Android.Resource.Attribute.actionBarStyle = global::Nearby_Sharing_Windows.Resource.Attribute.actionBarStyle;
+			global::ShortDev.Android.Resource.Attribute.actionBarTabBarStyle = global::Nearby_Sharing_Windows.Resource.Attribute.actionBarTabBarStyle;
+			global::ShortDev.Android.Resource.Attribute.actionBarTabStyle = global::Nearby_Sharing_Windows.Resource.Attribute.actionBarTabStyle;
+			global::ShortDev.Android.Resource.Attribute.actionBarTabTextStyle = global::Nearby_Sharing_Windows.Resource.Attribute.actionBarTabTextStyle;
+			global::ShortDev.Android.Resource.Attribute.actionBarTheme = global::Nearby_Sharing_Windows.Resource.Attribute.actionBarTheme;
+			global::ShortDev.Android.Resource.Attribute.actionBarWidgetTheme = global::Nearby_Sharing_Windows.Resource.Attribute.actionBarWidgetTheme;
+			global::ShortDev.Android.Resource.Attribute.actionButtonStyle = global::Nearby_Sharing_Windows.Resource.Attribute.actionButtonStyle;
+			global::ShortDev.Android.Resource.Attribute.actionDropDownStyle = global::Nearby_Sharing_Windows.Resource.Attribute.actionDropDownStyle;
+			global::ShortDev.Android.Resource.Attribute.actionLayout = global::Nearby_Sharing_Windows.Resource.Attribute.actionLayout;
+			global::ShortDev.Android.Resource.Attribute.actionMenuTextAppearance = global::Nearby_Sharing_Windows.Resource.Attribute.actionMenuTextAppearance;
+			global::ShortDev.Android.Resource.Attribute.actionMenuTextColor = global::Nearby_Sharing_Windows.Resource.Attribute.actionMenuTextColor;
+			global::ShortDev.Android.Resource.Attribute.actionModeBackground = global::Nearby_Sharing_Windows.Resource.Attribute.actionModeBackground;
+			global::ShortDev.Android.Resource.Attribute.actionModeCloseButtonStyle = global::Nearby_Sharing_Windows.Resource.Attribute.actionModeCloseButtonStyle;
+			global::ShortDev.Android.Resource.Attribute.actionModeCloseDrawable = global::Nearby_Sharing_Windows.Resource.Attribute.actionModeCloseDrawable;
+			global::ShortDev.Android.Resource.Attribute.actionModeCopyDrawable = global::Nearby_Sharing_Windows.Resource.Attribute.actionModeCopyDrawable;
+			global::ShortDev.Android.Resource.Attribute.actionModeCutDrawable = global::Nearby_Sharing_Windows.Resource.Attribute.actionModeCutDrawable;
+			global::ShortDev.Android.Resource.Attribute.actionModeFindDrawable = global::Nearby_Sharing_Windows.Resource.Attribute.actionModeFindDrawable;
+			global::ShortDev.Android.Resource.Attribute.actionModePasteDrawable = global::Nearby_Sharing_Windows.Resource.Attribute.actionModePasteDrawable;
+			global::ShortDev.Android.Resource.Attribute.actionModePopupWindowStyle = global::Nearby_Sharing_Windows.Resource.Attribute.actionModePopupWindowStyle;
+			global::ShortDev.Android.Resource.Attribute.actionModeSelectAllDrawable = global::Nearby_Sharing_Windows.Resource.Attribute.actionModeSelectAllDrawable;
+			global::ShortDev.Android.Resource.Attribute.actionModeShareDrawable = global::Nearby_Sharing_Windows.Resource.Attribute.actionModeShareDrawable;
+			global::ShortDev.Android.Resource.Attribute.actionModeSplitBackground = global::Nearby_Sharing_Windows.Resource.Attribute.actionModeSplitBackground;
+			global::ShortDev.Android.Resource.Attribute.actionModeStyle = global::Nearby_Sharing_Windows.Resource.Attribute.actionModeStyle;
+			global::ShortDev.Android.Resource.Attribute.actionModeWebSearchDrawable = global::Nearby_Sharing_Windows.Resource.Attribute.actionModeWebSearchDrawable;
+			global::ShortDev.Android.Resource.Attribute.actionOverflowButtonStyle = global::Nearby_Sharing_Windows.Resource.Attribute.actionOverflowButtonStyle;
+			global::ShortDev.Android.Resource.Attribute.actionOverflowMenuStyle = global::Nearby_Sharing_Windows.Resource.Attribute.actionOverflowMenuStyle;
+			global::ShortDev.Android.Resource.Attribute.actionProviderClass = global::Nearby_Sharing_Windows.Resource.Attribute.actionProviderClass;
+			global::ShortDev.Android.Resource.Attribute.actionViewClass = global::Nearby_Sharing_Windows.Resource.Attribute.actionViewClass;
+			global::ShortDev.Android.Resource.Attribute.activityChooserViewStyle = global::Nearby_Sharing_Windows.Resource.Attribute.activityChooserViewStyle;
+			global::ShortDev.Android.Resource.Attribute.alertDialogButtonGroupStyle = global::Nearby_Sharing_Windows.Resource.Attribute.alertDialogButtonGroupStyle;
+			global::ShortDev.Android.Resource.Attribute.alertDialogCenterButtons = global::Nearby_Sharing_Windows.Resource.Attribute.alertDialogCenterButtons;
+			global::ShortDev.Android.Resource.Attribute.alertDialogStyle = global::Nearby_Sharing_Windows.Resource.Attribute.alertDialogStyle;
+			global::ShortDev.Android.Resource.Attribute.alertDialogTheme = global::Nearby_Sharing_Windows.Resource.Attribute.alertDialogTheme;
+			global::ShortDev.Android.Resource.Attribute.allowStacking = global::Nearby_Sharing_Windows.Resource.Attribute.allowStacking;
+			global::ShortDev.Android.Resource.Attribute.alpha = global::Nearby_Sharing_Windows.Resource.Attribute.alpha;
+			global::ShortDev.Android.Resource.Attribute.alphabeticModifiers = global::Nearby_Sharing_Windows.Resource.Attribute.alphabeticModifiers;
+			global::ShortDev.Android.Resource.Attribute.arrowHeadLength = global::Nearby_Sharing_Windows.Resource.Attribute.arrowHeadLength;
+			global::ShortDev.Android.Resource.Attribute.arrowShaftLength = global::Nearby_Sharing_Windows.Resource.Attribute.arrowShaftLength;
+			global::ShortDev.Android.Resource.Attribute.autoCompleteTextViewStyle = global::Nearby_Sharing_Windows.Resource.Attribute.autoCompleteTextViewStyle;
+			global::ShortDev.Android.Resource.Attribute.autoSizeMaxTextSize = global::Nearby_Sharing_Windows.Resource.Attribute.autoSizeMaxTextSize;
+			global::ShortDev.Android.Resource.Attribute.autoSizeMinTextSize = global::Nearby_Sharing_Windows.Resource.Attribute.autoSizeMinTextSize;
+			global::ShortDev.Android.Resource.Attribute.autoSizePresetSizes = global::Nearby_Sharing_Windows.Resource.Attribute.autoSizePresetSizes;
+			global::ShortDev.Android.Resource.Attribute.autoSizeStepGranularity = global::Nearby_Sharing_Windows.Resource.Attribute.autoSizeStepGranularity;
+			global::ShortDev.Android.Resource.Attribute.autoSizeTextType = global::Nearby_Sharing_Windows.Resource.Attribute.autoSizeTextType;
+			global::ShortDev.Android.Resource.Attribute.background = global::Nearby_Sharing_Windows.Resource.Attribute.background;
+			global::ShortDev.Android.Resource.Attribute.backgroundSplit = global::Nearby_Sharing_Windows.Resource.Attribute.backgroundSplit;
+			global::ShortDev.Android.Resource.Attribute.backgroundStacked = global::Nearby_Sharing_Windows.Resource.Attribute.backgroundStacked;
+			global::ShortDev.Android.Resource.Attribute.backgroundTint = global::Nearby_Sharing_Windows.Resource.Attribute.backgroundTint;
+			global::ShortDev.Android.Resource.Attribute.backgroundTintMode = global::Nearby_Sharing_Windows.Resource.Attribute.backgroundTintMode;
+			global::ShortDev.Android.Resource.Attribute.barLength = global::Nearby_Sharing_Windows.Resource.Attribute.barLength;
+			global::ShortDev.Android.Resource.Attribute.borderlessButtonStyle = global::Nearby_Sharing_Windows.Resource.Attribute.borderlessButtonStyle;
+			global::ShortDev.Android.Resource.Attribute.buttonBarButtonStyle = global::Nearby_Sharing_Windows.Resource.Attribute.buttonBarButtonStyle;
+			global::ShortDev.Android.Resource.Attribute.buttonBarNegativeButtonStyle = global::Nearby_Sharing_Windows.Resource.Attribute.buttonBarNegativeButtonStyle;
+			global::ShortDev.Android.Resource.Attribute.buttonBarNeutralButtonStyle = global::Nearby_Sharing_Windows.Resource.Attribute.buttonBarNeutralButtonStyle;
+			global::ShortDev.Android.Resource.Attribute.buttonBarPositiveButtonStyle = global::Nearby_Sharing_Windows.Resource.Attribute.buttonBarPositiveButtonStyle;
+			global::ShortDev.Android.Resource.Attribute.buttonBarStyle = global::Nearby_Sharing_Windows.Resource.Attribute.buttonBarStyle;
+			global::ShortDev.Android.Resource.Attribute.buttonCompat = global::Nearby_Sharing_Windows.Resource.Attribute.buttonCompat;
+			global::ShortDev.Android.Resource.Attribute.buttonGravity = global::Nearby_Sharing_Windows.Resource.Attribute.buttonGravity;
+			global::ShortDev.Android.Resource.Attribute.buttonIconDimen = global::Nearby_Sharing_Windows.Resource.Attribute.buttonIconDimen;
+			global::ShortDev.Android.Resource.Attribute.buttonPanelSideLayout = global::Nearby_Sharing_Windows.Resource.Attribute.buttonPanelSideLayout;
+			global::ShortDev.Android.Resource.Attribute.buttonStyle = global::Nearby_Sharing_Windows.Resource.Attribute.buttonStyle;
+			global::ShortDev.Android.Resource.Attribute.buttonStyleSmall = global::Nearby_Sharing_Windows.Resource.Attribute.buttonStyleSmall;
+			global::ShortDev.Android.Resource.Attribute.buttonTint = global::Nearby_Sharing_Windows.Resource.Attribute.buttonTint;
+			global::ShortDev.Android.Resource.Attribute.buttonTintMode = global::Nearby_Sharing_Windows.Resource.Attribute.buttonTintMode;
+			global::ShortDev.Android.Resource.Attribute.checkboxStyle = global::Nearby_Sharing_Windows.Resource.Attribute.checkboxStyle;
+			global::ShortDev.Android.Resource.Attribute.checkedTextViewStyle = global::Nearby_Sharing_Windows.Resource.Attribute.checkedTextViewStyle;
+			global::ShortDev.Android.Resource.Attribute.closeIcon = global::Nearby_Sharing_Windows.Resource.Attribute.closeIcon;
+			global::ShortDev.Android.Resource.Attribute.closeItemLayout = global::Nearby_Sharing_Windows.Resource.Attribute.closeItemLayout;
+			global::ShortDev.Android.Resource.Attribute.collapseContentDescription = global::Nearby_Sharing_Windows.Resource.Attribute.collapseContentDescription;
+			global::ShortDev.Android.Resource.Attribute.collapseIcon = global::Nearby_Sharing_Windows.Resource.Attribute.collapseIcon;
+			global::ShortDev.Android.Resource.Attribute.color = global::Nearby_Sharing_Windows.Resource.Attribute.color;
+			global::ShortDev.Android.Resource.Attribute.colorAccent = global::Nearby_Sharing_Windows.Resource.Attribute.colorAccent;
+			global::ShortDev.Android.Resource.Attribute.colorBackgroundFloating = global::Nearby_Sharing_Windows.Resource.Attribute.colorBackgroundFloating;
+			global::ShortDev.Android.Resource.Attribute.colorButtonNormal = global::Nearby_Sharing_Windows.Resource.Attribute.colorButtonNormal;
+			global::ShortDev.Android.Resource.Attribute.colorControlActivated = global::Nearby_Sharing_Windows.Resource.Attribute.colorControlActivated;
+			global::ShortDev.Android.Resource.Attribute.colorControlHighlight = global::Nearby_Sharing_Windows.Resource.Attribute.colorControlHighlight;
+			global::ShortDev.Android.Resource.Attribute.colorControlNormal = global::Nearby_Sharing_Windows.Resource.Attribute.colorControlNormal;
+			global::ShortDev.Android.Resource.Attribute.colorError = global::Nearby_Sharing_Windows.Resource.Attribute.colorError;
+			global::ShortDev.Android.Resource.Attribute.colorPrimary = global::Nearby_Sharing_Windows.Resource.Attribute.colorPrimary;
+			global::ShortDev.Android.Resource.Attribute.colorPrimaryDark = global::Nearby_Sharing_Windows.Resource.Attribute.colorPrimaryDark;
+			global::ShortDev.Android.Resource.Attribute.colorSwitchThumbNormal = global::Nearby_Sharing_Windows.Resource.Attribute.colorSwitchThumbNormal;
+			global::ShortDev.Android.Resource.Attribute.commitIcon = global::Nearby_Sharing_Windows.Resource.Attribute.commitIcon;
+			global::ShortDev.Android.Resource.Attribute.contentDescription = global::Nearby_Sharing_Windows.Resource.Attribute.contentDescription;
+			global::ShortDev.Android.Resource.Attribute.contentInsetEnd = global::Nearby_Sharing_Windows.Resource.Attribute.contentInsetEnd;
+			global::ShortDev.Android.Resource.Attribute.contentInsetEndWithActions = global::Nearby_Sharing_Windows.Resource.Attribute.contentInsetEndWithActions;
+			global::ShortDev.Android.Resource.Attribute.contentInsetLeft = global::Nearby_Sharing_Windows.Resource.Attribute.contentInsetLeft;
+			global::ShortDev.Android.Resource.Attribute.contentInsetRight = global::Nearby_Sharing_Windows.Resource.Attribute.contentInsetRight;
+			global::ShortDev.Android.Resource.Attribute.contentInsetStart = global::Nearby_Sharing_Windows.Resource.Attribute.contentInsetStart;
+			global::ShortDev.Android.Resource.Attribute.contentInsetStartWithNavigation = global::Nearby_Sharing_Windows.Resource.Attribute.contentInsetStartWithNavigation;
+			global::ShortDev.Android.Resource.Attribute.controlBackground = global::Nearby_Sharing_Windows.Resource.Attribute.controlBackground;
+			global::ShortDev.Android.Resource.Attribute.customNavigationLayout = global::Nearby_Sharing_Windows.Resource.Attribute.customNavigationLayout;
+			global::ShortDev.Android.Resource.Attribute.defaultQueryHint = global::Nearby_Sharing_Windows.Resource.Attribute.defaultQueryHint;
+			global::ShortDev.Android.Resource.Attribute.dialogCornerRadius = global::Nearby_Sharing_Windows.Resource.Attribute.dialogCornerRadius;
+			global::ShortDev.Android.Resource.Attribute.dialogPreferredPadding = global::Nearby_Sharing_Windows.Resource.Attribute.dialogPreferredPadding;
+			global::ShortDev.Android.Resource.Attribute.dialogTheme = global::Nearby_Sharing_Windows.Resource.Attribute.dialogTheme;
+			global::ShortDev.Android.Resource.Attribute.displayOptions = global::Nearby_Sharing_Windows.Resource.Attribute.displayOptions;
+			global::ShortDev.Android.Resource.Attribute.divider = global::Nearby_Sharing_Windows.Resource.Attribute.divider;
+			global::ShortDev.Android.Resource.Attribute.dividerHorizontal = global::Nearby_Sharing_Windows.Resource.Attribute.dividerHorizontal;
+			global::ShortDev.Android.Resource.Attribute.dividerPadding = global::Nearby_Sharing_Windows.Resource.Attribute.dividerPadding;
+			global::ShortDev.Android.Resource.Attribute.dividerVertical = global::Nearby_Sharing_Windows.Resource.Attribute.dividerVertical;
+			global::ShortDev.Android.Resource.Attribute.drawableBottomCompat = global::Nearby_Sharing_Windows.Resource.Attribute.drawableBottomCompat;
+			global::ShortDev.Android.Resource.Attribute.drawableEndCompat = global::Nearby_Sharing_Windows.Resource.Attribute.drawableEndCompat;
+			global::ShortDev.Android.Resource.Attribute.drawableLeftCompat = global::Nearby_Sharing_Windows.Resource.Attribute.drawableLeftCompat;
+			global::ShortDev.Android.Resource.Attribute.drawableRightCompat = global::Nearby_Sharing_Windows.Resource.Attribute.drawableRightCompat;
+			global::ShortDev.Android.Resource.Attribute.drawableSize = global::Nearby_Sharing_Windows.Resource.Attribute.drawableSize;
+			global::ShortDev.Android.Resource.Attribute.drawableStartCompat = global::Nearby_Sharing_Windows.Resource.Attribute.drawableStartCompat;
+			global::ShortDev.Android.Resource.Attribute.drawableTint = global::Nearby_Sharing_Windows.Resource.Attribute.drawableTint;
+			global::ShortDev.Android.Resource.Attribute.drawableTintMode = global::Nearby_Sharing_Windows.Resource.Attribute.drawableTintMode;
+			global::ShortDev.Android.Resource.Attribute.drawableTopCompat = global::Nearby_Sharing_Windows.Resource.Attribute.drawableTopCompat;
+			global::ShortDev.Android.Resource.Attribute.drawerArrowStyle = global::Nearby_Sharing_Windows.Resource.Attribute.drawerArrowStyle;
+			global::ShortDev.Android.Resource.Attribute.drawerLayoutStyle = global::Nearby_Sharing_Windows.Resource.Attribute.drawerLayoutStyle;
+			global::ShortDev.Android.Resource.Attribute.dropdownListPreferredItemHeight = global::Nearby_Sharing_Windows.Resource.Attribute.dropdownListPreferredItemHeight;
+			global::ShortDev.Android.Resource.Attribute.dropDownListViewStyle = global::Nearby_Sharing_Windows.Resource.Attribute.dropDownListViewStyle;
+			global::ShortDev.Android.Resource.Attribute.editTextBackground = global::Nearby_Sharing_Windows.Resource.Attribute.editTextBackground;
+			global::ShortDev.Android.Resource.Attribute.editTextColor = global::Nearby_Sharing_Windows.Resource.Attribute.editTextColor;
+			global::ShortDev.Android.Resource.Attribute.editTextStyle = global::Nearby_Sharing_Windows.Resource.Attribute.editTextStyle;
+			global::ShortDev.Android.Resource.Attribute.elevation = global::Nearby_Sharing_Windows.Resource.Attribute.elevation;
+			global::ShortDev.Android.Resource.Attribute.expandActivityOverflowButtonDrawable = global::Nearby_Sharing_Windows.Resource.Attribute.expandActivityOverflowButtonDrawable;
+			global::ShortDev.Android.Resource.Attribute.fastScrollEnabled = global::Nearby_Sharing_Windows.Resource.Attribute.fastScrollEnabled;
+			global::ShortDev.Android.Resource.Attribute.fastScrollHorizontalThumbDrawable = global::Nearby_Sharing_Windows.Resource.Attribute.fastScrollHorizontalThumbDrawable;
+			global::ShortDev.Android.Resource.Attribute.fastScrollHorizontalTrackDrawable = global::Nearby_Sharing_Windows.Resource.Attribute.fastScrollHorizontalTrackDrawable;
+			global::ShortDev.Android.Resource.Attribute.fastScrollVerticalThumbDrawable = global::Nearby_Sharing_Windows.Resource.Attribute.fastScrollVerticalThumbDrawable;
+			global::ShortDev.Android.Resource.Attribute.fastScrollVerticalTrackDrawable = global::Nearby_Sharing_Windows.Resource.Attribute.fastScrollVerticalTrackDrawable;
+			global::ShortDev.Android.Resource.Attribute.firstBaselineToTopHeight = global::Nearby_Sharing_Windows.Resource.Attribute.firstBaselineToTopHeight;
+			global::ShortDev.Android.Resource.Attribute.font = global::Nearby_Sharing_Windows.Resource.Attribute.font;
+			global::ShortDev.Android.Resource.Attribute.fontFamily = global::Nearby_Sharing_Windows.Resource.Attribute.fontFamily;
+			global::ShortDev.Android.Resource.Attribute.fontProviderAuthority = global::Nearby_Sharing_Windows.Resource.Attribute.fontProviderAuthority;
+			global::ShortDev.Android.Resource.Attribute.fontProviderCerts = global::Nearby_Sharing_Windows.Resource.Attribute.fontProviderCerts;
+			global::ShortDev.Android.Resource.Attribute.fontProviderFetchStrategy = global::Nearby_Sharing_Windows.Resource.Attribute.fontProviderFetchStrategy;
+			global::ShortDev.Android.Resource.Attribute.fontProviderFetchTimeout = global::Nearby_Sharing_Windows.Resource.Attribute.fontProviderFetchTimeout;
+			global::ShortDev.Android.Resource.Attribute.fontProviderPackage = global::Nearby_Sharing_Windows.Resource.Attribute.fontProviderPackage;
+			global::ShortDev.Android.Resource.Attribute.fontProviderQuery = global::Nearby_Sharing_Windows.Resource.Attribute.fontProviderQuery;
+			global::ShortDev.Android.Resource.Attribute.fontProviderSystemFontFamily = global::Nearby_Sharing_Windows.Resource.Attribute.fontProviderSystemFontFamily;
+			global::ShortDev.Android.Resource.Attribute.fontStyle = global::Nearby_Sharing_Windows.Resource.Attribute.fontStyle;
+			global::ShortDev.Android.Resource.Attribute.fontVariationSettings = global::Nearby_Sharing_Windows.Resource.Attribute.fontVariationSettings;
+			global::ShortDev.Android.Resource.Attribute.fontWeight = global::Nearby_Sharing_Windows.Resource.Attribute.fontWeight;
+			global::ShortDev.Android.Resource.Attribute.gapBetweenBars = global::Nearby_Sharing_Windows.Resource.Attribute.gapBetweenBars;
+			global::ShortDev.Android.Resource.Attribute.goIcon = global::Nearby_Sharing_Windows.Resource.Attribute.goIcon;
+			global::ShortDev.Android.Resource.Attribute.height = global::Nearby_Sharing_Windows.Resource.Attribute.height;
+			global::ShortDev.Android.Resource.Attribute.hideOnContentScroll = global::Nearby_Sharing_Windows.Resource.Attribute.hideOnContentScroll;
+			global::ShortDev.Android.Resource.Attribute.homeAsUpIndicator = global::Nearby_Sharing_Windows.Resource.Attribute.homeAsUpIndicator;
+			global::ShortDev.Android.Resource.Attribute.homeLayout = global::Nearby_Sharing_Windows.Resource.Attribute.homeLayout;
+			global::ShortDev.Android.Resource.Attribute.icon = global::Nearby_Sharing_Windows.Resource.Attribute.icon;
+			global::ShortDev.Android.Resource.Attribute.iconifiedByDefault = global::Nearby_Sharing_Windows.Resource.Attribute.iconifiedByDefault;
+			global::ShortDev.Android.Resource.Attribute.iconTint = global::Nearby_Sharing_Windows.Resource.Attribute.iconTint;
+			global::ShortDev.Android.Resource.Attribute.iconTintMode = global::Nearby_Sharing_Windows.Resource.Attribute.iconTintMode;
+			global::ShortDev.Android.Resource.Attribute.imageButtonStyle = global::Nearby_Sharing_Windows.Resource.Attribute.imageButtonStyle;
+			global::ShortDev.Android.Resource.Attribute.indeterminateProgressStyle = global::Nearby_Sharing_Windows.Resource.Attribute.indeterminateProgressStyle;
+			global::ShortDev.Android.Resource.Attribute.initialActivityCount = global::Nearby_Sharing_Windows.Resource.Attribute.initialActivityCount;
+			global::ShortDev.Android.Resource.Attribute.isLightTheme = global::Nearby_Sharing_Windows.Resource.Attribute.isLightTheme;
+			global::ShortDev.Android.Resource.Attribute.itemPadding = global::Nearby_Sharing_Windows.Resource.Attribute.itemPadding;
+			global::ShortDev.Android.Resource.Attribute.lastBaselineToBottomHeight = global::Nearby_Sharing_Windows.Resource.Attribute.lastBaselineToBottomHeight;
+			global::ShortDev.Android.Resource.Attribute.layout = global::Nearby_Sharing_Windows.Resource.Attribute.layout;
+			global::ShortDev.Android.Resource.Attribute.layoutManager = global::Nearby_Sharing_Windows.Resource.Attribute.layoutManager;
+			global::ShortDev.Android.Resource.Attribute.lineHeight = global::Nearby_Sharing_Windows.Resource.Attribute.lineHeight;
+			global::ShortDev.Android.Resource.Attribute.listChoiceBackgroundIndicator = global::Nearby_Sharing_Windows.Resource.Attribute.listChoiceBackgroundIndicator;
+			global::ShortDev.Android.Resource.Attribute.listChoiceIndicatorMultipleAnimated = global::Nearby_Sharing_Windows.Resource.Attribute.listChoiceIndicatorMultipleAnimated;
+			global::ShortDev.Android.Resource.Attribute.listChoiceIndicatorSingleAnimated = global::Nearby_Sharing_Windows.Resource.Attribute.listChoiceIndicatorSingleAnimated;
+			global::ShortDev.Android.Resource.Attribute.listDividerAlertDialog = global::Nearby_Sharing_Windows.Resource.Attribute.listDividerAlertDialog;
+			global::ShortDev.Android.Resource.Attribute.listItemLayout = global::Nearby_Sharing_Windows.Resource.Attribute.listItemLayout;
+			global::ShortDev.Android.Resource.Attribute.listLayout = global::Nearby_Sharing_Windows.Resource.Attribute.listLayout;
+			global::ShortDev.Android.Resource.Attribute.listMenuViewStyle = global::Nearby_Sharing_Windows.Resource.Attribute.listMenuViewStyle;
+			global::ShortDev.Android.Resource.Attribute.listPopupWindowStyle = global::Nearby_Sharing_Windows.Resource.Attribute.listPopupWindowStyle;
+			global::ShortDev.Android.Resource.Attribute.listPreferredItemHeight = global::Nearby_Sharing_Windows.Resource.Attribute.listPreferredItemHeight;
+			global::ShortDev.Android.Resource.Attribute.listPreferredItemHeightLarge = global::Nearby_Sharing_Windows.Resource.Attribute.listPreferredItemHeightLarge;
+			global::ShortDev.Android.Resource.Attribute.listPreferredItemHeightSmall = global::Nearby_Sharing_Windows.Resource.Attribute.listPreferredItemHeightSmall;
+			global::ShortDev.Android.Resource.Attribute.listPreferredItemPaddingEnd = global::Nearby_Sharing_Windows.Resource.Attribute.listPreferredItemPaddingEnd;
+			global::ShortDev.Android.Resource.Attribute.listPreferredItemPaddingLeft = global::Nearby_Sharing_Windows.Resource.Attribute.listPreferredItemPaddingLeft;
+			global::ShortDev.Android.Resource.Attribute.listPreferredItemPaddingRight = global::Nearby_Sharing_Windows.Resource.Attribute.listPreferredItemPaddingRight;
+			global::ShortDev.Android.Resource.Attribute.listPreferredItemPaddingStart = global::Nearby_Sharing_Windows.Resource.Attribute.listPreferredItemPaddingStart;
+			global::ShortDev.Android.Resource.Attribute.logo = global::Nearby_Sharing_Windows.Resource.Attribute.logo;
+			global::ShortDev.Android.Resource.Attribute.logoDescription = global::Nearby_Sharing_Windows.Resource.Attribute.logoDescription;
+			global::ShortDev.Android.Resource.Attribute.lStar = global::Nearby_Sharing_Windows.Resource.Attribute.lStar;
+			global::ShortDev.Android.Resource.Attribute.maxButtonHeight = global::Nearby_Sharing_Windows.Resource.Attribute.maxButtonHeight;
+			global::ShortDev.Android.Resource.Attribute.measureWithLargestChild = global::Nearby_Sharing_Windows.Resource.Attribute.measureWithLargestChild;
+			global::ShortDev.Android.Resource.Attribute.menu = global::Nearby_Sharing_Windows.Resource.Attribute.menu;
+			global::ShortDev.Android.Resource.Attribute.multiChoiceItemLayout = global::Nearby_Sharing_Windows.Resource.Attribute.multiChoiceItemLayout;
+			global::ShortDev.Android.Resource.Attribute.navigationContentDescription = global::Nearby_Sharing_Windows.Resource.Attribute.navigationContentDescription;
+			global::ShortDev.Android.Resource.Attribute.navigationIcon = global::Nearby_Sharing_Windows.Resource.Attribute.navigationIcon;
+			global::ShortDev.Android.Resource.Attribute.navigationMode = global::Nearby_Sharing_Windows.Resource.Attribute.navigationMode;
+			global::ShortDev.Android.Resource.Attribute.nestedScrollViewStyle = global::Nearby_Sharing_Windows.Resource.Attribute.nestedScrollViewStyle;
+			global::ShortDev.Android.Resource.Attribute.numericModifiers = global::Nearby_Sharing_Windows.Resource.Attribute.numericModifiers;
+			global::ShortDev.Android.Resource.Attribute.overlapAnchor = global::Nearby_Sharing_Windows.Resource.Attribute.overlapAnchor;
+			global::ShortDev.Android.Resource.Attribute.paddingBottomNoButtons = global::Nearby_Sharing_Windows.Resource.Attribute.paddingBottomNoButtons;
+			global::ShortDev.Android.Resource.Attribute.paddingEnd = global::Nearby_Sharing_Windows.Resource.Attribute.paddingEnd;
+			global::ShortDev.Android.Resource.Attribute.paddingStart = global::Nearby_Sharing_Windows.Resource.Attribute.paddingStart;
+			global::ShortDev.Android.Resource.Attribute.paddingTopNoTitle = global::Nearby_Sharing_Windows.Resource.Attribute.paddingTopNoTitle;
+			global::ShortDev.Android.Resource.Attribute.panelBackground = global::Nearby_Sharing_Windows.Resource.Attribute.panelBackground;
+			global::ShortDev.Android.Resource.Attribute.panelMenuListTheme = global::Nearby_Sharing_Windows.Resource.Attribute.panelMenuListTheme;
+			global::ShortDev.Android.Resource.Attribute.panelMenuListWidth = global::Nearby_Sharing_Windows.Resource.Attribute.panelMenuListWidth;
+			global::ShortDev.Android.Resource.Attribute.popupMenuStyle = global::Nearby_Sharing_Windows.Resource.Attribute.popupMenuStyle;
+			global::ShortDev.Android.Resource.Attribute.popupTheme = global::Nearby_Sharing_Windows.Resource.Attribute.popupTheme;
+			global::ShortDev.Android.Resource.Attribute.popupWindowStyle = global::Nearby_Sharing_Windows.Resource.Attribute.popupWindowStyle;
+			global::ShortDev.Android.Resource.Attribute.preserveIconSpacing = global::Nearby_Sharing_Windows.Resource.Attribute.preserveIconSpacing;
+			global::ShortDev.Android.Resource.Attribute.progressBarPadding = global::Nearby_Sharing_Windows.Resource.Attribute.progressBarPadding;
+			global::ShortDev.Android.Resource.Attribute.progressBarStyle = global::Nearby_Sharing_Windows.Resource.Attribute.progressBarStyle;
+			global::ShortDev.Android.Resource.Attribute.queryBackground = global::Nearby_Sharing_Windows.Resource.Attribute.queryBackground;
+			global::ShortDev.Android.Resource.Attribute.queryHint = global::Nearby_Sharing_Windows.Resource.Attribute.queryHint;
+			global::ShortDev.Android.Resource.Attribute.queryPatterns = global::Nearby_Sharing_Windows.Resource.Attribute.queryPatterns;
+			global::ShortDev.Android.Resource.Attribute.radioButtonStyle = global::Nearby_Sharing_Windows.Resource.Attribute.radioButtonStyle;
+			global::ShortDev.Android.Resource.Attribute.ratingBarStyle = global::Nearby_Sharing_Windows.Resource.Attribute.ratingBarStyle;
+			global::ShortDev.Android.Resource.Attribute.ratingBarStyleIndicator = global::Nearby_Sharing_Windows.Resource.Attribute.ratingBarStyleIndicator;
+			global::ShortDev.Android.Resource.Attribute.ratingBarStyleSmall = global::Nearby_Sharing_Windows.Resource.Attribute.ratingBarStyleSmall;
+			global::ShortDev.Android.Resource.Attribute.recyclerViewStyle = global::Nearby_Sharing_Windows.Resource.Attribute.recyclerViewStyle;
+			global::ShortDev.Android.Resource.Attribute.reverseLayout = global::Nearby_Sharing_Windows.Resource.Attribute.reverseLayout;
+			global::ShortDev.Android.Resource.Attribute.searchHintIcon = global::Nearby_Sharing_Windows.Resource.Attribute.searchHintIcon;
+			global::ShortDev.Android.Resource.Attribute.searchIcon = global::Nearby_Sharing_Windows.Resource.Attribute.searchIcon;
+			global::ShortDev.Android.Resource.Attribute.searchViewStyle = global::Nearby_Sharing_Windows.Resource.Attribute.searchViewStyle;
+			global::ShortDev.Android.Resource.Attribute.seekBarStyle = global::Nearby_Sharing_Windows.Resource.Attribute.seekBarStyle;
+			global::ShortDev.Android.Resource.Attribute.selectableItemBackground = global::Nearby_Sharing_Windows.Resource.Attribute.selectableItemBackground;
+			global::ShortDev.Android.Resource.Attribute.selectableItemBackgroundBorderless = global::Nearby_Sharing_Windows.Resource.Attribute.selectableItemBackgroundBorderless;
+			global::ShortDev.Android.Resource.Attribute.shortcutMatchRequired = global::Nearby_Sharing_Windows.Resource.Attribute.shortcutMatchRequired;
+			global::ShortDev.Android.Resource.Attribute.showAsAction = global::Nearby_Sharing_Windows.Resource.Attribute.showAsAction;
+			global::ShortDev.Android.Resource.Attribute.showDividers = global::Nearby_Sharing_Windows.Resource.Attribute.showDividers;
+			global::ShortDev.Android.Resource.Attribute.showText = global::Nearby_Sharing_Windows.Resource.Attribute.showText;
+			global::ShortDev.Android.Resource.Attribute.showTitle = global::Nearby_Sharing_Windows.Resource.Attribute.showTitle;
+			global::ShortDev.Android.Resource.Attribute.singleChoiceItemLayout = global::Nearby_Sharing_Windows.Resource.Attribute.singleChoiceItemLayout;
+			global::ShortDev.Android.Resource.Attribute.spanCount = global::Nearby_Sharing_Windows.Resource.Attribute.spanCount;
+			global::ShortDev.Android.Resource.Attribute.spinBars = global::Nearby_Sharing_Windows.Resource.Attribute.spinBars;
+			global::ShortDev.Android.Resource.Attribute.spinnerDropDownItemStyle = global::Nearby_Sharing_Windows.Resource.Attribute.spinnerDropDownItemStyle;
+			global::ShortDev.Android.Resource.Attribute.spinnerStyle = global::Nearby_Sharing_Windows.Resource.Attribute.spinnerStyle;
+			global::ShortDev.Android.Resource.Attribute.splitTrack = global::Nearby_Sharing_Windows.Resource.Attribute.splitTrack;
+			global::ShortDev.Android.Resource.Attribute.srcCompat = global::Nearby_Sharing_Windows.Resource.Attribute.srcCompat;
+			global::ShortDev.Android.Resource.Attribute.stackFromEnd = global::Nearby_Sharing_Windows.Resource.Attribute.stackFromEnd;
+			global::ShortDev.Android.Resource.Attribute.state_above_anchor = global::Nearby_Sharing_Windows.Resource.Attribute.state_above_anchor;
+			global::ShortDev.Android.Resource.Attribute.subMenuArrow = global::Nearby_Sharing_Windows.Resource.Attribute.subMenuArrow;
+			global::ShortDev.Android.Resource.Attribute.submitBackground = global::Nearby_Sharing_Windows.Resource.Attribute.submitBackground;
+			global::ShortDev.Android.Resource.Attribute.subtitle = global::Nearby_Sharing_Windows.Resource.Attribute.subtitle;
+			global::ShortDev.Android.Resource.Attribute.subtitleTextAppearance = global::Nearby_Sharing_Windows.Resource.Attribute.subtitleTextAppearance;
+			global::ShortDev.Android.Resource.Attribute.subtitleTextColor = global::Nearby_Sharing_Windows.Resource.Attribute.subtitleTextColor;
+			global::ShortDev.Android.Resource.Attribute.subtitleTextStyle = global::Nearby_Sharing_Windows.Resource.Attribute.subtitleTextStyle;
+			global::ShortDev.Android.Resource.Attribute.suggestionRowLayout = global::Nearby_Sharing_Windows.Resource.Attribute.suggestionRowLayout;
+			global::ShortDev.Android.Resource.Attribute.switchMinWidth = global::Nearby_Sharing_Windows.Resource.Attribute.switchMinWidth;
+			global::ShortDev.Android.Resource.Attribute.switchPadding = global::Nearby_Sharing_Windows.Resource.Attribute.switchPadding;
+			global::ShortDev.Android.Resource.Attribute.switchStyle = global::Nearby_Sharing_Windows.Resource.Attribute.switchStyle;
+			global::ShortDev.Android.Resource.Attribute.switchTextAppearance = global::Nearby_Sharing_Windows.Resource.Attribute.switchTextAppearance;
+			global::ShortDev.Android.Resource.Attribute.textAllCaps = global::Nearby_Sharing_Windows.Resource.Attribute.textAllCaps;
+			global::ShortDev.Android.Resource.Attribute.textAppearanceLargePopupMenu = global::Nearby_Sharing_Windows.Resource.Attribute.textAppearanceLargePopupMenu;
+			global::ShortDev.Android.Resource.Attribute.textAppearanceListItem = global::Nearby_Sharing_Windows.Resource.Attribute.textAppearanceListItem;
+			global::ShortDev.Android.Resource.Attribute.textAppearanceListItemSecondary = global::Nearby_Sharing_Windows.Resource.Attribute.textAppearanceListItemSecondary;
+			global::ShortDev.Android.Resource.Attribute.textAppearanceListItemSmall = global::Nearby_Sharing_Windows.Resource.Attribute.textAppearanceListItemSmall;
+			global::ShortDev.Android.Resource.Attribute.textAppearancePopupMenuHeader = global::Nearby_Sharing_Windows.Resource.Attribute.textAppearancePopupMenuHeader;
+			global::ShortDev.Android.Resource.Attribute.textAppearanceSearchResultSubtitle = global::Nearby_Sharing_Windows.Resource.Attribute.textAppearanceSearchResultSubtitle;
+			global::ShortDev.Android.Resource.Attribute.textAppearanceSearchResultTitle = global::Nearby_Sharing_Windows.Resource.Attribute.textAppearanceSearchResultTitle;
+			global::ShortDev.Android.Resource.Attribute.textAppearanceSmallPopupMenu = global::Nearby_Sharing_Windows.Resource.Attribute.textAppearanceSmallPopupMenu;
+			global::ShortDev.Android.Resource.Attribute.textColorAlertDialogListItem = global::Nearby_Sharing_Windows.Resource.Attribute.textColorAlertDialogListItem;
+			global::ShortDev.Android.Resource.Attribute.textColorSearchUrl = global::Nearby_Sharing_Windows.Resource.Attribute.textColorSearchUrl;
+			global::ShortDev.Android.Resource.Attribute.textLocale = global::Nearby_Sharing_Windows.Resource.Attribute.textLocale;
+			global::ShortDev.Android.Resource.Attribute.theme = global::Nearby_Sharing_Windows.Resource.Attribute.theme;
+			global::ShortDev.Android.Resource.Attribute.thickness = global::Nearby_Sharing_Windows.Resource.Attribute.thickness;
+			global::ShortDev.Android.Resource.Attribute.thumbTextPadding = global::Nearby_Sharing_Windows.Resource.Attribute.thumbTextPadding;
+			global::ShortDev.Android.Resource.Attribute.thumbTint = global::Nearby_Sharing_Windows.Resource.Attribute.thumbTint;
+			global::ShortDev.Android.Resource.Attribute.thumbTintMode = global::Nearby_Sharing_Windows.Resource.Attribute.thumbTintMode;
+			global::ShortDev.Android.Resource.Attribute.tickMark = global::Nearby_Sharing_Windows.Resource.Attribute.tickMark;
+			global::ShortDev.Android.Resource.Attribute.tickMarkTint = global::Nearby_Sharing_Windows.Resource.Attribute.tickMarkTint;
+			global::ShortDev.Android.Resource.Attribute.tickMarkTintMode = global::Nearby_Sharing_Windows.Resource.Attribute.tickMarkTintMode;
+			global::ShortDev.Android.Resource.Attribute.tint = global::Nearby_Sharing_Windows.Resource.Attribute.tint;
+			global::ShortDev.Android.Resource.Attribute.tintMode = global::Nearby_Sharing_Windows.Resource.Attribute.tintMode;
+			global::ShortDev.Android.Resource.Attribute.title = global::Nearby_Sharing_Windows.Resource.Attribute.title;
+			global::ShortDev.Android.Resource.Attribute.titleMargin = global::Nearby_Sharing_Windows.Resource.Attribute.titleMargin;
+			global::ShortDev.Android.Resource.Attribute.titleMarginBottom = global::Nearby_Sharing_Windows.Resource.Attribute.titleMarginBottom;
+			global::ShortDev.Android.Resource.Attribute.titleMarginEnd = global::Nearby_Sharing_Windows.Resource.Attribute.titleMarginEnd;
+			global::ShortDev.Android.Resource.Attribute.titleMargins = global::Nearby_Sharing_Windows.Resource.Attribute.titleMargins;
+			global::ShortDev.Android.Resource.Attribute.titleMarginStart = global::Nearby_Sharing_Windows.Resource.Attribute.titleMarginStart;
+			global::ShortDev.Android.Resource.Attribute.titleMarginTop = global::Nearby_Sharing_Windows.Resource.Attribute.titleMarginTop;
+			global::ShortDev.Android.Resource.Attribute.titleTextAppearance = global::Nearby_Sharing_Windows.Resource.Attribute.titleTextAppearance;
+			global::ShortDev.Android.Resource.Attribute.titleTextColor = global::Nearby_Sharing_Windows.Resource.Attribute.titleTextColor;
+			global::ShortDev.Android.Resource.Attribute.titleTextStyle = global::Nearby_Sharing_Windows.Resource.Attribute.titleTextStyle;
+			global::ShortDev.Android.Resource.Attribute.toolbarNavigationButtonStyle = global::Nearby_Sharing_Windows.Resource.Attribute.toolbarNavigationButtonStyle;
+			global::ShortDev.Android.Resource.Attribute.toolbarStyle = global::Nearby_Sharing_Windows.Resource.Attribute.toolbarStyle;
+			global::ShortDev.Android.Resource.Attribute.tooltipForegroundColor = global::Nearby_Sharing_Windows.Resource.Attribute.tooltipForegroundColor;
+			global::ShortDev.Android.Resource.Attribute.tooltipFrameBackground = global::Nearby_Sharing_Windows.Resource.Attribute.tooltipFrameBackground;
+			global::ShortDev.Android.Resource.Attribute.tooltipText = global::Nearby_Sharing_Windows.Resource.Attribute.tooltipText;
+			global::ShortDev.Android.Resource.Attribute.track = global::Nearby_Sharing_Windows.Resource.Attribute.track;
+			global::ShortDev.Android.Resource.Attribute.trackTint = global::Nearby_Sharing_Windows.Resource.Attribute.trackTint;
+			global::ShortDev.Android.Resource.Attribute.trackTintMode = global::Nearby_Sharing_Windows.Resource.Attribute.trackTintMode;
+			global::ShortDev.Android.Resource.Attribute.ttcIndex = global::Nearby_Sharing_Windows.Resource.Attribute.ttcIndex;
+			global::ShortDev.Android.Resource.Attribute.viewInflaterClass = global::Nearby_Sharing_Windows.Resource.Attribute.viewInflaterClass;
+			global::ShortDev.Android.Resource.Attribute.voiceIcon = global::Nearby_Sharing_Windows.Resource.Attribute.voiceIcon;
+			global::ShortDev.Android.Resource.Attribute.windowActionBar = global::Nearby_Sharing_Windows.Resource.Attribute.windowActionBar;
+			global::ShortDev.Android.Resource.Attribute.windowActionBarOverlay = global::Nearby_Sharing_Windows.Resource.Attribute.windowActionBarOverlay;
+			global::ShortDev.Android.Resource.Attribute.windowActionModeOverlay = global::Nearby_Sharing_Windows.Resource.Attribute.windowActionModeOverlay;
+			global::ShortDev.Android.Resource.Attribute.windowFixedHeightMajor = global::Nearby_Sharing_Windows.Resource.Attribute.windowFixedHeightMajor;
+			global::ShortDev.Android.Resource.Attribute.windowFixedHeightMinor = global::Nearby_Sharing_Windows.Resource.Attribute.windowFixedHeightMinor;
+			global::ShortDev.Android.Resource.Attribute.windowFixedWidthMajor = global::Nearby_Sharing_Windows.Resource.Attribute.windowFixedWidthMajor;
+			global::ShortDev.Android.Resource.Attribute.windowFixedWidthMinor = global::Nearby_Sharing_Windows.Resource.Attribute.windowFixedWidthMinor;
+			global::ShortDev.Android.Resource.Attribute.windowMinWidthMajor = global::Nearby_Sharing_Windows.Resource.Attribute.windowMinWidthMajor;
+			global::ShortDev.Android.Resource.Attribute.windowMinWidthMinor = global::Nearby_Sharing_Windows.Resource.Attribute.windowMinWidthMinor;
+			global::ShortDev.Android.Resource.Attribute.windowNoTitle = global::Nearby_Sharing_Windows.Resource.Attribute.windowNoTitle;
+			global::ShortDev.Android.Resource.Boolean.abc_action_bar_embed_tabs = global::Nearby_Sharing_Windows.Resource.Boolean.abc_action_bar_embed_tabs;
+			global::ShortDev.Android.Resource.Boolean.abc_config_actionMenuItemAllCaps = global::Nearby_Sharing_Windows.Resource.Boolean.abc_config_actionMenuItemAllCaps;
+			global::ShortDev.Android.Resource.Color.abc_background_cache_hint_selector_material_dark = global::Nearby_Sharing_Windows.Resource.Color.abc_background_cache_hint_selector_material_dark;
+			global::ShortDev.Android.Resource.Color.abc_background_cache_hint_selector_material_light = global::Nearby_Sharing_Windows.Resource.Color.abc_background_cache_hint_selector_material_light;
+			global::ShortDev.Android.Resource.Color.abc_btn_colored_borderless_text_material = global::Nearby_Sharing_Windows.Resource.Color.abc_btn_colored_borderless_text_material;
+			global::ShortDev.Android.Resource.Color.abc_btn_colored_text_material = global::Nearby_Sharing_Windows.Resource.Color.abc_btn_colored_text_material;
+			global::ShortDev.Android.Resource.Color.abc_color_highlight_material = global::Nearby_Sharing_Windows.Resource.Color.abc_color_highlight_material;
+			global::ShortDev.Android.Resource.Color.abc_decor_view_status_guard = global::Nearby_Sharing_Windows.Resource.Color.abc_decor_view_status_guard;
+			global::ShortDev.Android.Resource.Color.abc_decor_view_status_guard_light = global::Nearby_Sharing_Windows.Resource.Color.abc_decor_view_status_guard_light;
+			global::ShortDev.Android.Resource.Color.abc_hint_foreground_material_dark = global::Nearby_Sharing_Windows.Resource.Color.abc_hint_foreground_material_dark;
+			global::ShortDev.Android.Resource.Color.abc_hint_foreground_material_light = global::Nearby_Sharing_Windows.Resource.Color.abc_hint_foreground_material_light;
+			global::ShortDev.Android.Resource.Color.abc_primary_text_disable_only_material_dark = global::Nearby_Sharing_Windows.Resource.Color.abc_primary_text_disable_only_material_dark;
+			global::ShortDev.Android.Resource.Color.abc_primary_text_disable_only_material_light = global::Nearby_Sharing_Windows.Resource.Color.abc_primary_text_disable_only_material_light;
+			global::ShortDev.Android.Resource.Color.abc_primary_text_material_dark = global::Nearby_Sharing_Windows.Resource.Color.abc_primary_text_material_dark;
+			global::ShortDev.Android.Resource.Color.abc_primary_text_material_light = global::Nearby_Sharing_Windows.Resource.Color.abc_primary_text_material_light;
+			global::ShortDev.Android.Resource.Color.abc_search_url_text = global::Nearby_Sharing_Windows.Resource.Color.abc_search_url_text;
+			global::ShortDev.Android.Resource.Color.abc_search_url_text_normal = global::Nearby_Sharing_Windows.Resource.Color.abc_search_url_text_normal;
+			global::ShortDev.Android.Resource.Color.abc_search_url_text_pressed = global::Nearby_Sharing_Windows.Resource.Color.abc_search_url_text_pressed;
+			global::ShortDev.Android.Resource.Color.abc_search_url_text_selected = global::Nearby_Sharing_Windows.Resource.Color.abc_search_url_text_selected;
+			global::ShortDev.Android.Resource.Color.abc_secondary_text_material_dark = global::Nearby_Sharing_Windows.Resource.Color.abc_secondary_text_material_dark;
+			global::ShortDev.Android.Resource.Color.abc_secondary_text_material_light = global::Nearby_Sharing_Windows.Resource.Color.abc_secondary_text_material_light;
+			global::ShortDev.Android.Resource.Color.abc_tint_btn_checkable = global::Nearby_Sharing_Windows.Resource.Color.abc_tint_btn_checkable;
+			global::ShortDev.Android.Resource.Color.abc_tint_default = global::Nearby_Sharing_Windows.Resource.Color.abc_tint_default;
+			global::ShortDev.Android.Resource.Color.abc_tint_edittext = global::Nearby_Sharing_Windows.Resource.Color.abc_tint_edittext;
+			global::ShortDev.Android.Resource.Color.abc_tint_seek_thumb = global::Nearby_Sharing_Windows.Resource.Color.abc_tint_seek_thumb;
+			global::ShortDev.Android.Resource.Color.abc_tint_spinner = global::Nearby_Sharing_Windows.Resource.Color.abc_tint_spinner;
+			global::ShortDev.Android.Resource.Color.abc_tint_switch_track = global::Nearby_Sharing_Windows.Resource.Color.abc_tint_switch_track;
+			global::ShortDev.Android.Resource.Color.accent_material_dark = global::Nearby_Sharing_Windows.Resource.Color.accent_material_dark;
+			global::ShortDev.Android.Resource.Color.accent_material_light = global::Nearby_Sharing_Windows.Resource.Color.accent_material_light;
+			global::ShortDev.Android.Resource.Color.androidx_core_ripple_material_light = global::Nearby_Sharing_Windows.Resource.Color.androidx_core_ripple_material_light;
+			global::ShortDev.Android.Resource.Color.androidx_core_secondary_text_default_material_light = global::Nearby_Sharing_Windows.Resource.Color.androidx_core_secondary_text_default_material_light;
+			global::ShortDev.Android.Resource.Color.background_floating_material_dark = global::Nearby_Sharing_Windows.Resource.Color.background_floating_material_dark;
+			global::ShortDev.Android.Resource.Color.background_floating_material_light = global::Nearby_Sharing_Windows.Resource.Color.background_floating_material_light;
+			global::ShortDev.Android.Resource.Color.background_material_dark = global::Nearby_Sharing_Windows.Resource.Color.background_material_dark;
+			global::ShortDev.Android.Resource.Color.background_material_light = global::Nearby_Sharing_Windows.Resource.Color.background_material_light;
+			global::ShortDev.Android.Resource.Color.bright_foreground_disabled_material_dark = global::Nearby_Sharing_Windows.Resource.Color.bright_foreground_disabled_material_dark;
+			global::ShortDev.Android.Resource.Color.bright_foreground_disabled_material_light = global::Nearby_Sharing_Windows.Resource.Color.bright_foreground_disabled_material_light;
+			global::ShortDev.Android.Resource.Color.bright_foreground_inverse_material_dark = global::Nearby_Sharing_Windows.Resource.Color.bright_foreground_inverse_material_dark;
+			global::ShortDev.Android.Resource.Color.bright_foreground_inverse_material_light = global::Nearby_Sharing_Windows.Resource.Color.bright_foreground_inverse_material_light;
+			global::ShortDev.Android.Resource.Color.bright_foreground_material_dark = global::Nearby_Sharing_Windows.Resource.Color.bright_foreground_material_dark;
+			global::ShortDev.Android.Resource.Color.bright_foreground_material_light = global::Nearby_Sharing_Windows.Resource.Color.bright_foreground_material_light;
+			global::ShortDev.Android.Resource.Color.button_material_dark = global::Nearby_Sharing_Windows.Resource.Color.button_material_dark;
+			global::ShortDev.Android.Resource.Color.button_material_light = global::Nearby_Sharing_Windows.Resource.Color.button_material_light;
+			global::ShortDev.Android.Resource.Color.dim_foreground_disabled_material_dark = global::Nearby_Sharing_Windows.Resource.Color.dim_foreground_disabled_material_dark;
+			global::ShortDev.Android.Resource.Color.dim_foreground_disabled_material_light = global::Nearby_Sharing_Windows.Resource.Color.dim_foreground_disabled_material_light;
+			global::ShortDev.Android.Resource.Color.dim_foreground_material_dark = global::Nearby_Sharing_Windows.Resource.Color.dim_foreground_material_dark;
+			global::ShortDev.Android.Resource.Color.dim_foreground_material_light = global::Nearby_Sharing_Windows.Resource.Color.dim_foreground_material_light;
+			global::ShortDev.Android.Resource.Color.error_color_material_dark = global::Nearby_Sharing_Windows.Resource.Color.error_color_material_dark;
+			global::ShortDev.Android.Resource.Color.error_color_material_light = global::Nearby_Sharing_Windows.Resource.Color.error_color_material_light;
+			global::ShortDev.Android.Resource.Color.foreground_material_dark = global::Nearby_Sharing_Windows.Resource.Color.foreground_material_dark;
+			global::ShortDev.Android.Resource.Color.foreground_material_light = global::Nearby_Sharing_Windows.Resource.Color.foreground_material_light;
+			global::ShortDev.Android.Resource.Color.highlighted_text_material_dark = global::Nearby_Sharing_Windows.Resource.Color.highlighted_text_material_dark;
+			global::ShortDev.Android.Resource.Color.highlighted_text_material_light = global::Nearby_Sharing_Windows.Resource.Color.highlighted_text_material_light;
+			global::ShortDev.Android.Resource.Color.material_blue_grey_800 = global::Nearby_Sharing_Windows.Resource.Color.material_blue_grey_800;
+			global::ShortDev.Android.Resource.Color.material_blue_grey_900 = global::Nearby_Sharing_Windows.Resource.Color.material_blue_grey_900;
+			global::ShortDev.Android.Resource.Color.material_blue_grey_950 = global::Nearby_Sharing_Windows.Resource.Color.material_blue_grey_950;
+			global::ShortDev.Android.Resource.Color.material_deep_teal_200 = global::Nearby_Sharing_Windows.Resource.Color.material_deep_teal_200;
+			global::ShortDev.Android.Resource.Color.material_deep_teal_500 = global::Nearby_Sharing_Windows.Resource.Color.material_deep_teal_500;
+			global::ShortDev.Android.Resource.Color.material_grey_100 = global::Nearby_Sharing_Windows.Resource.Color.material_grey_100;
+			global::ShortDev.Android.Resource.Color.material_grey_300 = global::Nearby_Sharing_Windows.Resource.Color.material_grey_300;
+			global::ShortDev.Android.Resource.Color.material_grey_50 = global::Nearby_Sharing_Windows.Resource.Color.material_grey_50;
+			global::ShortDev.Android.Resource.Color.material_grey_600 = global::Nearby_Sharing_Windows.Resource.Color.material_grey_600;
+			global::ShortDev.Android.Resource.Color.material_grey_800 = global::Nearby_Sharing_Windows.Resource.Color.material_grey_800;
+			global::ShortDev.Android.Resource.Color.material_grey_850 = global::Nearby_Sharing_Windows.Resource.Color.material_grey_850;
+			global::ShortDev.Android.Resource.Color.material_grey_900 = global::Nearby_Sharing_Windows.Resource.Color.material_grey_900;
+			global::ShortDev.Android.Resource.Color.notification_action_color_filter = global::Nearby_Sharing_Windows.Resource.Color.notification_action_color_filter;
+			global::ShortDev.Android.Resource.Color.notification_icon_bg_color = global::Nearby_Sharing_Windows.Resource.Color.notification_icon_bg_color;
+			global::ShortDev.Android.Resource.Color.primary_dark_material_dark = global::Nearby_Sharing_Windows.Resource.Color.primary_dark_material_dark;
+			global::ShortDev.Android.Resource.Color.primary_dark_material_light = global::Nearby_Sharing_Windows.Resource.Color.primary_dark_material_light;
+			global::ShortDev.Android.Resource.Color.primary_material_dark = global::Nearby_Sharing_Windows.Resource.Color.primary_material_dark;
+			global::ShortDev.Android.Resource.Color.primary_material_light = global::Nearby_Sharing_Windows.Resource.Color.primary_material_light;
+			global::ShortDev.Android.Resource.Color.primary_text_default_material_dark = global::Nearby_Sharing_Windows.Resource.Color.primary_text_default_material_dark;
+			global::ShortDev.Android.Resource.Color.primary_text_default_material_light = global::Nearby_Sharing_Windows.Resource.Color.primary_text_default_material_light;
+			global::ShortDev.Android.Resource.Color.primary_text_disabled_material_dark = global::Nearby_Sharing_Windows.Resource.Color.primary_text_disabled_material_dark;
+			global::ShortDev.Android.Resource.Color.primary_text_disabled_material_light = global::Nearby_Sharing_Windows.Resource.Color.primary_text_disabled_material_light;
+			global::ShortDev.Android.Resource.Color.ripple_material_dark = global::Nearby_Sharing_Windows.Resource.Color.ripple_material_dark;
+			global::ShortDev.Android.Resource.Color.ripple_material_light = global::Nearby_Sharing_Windows.Resource.Color.ripple_material_light;
+			global::ShortDev.Android.Resource.Color.secondary_text_default_material_dark = global::Nearby_Sharing_Windows.Resource.Color.secondary_text_default_material_dark;
+			global::ShortDev.Android.Resource.Color.secondary_text_default_material_light = global::Nearby_Sharing_Windows.Resource.Color.secondary_text_default_material_light;
+			global::ShortDev.Android.Resource.Color.secondary_text_disabled_material_dark = global::Nearby_Sharing_Windows.Resource.Color.secondary_text_disabled_material_dark;
+			global::ShortDev.Android.Resource.Color.secondary_text_disabled_material_light = global::Nearby_Sharing_Windows.Resource.Color.secondary_text_disabled_material_light;
+			global::ShortDev.Android.Resource.Color.switch_thumb_disabled_material_dark = global::Nearby_Sharing_Windows.Resource.Color.switch_thumb_disabled_material_dark;
+			global::ShortDev.Android.Resource.Color.switch_thumb_disabled_material_light = global::Nearby_Sharing_Windows.Resource.Color.switch_thumb_disabled_material_light;
+			global::ShortDev.Android.Resource.Color.switch_thumb_material_dark = global::Nearby_Sharing_Windows.Resource.Color.switch_thumb_material_dark;
+			global::ShortDev.Android.Resource.Color.switch_thumb_material_light = global::Nearby_Sharing_Windows.Resource.Color.switch_thumb_material_light;
+			global::ShortDev.Android.Resource.Color.switch_thumb_normal_material_dark = global::Nearby_Sharing_Windows.Resource.Color.switch_thumb_normal_material_dark;
+			global::ShortDev.Android.Resource.Color.switch_thumb_normal_material_light = global::Nearby_Sharing_Windows.Resource.Color.switch_thumb_normal_material_light;
+			global::ShortDev.Android.Resource.Color.tooltip_background_dark = global::Nearby_Sharing_Windows.Resource.Color.tooltip_background_dark;
+			global::ShortDev.Android.Resource.Color.tooltip_background_light = global::Nearby_Sharing_Windows.Resource.Color.tooltip_background_light;
+			global::ShortDev.Android.Resource.Dimension.abc_action_bar_content_inset_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_action_bar_content_inset_material;
+			global::ShortDev.Android.Resource.Dimension.abc_action_bar_content_inset_with_nav = global::Nearby_Sharing_Windows.Resource.Dimension.abc_action_bar_content_inset_with_nav;
+			global::ShortDev.Android.Resource.Dimension.abc_action_bar_default_height_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_action_bar_default_height_material;
+			global::ShortDev.Android.Resource.Dimension.abc_action_bar_default_padding_end_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_action_bar_default_padding_end_material;
+			global::ShortDev.Android.Resource.Dimension.abc_action_bar_default_padding_start_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_action_bar_default_padding_start_material;
+			global::ShortDev.Android.Resource.Dimension.abc_action_bar_elevation_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_action_bar_elevation_material;
+			global::ShortDev.Android.Resource.Dimension.abc_action_bar_icon_vertical_padding_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_action_bar_icon_vertical_padding_material;
+			global::ShortDev.Android.Resource.Dimension.abc_action_bar_overflow_padding_end_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_action_bar_overflow_padding_end_material;
+			global::ShortDev.Android.Resource.Dimension.abc_action_bar_overflow_padding_start_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_action_bar_overflow_padding_start_material;
+			global::ShortDev.Android.Resource.Dimension.abc_action_bar_stacked_max_height = global::Nearby_Sharing_Windows.Resource.Dimension.abc_action_bar_stacked_max_height;
+			global::ShortDev.Android.Resource.Dimension.abc_action_bar_stacked_tab_max_width = global::Nearby_Sharing_Windows.Resource.Dimension.abc_action_bar_stacked_tab_max_width;
+			global::ShortDev.Android.Resource.Dimension.abc_action_bar_subtitle_bottom_margin_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_action_bar_subtitle_bottom_margin_material;
+			global::ShortDev.Android.Resource.Dimension.abc_action_bar_subtitle_top_margin_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_action_bar_subtitle_top_margin_material;
+			global::ShortDev.Android.Resource.Dimension.abc_action_button_min_height_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_action_button_min_height_material;
+			global::ShortDev.Android.Resource.Dimension.abc_action_button_min_width_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_action_button_min_width_material;
+			global::ShortDev.Android.Resource.Dimension.abc_action_button_min_width_overflow_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_action_button_min_width_overflow_material;
+			global::ShortDev.Android.Resource.Dimension.abc_alert_dialog_button_bar_height = global::Nearby_Sharing_Windows.Resource.Dimension.abc_alert_dialog_button_bar_height;
+			global::ShortDev.Android.Resource.Dimension.abc_alert_dialog_button_dimen = global::Nearby_Sharing_Windows.Resource.Dimension.abc_alert_dialog_button_dimen;
+			global::ShortDev.Android.Resource.Dimension.abc_button_inset_horizontal_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_button_inset_horizontal_material;
+			global::ShortDev.Android.Resource.Dimension.abc_button_inset_vertical_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_button_inset_vertical_material;
+			global::ShortDev.Android.Resource.Dimension.abc_button_padding_horizontal_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_button_padding_horizontal_material;
+			global::ShortDev.Android.Resource.Dimension.abc_button_padding_vertical_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_button_padding_vertical_material;
+			global::ShortDev.Android.Resource.Dimension.abc_cascading_menus_min_smallest_width = global::Nearby_Sharing_Windows.Resource.Dimension.abc_cascading_menus_min_smallest_width;
+			global::ShortDev.Android.Resource.Dimension.abc_config_prefDialogWidth = global::Nearby_Sharing_Windows.Resource.Dimension.abc_config_prefDialogWidth;
+			global::ShortDev.Android.Resource.Dimension.abc_control_corner_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_control_corner_material;
+			global::ShortDev.Android.Resource.Dimension.abc_control_inset_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_control_inset_material;
+			global::ShortDev.Android.Resource.Dimension.abc_control_padding_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_control_padding_material;
+			global::ShortDev.Android.Resource.Dimension.abc_dialog_corner_radius_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_dialog_corner_radius_material;
+			global::ShortDev.Android.Resource.Dimension.abc_dialog_fixed_height_major = global::Nearby_Sharing_Windows.Resource.Dimension.abc_dialog_fixed_height_major;
+			global::ShortDev.Android.Resource.Dimension.abc_dialog_fixed_height_minor = global::Nearby_Sharing_Windows.Resource.Dimension.abc_dialog_fixed_height_minor;
+			global::ShortDev.Android.Resource.Dimension.abc_dialog_fixed_width_major = global::Nearby_Sharing_Windows.Resource.Dimension.abc_dialog_fixed_width_major;
+			global::ShortDev.Android.Resource.Dimension.abc_dialog_fixed_width_minor = global::Nearby_Sharing_Windows.Resource.Dimension.abc_dialog_fixed_width_minor;
+			global::ShortDev.Android.Resource.Dimension.abc_dialog_list_padding_bottom_no_buttons = global::Nearby_Sharing_Windows.Resource.Dimension.abc_dialog_list_padding_bottom_no_buttons;
+			global::ShortDev.Android.Resource.Dimension.abc_dialog_list_padding_top_no_title = global::Nearby_Sharing_Windows.Resource.Dimension.abc_dialog_list_padding_top_no_title;
+			global::ShortDev.Android.Resource.Dimension.abc_dialog_min_width_major = global::Nearby_Sharing_Windows.Resource.Dimension.abc_dialog_min_width_major;
+			global::ShortDev.Android.Resource.Dimension.abc_dialog_min_width_minor = global::Nearby_Sharing_Windows.Resource.Dimension.abc_dialog_min_width_minor;
+			global::ShortDev.Android.Resource.Dimension.abc_dialog_padding_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_dialog_padding_material;
+			global::ShortDev.Android.Resource.Dimension.abc_dialog_padding_top_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_dialog_padding_top_material;
+			global::ShortDev.Android.Resource.Dimension.abc_dialog_title_divider_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_dialog_title_divider_material;
+			global::ShortDev.Android.Resource.Dimension.abc_disabled_alpha_material_dark = global::Nearby_Sharing_Windows.Resource.Dimension.abc_disabled_alpha_material_dark;
+			global::ShortDev.Android.Resource.Dimension.abc_disabled_alpha_material_light = global::Nearby_Sharing_Windows.Resource.Dimension.abc_disabled_alpha_material_light;
+			global::ShortDev.Android.Resource.Dimension.abc_dropdownitem_icon_width = global::Nearby_Sharing_Windows.Resource.Dimension.abc_dropdownitem_icon_width;
+			global::ShortDev.Android.Resource.Dimension.abc_dropdownitem_text_padding_left = global::Nearby_Sharing_Windows.Resource.Dimension.abc_dropdownitem_text_padding_left;
+			global::ShortDev.Android.Resource.Dimension.abc_dropdownitem_text_padding_right = global::Nearby_Sharing_Windows.Resource.Dimension.abc_dropdownitem_text_padding_right;
+			global::ShortDev.Android.Resource.Dimension.abc_edit_text_inset_bottom_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_edit_text_inset_bottom_material;
+			global::ShortDev.Android.Resource.Dimension.abc_edit_text_inset_horizontal_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_edit_text_inset_horizontal_material;
+			global::ShortDev.Android.Resource.Dimension.abc_edit_text_inset_top_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_edit_text_inset_top_material;
+			global::ShortDev.Android.Resource.Dimension.abc_floating_window_z = global::Nearby_Sharing_Windows.Resource.Dimension.abc_floating_window_z;
+			global::ShortDev.Android.Resource.Dimension.abc_list_item_height_large_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_list_item_height_large_material;
+			global::ShortDev.Android.Resource.Dimension.abc_list_item_height_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_list_item_height_material;
+			global::ShortDev.Android.Resource.Dimension.abc_list_item_height_small_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_list_item_height_small_material;
+			global::ShortDev.Android.Resource.Dimension.abc_list_item_padding_horizontal_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_list_item_padding_horizontal_material;
+			global::ShortDev.Android.Resource.Dimension.abc_panel_menu_list_width = global::Nearby_Sharing_Windows.Resource.Dimension.abc_panel_menu_list_width;
+			global::ShortDev.Android.Resource.Dimension.abc_progress_bar_height_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_progress_bar_height_material;
+			global::ShortDev.Android.Resource.Dimension.abc_search_view_preferred_height = global::Nearby_Sharing_Windows.Resource.Dimension.abc_search_view_preferred_height;
+			global::ShortDev.Android.Resource.Dimension.abc_search_view_preferred_width = global::Nearby_Sharing_Windows.Resource.Dimension.abc_search_view_preferred_width;
+			global::ShortDev.Android.Resource.Dimension.abc_seekbar_track_background_height_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_seekbar_track_background_height_material;
+			global::ShortDev.Android.Resource.Dimension.abc_seekbar_track_progress_height_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_seekbar_track_progress_height_material;
+			global::ShortDev.Android.Resource.Dimension.abc_select_dialog_padding_start_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_select_dialog_padding_start_material;
+			global::ShortDev.Android.Resource.Dimension.abc_switch_padding = global::Nearby_Sharing_Windows.Resource.Dimension.abc_switch_padding;
+			global::ShortDev.Android.Resource.Dimension.abc_text_size_body_1_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_text_size_body_1_material;
+			global::ShortDev.Android.Resource.Dimension.abc_text_size_body_2_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_text_size_body_2_material;
+			global::ShortDev.Android.Resource.Dimension.abc_text_size_button_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_text_size_button_material;
+			global::ShortDev.Android.Resource.Dimension.abc_text_size_caption_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_text_size_caption_material;
+			global::ShortDev.Android.Resource.Dimension.abc_text_size_display_1_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_text_size_display_1_material;
+			global::ShortDev.Android.Resource.Dimension.abc_text_size_display_2_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_text_size_display_2_material;
+			global::ShortDev.Android.Resource.Dimension.abc_text_size_display_3_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_text_size_display_3_material;
+			global::ShortDev.Android.Resource.Dimension.abc_text_size_display_4_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_text_size_display_4_material;
+			global::ShortDev.Android.Resource.Dimension.abc_text_size_headline_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_text_size_headline_material;
+			global::ShortDev.Android.Resource.Dimension.abc_text_size_large_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_text_size_large_material;
+			global::ShortDev.Android.Resource.Dimension.abc_text_size_medium_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_text_size_medium_material;
+			global::ShortDev.Android.Resource.Dimension.abc_text_size_menu_header_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_text_size_menu_header_material;
+			global::ShortDev.Android.Resource.Dimension.abc_text_size_menu_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_text_size_menu_material;
+			global::ShortDev.Android.Resource.Dimension.abc_text_size_small_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_text_size_small_material;
+			global::ShortDev.Android.Resource.Dimension.abc_text_size_subhead_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_text_size_subhead_material;
+			global::ShortDev.Android.Resource.Dimension.abc_text_size_subtitle_material_toolbar = global::Nearby_Sharing_Windows.Resource.Dimension.abc_text_size_subtitle_material_toolbar;
+			global::ShortDev.Android.Resource.Dimension.abc_text_size_title_material = global::Nearby_Sharing_Windows.Resource.Dimension.abc_text_size_title_material;
+			global::ShortDev.Android.Resource.Dimension.abc_text_size_title_material_toolbar = global::Nearby_Sharing_Windows.Resource.Dimension.abc_text_size_title_material_toolbar;
+			global::ShortDev.Android.Resource.Dimension.compat_button_inset_horizontal_material = global::Nearby_Sharing_Windows.Resource.Dimension.compat_button_inset_horizontal_material;
+			global::ShortDev.Android.Resource.Dimension.compat_button_inset_vertical_material = global::Nearby_Sharing_Windows.Resource.Dimension.compat_button_inset_vertical_material;
+			global::ShortDev.Android.Resource.Dimension.compat_button_padding_horizontal_material = global::Nearby_Sharing_Windows.Resource.Dimension.compat_button_padding_horizontal_material;
+			global::ShortDev.Android.Resource.Dimension.compat_button_padding_vertical_material = global::Nearby_Sharing_Windows.Resource.Dimension.compat_button_padding_vertical_material;
+			global::ShortDev.Android.Resource.Dimension.compat_control_corner_material = global::Nearby_Sharing_Windows.Resource.Dimension.compat_control_corner_material;
+			global::ShortDev.Android.Resource.Dimension.compat_notification_large_icon_max_height = global::Nearby_Sharing_Windows.Resource.Dimension.compat_notification_large_icon_max_height;
+			global::ShortDev.Android.Resource.Dimension.compat_notification_large_icon_max_width = global::Nearby_Sharing_Windows.Resource.Dimension.compat_notification_large_icon_max_width;
+			global::ShortDev.Android.Resource.Dimension.def_drawer_elevation = global::Nearby_Sharing_Windows.Resource.Dimension.def_drawer_elevation;
+			global::ShortDev.Android.Resource.Dimension.disabled_alpha_material_dark = global::Nearby_Sharing_Windows.Resource.Dimension.disabled_alpha_material_dark;
+			global::ShortDev.Android.Resource.Dimension.disabled_alpha_material_light = global::Nearby_Sharing_Windows.Resource.Dimension.disabled_alpha_material_light;
+			global::ShortDev.Android.Resource.Dimension.fastscroll_default_thickness = global::Nearby_Sharing_Windows.Resource.Dimension.fastscroll_default_thickness;
+			global::ShortDev.Android.Resource.Dimension.fastscroll_margin = global::Nearby_Sharing_Windows.Resource.Dimension.fastscroll_margin;
+			global::ShortDev.Android.Resource.Dimension.fastscroll_minimum_range = global::Nearby_Sharing_Windows.Resource.Dimension.fastscroll_minimum_range;
+			global::ShortDev.Android.Resource.Dimension.highlight_alpha_material_colored = global::Nearby_Sharing_Windows.Resource.Dimension.highlight_alpha_material_colored;
+			global::ShortDev.Android.Resource.Dimension.highlight_alpha_material_dark = global::Nearby_Sharing_Windows.Resource.Dimension.highlight_alpha_material_dark;
+			global::ShortDev.Android.Resource.Dimension.highlight_alpha_material_light = global::Nearby_Sharing_Windows.Resource.Dimension.highlight_alpha_material_light;
+			global::ShortDev.Android.Resource.Dimension.hint_alpha_material_dark = global::Nearby_Sharing_Windows.Resource.Dimension.hint_alpha_material_dark;
+			global::ShortDev.Android.Resource.Dimension.hint_alpha_material_light = global::Nearby_Sharing_Windows.Resource.Dimension.hint_alpha_material_light;
+			global::ShortDev.Android.Resource.Dimension.hint_pressed_alpha_material_dark = global::Nearby_Sharing_Windows.Resource.Dimension.hint_pressed_alpha_material_dark;
+			global::ShortDev.Android.Resource.Dimension.hint_pressed_alpha_material_light = global::Nearby_Sharing_Windows.Resource.Dimension.hint_pressed_alpha_material_light;
+			global::ShortDev.Android.Resource.Dimension.item_touch_helper_max_drag_scroll_per_frame = global::Nearby_Sharing_Windows.Resource.Dimension.item_touch_helper_max_drag_scroll_per_frame;
+			global::ShortDev.Android.Resource.Dimension.item_touch_helper_swipe_escape_max_velocity = global::Nearby_Sharing_Windows.Resource.Dimension.item_touch_helper_swipe_escape_max_velocity;
+			global::ShortDev.Android.Resource.Dimension.item_touch_helper_swipe_escape_velocity = global::Nearby_Sharing_Windows.Resource.Dimension.item_touch_helper_swipe_escape_velocity;
+			global::ShortDev.Android.Resource.Dimension.notification_action_icon_size = global::Nearby_Sharing_Windows.Resource.Dimension.notification_action_icon_size;
+			global::ShortDev.Android.Resource.Dimension.notification_action_text_size = global::Nearby_Sharing_Windows.Resource.Dimension.notification_action_text_size;
+			global::ShortDev.Android.Resource.Dimension.notification_big_circle_margin = global::Nearby_Sharing_Windows.Resource.Dimension.notification_big_circle_margin;
+			global::ShortDev.Android.Resource.Dimension.notification_content_margin_start = global::Nearby_Sharing_Windows.Resource.Dimension.notification_content_margin_start;
+			global::ShortDev.Android.Resource.Dimension.notification_large_icon_height = global::Nearby_Sharing_Windows.Resource.Dimension.notification_large_icon_height;
+			global::ShortDev.Android.Resource.Dimension.notification_large_icon_width = global::Nearby_Sharing_Windows.Resource.Dimension.notification_large_icon_width;
+			global::ShortDev.Android.Resource.Dimension.notification_main_column_padding_top = global::Nearby_Sharing_Windows.Resource.Dimension.notification_main_column_padding_top;
+			global::ShortDev.Android.Resource.Dimension.notification_media_narrow_margin = global::Nearby_Sharing_Windows.Resource.Dimension.notification_media_narrow_margin;
+			global::ShortDev.Android.Resource.Dimension.notification_right_icon_size = global::Nearby_Sharing_Windows.Resource.Dimension.notification_right_icon_size;
+			global::ShortDev.Android.Resource.Dimension.notification_right_side_padding_top = global::Nearby_Sharing_Windows.Resource.Dimension.notification_right_side_padding_top;
+			global::ShortDev.Android.Resource.Dimension.notification_small_icon_background_padding = global::Nearby_Sharing_Windows.Resource.Dimension.notification_small_icon_background_padding;
+			global::ShortDev.Android.Resource.Dimension.notification_small_icon_size_as_large = global::Nearby_Sharing_Windows.Resource.Dimension.notification_small_icon_size_as_large;
+			global::ShortDev.Android.Resource.Dimension.notification_subtext_size = global::Nearby_Sharing_Windows.Resource.Dimension.notification_subtext_size;
+			global::ShortDev.Android.Resource.Dimension.notification_top_pad = global::Nearby_Sharing_Windows.Resource.Dimension.notification_top_pad;
+			global::ShortDev.Android.Resource.Dimension.notification_top_pad_large_text = global::Nearby_Sharing_Windows.Resource.Dimension.notification_top_pad_large_text;
+			global::ShortDev.Android.Resource.Dimension.tooltip_corner_radius = global::Nearby_Sharing_Windows.Resource.Dimension.tooltip_corner_radius;
+			global::ShortDev.Android.Resource.Dimension.tooltip_horizontal_padding = global::Nearby_Sharing_Windows.Resource.Dimension.tooltip_horizontal_padding;
+			global::ShortDev.Android.Resource.Dimension.tooltip_margin = global::Nearby_Sharing_Windows.Resource.Dimension.tooltip_margin;
+			global::ShortDev.Android.Resource.Dimension.tooltip_precise_anchor_extra_offset = global::Nearby_Sharing_Windows.Resource.Dimension.tooltip_precise_anchor_extra_offset;
+			global::ShortDev.Android.Resource.Dimension.tooltip_precise_anchor_threshold = global::Nearby_Sharing_Windows.Resource.Dimension.tooltip_precise_anchor_threshold;
+			global::ShortDev.Android.Resource.Dimension.tooltip_vertical_padding = global::Nearby_Sharing_Windows.Resource.Dimension.tooltip_vertical_padding;
+			global::ShortDev.Android.Resource.Dimension.tooltip_y_offset_non_touch = global::Nearby_Sharing_Windows.Resource.Dimension.tooltip_y_offset_non_touch;
+			global::ShortDev.Android.Resource.Dimension.tooltip_y_offset_touch = global::Nearby_Sharing_Windows.Resource.Dimension.tooltip_y_offset_touch;
+			global::ShortDev.Android.Resource.Drawable.abc_ab_share_pack_mtrl_alpha = global::Nearby_Sharing_Windows.Resource.Drawable.abc_ab_share_pack_mtrl_alpha;
+			global::ShortDev.Android.Resource.Drawable.abc_action_bar_item_background_material = global::Nearby_Sharing_Windows.Resource.Drawable.abc_action_bar_item_background_material;
+			global::ShortDev.Android.Resource.Drawable.abc_btn_borderless_material = global::Nearby_Sharing_Windows.Resource.Drawable.abc_btn_borderless_material;
+			global::ShortDev.Android.Resource.Drawable.abc_btn_check_material = global::Nearby_Sharing_Windows.Resource.Drawable.abc_btn_check_material;
+			global::ShortDev.Android.Resource.Drawable.abc_btn_check_material_anim = global::Nearby_Sharing_Windows.Resource.Drawable.abc_btn_check_material_anim;
+			global::ShortDev.Android.Resource.Drawable.abc_btn_check_to_on_mtrl_000 = global::Nearby_Sharing_Windows.Resource.Drawable.abc_btn_check_to_on_mtrl_000;
+			global::ShortDev.Android.Resource.Drawable.abc_btn_check_to_on_mtrl_015 = global::Nearby_Sharing_Windows.Resource.Drawable.abc_btn_check_to_on_mtrl_015;
+			global::ShortDev.Android.Resource.Drawable.abc_btn_colored_material = global::Nearby_Sharing_Windows.Resource.Drawable.abc_btn_colored_material;
+			global::ShortDev.Android.Resource.Drawable.abc_btn_default_mtrl_shape = global::Nearby_Sharing_Windows.Resource.Drawable.abc_btn_default_mtrl_shape;
+			global::ShortDev.Android.Resource.Drawable.abc_btn_radio_material = global::Nearby_Sharing_Windows.Resource.Drawable.abc_btn_radio_material;
+			global::ShortDev.Android.Resource.Drawable.abc_btn_radio_material_anim = global::Nearby_Sharing_Windows.Resource.Drawable.abc_btn_radio_material_anim;
+			global::ShortDev.Android.Resource.Drawable.abc_btn_radio_to_on_mtrl_000 = global::Nearby_Sharing_Windows.Resource.Drawable.abc_btn_radio_to_on_mtrl_000;
+			global::ShortDev.Android.Resource.Drawable.abc_btn_radio_to_on_mtrl_015 = global::Nearby_Sharing_Windows.Resource.Drawable.abc_btn_radio_to_on_mtrl_015;
+			global::ShortDev.Android.Resource.Drawable.abc_btn_switch_to_on_mtrl_00001 = global::Nearby_Sharing_Windows.Resource.Drawable.abc_btn_switch_to_on_mtrl_00001;
+			global::ShortDev.Android.Resource.Drawable.abc_btn_switch_to_on_mtrl_00012 = global::Nearby_Sharing_Windows.Resource.Drawable.abc_btn_switch_to_on_mtrl_00012;
+			global::ShortDev.Android.Resource.Drawable.abc_cab_background_internal_bg = global::Nearby_Sharing_Windows.Resource.Drawable.abc_cab_background_internal_bg;
+			global::ShortDev.Android.Resource.Drawable.abc_cab_background_top_material = global::Nearby_Sharing_Windows.Resource.Drawable.abc_cab_background_top_material;
+			global::ShortDev.Android.Resource.Drawable.abc_cab_background_top_mtrl_alpha = global::Nearby_Sharing_Windows.Resource.Drawable.abc_cab_background_top_mtrl_alpha;
+			global::ShortDev.Android.Resource.Drawable.abc_control_background_material = global::Nearby_Sharing_Windows.Resource.Drawable.abc_control_background_material;
+			global::ShortDev.Android.Resource.Drawable.abc_dialog_material_background = global::Nearby_Sharing_Windows.Resource.Drawable.abc_dialog_material_background;
+			global::ShortDev.Android.Resource.Drawable.abc_edit_text_material = global::Nearby_Sharing_Windows.Resource.Drawable.abc_edit_text_material;
+			global::ShortDev.Android.Resource.Drawable.abc_ic_ab_back_material = global::Nearby_Sharing_Windows.Resource.Drawable.abc_ic_ab_back_material;
+			global::ShortDev.Android.Resource.Drawable.abc_ic_arrow_drop_right_black_24dp = global::Nearby_Sharing_Windows.Resource.Drawable.abc_ic_arrow_drop_right_black_24dp;
+			global::ShortDev.Android.Resource.Drawable.abc_ic_clear_material = global::Nearby_Sharing_Windows.Resource.Drawable.abc_ic_clear_material;
+			global::ShortDev.Android.Resource.Drawable.abc_ic_commit_search_api_mtrl_alpha = global::Nearby_Sharing_Windows.Resource.Drawable.abc_ic_commit_search_api_mtrl_alpha;
+			global::ShortDev.Android.Resource.Drawable.abc_ic_go_search_api_material = global::Nearby_Sharing_Windows.Resource.Drawable.abc_ic_go_search_api_material;
+			global::ShortDev.Android.Resource.Drawable.abc_ic_menu_copy_mtrl_am_alpha = global::Nearby_Sharing_Windows.Resource.Drawable.abc_ic_menu_copy_mtrl_am_alpha;
+			global::ShortDev.Android.Resource.Drawable.abc_ic_menu_cut_mtrl_alpha = global::Nearby_Sharing_Windows.Resource.Drawable.abc_ic_menu_cut_mtrl_alpha;
+			global::ShortDev.Android.Resource.Drawable.abc_ic_menu_overflow_material = global::Nearby_Sharing_Windows.Resource.Drawable.abc_ic_menu_overflow_material;
+			global::ShortDev.Android.Resource.Drawable.abc_ic_menu_paste_mtrl_am_alpha = global::Nearby_Sharing_Windows.Resource.Drawable.abc_ic_menu_paste_mtrl_am_alpha;
+			global::ShortDev.Android.Resource.Drawable.abc_ic_menu_selectall_mtrl_alpha = global::Nearby_Sharing_Windows.Resource.Drawable.abc_ic_menu_selectall_mtrl_alpha;
+			global::ShortDev.Android.Resource.Drawable.abc_ic_menu_share_mtrl_alpha = global::Nearby_Sharing_Windows.Resource.Drawable.abc_ic_menu_share_mtrl_alpha;
+			global::ShortDev.Android.Resource.Drawable.abc_ic_search_api_material = global::Nearby_Sharing_Windows.Resource.Drawable.abc_ic_search_api_material;
+			global::ShortDev.Android.Resource.Drawable.abc_ic_voice_search_api_material = global::Nearby_Sharing_Windows.Resource.Drawable.abc_ic_voice_search_api_material;
+			global::ShortDev.Android.Resource.Drawable.abc_item_background_holo_dark = global::Nearby_Sharing_Windows.Resource.Drawable.abc_item_background_holo_dark;
+			global::ShortDev.Android.Resource.Drawable.abc_item_background_holo_light = global::Nearby_Sharing_Windows.Resource.Drawable.abc_item_background_holo_light;
+			global::ShortDev.Android.Resource.Drawable.abc_list_divider_material = global::Nearby_Sharing_Windows.Resource.Drawable.abc_list_divider_material;
+			global::ShortDev.Android.Resource.Drawable.abc_list_divider_mtrl_alpha = global::Nearby_Sharing_Windows.Resource.Drawable.abc_list_divider_mtrl_alpha;
+			global::ShortDev.Android.Resource.Drawable.abc_list_focused_holo = global::Nearby_Sharing_Windows.Resource.Drawable.abc_list_focused_holo;
+			global::ShortDev.Android.Resource.Drawable.abc_list_longpressed_holo = global::Nearby_Sharing_Windows.Resource.Drawable.abc_list_longpressed_holo;
+			global::ShortDev.Android.Resource.Drawable.abc_list_pressed_holo_dark = global::Nearby_Sharing_Windows.Resource.Drawable.abc_list_pressed_holo_dark;
+			global::ShortDev.Android.Resource.Drawable.abc_list_pressed_holo_light = global::Nearby_Sharing_Windows.Resource.Drawable.abc_list_pressed_holo_light;
+			global::ShortDev.Android.Resource.Drawable.abc_list_selector_background_transition_holo_dark = global::Nearby_Sharing_Windows.Resource.Drawable.abc_list_selector_background_transition_holo_dark;
+			global::ShortDev.Android.Resource.Drawable.abc_list_selector_background_transition_holo_light = global::Nearby_Sharing_Windows.Resource.Drawable.abc_list_selector_background_transition_holo_light;
+			global::ShortDev.Android.Resource.Drawable.abc_list_selector_disabled_holo_dark = global::Nearby_Sharing_Windows.Resource.Drawable.abc_list_selector_disabled_holo_dark;
+			global::ShortDev.Android.Resource.Drawable.abc_list_selector_disabled_holo_light = global::Nearby_Sharing_Windows.Resource.Drawable.abc_list_selector_disabled_holo_light;
+			global::ShortDev.Android.Resource.Drawable.abc_list_selector_holo_dark = global::Nearby_Sharing_Windows.Resource.Drawable.abc_list_selector_holo_dark;
+			global::ShortDev.Android.Resource.Drawable.abc_list_selector_holo_light = global::Nearby_Sharing_Windows.Resource.Drawable.abc_list_selector_holo_light;
+			global::ShortDev.Android.Resource.Drawable.abc_menu_hardkey_panel_mtrl_mult = global::Nearby_Sharing_Windows.Resource.Drawable.abc_menu_hardkey_panel_mtrl_mult;
+			global::ShortDev.Android.Resource.Drawable.abc_popup_background_mtrl_mult = global::Nearby_Sharing_Windows.Resource.Drawable.abc_popup_background_mtrl_mult;
+			global::ShortDev.Android.Resource.Drawable.abc_ratingbar_indicator_material = global::Nearby_Sharing_Windows.Resource.Drawable.abc_ratingbar_indicator_material;
+			global::ShortDev.Android.Resource.Drawable.abc_ratingbar_material = global::Nearby_Sharing_Windows.Resource.Drawable.abc_ratingbar_material;
+			global::ShortDev.Android.Resource.Drawable.abc_ratingbar_small_material = global::Nearby_Sharing_Windows.Resource.Drawable.abc_ratingbar_small_material;
+			global::ShortDev.Android.Resource.Drawable.abc_scrubber_control_off_mtrl_alpha = global::Nearby_Sharing_Windows.Resource.Drawable.abc_scrubber_control_off_mtrl_alpha;
+			global::ShortDev.Android.Resource.Drawable.abc_scrubber_control_to_pressed_mtrl_000 = global::Nearby_Sharing_Windows.Resource.Drawable.abc_scrubber_control_to_pressed_mtrl_000;
+			global::ShortDev.Android.Resource.Drawable.abc_scrubber_control_to_pressed_mtrl_005 = global::Nearby_Sharing_Windows.Resource.Drawable.abc_scrubber_control_to_pressed_mtrl_005;
+			global::ShortDev.Android.Resource.Drawable.abc_scrubber_primary_mtrl_alpha = global::Nearby_Sharing_Windows.Resource.Drawable.abc_scrubber_primary_mtrl_alpha;
+			global::ShortDev.Android.Resource.Drawable.abc_scrubber_track_mtrl_alpha = global::Nearby_Sharing_Windows.Resource.Drawable.abc_scrubber_track_mtrl_alpha;
+			global::ShortDev.Android.Resource.Drawable.abc_seekbar_thumb_material = global::Nearby_Sharing_Windows.Resource.Drawable.abc_seekbar_thumb_material;
+			global::ShortDev.Android.Resource.Drawable.abc_seekbar_tick_mark_material = global::Nearby_Sharing_Windows.Resource.Drawable.abc_seekbar_tick_mark_material;
+			global::ShortDev.Android.Resource.Drawable.abc_seekbar_track_material = global::Nearby_Sharing_Windows.Resource.Drawable.abc_seekbar_track_material;
+			global::ShortDev.Android.Resource.Drawable.abc_spinner_mtrl_am_alpha = global::Nearby_Sharing_Windows.Resource.Drawable.abc_spinner_mtrl_am_alpha;
+			global::ShortDev.Android.Resource.Drawable.abc_spinner_textfield_background_material = global::Nearby_Sharing_Windows.Resource.Drawable.abc_spinner_textfield_background_material;
+			global::ShortDev.Android.Resource.Drawable.abc_switch_thumb_material = global::Nearby_Sharing_Windows.Resource.Drawable.abc_switch_thumb_material;
+			global::ShortDev.Android.Resource.Drawable.abc_switch_track_mtrl_alpha = global::Nearby_Sharing_Windows.Resource.Drawable.abc_switch_track_mtrl_alpha;
+			global::ShortDev.Android.Resource.Drawable.abc_tab_indicator_material = global::Nearby_Sharing_Windows.Resource.Drawable.abc_tab_indicator_material;
+			global::ShortDev.Android.Resource.Drawable.abc_tab_indicator_mtrl_alpha = global::Nearby_Sharing_Windows.Resource.Drawable.abc_tab_indicator_mtrl_alpha;
+			global::ShortDev.Android.Resource.Drawable.abc_textfield_activated_mtrl_alpha = global::Nearby_Sharing_Windows.Resource.Drawable.abc_textfield_activated_mtrl_alpha;
+			global::ShortDev.Android.Resource.Drawable.abc_textfield_default_mtrl_alpha = global::Nearby_Sharing_Windows.Resource.Drawable.abc_textfield_default_mtrl_alpha;
+			global::ShortDev.Android.Resource.Drawable.abc_textfield_search_activated_mtrl_alpha = global::Nearby_Sharing_Windows.Resource.Drawable.abc_textfield_search_activated_mtrl_alpha;
+			global::ShortDev.Android.Resource.Drawable.abc_textfield_search_default_mtrl_alpha = global::Nearby_Sharing_Windows.Resource.Drawable.abc_textfield_search_default_mtrl_alpha;
+			global::ShortDev.Android.Resource.Drawable.abc_textfield_search_material = global::Nearby_Sharing_Windows.Resource.Drawable.abc_textfield_search_material;
+			global::ShortDev.Android.Resource.Drawable.abc_text_cursor_material = global::Nearby_Sharing_Windows.Resource.Drawable.abc_text_cursor_material;
+			global::ShortDev.Android.Resource.Drawable.abc_vector_test = global::Nearby_Sharing_Windows.Resource.Drawable.abc_vector_test;
+			global::ShortDev.Android.Resource.Drawable.btn_checkbox_checked_mtrl = global::Nearby_Sharing_Windows.Resource.Drawable.btn_checkbox_checked_mtrl;
+			global::ShortDev.Android.Resource.Drawable.btn_checkbox_checked_to_unchecked_mtrl_animation = global::Nearby_Sharing_Windows.Resource.Drawable.btn_checkbox_checked_to_unchecked_mtrl_animation;
+			global::ShortDev.Android.Resource.Drawable.btn_checkbox_unchecked_mtrl = global::Nearby_Sharing_Windows.Resource.Drawable.btn_checkbox_unchecked_mtrl;
+			global::ShortDev.Android.Resource.Drawable.btn_checkbox_unchecked_to_checked_mtrl_animation = global::Nearby_Sharing_Windows.Resource.Drawable.btn_checkbox_unchecked_to_checked_mtrl_animation;
+			global::ShortDev.Android.Resource.Drawable.btn_radio_off_mtrl = global::Nearby_Sharing_Windows.Resource.Drawable.btn_radio_off_mtrl;
+			global::ShortDev.Android.Resource.Drawable.btn_radio_off_to_on_mtrl_animation = global::Nearby_Sharing_Windows.Resource.Drawable.btn_radio_off_to_on_mtrl_animation;
+			global::ShortDev.Android.Resource.Drawable.btn_radio_on_mtrl = global::Nearby_Sharing_Windows.Resource.Drawable.btn_radio_on_mtrl;
+			global::ShortDev.Android.Resource.Drawable.btn_radio_on_to_off_mtrl_animation = global::Nearby_Sharing_Windows.Resource.Drawable.btn_radio_on_to_off_mtrl_animation;
+			global::ShortDev.Android.Resource.Drawable.notification_action_background = global::Nearby_Sharing_Windows.Resource.Drawable.notification_action_background;
+			global::ShortDev.Android.Resource.Drawable.notification_bg = global::Nearby_Sharing_Windows.Resource.Drawable.notification_bg;
+			global::ShortDev.Android.Resource.Drawable.notification_bg_low = global::Nearby_Sharing_Windows.Resource.Drawable.notification_bg_low;
+			global::ShortDev.Android.Resource.Drawable.notification_bg_low_normal = global::Nearby_Sharing_Windows.Resource.Drawable.notification_bg_low_normal;
+			global::ShortDev.Android.Resource.Drawable.notification_bg_low_pressed = global::Nearby_Sharing_Windows.Resource.Drawable.notification_bg_low_pressed;
+			global::ShortDev.Android.Resource.Drawable.notification_bg_normal = global::Nearby_Sharing_Windows.Resource.Drawable.notification_bg_normal;
+			global::ShortDev.Android.Resource.Drawable.notification_bg_normal_pressed = global::Nearby_Sharing_Windows.Resource.Drawable.notification_bg_normal_pressed;
+			global::ShortDev.Android.Resource.Drawable.notification_icon_background = global::Nearby_Sharing_Windows.Resource.Drawable.notification_icon_background;
+			global::ShortDev.Android.Resource.Drawable.notification_template_icon_bg = global::Nearby_Sharing_Windows.Resource.Drawable.notification_template_icon_bg;
+			global::ShortDev.Android.Resource.Drawable.notification_template_icon_low_bg = global::Nearby_Sharing_Windows.Resource.Drawable.notification_template_icon_low_bg;
+			global::ShortDev.Android.Resource.Drawable.notification_tile_bg = global::Nearby_Sharing_Windows.Resource.Drawable.notification_tile_bg;
+			global::ShortDev.Android.Resource.Drawable.notify_panel_notification_icon_bg = global::Nearby_Sharing_Windows.Resource.Drawable.notify_panel_notification_icon_bg;
+			global::ShortDev.Android.Resource.Drawable.tooltip_frame_dark = global::Nearby_Sharing_Windows.Resource.Drawable.tooltip_frame_dark;
+			global::ShortDev.Android.Resource.Drawable.tooltip_frame_light = global::Nearby_Sharing_Windows.Resource.Drawable.tooltip_frame_light;
+			global::ShortDev.Android.Resource.Id.accessibility_action_clickable_span = global::Nearby_Sharing_Windows.Resource.Id.accessibility_action_clickable_span;
+			global::ShortDev.Android.Resource.Id.accessibility_custom_action_0 = global::Nearby_Sharing_Windows.Resource.Id.accessibility_custom_action_0;
+			global::ShortDev.Android.Resource.Id.accessibility_custom_action_1 = global::Nearby_Sharing_Windows.Resource.Id.accessibility_custom_action_1;
+			global::ShortDev.Android.Resource.Id.accessibility_custom_action_10 = global::Nearby_Sharing_Windows.Resource.Id.accessibility_custom_action_10;
+			global::ShortDev.Android.Resource.Id.accessibility_custom_action_11 = global::Nearby_Sharing_Windows.Resource.Id.accessibility_custom_action_11;
+			global::ShortDev.Android.Resource.Id.accessibility_custom_action_12 = global::Nearby_Sharing_Windows.Resource.Id.accessibility_custom_action_12;
+			global::ShortDev.Android.Resource.Id.accessibility_custom_action_13 = global::Nearby_Sharing_Windows.Resource.Id.accessibility_custom_action_13;
+			global::ShortDev.Android.Resource.Id.accessibility_custom_action_14 = global::Nearby_Sharing_Windows.Resource.Id.accessibility_custom_action_14;
+			global::ShortDev.Android.Resource.Id.accessibility_custom_action_15 = global::Nearby_Sharing_Windows.Resource.Id.accessibility_custom_action_15;
+			global::ShortDev.Android.Resource.Id.accessibility_custom_action_16 = global::Nearby_Sharing_Windows.Resource.Id.accessibility_custom_action_16;
+			global::ShortDev.Android.Resource.Id.accessibility_custom_action_17 = global::Nearby_Sharing_Windows.Resource.Id.accessibility_custom_action_17;
+			global::ShortDev.Android.Resource.Id.accessibility_custom_action_18 = global::Nearby_Sharing_Windows.Resource.Id.accessibility_custom_action_18;
+			global::ShortDev.Android.Resource.Id.accessibility_custom_action_19 = global::Nearby_Sharing_Windows.Resource.Id.accessibility_custom_action_19;
+			global::ShortDev.Android.Resource.Id.accessibility_custom_action_2 = global::Nearby_Sharing_Windows.Resource.Id.accessibility_custom_action_2;
+			global::ShortDev.Android.Resource.Id.accessibility_custom_action_20 = global::Nearby_Sharing_Windows.Resource.Id.accessibility_custom_action_20;
+			global::ShortDev.Android.Resource.Id.accessibility_custom_action_21 = global::Nearby_Sharing_Windows.Resource.Id.accessibility_custom_action_21;
+			global::ShortDev.Android.Resource.Id.accessibility_custom_action_22 = global::Nearby_Sharing_Windows.Resource.Id.accessibility_custom_action_22;
+			global::ShortDev.Android.Resource.Id.accessibility_custom_action_23 = global::Nearby_Sharing_Windows.Resource.Id.accessibility_custom_action_23;
+			global::ShortDev.Android.Resource.Id.accessibility_custom_action_24 = global::Nearby_Sharing_Windows.Resource.Id.accessibility_custom_action_24;
+			global::ShortDev.Android.Resource.Id.accessibility_custom_action_25 = global::Nearby_Sharing_Windows.Resource.Id.accessibility_custom_action_25;
+			global::ShortDev.Android.Resource.Id.accessibility_custom_action_26 = global::Nearby_Sharing_Windows.Resource.Id.accessibility_custom_action_26;
+			global::ShortDev.Android.Resource.Id.accessibility_custom_action_27 = global::Nearby_Sharing_Windows.Resource.Id.accessibility_custom_action_27;
+			global::ShortDev.Android.Resource.Id.accessibility_custom_action_28 = global::Nearby_Sharing_Windows.Resource.Id.accessibility_custom_action_28;
+			global::ShortDev.Android.Resource.Id.accessibility_custom_action_29 = global::Nearby_Sharing_Windows.Resource.Id.accessibility_custom_action_29;
+			global::ShortDev.Android.Resource.Id.accessibility_custom_action_3 = global::Nearby_Sharing_Windows.Resource.Id.accessibility_custom_action_3;
+			global::ShortDev.Android.Resource.Id.accessibility_custom_action_30 = global::Nearby_Sharing_Windows.Resource.Id.accessibility_custom_action_30;
+			global::ShortDev.Android.Resource.Id.accessibility_custom_action_31 = global::Nearby_Sharing_Windows.Resource.Id.accessibility_custom_action_31;
+			global::ShortDev.Android.Resource.Id.accessibility_custom_action_4 = global::Nearby_Sharing_Windows.Resource.Id.accessibility_custom_action_4;
+			global::ShortDev.Android.Resource.Id.accessibility_custom_action_5 = global::Nearby_Sharing_Windows.Resource.Id.accessibility_custom_action_5;
+			global::ShortDev.Android.Resource.Id.accessibility_custom_action_6 = global::Nearby_Sharing_Windows.Resource.Id.accessibility_custom_action_6;
+			global::ShortDev.Android.Resource.Id.accessibility_custom_action_7 = global::Nearby_Sharing_Windows.Resource.Id.accessibility_custom_action_7;
+			global::ShortDev.Android.Resource.Id.accessibility_custom_action_8 = global::Nearby_Sharing_Windows.Resource.Id.accessibility_custom_action_8;
+			global::ShortDev.Android.Resource.Id.accessibility_custom_action_9 = global::Nearby_Sharing_Windows.Resource.Id.accessibility_custom_action_9;
+			global::ShortDev.Android.Resource.Id.actions = global::Nearby_Sharing_Windows.Resource.Id.actions;
+			global::ShortDev.Android.Resource.Id.action_bar = global::Nearby_Sharing_Windows.Resource.Id.action_bar;
+			global::ShortDev.Android.Resource.Id.action_bar_activity_content = global::Nearby_Sharing_Windows.Resource.Id.action_bar_activity_content;
+			global::ShortDev.Android.Resource.Id.action_bar_container = global::Nearby_Sharing_Windows.Resource.Id.action_bar_container;
+			global::ShortDev.Android.Resource.Id.action_bar_root = global::Nearby_Sharing_Windows.Resource.Id.action_bar_root;
+			global::ShortDev.Android.Resource.Id.action_bar_spinner = global::Nearby_Sharing_Windows.Resource.Id.action_bar_spinner;
+			global::ShortDev.Android.Resource.Id.action_bar_subtitle = global::Nearby_Sharing_Windows.Resource.Id.action_bar_subtitle;
+			global::ShortDev.Android.Resource.Id.action_bar_title = global::Nearby_Sharing_Windows.Resource.Id.action_bar_title;
+			global::ShortDev.Android.Resource.Id.action_container = global::Nearby_Sharing_Windows.Resource.Id.action_container;
+			global::ShortDev.Android.Resource.Id.action_context_bar = global::Nearby_Sharing_Windows.Resource.Id.action_context_bar;
+			global::ShortDev.Android.Resource.Id.action_divider = global::Nearby_Sharing_Windows.Resource.Id.action_divider;
+			global::ShortDev.Android.Resource.Id.action_image = global::Nearby_Sharing_Windows.Resource.Id.action_image;
+			global::ShortDev.Android.Resource.Id.action_menu_divider = global::Nearby_Sharing_Windows.Resource.Id.action_menu_divider;
+			global::ShortDev.Android.Resource.Id.action_menu_presenter = global::Nearby_Sharing_Windows.Resource.Id.action_menu_presenter;
+			global::ShortDev.Android.Resource.Id.action_mode_bar = global::Nearby_Sharing_Windows.Resource.Id.action_mode_bar;
+			global::ShortDev.Android.Resource.Id.action_mode_bar_stub = global::Nearby_Sharing_Windows.Resource.Id.action_mode_bar_stub;
+			global::ShortDev.Android.Resource.Id.action_mode_close_button = global::Nearby_Sharing_Windows.Resource.Id.action_mode_close_button;
+			global::ShortDev.Android.Resource.Id.action_text = global::Nearby_Sharing_Windows.Resource.Id.action_text;
+			global::ShortDev.Android.Resource.Id.activity_chooser_view_content = global::Nearby_Sharing_Windows.Resource.Id.activity_chooser_view_content;
+			global::ShortDev.Android.Resource.Id.add = global::Nearby_Sharing_Windows.Resource.Id.add;
+			global::ShortDev.Android.Resource.Id.alertTitle = global::Nearby_Sharing_Windows.Resource.Id.alertTitle;
+			global::ShortDev.Android.Resource.Id.ALT = global::Nearby_Sharing_Windows.Resource.Id.ALT;
+			global::ShortDev.Android.Resource.Id.always = global::Nearby_Sharing_Windows.Resource.Id.always;
+			global::ShortDev.Android.Resource.Id.async = global::Nearby_Sharing_Windows.Resource.Id.async;
+			global::ShortDev.Android.Resource.Id.beginning = global::Nearby_Sharing_Windows.Resource.Id.beginning;
+			global::ShortDev.Android.Resource.Id.blocking = global::Nearby_Sharing_Windows.Resource.Id.blocking;
+			global::ShortDev.Android.Resource.Id.bottom = global::Nearby_Sharing_Windows.Resource.Id.bottom;
+			global::ShortDev.Android.Resource.Id.buttonPanel = global::Nearby_Sharing_Windows.Resource.Id.buttonPanel;
+			global::ShortDev.Android.Resource.Id.center_vertical = global::Nearby_Sharing_Windows.Resource.Id.center_vertical;
+			global::ShortDev.Android.Resource.Id.checkbox = global::Nearby_Sharing_Windows.Resource.Id.checkbox;
+			global::ShortDev.Android.Resource.Id.@checked = global::Nearby_Sharing_Windows.Resource.Id.@checked;
+			global::ShortDev.Android.Resource.Id.chronometer = global::Nearby_Sharing_Windows.Resource.Id.chronometer;
+			global::ShortDev.Android.Resource.Id.collapseActionView = global::Nearby_Sharing_Windows.Resource.Id.collapseActionView;
+			global::ShortDev.Android.Resource.Id.content = global::Nearby_Sharing_Windows.Resource.Id.content;
+			global::ShortDev.Android.Resource.Id.contentPanel = global::Nearby_Sharing_Windows.Resource.Id.contentPanel;
+			global::ShortDev.Android.Resource.Id.CTRL = global::Nearby_Sharing_Windows.Resource.Id.CTRL;
+			global::ShortDev.Android.Resource.Id.custom = global::Nearby_Sharing_Windows.Resource.Id.custom;
+			global::ShortDev.Android.Resource.Id.customPanel = global::Nearby_Sharing_Windows.Resource.Id.customPanel;
+			global::ShortDev.Android.Resource.Id.decor_content_parent = global::Nearby_Sharing_Windows.Resource.Id.decor_content_parent;
+			global::ShortDev.Android.Resource.Id.default_activity_button = global::Nearby_Sharing_Windows.Resource.Id.default_activity_button;
+			global::ShortDev.Android.Resource.Id.dialog_button = global::Nearby_Sharing_Windows.Resource.Id.dialog_button;
+			global::ShortDev.Android.Resource.Id.disableHome = global::Nearby_Sharing_Windows.Resource.Id.disableHome;
+			global::ShortDev.Android.Resource.Id.edit_query = global::Nearby_Sharing_Windows.Resource.Id.edit_query;
+			global::ShortDev.Android.Resource.Id.end = global::Nearby_Sharing_Windows.Resource.Id.end;
+			global::ShortDev.Android.Resource.Id.expanded_menu = global::Nearby_Sharing_Windows.Resource.Id.expanded_menu;
+			global::ShortDev.Android.Resource.Id.expand_activities_button = global::Nearby_Sharing_Windows.Resource.Id.expand_activities_button;
+			global::ShortDev.Android.Resource.Id.forever = global::Nearby_Sharing_Windows.Resource.Id.forever;
+			global::ShortDev.Android.Resource.Id.fragment_container_view_tag = global::Nearby_Sharing_Windows.Resource.Id.fragment_container_view_tag;
+			global::ShortDev.Android.Resource.Id.FUNCTION = global::Nearby_Sharing_Windows.Resource.Id.FUNCTION;
+			global::ShortDev.Android.Resource.Id.group_divider = global::Nearby_Sharing_Windows.Resource.Id.group_divider;
+			global::ShortDev.Android.Resource.Id.home = global::Nearby_Sharing_Windows.Resource.Id.home;
+			global::ShortDev.Android.Resource.Id.homeAsUp = global::Nearby_Sharing_Windows.Resource.Id.homeAsUp;
+			global::ShortDev.Android.Resource.Id.icon = global::Nearby_Sharing_Windows.Resource.Id.icon;
+			global::ShortDev.Android.Resource.Id.icon_group = global::Nearby_Sharing_Windows.Resource.Id.icon_group;
+			global::ShortDev.Android.Resource.Id.ifRoom = global::Nearby_Sharing_Windows.Resource.Id.ifRoom;
+			global::ShortDev.Android.Resource.Id.image = global::Nearby_Sharing_Windows.Resource.Id.image;
+			global::ShortDev.Android.Resource.Id.info = global::Nearby_Sharing_Windows.Resource.Id.info;
+			global::ShortDev.Android.Resource.Id.italic = global::Nearby_Sharing_Windows.Resource.Id.italic;
+			global::ShortDev.Android.Resource.Id.item1 = global::Nearby_Sharing_Windows.Resource.Id.item1;
+			global::ShortDev.Android.Resource.Id.item2 = global::Nearby_Sharing_Windows.Resource.Id.item2;
+			global::ShortDev.Android.Resource.Id.item3 = global::Nearby_Sharing_Windows.Resource.Id.item3;
+			global::ShortDev.Android.Resource.Id.item4 = global::Nearby_Sharing_Windows.Resource.Id.item4;
+			global::ShortDev.Android.Resource.Id.item_touch_helper_previous_elevation = global::Nearby_Sharing_Windows.Resource.Id.item_touch_helper_previous_elevation;
+			global::ShortDev.Android.Resource.Id.line1 = global::Nearby_Sharing_Windows.Resource.Id.line1;
+			global::ShortDev.Android.Resource.Id.line3 = global::Nearby_Sharing_Windows.Resource.Id.line3;
+			global::ShortDev.Android.Resource.Id.listMode = global::Nearby_Sharing_Windows.Resource.Id.listMode;
+			global::ShortDev.Android.Resource.Id.list_item = global::Nearby_Sharing_Windows.Resource.Id.list_item;
+			global::ShortDev.Android.Resource.Id.message = global::Nearby_Sharing_Windows.Resource.Id.message;
+			global::ShortDev.Android.Resource.Id.META = global::Nearby_Sharing_Windows.Resource.Id.META;
+			global::ShortDev.Android.Resource.Id.middle = global::Nearby_Sharing_Windows.Resource.Id.middle;
+			global::ShortDev.Android.Resource.Id.multiply = global::Nearby_Sharing_Windows.Resource.Id.multiply;
+			global::ShortDev.Android.Resource.Id.never = global::Nearby_Sharing_Windows.Resource.Id.never;
+			global::ShortDev.Android.Resource.Id.none = global::Nearby_Sharing_Windows.Resource.Id.none;
+			global::ShortDev.Android.Resource.Id.normal = global::Nearby_Sharing_Windows.Resource.Id.normal;
+			global::ShortDev.Android.Resource.Id.notification_background = global::Nearby_Sharing_Windows.Resource.Id.notification_background;
+			global::ShortDev.Android.Resource.Id.notification_main_column = global::Nearby_Sharing_Windows.Resource.Id.notification_main_column;
+			global::ShortDev.Android.Resource.Id.notification_main_column_container = global::Nearby_Sharing_Windows.Resource.Id.notification_main_column_container;
+			global::ShortDev.Android.Resource.Id.off = global::Nearby_Sharing_Windows.Resource.Id.off;
+			global::ShortDev.Android.Resource.Id.on = global::Nearby_Sharing_Windows.Resource.Id.on;
+			global::ShortDev.Android.Resource.Id.parentPanel = global::Nearby_Sharing_Windows.Resource.Id.parentPanel;
+			global::ShortDev.Android.Resource.Id.progress_circular = global::Nearby_Sharing_Windows.Resource.Id.progress_circular;
+			global::ShortDev.Android.Resource.Id.progress_horizontal = global::Nearby_Sharing_Windows.Resource.Id.progress_horizontal;
+			global::ShortDev.Android.Resource.Id.radio = global::Nearby_Sharing_Windows.Resource.Id.radio;
+			global::ShortDev.Android.Resource.Id.right_icon = global::Nearby_Sharing_Windows.Resource.Id.right_icon;
+			global::ShortDev.Android.Resource.Id.right_side = global::Nearby_Sharing_Windows.Resource.Id.right_side;
+			global::ShortDev.Android.Resource.Id.screen = global::Nearby_Sharing_Windows.Resource.Id.screen;
+			global::ShortDev.Android.Resource.Id.scrollIndicatorDown = global::Nearby_Sharing_Windows.Resource.Id.scrollIndicatorDown;
+			global::ShortDev.Android.Resource.Id.scrollIndicatorUp = global::Nearby_Sharing_Windows.Resource.Id.scrollIndicatorUp;
+			global::ShortDev.Android.Resource.Id.scrollView = global::Nearby_Sharing_Windows.Resource.Id.scrollView;
+			global::ShortDev.Android.Resource.Id.search_badge = global::Nearby_Sharing_Windows.Resource.Id.search_badge;
+			global::ShortDev.Android.Resource.Id.search_bar = global::Nearby_Sharing_Windows.Resource.Id.search_bar;
+			global::ShortDev.Android.Resource.Id.search_button = global::Nearby_Sharing_Windows.Resource.Id.search_button;
+			global::ShortDev.Android.Resource.Id.search_close_btn = global::Nearby_Sharing_Windows.Resource.Id.search_close_btn;
+			global::ShortDev.Android.Resource.Id.search_edit_frame = global::Nearby_Sharing_Windows.Resource.Id.search_edit_frame;
+			global::ShortDev.Android.Resource.Id.search_go_btn = global::Nearby_Sharing_Windows.Resource.Id.search_go_btn;
+			global::ShortDev.Android.Resource.Id.search_mag_icon = global::Nearby_Sharing_Windows.Resource.Id.search_mag_icon;
+			global::ShortDev.Android.Resource.Id.search_plate = global::Nearby_Sharing_Windows.Resource.Id.search_plate;
+			global::ShortDev.Android.Resource.Id.search_src_text = global::Nearby_Sharing_Windows.Resource.Id.search_src_text;
+			global::ShortDev.Android.Resource.Id.search_voice_btn = global::Nearby_Sharing_Windows.Resource.Id.search_voice_btn;
+			global::ShortDev.Android.Resource.Id.select_dialog_listview = global::Nearby_Sharing_Windows.Resource.Id.select_dialog_listview;
+			global::ShortDev.Android.Resource.Id.SHIFT = global::Nearby_Sharing_Windows.Resource.Id.SHIFT;
+			global::ShortDev.Android.Resource.Id.shortcut = global::Nearby_Sharing_Windows.Resource.Id.shortcut;
+			global::ShortDev.Android.Resource.Id.showCustom = global::Nearby_Sharing_Windows.Resource.Id.showCustom;
+			global::ShortDev.Android.Resource.Id.showHome = global::Nearby_Sharing_Windows.Resource.Id.showHome;
+			global::ShortDev.Android.Resource.Id.showTitle = global::Nearby_Sharing_Windows.Resource.Id.showTitle;
+			global::ShortDev.Android.Resource.Id.spacer = global::Nearby_Sharing_Windows.Resource.Id.spacer;
+			global::ShortDev.Android.Resource.Id.split_action_bar = global::Nearby_Sharing_Windows.Resource.Id.split_action_bar;
+			global::ShortDev.Android.Resource.Id.src_atop = global::Nearby_Sharing_Windows.Resource.Id.src_atop;
+			global::ShortDev.Android.Resource.Id.src_in = global::Nearby_Sharing_Windows.Resource.Id.src_in;
+			global::ShortDev.Android.Resource.Id.src_over = global::Nearby_Sharing_Windows.Resource.Id.src_over;
+			global::ShortDev.Android.Resource.Id.submenuarrow = global::Nearby_Sharing_Windows.Resource.Id.submenuarrow;
+			global::ShortDev.Android.Resource.Id.submit_area = global::Nearby_Sharing_Windows.Resource.Id.submit_area;
+			global::ShortDev.Android.Resource.Id.SYM = global::Nearby_Sharing_Windows.Resource.Id.SYM;
+			global::ShortDev.Android.Resource.Id.tabMode = global::Nearby_Sharing_Windows.Resource.Id.tabMode;
+			global::ShortDev.Android.Resource.Id.tag_accessibility_actions = global::Nearby_Sharing_Windows.Resource.Id.tag_accessibility_actions;
+			global::ShortDev.Android.Resource.Id.tag_accessibility_clickable_spans = global::Nearby_Sharing_Windows.Resource.Id.tag_accessibility_clickable_spans;
+			global::ShortDev.Android.Resource.Id.tag_accessibility_heading = global::Nearby_Sharing_Windows.Resource.Id.tag_accessibility_heading;
+			global::ShortDev.Android.Resource.Id.tag_accessibility_pane_title = global::Nearby_Sharing_Windows.Resource.Id.tag_accessibility_pane_title;
+			global::ShortDev.Android.Resource.Id.tag_on_apply_window_listener = global::Nearby_Sharing_Windows.Resource.Id.tag_on_apply_window_listener;
+			global::ShortDev.Android.Resource.Id.tag_on_receive_content_listener = global::Nearby_Sharing_Windows.Resource.Id.tag_on_receive_content_listener;
+			global::ShortDev.Android.Resource.Id.tag_on_receive_content_mime_types = global::Nearby_Sharing_Windows.Resource.Id.tag_on_receive_content_mime_types;
+			global::ShortDev.Android.Resource.Id.tag_screen_reader_focusable = global::Nearby_Sharing_Windows.Resource.Id.tag_screen_reader_focusable;
+			global::ShortDev.Android.Resource.Id.tag_state_description = global::Nearby_Sharing_Windows.Resource.Id.tag_state_description;
+			global::ShortDev.Android.Resource.Id.tag_transition_group = global::Nearby_Sharing_Windows.Resource.Id.tag_transition_group;
+			global::ShortDev.Android.Resource.Id.tag_unhandled_key_event_manager = global::Nearby_Sharing_Windows.Resource.Id.tag_unhandled_key_event_manager;
+			global::ShortDev.Android.Resource.Id.tag_unhandled_key_listeners = global::Nearby_Sharing_Windows.Resource.Id.tag_unhandled_key_listeners;
+			global::ShortDev.Android.Resource.Id.tag_window_insets_animation_callback = global::Nearby_Sharing_Windows.Resource.Id.tag_window_insets_animation_callback;
+			global::ShortDev.Android.Resource.Id.text = global::Nearby_Sharing_Windows.Resource.Id.text;
+			global::ShortDev.Android.Resource.Id.text2 = global::Nearby_Sharing_Windows.Resource.Id.text2;
+			global::ShortDev.Android.Resource.Id.textSpacerNoButtons = global::Nearby_Sharing_Windows.Resource.Id.textSpacerNoButtons;
+			global::ShortDev.Android.Resource.Id.textSpacerNoTitle = global::Nearby_Sharing_Windows.Resource.Id.textSpacerNoTitle;
+			global::ShortDev.Android.Resource.Id.time = global::Nearby_Sharing_Windows.Resource.Id.time;
+			global::ShortDev.Android.Resource.Id.title = global::Nearby_Sharing_Windows.Resource.Id.title;
+			global::ShortDev.Android.Resource.Id.titleDividerNoCustom = global::Nearby_Sharing_Windows.Resource.Id.titleDividerNoCustom;
+			global::ShortDev.Android.Resource.Id.title_template = global::Nearby_Sharing_Windows.Resource.Id.title_template;
+			global::ShortDev.Android.Resource.Id.top = global::Nearby_Sharing_Windows.Resource.Id.top;
+			global::ShortDev.Android.Resource.Id.topPanel = global::Nearby_Sharing_Windows.Resource.Id.topPanel;
+			global::ShortDev.Android.Resource.Id.@unchecked = global::Nearby_Sharing_Windows.Resource.Id.@unchecked;
+			global::ShortDev.Android.Resource.Id.uniform = global::Nearby_Sharing_Windows.Resource.Id.uniform;
+			global::ShortDev.Android.Resource.Id.up = global::Nearby_Sharing_Windows.Resource.Id.up;
+			global::ShortDev.Android.Resource.Id.useLogo = global::Nearby_Sharing_Windows.Resource.Id.useLogo;
+			global::ShortDev.Android.Resource.Id.view_tree_lifecycle_owner = global::Nearby_Sharing_Windows.Resource.Id.view_tree_lifecycle_owner;
+			global::ShortDev.Android.Resource.Id.view_tree_saved_state_registry_owner = global::Nearby_Sharing_Windows.Resource.Id.view_tree_saved_state_registry_owner;
+			global::ShortDev.Android.Resource.Id.visible_removing_fragment_view_tag = global::Nearby_Sharing_Windows.Resource.Id.visible_removing_fragment_view_tag;
+			global::ShortDev.Android.Resource.Id.withText = global::Nearby_Sharing_Windows.Resource.Id.withText;
+			global::ShortDev.Android.Resource.Id.wrap_content = global::Nearby_Sharing_Windows.Resource.Id.wrap_content;
+			global::ShortDev.Android.Resource.Integer.abc_config_activityDefaultDur = global::Nearby_Sharing_Windows.Resource.Integer.abc_config_activityDefaultDur;
+			global::ShortDev.Android.Resource.Integer.abc_config_activityShortDur = global::Nearby_Sharing_Windows.Resource.Integer.abc_config_activityShortDur;
+			global::ShortDev.Android.Resource.Integer.cancel_button_image_alpha = global::Nearby_Sharing_Windows.Resource.Integer.cancel_button_image_alpha;
+			global::ShortDev.Android.Resource.Integer.config_tooltipAnimTime = global::Nearby_Sharing_Windows.Resource.Integer.config_tooltipAnimTime;
+			global::ShortDev.Android.Resource.Integer.status_bar_notification_info_maxnum = global::Nearby_Sharing_Windows.Resource.Integer.status_bar_notification_info_maxnum;
+			global::ShortDev.Android.Resource.Interpolator.btn_checkbox_checked_mtrl_animation_interpolator_0 = global::Nearby_Sharing_Windows.Resource.Interpolator.btn_checkbox_checked_mtrl_animation_interpolator_0;
+			global::ShortDev.Android.Resource.Interpolator.btn_checkbox_checked_mtrl_animation_interpolator_1 = global::Nearby_Sharing_Windows.Resource.Interpolator.btn_checkbox_checked_mtrl_animation_interpolator_1;
+			global::ShortDev.Android.Resource.Interpolator.btn_checkbox_unchecked_mtrl_animation_interpolator_0 = global::Nearby_Sharing_Windows.Resource.Interpolator.btn_checkbox_unchecked_mtrl_animation_interpolator_0;
+			global::ShortDev.Android.Resource.Interpolator.btn_checkbox_unchecked_mtrl_animation_interpolator_1 = global::Nearby_Sharing_Windows.Resource.Interpolator.btn_checkbox_unchecked_mtrl_animation_interpolator_1;
+			global::ShortDev.Android.Resource.Interpolator.btn_radio_to_off_mtrl_animation_interpolator_0 = global::Nearby_Sharing_Windows.Resource.Interpolator.btn_radio_to_off_mtrl_animation_interpolator_0;
+			global::ShortDev.Android.Resource.Interpolator.btn_radio_to_on_mtrl_animation_interpolator_0 = global::Nearby_Sharing_Windows.Resource.Interpolator.btn_radio_to_on_mtrl_animation_interpolator_0;
+			global::ShortDev.Android.Resource.Interpolator.fast_out_slow_in = global::Nearby_Sharing_Windows.Resource.Interpolator.fast_out_slow_in;
+			global::ShortDev.Android.Resource.Layout.abc_action_bar_title_item = global::Nearby_Sharing_Windows.Resource.Layout.abc_action_bar_title_item;
+			global::ShortDev.Android.Resource.Layout.abc_action_bar_up_container = global::Nearby_Sharing_Windows.Resource.Layout.abc_action_bar_up_container;
+			global::ShortDev.Android.Resource.Layout.abc_action_menu_item_layout = global::Nearby_Sharing_Windows.Resource.Layout.abc_action_menu_item_layout;
+			global::ShortDev.Android.Resource.Layout.abc_action_menu_layout = global::Nearby_Sharing_Windows.Resource.Layout.abc_action_menu_layout;
+			global::ShortDev.Android.Resource.Layout.abc_action_mode_bar = global::Nearby_Sharing_Windows.Resource.Layout.abc_action_mode_bar;
+			global::ShortDev.Android.Resource.Layout.abc_action_mode_close_item_material = global::Nearby_Sharing_Windows.Resource.Layout.abc_action_mode_close_item_material;
+			global::ShortDev.Android.Resource.Layout.abc_activity_chooser_view = global::Nearby_Sharing_Windows.Resource.Layout.abc_activity_chooser_view;
+			global::ShortDev.Android.Resource.Layout.abc_activity_chooser_view_list_item = global::Nearby_Sharing_Windows.Resource.Layout.abc_activity_chooser_view_list_item;
+			global::ShortDev.Android.Resource.Layout.abc_alert_dialog_button_bar_material = global::Nearby_Sharing_Windows.Resource.Layout.abc_alert_dialog_button_bar_material;
+			global::ShortDev.Android.Resource.Layout.abc_alert_dialog_material = global::Nearby_Sharing_Windows.Resource.Layout.abc_alert_dialog_material;
+			global::ShortDev.Android.Resource.Layout.abc_alert_dialog_title_material = global::Nearby_Sharing_Windows.Resource.Layout.abc_alert_dialog_title_material;
+			global::ShortDev.Android.Resource.Layout.abc_cascading_menu_item_layout = global::Nearby_Sharing_Windows.Resource.Layout.abc_cascading_menu_item_layout;
+			global::ShortDev.Android.Resource.Layout.abc_dialog_title_material = global::Nearby_Sharing_Windows.Resource.Layout.abc_dialog_title_material;
+			global::ShortDev.Android.Resource.Layout.abc_expanded_menu_layout = global::Nearby_Sharing_Windows.Resource.Layout.abc_expanded_menu_layout;
+			global::ShortDev.Android.Resource.Layout.abc_list_menu_item_checkbox = global::Nearby_Sharing_Windows.Resource.Layout.abc_list_menu_item_checkbox;
+			global::ShortDev.Android.Resource.Layout.abc_list_menu_item_icon = global::Nearby_Sharing_Windows.Resource.Layout.abc_list_menu_item_icon;
+			global::ShortDev.Android.Resource.Layout.abc_list_menu_item_layout = global::Nearby_Sharing_Windows.Resource.Layout.abc_list_menu_item_layout;
+			global::ShortDev.Android.Resource.Layout.abc_list_menu_item_radio = global::Nearby_Sharing_Windows.Resource.Layout.abc_list_menu_item_radio;
+			global::ShortDev.Android.Resource.Layout.abc_popup_menu_header_item_layout = global::Nearby_Sharing_Windows.Resource.Layout.abc_popup_menu_header_item_layout;
+			global::ShortDev.Android.Resource.Layout.abc_popup_menu_item_layout = global::Nearby_Sharing_Windows.Resource.Layout.abc_popup_menu_item_layout;
+			global::ShortDev.Android.Resource.Layout.abc_screen_content_include = global::Nearby_Sharing_Windows.Resource.Layout.abc_screen_content_include;
+			global::ShortDev.Android.Resource.Layout.abc_screen_simple = global::Nearby_Sharing_Windows.Resource.Layout.abc_screen_simple;
+			global::ShortDev.Android.Resource.Layout.abc_screen_simple_overlay_action_mode = global::Nearby_Sharing_Windows.Resource.Layout.abc_screen_simple_overlay_action_mode;
+			global::ShortDev.Android.Resource.Layout.abc_screen_toolbar = global::Nearby_Sharing_Windows.Resource.Layout.abc_screen_toolbar;
+			global::ShortDev.Android.Resource.Layout.abc_search_dropdown_item_icons_2line = global::Nearby_Sharing_Windows.Resource.Layout.abc_search_dropdown_item_icons_2line;
+			global::ShortDev.Android.Resource.Layout.abc_search_view = global::Nearby_Sharing_Windows.Resource.Layout.abc_search_view;
+			global::ShortDev.Android.Resource.Layout.abc_select_dialog_material = global::Nearby_Sharing_Windows.Resource.Layout.abc_select_dialog_material;
+			global::ShortDev.Android.Resource.Layout.abc_tooltip = global::Nearby_Sharing_Windows.Resource.Layout.abc_tooltip;
+			global::ShortDev.Android.Resource.Layout.custom_dialog = global::Nearby_Sharing_Windows.Resource.Layout.custom_dialog;
+			global::ShortDev.Android.Resource.Layout.notification_action = global::Nearby_Sharing_Windows.Resource.Layout.notification_action;
+			global::ShortDev.Android.Resource.Layout.notification_action_tombstone = global::Nearby_Sharing_Windows.Resource.Layout.notification_action_tombstone;
+			global::ShortDev.Android.Resource.Layout.notification_template_custom_big = global::Nearby_Sharing_Windows.Resource.Layout.notification_template_custom_big;
+			global::ShortDev.Android.Resource.Layout.notification_template_icon_group = global::Nearby_Sharing_Windows.Resource.Layout.notification_template_icon_group;
+			global::ShortDev.Android.Resource.Layout.notification_template_part_chronometer = global::Nearby_Sharing_Windows.Resource.Layout.notification_template_part_chronometer;
+			global::ShortDev.Android.Resource.Layout.notification_template_part_time = global::Nearby_Sharing_Windows.Resource.Layout.notification_template_part_time;
+			global::ShortDev.Android.Resource.Layout.select_dialog_item_material = global::Nearby_Sharing_Windows.Resource.Layout.select_dialog_item_material;
+			global::ShortDev.Android.Resource.Layout.select_dialog_multichoice_material = global::Nearby_Sharing_Windows.Resource.Layout.select_dialog_multichoice_material;
+			global::ShortDev.Android.Resource.Layout.select_dialog_singlechoice_material = global::Nearby_Sharing_Windows.Resource.Layout.select_dialog_singlechoice_material;
+			global::ShortDev.Android.Resource.Layout.support_simple_spinner_dropdown_item = global::Nearby_Sharing_Windows.Resource.Layout.support_simple_spinner_dropdown_item;
+			global::ShortDev.Android.Resource.Menu.example_menu = global::Nearby_Sharing_Windows.Resource.Menu.example_menu;
+			global::ShortDev.Android.Resource.Menu.example_menu2 = global::Nearby_Sharing_Windows.Resource.Menu.example_menu2;
+			global::ShortDev.Android.Resource.String.abc_action_bar_home_description = global::Nearby_Sharing_Windows.Resource.String.abc_action_bar_home_description;
+			global::ShortDev.Android.Resource.String.abc_action_bar_up_description = global::Nearby_Sharing_Windows.Resource.String.abc_action_bar_up_description;
+			global::ShortDev.Android.Resource.String.abc_action_menu_overflow_description = global::Nearby_Sharing_Windows.Resource.String.abc_action_menu_overflow_description;
+			global::ShortDev.Android.Resource.String.abc_action_mode_done = global::Nearby_Sharing_Windows.Resource.String.abc_action_mode_done;
+			global::ShortDev.Android.Resource.String.abc_activitychooserview_choose_application = global::Nearby_Sharing_Windows.Resource.String.abc_activitychooserview_choose_application;
+			global::ShortDev.Android.Resource.String.abc_activity_chooser_view_see_all = global::Nearby_Sharing_Windows.Resource.String.abc_activity_chooser_view_see_all;
+			global::ShortDev.Android.Resource.String.abc_capital_off = global::Nearby_Sharing_Windows.Resource.String.abc_capital_off;
+			global::ShortDev.Android.Resource.String.abc_capital_on = global::Nearby_Sharing_Windows.Resource.String.abc_capital_on;
+			global::ShortDev.Android.Resource.String.abc_menu_alt_shortcut_label = global::Nearby_Sharing_Windows.Resource.String.abc_menu_alt_shortcut_label;
+			global::ShortDev.Android.Resource.String.abc_menu_ctrl_shortcut_label = global::Nearby_Sharing_Windows.Resource.String.abc_menu_ctrl_shortcut_label;
+			global::ShortDev.Android.Resource.String.abc_menu_delete_shortcut_label = global::Nearby_Sharing_Windows.Resource.String.abc_menu_delete_shortcut_label;
+			global::ShortDev.Android.Resource.String.abc_menu_enter_shortcut_label = global::Nearby_Sharing_Windows.Resource.String.abc_menu_enter_shortcut_label;
+			global::ShortDev.Android.Resource.String.abc_menu_function_shortcut_label = global::Nearby_Sharing_Windows.Resource.String.abc_menu_function_shortcut_label;
+			global::ShortDev.Android.Resource.String.abc_menu_meta_shortcut_label = global::Nearby_Sharing_Windows.Resource.String.abc_menu_meta_shortcut_label;
+			global::ShortDev.Android.Resource.String.abc_menu_shift_shortcut_label = global::Nearby_Sharing_Windows.Resource.String.abc_menu_shift_shortcut_label;
+			global::ShortDev.Android.Resource.String.abc_menu_space_shortcut_label = global::Nearby_Sharing_Windows.Resource.String.abc_menu_space_shortcut_label;
+			global::ShortDev.Android.Resource.String.abc_menu_sym_shortcut_label = global::Nearby_Sharing_Windows.Resource.String.abc_menu_sym_shortcut_label;
+			global::ShortDev.Android.Resource.String.abc_prepend_shortcut_label = global::Nearby_Sharing_Windows.Resource.String.abc_prepend_shortcut_label;
+			global::ShortDev.Android.Resource.String.abc_searchview_description_clear = global::Nearby_Sharing_Windows.Resource.String.abc_searchview_description_clear;
+			global::ShortDev.Android.Resource.String.abc_searchview_description_query = global::Nearby_Sharing_Windows.Resource.String.abc_searchview_description_query;
+			global::ShortDev.Android.Resource.String.abc_searchview_description_search = global::Nearby_Sharing_Windows.Resource.String.abc_searchview_description_search;
+			global::ShortDev.Android.Resource.String.abc_searchview_description_submit = global::Nearby_Sharing_Windows.Resource.String.abc_searchview_description_submit;
+			global::ShortDev.Android.Resource.String.abc_searchview_description_voice = global::Nearby_Sharing_Windows.Resource.String.abc_searchview_description_voice;
+			global::ShortDev.Android.Resource.String.abc_search_hint = global::Nearby_Sharing_Windows.Resource.String.abc_search_hint;
+			global::ShortDev.Android.Resource.String.abc_shareactionprovider_share_with = global::Nearby_Sharing_Windows.Resource.String.abc_shareactionprovider_share_with;
+			global::ShortDev.Android.Resource.String.abc_shareactionprovider_share_with_application = global::Nearby_Sharing_Windows.Resource.String.abc_shareactionprovider_share_with_application;
+			global::ShortDev.Android.Resource.String.abc_toolbar_collapse_description = global::Nearby_Sharing_Windows.Resource.String.abc_toolbar_collapse_description;
+			global::ShortDev.Android.Resource.String.app_name = global::Nearby_Sharing_Windows.Resource.String.app_name;
+			global::ShortDev.Android.Resource.String.hello = global::Nearby_Sharing_Windows.Resource.String.hello;
+			global::ShortDev.Android.Resource.String.search_menu_title = global::Nearby_Sharing_Windows.Resource.String.search_menu_title;
+			global::ShortDev.Android.Resource.String.status_bar_notification_info_overflow = global::Nearby_Sharing_Windows.Resource.String.status_bar_notification_info_overflow;
+			global::ShortDev.Android.Resource.Style.AlertDialog_AppCompat = global::Nearby_Sharing_Windows.Resource.Style.AlertDialog_AppCompat;
+			global::ShortDev.Android.Resource.Style.AlertDialog_AppCompat_Light = global::Nearby_Sharing_Windows.Resource.Style.AlertDialog_AppCompat_Light;
+			global::ShortDev.Android.Resource.Style.Animation_AppCompat_Dialog = global::Nearby_Sharing_Windows.Resource.Style.Animation_AppCompat_Dialog;
+			global::ShortDev.Android.Resource.Style.Animation_AppCompat_DropDownUp = global::Nearby_Sharing_Windows.Resource.Style.Animation_AppCompat_DropDownUp;
+			global::ShortDev.Android.Resource.Style.Animation_AppCompat_Tooltip = global::Nearby_Sharing_Windows.Resource.Style.Animation_AppCompat_Tooltip;
+			global::ShortDev.Android.Resource.Style.Base_AlertDialog_AppCompat = global::Nearby_Sharing_Windows.Resource.Style.Base_AlertDialog_AppCompat;
+			global::ShortDev.Android.Resource.Style.Base_AlertDialog_AppCompat_Light = global::Nearby_Sharing_Windows.Resource.Style.Base_AlertDialog_AppCompat_Light;
+			global::ShortDev.Android.Resource.Style.Base_Animation_AppCompat_Dialog = global::Nearby_Sharing_Windows.Resource.Style.Base_Animation_AppCompat_Dialog;
+			global::ShortDev.Android.Resource.Style.Base_Animation_AppCompat_DropDownUp = global::Nearby_Sharing_Windows.Resource.Style.Base_Animation_AppCompat_DropDownUp;
+			global::ShortDev.Android.Resource.Style.Base_Animation_AppCompat_Tooltip = global::Nearby_Sharing_Windows.Resource.Style.Base_Animation_AppCompat_Tooltip;
+			global::ShortDev.Android.Resource.Style.Base_DialogWindowTitleBackground_AppCompat = global::Nearby_Sharing_Windows.Resource.Style.Base_DialogWindowTitleBackground_AppCompat;
+			global::ShortDev.Android.Resource.Style.Base_DialogWindowTitle_AppCompat = global::Nearby_Sharing_Windows.Resource.Style.Base_DialogWindowTitle_AppCompat;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat_Body1 = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat_Body1;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat_Body2 = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat_Body2;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat_Button = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat_Button;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat_Caption = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat_Caption;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat_Display1 = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat_Display1;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat_Display2 = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat_Display2;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat_Display3 = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat_Display3;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat_Display4 = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat_Display4;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat_Headline = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat_Headline;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat_Inverse = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat_Inverse;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat_Large = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat_Large;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat_Large_Inverse = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat_Large_Inverse;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat_Light_Widget_PopupMenu_Large = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat_Light_Widget_PopupMenu_Large;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat_Light_Widget_PopupMenu_Small = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat_Light_Widget_PopupMenu_Small;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat_Medium = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat_Medium;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat_Medium_Inverse = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat_Medium_Inverse;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat_Menu = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat_Menu;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat_SearchResult = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat_SearchResult;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat_SearchResult_Subtitle = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat_SearchResult_Subtitle;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat_SearchResult_Title = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat_SearchResult_Title;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat_Small = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat_Small;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat_Small_Inverse = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat_Small_Inverse;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat_Subhead = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat_Subhead;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat_Subhead_Inverse = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat_Subhead_Inverse;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat_Title = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat_Title;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat_Title_Inverse = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat_Title_Inverse;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat_Tooltip = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat_Tooltip;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionBar_Menu = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionBar_Menu;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionBar_Subtitle = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionBar_Subtitle;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionBar_Subtitle_Inverse = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionBar_Subtitle_Inverse;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionBar_Title = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionBar_Title;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionBar_Title_Inverse = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionBar_Title_Inverse;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionMode_Subtitle = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionMode_Subtitle;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionMode_Title = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionMode_Title;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat_Widget_Button = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat_Widget_Button;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat_Widget_Button_Borderless_Colored = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat_Widget_Button_Borderless_Colored;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat_Widget_Button_Colored = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat_Widget_Button_Colored;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat_Widget_Button_Inverse = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat_Widget_Button_Inverse;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat_Widget_DropDownItem = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat_Widget_DropDownItem;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat_Widget_PopupMenu_Header = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat_Widget_PopupMenu_Header;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat_Widget_PopupMenu_Large = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat_Widget_PopupMenu_Large;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat_Widget_PopupMenu_Small = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat_Widget_PopupMenu_Small;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat_Widget_Switch = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat_Widget_Switch;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_AppCompat_Widget_TextView_SpinnerItem = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_AppCompat_Widget_TextView_SpinnerItem;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_Widget_AppCompat_ExpandedMenu_Item = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_Widget_AppCompat_ExpandedMenu_Item;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_Widget_AppCompat_Toolbar_Subtitle = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_Widget_AppCompat_Toolbar_Subtitle;
+			global::ShortDev.Android.Resource.Style.Base_TextAppearance_Widget_AppCompat_Toolbar_Title = global::Nearby_Sharing_Windows.Resource.Style.Base_TextAppearance_Widget_AppCompat_Toolbar_Title;
+			global::ShortDev.Android.Resource.Style.Base_ThemeOverlay_AppCompat = global::Nearby_Sharing_Windows.Resource.Style.Base_ThemeOverlay_AppCompat;
+			global::ShortDev.Android.Resource.Style.Base_ThemeOverlay_AppCompat_ActionBar = global::Nearby_Sharing_Windows.Resource.Style.Base_ThemeOverlay_AppCompat_ActionBar;
+			global::ShortDev.Android.Resource.Style.Base_ThemeOverlay_AppCompat_Dark = global::Nearby_Sharing_Windows.Resource.Style.Base_ThemeOverlay_AppCompat_Dark;
+			global::ShortDev.Android.Resource.Style.Base_ThemeOverlay_AppCompat_Dark_ActionBar = global::Nearby_Sharing_Windows.Resource.Style.Base_ThemeOverlay_AppCompat_Dark_ActionBar;
+			global::ShortDev.Android.Resource.Style.Base_ThemeOverlay_AppCompat_Dialog = global::Nearby_Sharing_Windows.Resource.Style.Base_ThemeOverlay_AppCompat_Dialog;
+			global::ShortDev.Android.Resource.Style.Base_ThemeOverlay_AppCompat_Dialog_Alert = global::Nearby_Sharing_Windows.Resource.Style.Base_ThemeOverlay_AppCompat_Dialog_Alert;
+			global::ShortDev.Android.Resource.Style.Base_ThemeOverlay_AppCompat_Light = global::Nearby_Sharing_Windows.Resource.Style.Base_ThemeOverlay_AppCompat_Light;
+			global::ShortDev.Android.Resource.Style.Base_Theme_AppCompat = global::Nearby_Sharing_Windows.Resource.Style.Base_Theme_AppCompat;
+			global::ShortDev.Android.Resource.Style.Base_Theme_AppCompat_CompactMenu = global::Nearby_Sharing_Windows.Resource.Style.Base_Theme_AppCompat_CompactMenu;
+			global::ShortDev.Android.Resource.Style.Base_Theme_AppCompat_Dialog = global::Nearby_Sharing_Windows.Resource.Style.Base_Theme_AppCompat_Dialog;
+			global::ShortDev.Android.Resource.Style.Base_Theme_AppCompat_DialogWhenLarge = global::Nearby_Sharing_Windows.Resource.Style.Base_Theme_AppCompat_DialogWhenLarge;
+			global::ShortDev.Android.Resource.Style.Base_Theme_AppCompat_Dialog_Alert = global::Nearby_Sharing_Windows.Resource.Style.Base_Theme_AppCompat_Dialog_Alert;
+			global::ShortDev.Android.Resource.Style.Base_Theme_AppCompat_Dialog_FixedSize = global::Nearby_Sharing_Windows.Resource.Style.Base_Theme_AppCompat_Dialog_FixedSize;
+			global::ShortDev.Android.Resource.Style.Base_Theme_AppCompat_Dialog_MinWidth = global::Nearby_Sharing_Windows.Resource.Style.Base_Theme_AppCompat_Dialog_MinWidth;
+			global::ShortDev.Android.Resource.Style.Base_Theme_AppCompat_Light = global::Nearby_Sharing_Windows.Resource.Style.Base_Theme_AppCompat_Light;
+			global::ShortDev.Android.Resource.Style.Base_Theme_AppCompat_Light_DarkActionBar = global::Nearby_Sharing_Windows.Resource.Style.Base_Theme_AppCompat_Light_DarkActionBar;
+			global::ShortDev.Android.Resource.Style.Base_Theme_AppCompat_Light_Dialog = global::Nearby_Sharing_Windows.Resource.Style.Base_Theme_AppCompat_Light_Dialog;
+			global::ShortDev.Android.Resource.Style.Base_Theme_AppCompat_Light_DialogWhenLarge = global::Nearby_Sharing_Windows.Resource.Style.Base_Theme_AppCompat_Light_DialogWhenLarge;
+			global::ShortDev.Android.Resource.Style.Base_Theme_AppCompat_Light_Dialog_Alert = global::Nearby_Sharing_Windows.Resource.Style.Base_Theme_AppCompat_Light_Dialog_Alert;
+			global::ShortDev.Android.Resource.Style.Base_Theme_AppCompat_Light_Dialog_FixedSize = global::Nearby_Sharing_Windows.Resource.Style.Base_Theme_AppCompat_Light_Dialog_FixedSize;
+			global::ShortDev.Android.Resource.Style.Base_Theme_AppCompat_Light_Dialog_MinWidth = global::Nearby_Sharing_Windows.Resource.Style.Base_Theme_AppCompat_Light_Dialog_MinWidth;
+			global::ShortDev.Android.Resource.Style.Base_V21_ThemeOverlay_AppCompat_Dialog = global::Nearby_Sharing_Windows.Resource.Style.Base_V21_ThemeOverlay_AppCompat_Dialog;
+			global::ShortDev.Android.Resource.Style.Base_V21_Theme_AppCompat = global::Nearby_Sharing_Windows.Resource.Style.Base_V21_Theme_AppCompat;
+			global::ShortDev.Android.Resource.Style.Base_V21_Theme_AppCompat_Dialog = global::Nearby_Sharing_Windows.Resource.Style.Base_V21_Theme_AppCompat_Dialog;
+			global::ShortDev.Android.Resource.Style.Base_V21_Theme_AppCompat_Light = global::Nearby_Sharing_Windows.Resource.Style.Base_V21_Theme_AppCompat_Light;
+			global::ShortDev.Android.Resource.Style.Base_V21_Theme_AppCompat_Light_Dialog = global::Nearby_Sharing_Windows.Resource.Style.Base_V21_Theme_AppCompat_Light_Dialog;
+			global::ShortDev.Android.Resource.Style.Base_V22_Theme_AppCompat = global::Nearby_Sharing_Windows.Resource.Style.Base_V22_Theme_AppCompat;
+			global::ShortDev.Android.Resource.Style.Base_V22_Theme_AppCompat_Light = global::Nearby_Sharing_Windows.Resource.Style.Base_V22_Theme_AppCompat_Light;
+			global::ShortDev.Android.Resource.Style.Base_V23_Theme_AppCompat = global::Nearby_Sharing_Windows.Resource.Style.Base_V23_Theme_AppCompat;
+			global::ShortDev.Android.Resource.Style.Base_V23_Theme_AppCompat_Light = global::Nearby_Sharing_Windows.Resource.Style.Base_V23_Theme_AppCompat_Light;
+			global::ShortDev.Android.Resource.Style.Base_V26_Theme_AppCompat = global::Nearby_Sharing_Windows.Resource.Style.Base_V26_Theme_AppCompat;
+			global::ShortDev.Android.Resource.Style.Base_V26_Theme_AppCompat_Light = global::Nearby_Sharing_Windows.Resource.Style.Base_V26_Theme_AppCompat_Light;
+			global::ShortDev.Android.Resource.Style.Base_V26_Widget_AppCompat_Toolbar = global::Nearby_Sharing_Windows.Resource.Style.Base_V26_Widget_AppCompat_Toolbar;
+			global::ShortDev.Android.Resource.Style.Base_V28_Theme_AppCompat = global::Nearby_Sharing_Windows.Resource.Style.Base_V28_Theme_AppCompat;
+			global::ShortDev.Android.Resource.Style.Base_V28_Theme_AppCompat_Light = global::Nearby_Sharing_Windows.Resource.Style.Base_V28_Theme_AppCompat_Light;
+			global::ShortDev.Android.Resource.Style.Base_V7_ThemeOverlay_AppCompat_Dialog = global::Nearby_Sharing_Windows.Resource.Style.Base_V7_ThemeOverlay_AppCompat_Dialog;
+			global::ShortDev.Android.Resource.Style.Base_V7_Theme_AppCompat = global::Nearby_Sharing_Windows.Resource.Style.Base_V7_Theme_AppCompat;
+			global::ShortDev.Android.Resource.Style.Base_V7_Theme_AppCompat_Dialog = global::Nearby_Sharing_Windows.Resource.Style.Base_V7_Theme_AppCompat_Dialog;
+			global::ShortDev.Android.Resource.Style.Base_V7_Theme_AppCompat_Light = global::Nearby_Sharing_Windows.Resource.Style.Base_V7_Theme_AppCompat_Light;
+			global::ShortDev.Android.Resource.Style.Base_V7_Theme_AppCompat_Light_Dialog = global::Nearby_Sharing_Windows.Resource.Style.Base_V7_Theme_AppCompat_Light_Dialog;
+			global::ShortDev.Android.Resource.Style.Base_V7_Widget_AppCompat_AutoCompleteTextView = global::Nearby_Sharing_Windows.Resource.Style.Base_V7_Widget_AppCompat_AutoCompleteTextView;
+			global::ShortDev.Android.Resource.Style.Base_V7_Widget_AppCompat_EditText = global::Nearby_Sharing_Windows.Resource.Style.Base_V7_Widget_AppCompat_EditText;
+			global::ShortDev.Android.Resource.Style.Base_V7_Widget_AppCompat_Toolbar = global::Nearby_Sharing_Windows.Resource.Style.Base_V7_Widget_AppCompat_Toolbar;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_ActionBar = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_ActionBar;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_ActionBar_Solid = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_ActionBar_Solid;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_ActionBar_TabBar = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_ActionBar_TabBar;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_ActionBar_TabText = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_ActionBar_TabText;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_ActionBar_TabView = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_ActionBar_TabView;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_ActionButton = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_ActionButton;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_ActionButton_CloseMode = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_ActionButton_CloseMode;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_ActionButton_Overflow = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_ActionButton_Overflow;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_ActionMode = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_ActionMode;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_ActivityChooserView = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_ActivityChooserView;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_AutoCompleteTextView = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_AutoCompleteTextView;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_Button = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_Button;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_ButtonBar = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_ButtonBar;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_ButtonBar_AlertDialog = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_ButtonBar_AlertDialog;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_Button_Borderless = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_Button_Borderless;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_Button_Borderless_Colored = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_Button_Borderless_Colored;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_Button_ButtonBar_AlertDialog = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_Button_ButtonBar_AlertDialog;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_Button_Colored = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_Button_Colored;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_Button_Small = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_Button_Small;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_CompoundButton_CheckBox = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_CompoundButton_CheckBox;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_CompoundButton_RadioButton = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_CompoundButton_RadioButton;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_CompoundButton_Switch = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_CompoundButton_Switch;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_DrawerArrowToggle = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_DrawerArrowToggle;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_DrawerArrowToggle_Common = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_DrawerArrowToggle_Common;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_DropDownItem_Spinner = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_DropDownItem_Spinner;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_EditText = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_EditText;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_ImageButton = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_ImageButton;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_Light_ActionBar = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_Light_ActionBar;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_Light_ActionBar_Solid = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_Light_ActionBar_Solid;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_Light_ActionBar_TabBar = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_Light_ActionBar_TabBar;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_Light_ActionBar_TabText = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_Light_ActionBar_TabText;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_Light_ActionBar_TabText_Inverse = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_Light_ActionBar_TabText_Inverse;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_Light_ActionBar_TabView = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_Light_ActionBar_TabView;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_Light_PopupMenu = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_Light_PopupMenu;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_Light_PopupMenu_Overflow = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_Light_PopupMenu_Overflow;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_ListMenuView = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_ListMenuView;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_ListPopupWindow = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_ListPopupWindow;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_ListView = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_ListView;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_ListView_DropDown = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_ListView_DropDown;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_ListView_Menu = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_ListView_Menu;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_PopupMenu = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_PopupMenu;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_PopupMenu_Overflow = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_PopupMenu_Overflow;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_PopupWindow = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_PopupWindow;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_ProgressBar = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_ProgressBar;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_ProgressBar_Horizontal = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_ProgressBar_Horizontal;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_RatingBar = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_RatingBar;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_RatingBar_Indicator = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_RatingBar_Indicator;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_RatingBar_Small = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_RatingBar_Small;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_SearchView = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_SearchView;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_SearchView_ActionBar = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_SearchView_ActionBar;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_SeekBar = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_SeekBar;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_SeekBar_Discrete = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_SeekBar_Discrete;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_Spinner = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_Spinner;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_Spinner_Underlined = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_Spinner_Underlined;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_TextView = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_TextView;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_TextView_SpinnerItem = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_TextView_SpinnerItem;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_Toolbar = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_Toolbar;
+			global::ShortDev.Android.Resource.Style.Base_Widget_AppCompat_Toolbar_Button_Navigation = global::Nearby_Sharing_Windows.Resource.Style.Base_Widget_AppCompat_Toolbar_Button_Navigation;
+			global::ShortDev.Android.Resource.Style.Platform_AppCompat = global::Nearby_Sharing_Windows.Resource.Style.Platform_AppCompat;
+			global::ShortDev.Android.Resource.Style.Platform_AppCompat_Light = global::Nearby_Sharing_Windows.Resource.Style.Platform_AppCompat_Light;
+			global::ShortDev.Android.Resource.Style.Platform_ThemeOverlay_AppCompat = global::Nearby_Sharing_Windows.Resource.Style.Platform_ThemeOverlay_AppCompat;
+			global::ShortDev.Android.Resource.Style.Platform_ThemeOverlay_AppCompat_Dark = global::Nearby_Sharing_Windows.Resource.Style.Platform_ThemeOverlay_AppCompat_Dark;
+			global::ShortDev.Android.Resource.Style.Platform_ThemeOverlay_AppCompat_Light = global::Nearby_Sharing_Windows.Resource.Style.Platform_ThemeOverlay_AppCompat_Light;
+			global::ShortDev.Android.Resource.Style.Platform_V21_AppCompat = global::Nearby_Sharing_Windows.Resource.Style.Platform_V21_AppCompat;
+			global::ShortDev.Android.Resource.Style.Platform_V21_AppCompat_Light = global::Nearby_Sharing_Windows.Resource.Style.Platform_V21_AppCompat_Light;
+			global::ShortDev.Android.Resource.Style.Platform_V25_AppCompat = global::Nearby_Sharing_Windows.Resource.Style.Platform_V25_AppCompat;
+			global::ShortDev.Android.Resource.Style.Platform_V25_AppCompat_Light = global::Nearby_Sharing_Windows.Resource.Style.Platform_V25_AppCompat_Light;
+			global::ShortDev.Android.Resource.Style.Platform_Widget_AppCompat_Spinner = global::Nearby_Sharing_Windows.Resource.Style.Platform_Widget_AppCompat_Spinner;
+			global::ShortDev.Android.Resource.Style.RtlOverlay_DialogWindowTitle_AppCompat = global::Nearby_Sharing_Windows.Resource.Style.RtlOverlay_DialogWindowTitle_AppCompat;
+			global::ShortDev.Android.Resource.Style.RtlOverlay_Widget_AppCompat_ActionBar_TitleItem = global::Nearby_Sharing_Windows.Resource.Style.RtlOverlay_Widget_AppCompat_ActionBar_TitleItem;
+			global::ShortDev.Android.Resource.Style.RtlOverlay_Widget_AppCompat_DialogTitle_Icon = global::Nearby_Sharing_Windows.Resource.Style.RtlOverlay_Widget_AppCompat_DialogTitle_Icon;
+			global::ShortDev.Android.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem = global::Nearby_Sharing_Windows.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem;
+			global::ShortDev.Android.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem_InternalGroup = global::Nearby_Sharing_Windows.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem_InternalGroup;
+			global::ShortDev.Android.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem_Shortcut = global::Nearby_Sharing_Windows.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem_Shortcut;
+			global::ShortDev.Android.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem_SubmenuArrow = global::Nearby_Sharing_Windows.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem_SubmenuArrow;
+			global::ShortDev.Android.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem_Text = global::Nearby_Sharing_Windows.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem_Text;
+			global::ShortDev.Android.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem_Title = global::Nearby_Sharing_Windows.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem_Title;
+			global::ShortDev.Android.Resource.Style.RtlOverlay_Widget_AppCompat_SearchView_MagIcon = global::Nearby_Sharing_Windows.Resource.Style.RtlOverlay_Widget_AppCompat_SearchView_MagIcon;
+			global::ShortDev.Android.Resource.Style.RtlOverlay_Widget_AppCompat_Search_DropDown = global::Nearby_Sharing_Windows.Resource.Style.RtlOverlay_Widget_AppCompat_Search_DropDown;
+			global::ShortDev.Android.Resource.Style.RtlOverlay_Widget_AppCompat_Search_DropDown_Icon1 = global::Nearby_Sharing_Windows.Resource.Style.RtlOverlay_Widget_AppCompat_Search_DropDown_Icon1;
+			global::ShortDev.Android.Resource.Style.RtlOverlay_Widget_AppCompat_Search_DropDown_Icon2 = global::Nearby_Sharing_Windows.Resource.Style.RtlOverlay_Widget_AppCompat_Search_DropDown_Icon2;
+			global::ShortDev.Android.Resource.Style.RtlOverlay_Widget_AppCompat_Search_DropDown_Query = global::Nearby_Sharing_Windows.Resource.Style.RtlOverlay_Widget_AppCompat_Search_DropDown_Query;
+			global::ShortDev.Android.Resource.Style.RtlOverlay_Widget_AppCompat_Search_DropDown_Text = global::Nearby_Sharing_Windows.Resource.Style.RtlOverlay_Widget_AppCompat_Search_DropDown_Text;
+			global::ShortDev.Android.Resource.Style.RtlUnderlay_Widget_AppCompat_ActionButton = global::Nearby_Sharing_Windows.Resource.Style.RtlUnderlay_Widget_AppCompat_ActionButton;
+			global::ShortDev.Android.Resource.Style.RtlUnderlay_Widget_AppCompat_ActionButton_Overflow = global::Nearby_Sharing_Windows.Resource.Style.RtlUnderlay_Widget_AppCompat_ActionButton_Overflow;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Body1 = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Body1;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Body2 = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Body2;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Button = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Button;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Caption = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Caption;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Display1 = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Display1;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Display2 = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Display2;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Display3 = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Display3;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Display4 = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Display4;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Headline = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Headline;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Inverse = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Inverse;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Large = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Large;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Large_Inverse = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Large_Inverse;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Light_SearchResult_Subtitle = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Light_SearchResult_Subtitle;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Light_SearchResult_Title = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Light_SearchResult_Title;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Light_Widget_PopupMenu_Large = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Light_Widget_PopupMenu_Large;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Light_Widget_PopupMenu_Small = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Light_Widget_PopupMenu_Small;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Medium = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Medium;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Medium_Inverse = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Medium_Inverse;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Menu = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Menu;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_SearchResult_Subtitle = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_SearchResult_Subtitle;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_SearchResult_Title = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_SearchResult_Title;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Small = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Small;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Small_Inverse = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Small_Inverse;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Subhead = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Subhead;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Subhead_Inverse = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Subhead_Inverse;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Title = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Title;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Title_Inverse = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Title_Inverse;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Tooltip = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Tooltip;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Widget_ActionBar_Menu = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Widget_ActionBar_Menu;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Widget_ActionBar_Subtitle = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Widget_ActionBar_Subtitle;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Widget_ActionBar_Subtitle_Inverse = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Widget_ActionBar_Subtitle_Inverse;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Widget_ActionBar_Title = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Widget_ActionBar_Title;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Widget_ActionBar_Title_Inverse = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Widget_ActionBar_Title_Inverse;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Widget_ActionMode_Subtitle = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Widget_ActionMode_Subtitle;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Widget_ActionMode_Subtitle_Inverse = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Widget_ActionMode_Subtitle_Inverse;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Widget_ActionMode_Title = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Widget_ActionMode_Title;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Widget_ActionMode_Title_Inverse = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Widget_ActionMode_Title_Inverse;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Widget_Button = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Widget_Button;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Widget_Button_Borderless_Colored = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Widget_Button_Borderless_Colored;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Widget_Button_Colored = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Widget_Button_Colored;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Widget_Button_Inverse = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Widget_Button_Inverse;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Widget_DropDownItem = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Widget_DropDownItem;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Widget_PopupMenu_Header = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Widget_PopupMenu_Header;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Widget_PopupMenu_Large = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Widget_PopupMenu_Large;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Widget_PopupMenu_Small = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Widget_PopupMenu_Small;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Widget_Switch = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Widget_Switch;
+			global::ShortDev.Android.Resource.Style.TextAppearance_AppCompat_Widget_TextView_SpinnerItem = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_AppCompat_Widget_TextView_SpinnerItem;
+			global::ShortDev.Android.Resource.Style.TextAppearance_Compat_Notification = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_Compat_Notification;
+			global::ShortDev.Android.Resource.Style.TextAppearance_Compat_Notification_Info = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_Compat_Notification_Info;
+			global::ShortDev.Android.Resource.Style.TextAppearance_Compat_Notification_Line2 = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_Compat_Notification_Line2;
+			global::ShortDev.Android.Resource.Style.TextAppearance_Compat_Notification_Time = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_Compat_Notification_Time;
+			global::ShortDev.Android.Resource.Style.TextAppearance_Compat_Notification_Title = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_Compat_Notification_Title;
+			global::ShortDev.Android.Resource.Style.TextAppearance_Widget_AppCompat_ExpandedMenu_Item = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_Widget_AppCompat_ExpandedMenu_Item;
+			global::ShortDev.Android.Resource.Style.TextAppearance_Widget_AppCompat_Toolbar_Subtitle = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_Widget_AppCompat_Toolbar_Subtitle;
+			global::ShortDev.Android.Resource.Style.TextAppearance_Widget_AppCompat_Toolbar_Title = global::Nearby_Sharing_Windows.Resource.Style.TextAppearance_Widget_AppCompat_Toolbar_Title;
+			global::ShortDev.Android.Resource.Style.ThemeOverlay_AppCompat = global::Nearby_Sharing_Windows.Resource.Style.ThemeOverlay_AppCompat;
+			global::ShortDev.Android.Resource.Style.ThemeOverlay_AppCompat_ActionBar = global::Nearby_Sharing_Windows.Resource.Style.ThemeOverlay_AppCompat_ActionBar;
+			global::ShortDev.Android.Resource.Style.ThemeOverlay_AppCompat_Dark = global::Nearby_Sharing_Windows.Resource.Style.ThemeOverlay_AppCompat_Dark;
+			global::ShortDev.Android.Resource.Style.ThemeOverlay_AppCompat_Dark_ActionBar = global::Nearby_Sharing_Windows.Resource.Style.ThemeOverlay_AppCompat_Dark_ActionBar;
+			global::ShortDev.Android.Resource.Style.ThemeOverlay_AppCompat_DayNight = global::Nearby_Sharing_Windows.Resource.Style.ThemeOverlay_AppCompat_DayNight;
+			global::ShortDev.Android.Resource.Style.ThemeOverlay_AppCompat_DayNight_ActionBar = global::Nearby_Sharing_Windows.Resource.Style.ThemeOverlay_AppCompat_DayNight_ActionBar;
+			global::ShortDev.Android.Resource.Style.ThemeOverlay_AppCompat_Dialog = global::Nearby_Sharing_Windows.Resource.Style.ThemeOverlay_AppCompat_Dialog;
+			global::ShortDev.Android.Resource.Style.ThemeOverlay_AppCompat_Dialog_Alert = global::Nearby_Sharing_Windows.Resource.Style.ThemeOverlay_AppCompat_Dialog_Alert;
+			global::ShortDev.Android.Resource.Style.ThemeOverlay_AppCompat_Light = global::Nearby_Sharing_Windows.Resource.Style.ThemeOverlay_AppCompat_Light;
+			global::ShortDev.Android.Resource.Style.Theme_AppCompat = global::Nearby_Sharing_Windows.Resource.Style.Theme_AppCompat;
+			global::ShortDev.Android.Resource.Style.Theme_AppCompat_CompactMenu = global::Nearby_Sharing_Windows.Resource.Style.Theme_AppCompat_CompactMenu;
+			global::ShortDev.Android.Resource.Style.Theme_AppCompat_DayNight = global::Nearby_Sharing_Windows.Resource.Style.Theme_AppCompat_DayNight;
+			global::ShortDev.Android.Resource.Style.Theme_AppCompat_DayNight_DarkActionBar = global::Nearby_Sharing_Windows.Resource.Style.Theme_AppCompat_DayNight_DarkActionBar;
+			global::ShortDev.Android.Resource.Style.Theme_AppCompat_DayNight_Dialog = global::Nearby_Sharing_Windows.Resource.Style.Theme_AppCompat_DayNight_Dialog;
+			global::ShortDev.Android.Resource.Style.Theme_AppCompat_DayNight_DialogWhenLarge = global::Nearby_Sharing_Windows.Resource.Style.Theme_AppCompat_DayNight_DialogWhenLarge;
+			global::ShortDev.Android.Resource.Style.Theme_AppCompat_DayNight_Dialog_Alert = global::Nearby_Sharing_Windows.Resource.Style.Theme_AppCompat_DayNight_Dialog_Alert;
+			global::ShortDev.Android.Resource.Style.Theme_AppCompat_DayNight_Dialog_MinWidth = global::Nearby_Sharing_Windows.Resource.Style.Theme_AppCompat_DayNight_Dialog_MinWidth;
+			global::ShortDev.Android.Resource.Style.Theme_AppCompat_DayNight_NoActionBar = global::Nearby_Sharing_Windows.Resource.Style.Theme_AppCompat_DayNight_NoActionBar;
+			global::ShortDev.Android.Resource.Style.Theme_AppCompat_Dialog = global::Nearby_Sharing_Windows.Resource.Style.Theme_AppCompat_Dialog;
+			global::ShortDev.Android.Resource.Style.Theme_AppCompat_DialogWhenLarge = global::Nearby_Sharing_Windows.Resource.Style.Theme_AppCompat_DialogWhenLarge;
+			global::ShortDev.Android.Resource.Style.Theme_AppCompat_Dialog_Alert = global::Nearby_Sharing_Windows.Resource.Style.Theme_AppCompat_Dialog_Alert;
+			global::ShortDev.Android.Resource.Style.Theme_AppCompat_Dialog_MinWidth = global::Nearby_Sharing_Windows.Resource.Style.Theme_AppCompat_Dialog_MinWidth;
+			global::ShortDev.Android.Resource.Style.Theme_AppCompat_Empty = global::Nearby_Sharing_Windows.Resource.Style.Theme_AppCompat_Empty;
+			global::ShortDev.Android.Resource.Style.Theme_AppCompat_Light = global::Nearby_Sharing_Windows.Resource.Style.Theme_AppCompat_Light;
+			global::ShortDev.Android.Resource.Style.Theme_AppCompat_Light_DarkActionBar = global::Nearby_Sharing_Windows.Resource.Style.Theme_AppCompat_Light_DarkActionBar;
+			global::ShortDev.Android.Resource.Style.Theme_AppCompat_Light_Dialog = global::Nearby_Sharing_Windows.Resource.Style.Theme_AppCompat_Light_Dialog;
+			global::ShortDev.Android.Resource.Style.Theme_AppCompat_Light_DialogWhenLarge = global::Nearby_Sharing_Windows.Resource.Style.Theme_AppCompat_Light_DialogWhenLarge;
+			global::ShortDev.Android.Resource.Style.Theme_AppCompat_Light_Dialog_Alert = global::Nearby_Sharing_Windows.Resource.Style.Theme_AppCompat_Light_Dialog_Alert;
+			global::ShortDev.Android.Resource.Style.Theme_AppCompat_Light_Dialog_MinWidth = global::Nearby_Sharing_Windows.Resource.Style.Theme_AppCompat_Light_Dialog_MinWidth;
+			global::ShortDev.Android.Resource.Style.Theme_AppCompat_Light_NoActionBar = global::Nearby_Sharing_Windows.Resource.Style.Theme_AppCompat_Light_NoActionBar;
+			global::ShortDev.Android.Resource.Style.Theme_AppCompat_NoActionBar = global::Nearby_Sharing_Windows.Resource.Style.Theme_AppCompat_NoActionBar;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_ActionBar = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_ActionBar;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_ActionBar_Solid = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_ActionBar_Solid;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_ActionBar_TabBar = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_ActionBar_TabBar;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_ActionBar_TabText = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_ActionBar_TabText;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_ActionBar_TabView = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_ActionBar_TabView;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_ActionButton = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_ActionButton;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_ActionButton_CloseMode = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_ActionButton_CloseMode;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_ActionButton_Overflow = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_ActionButton_Overflow;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_ActionMode = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_ActionMode;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_ActivityChooserView = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_ActivityChooserView;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_AutoCompleteTextView = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_AutoCompleteTextView;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_Button = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_Button;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_ButtonBar = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_ButtonBar;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_ButtonBar_AlertDialog = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_ButtonBar_AlertDialog;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_Button_Borderless = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_Button_Borderless;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_Button_Borderless_Colored = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_Button_Borderless_Colored;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_Button_ButtonBar_AlertDialog = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_Button_ButtonBar_AlertDialog;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_Button_Colored = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_Button_Colored;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_Button_Small = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_Button_Small;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_CompoundButton_CheckBox = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_CompoundButton_CheckBox;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_CompoundButton_RadioButton = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_CompoundButton_RadioButton;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_CompoundButton_Switch = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_CompoundButton_Switch;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_DrawerArrowToggle = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_DrawerArrowToggle;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_DropDownItem_Spinner = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_DropDownItem_Spinner;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_EditText = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_EditText;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_ImageButton = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_ImageButton;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_Light_ActionBar = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_Light_ActionBar;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_Light_ActionBar_Solid = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_Light_ActionBar_Solid;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_Light_ActionBar_Solid_Inverse = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_Light_ActionBar_Solid_Inverse;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_Light_ActionBar_TabBar = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_Light_ActionBar_TabBar;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_Light_ActionBar_TabBar_Inverse = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_Light_ActionBar_TabBar_Inverse;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_Light_ActionBar_TabText = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_Light_ActionBar_TabText;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_Light_ActionBar_TabText_Inverse = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_Light_ActionBar_TabText_Inverse;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_Light_ActionBar_TabView = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_Light_ActionBar_TabView;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_Light_ActionBar_TabView_Inverse = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_Light_ActionBar_TabView_Inverse;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_Light_ActionButton = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_Light_ActionButton;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_Light_ActionButton_CloseMode = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_Light_ActionButton_CloseMode;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_Light_ActionButton_Overflow = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_Light_ActionButton_Overflow;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_Light_ActionMode_Inverse = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_Light_ActionMode_Inverse;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_Light_ActivityChooserView = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_Light_ActivityChooserView;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_Light_AutoCompleteTextView = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_Light_AutoCompleteTextView;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_Light_DropDownItem_Spinner = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_Light_DropDownItem_Spinner;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_Light_ListPopupWindow = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_Light_ListPopupWindow;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_Light_ListView_DropDown = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_Light_ListView_DropDown;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_Light_PopupMenu = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_Light_PopupMenu;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_Light_PopupMenu_Overflow = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_Light_PopupMenu_Overflow;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_Light_SearchView = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_Light_SearchView;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_Light_Spinner_DropDown_ActionBar = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_Light_Spinner_DropDown_ActionBar;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_ListMenuView = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_ListMenuView;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_ListPopupWindow = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_ListPopupWindow;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_ListView = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_ListView;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_ListView_DropDown = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_ListView_DropDown;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_ListView_Menu = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_ListView_Menu;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_PopupMenu = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_PopupMenu;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_PopupMenu_Overflow = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_PopupMenu_Overflow;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_PopupWindow = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_PopupWindow;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_ProgressBar = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_ProgressBar;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_ProgressBar_Horizontal = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_ProgressBar_Horizontal;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_RatingBar = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_RatingBar;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_RatingBar_Indicator = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_RatingBar_Indicator;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_RatingBar_Small = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_RatingBar_Small;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_SearchView = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_SearchView;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_SearchView_ActionBar = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_SearchView_ActionBar;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_SeekBar = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_SeekBar;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_SeekBar_Discrete = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_SeekBar_Discrete;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_Spinner = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_Spinner;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_Spinner_DropDown = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_Spinner_DropDown;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_Spinner_DropDown_ActionBar = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_Spinner_DropDown_ActionBar;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_Spinner_Underlined = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_Spinner_Underlined;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_TextView = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_TextView;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_TextView_SpinnerItem = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_TextView_SpinnerItem;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_Toolbar = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_Toolbar;
+			global::ShortDev.Android.Resource.Style.Widget_AppCompat_Toolbar_Button_Navigation = global::Nearby_Sharing_Windows.Resource.Style.Widget_AppCompat_Toolbar_Button_Navigation;
+			global::ShortDev.Android.Resource.Style.Widget_Compat_NotificationActionContainer = global::Nearby_Sharing_Windows.Resource.Style.Widget_Compat_NotificationActionContainer;
+			global::ShortDev.Android.Resource.Style.Widget_Compat_NotificationActionText = global::Nearby_Sharing_Windows.Resource.Style.Widget_Compat_NotificationActionText;
+			global::ShortDev.Android.Resource.Styleable.ActionBar = global::Nearby_Sharing_Windows.Resource.Styleable.ActionBar;
+			global::ShortDev.Android.Resource.Styleable.ActionBarLayout = global::Nearby_Sharing_Windows.Resource.Styleable.ActionBarLayout;
+			global::ShortDev.Android.Resource.Styleable.ActionBarLayout_android_layout_gravity = global::Nearby_Sharing_Windows.Resource.Styleable.ActionBarLayout_android_layout_gravity;
+			global::ShortDev.Android.Resource.Styleable.ActionBar_background = global::Nearby_Sharing_Windows.Resource.Styleable.ActionBar_background;
+			global::ShortDev.Android.Resource.Styleable.ActionBar_backgroundSplit = global::Nearby_Sharing_Windows.Resource.Styleable.ActionBar_backgroundSplit;
+			global::ShortDev.Android.Resource.Styleable.ActionBar_backgroundStacked = global::Nearby_Sharing_Windows.Resource.Styleable.ActionBar_backgroundStacked;
+			global::ShortDev.Android.Resource.Styleable.ActionBar_contentInsetEnd = global::Nearby_Sharing_Windows.Resource.Styleable.ActionBar_contentInsetEnd;
+			global::ShortDev.Android.Resource.Styleable.ActionBar_contentInsetEndWithActions = global::Nearby_Sharing_Windows.Resource.Styleable.ActionBar_contentInsetEndWithActions;
+			global::ShortDev.Android.Resource.Styleable.ActionBar_contentInsetLeft = global::Nearby_Sharing_Windows.Resource.Styleable.ActionBar_contentInsetLeft;
+			global::ShortDev.Android.Resource.Styleable.ActionBar_contentInsetRight = global::Nearby_Sharing_Windows.Resource.Styleable.ActionBar_contentInsetRight;
+			global::ShortDev.Android.Resource.Styleable.ActionBar_contentInsetStart = global::Nearby_Sharing_Windows.Resource.Styleable.ActionBar_contentInsetStart;
+			global::ShortDev.Android.Resource.Styleable.ActionBar_contentInsetStartWithNavigation = global::Nearby_Sharing_Windows.Resource.Styleable.ActionBar_contentInsetStartWithNavigation;
+			global::ShortDev.Android.Resource.Styleable.ActionBar_customNavigationLayout = global::Nearby_Sharing_Windows.Resource.Styleable.ActionBar_customNavigationLayout;
+			global::ShortDev.Android.Resource.Styleable.ActionBar_displayOptions = global::Nearby_Sharing_Windows.Resource.Styleable.ActionBar_displayOptions;
+			global::ShortDev.Android.Resource.Styleable.ActionBar_divider = global::Nearby_Sharing_Windows.Resource.Styleable.ActionBar_divider;
+			global::ShortDev.Android.Resource.Styleable.ActionBar_elevation = global::Nearby_Sharing_Windows.Resource.Styleable.ActionBar_elevation;
+			global::ShortDev.Android.Resource.Styleable.ActionBar_height = global::Nearby_Sharing_Windows.Resource.Styleable.ActionBar_height;
+			global::ShortDev.Android.Resource.Styleable.ActionBar_hideOnContentScroll = global::Nearby_Sharing_Windows.Resource.Styleable.ActionBar_hideOnContentScroll;
+			global::ShortDev.Android.Resource.Styleable.ActionBar_homeAsUpIndicator = global::Nearby_Sharing_Windows.Resource.Styleable.ActionBar_homeAsUpIndicator;
+			global::ShortDev.Android.Resource.Styleable.ActionBar_homeLayout = global::Nearby_Sharing_Windows.Resource.Styleable.ActionBar_homeLayout;
+			global::ShortDev.Android.Resource.Styleable.ActionBar_icon = global::Nearby_Sharing_Windows.Resource.Styleable.ActionBar_icon;
+			global::ShortDev.Android.Resource.Styleable.ActionBar_indeterminateProgressStyle = global::Nearby_Sharing_Windows.Resource.Styleable.ActionBar_indeterminateProgressStyle;
+			global::ShortDev.Android.Resource.Styleable.ActionBar_itemPadding = global::Nearby_Sharing_Windows.Resource.Styleable.ActionBar_itemPadding;
+			global::ShortDev.Android.Resource.Styleable.ActionBar_logo = global::Nearby_Sharing_Windows.Resource.Styleable.ActionBar_logo;
+			global::ShortDev.Android.Resource.Styleable.ActionBar_navigationMode = global::Nearby_Sharing_Windows.Resource.Styleable.ActionBar_navigationMode;
+			global::ShortDev.Android.Resource.Styleable.ActionBar_popupTheme = global::Nearby_Sharing_Windows.Resource.Styleable.ActionBar_popupTheme;
+			global::ShortDev.Android.Resource.Styleable.ActionBar_progressBarPadding = global::Nearby_Sharing_Windows.Resource.Styleable.ActionBar_progressBarPadding;
+			global::ShortDev.Android.Resource.Styleable.ActionBar_progressBarStyle = global::Nearby_Sharing_Windows.Resource.Styleable.ActionBar_progressBarStyle;
+			global::ShortDev.Android.Resource.Styleable.ActionBar_subtitle = global::Nearby_Sharing_Windows.Resource.Styleable.ActionBar_subtitle;
+			global::ShortDev.Android.Resource.Styleable.ActionBar_subtitleTextStyle = global::Nearby_Sharing_Windows.Resource.Styleable.ActionBar_subtitleTextStyle;
+			global::ShortDev.Android.Resource.Styleable.ActionBar_title = global::Nearby_Sharing_Windows.Resource.Styleable.ActionBar_title;
+			global::ShortDev.Android.Resource.Styleable.ActionBar_titleTextStyle = global::Nearby_Sharing_Windows.Resource.Styleable.ActionBar_titleTextStyle;
+			global::ShortDev.Android.Resource.Styleable.ActionMenuItemView = global::Nearby_Sharing_Windows.Resource.Styleable.ActionMenuItemView;
+			global::ShortDev.Android.Resource.Styleable.ActionMenuItemView_android_minWidth = global::Nearby_Sharing_Windows.Resource.Styleable.ActionMenuItemView_android_minWidth;
+			global::ShortDev.Android.Resource.Styleable.ActionMenuView = global::Nearby_Sharing_Windows.Resource.Styleable.ActionMenuView;
+			global::ShortDev.Android.Resource.Styleable.ActionMode = global::Nearby_Sharing_Windows.Resource.Styleable.ActionMode;
+			global::ShortDev.Android.Resource.Styleable.ActionMode_background = global::Nearby_Sharing_Windows.Resource.Styleable.ActionMode_background;
+			global::ShortDev.Android.Resource.Styleable.ActionMode_backgroundSplit = global::Nearby_Sharing_Windows.Resource.Styleable.ActionMode_backgroundSplit;
+			global::ShortDev.Android.Resource.Styleable.ActionMode_closeItemLayout = global::Nearby_Sharing_Windows.Resource.Styleable.ActionMode_closeItemLayout;
+			global::ShortDev.Android.Resource.Styleable.ActionMode_height = global::Nearby_Sharing_Windows.Resource.Styleable.ActionMode_height;
+			global::ShortDev.Android.Resource.Styleable.ActionMode_subtitleTextStyle = global::Nearby_Sharing_Windows.Resource.Styleable.ActionMode_subtitleTextStyle;
+			global::ShortDev.Android.Resource.Styleable.ActionMode_titleTextStyle = global::Nearby_Sharing_Windows.Resource.Styleable.ActionMode_titleTextStyle;
+			global::ShortDev.Android.Resource.Styleable.ActivityChooserView = global::Nearby_Sharing_Windows.Resource.Styleable.ActivityChooserView;
+			global::ShortDev.Android.Resource.Styleable.ActivityChooserView_expandActivityOverflowButtonDrawable = global::Nearby_Sharing_Windows.Resource.Styleable.ActivityChooserView_expandActivityOverflowButtonDrawable;
+			global::ShortDev.Android.Resource.Styleable.ActivityChooserView_initialActivityCount = global::Nearby_Sharing_Windows.Resource.Styleable.ActivityChooserView_initialActivityCount;
+			global::ShortDev.Android.Resource.Styleable.AlertDialog = global::Nearby_Sharing_Windows.Resource.Styleable.AlertDialog;
+			global::ShortDev.Android.Resource.Styleable.AlertDialog_android_layout = global::Nearby_Sharing_Windows.Resource.Styleable.AlertDialog_android_layout;
+			global::ShortDev.Android.Resource.Styleable.AlertDialog_buttonIconDimen = global::Nearby_Sharing_Windows.Resource.Styleable.AlertDialog_buttonIconDimen;
+			global::ShortDev.Android.Resource.Styleable.AlertDialog_buttonPanelSideLayout = global::Nearby_Sharing_Windows.Resource.Styleable.AlertDialog_buttonPanelSideLayout;
+			global::ShortDev.Android.Resource.Styleable.AlertDialog_listItemLayout = global::Nearby_Sharing_Windows.Resource.Styleable.AlertDialog_listItemLayout;
+			global::ShortDev.Android.Resource.Styleable.AlertDialog_listLayout = global::Nearby_Sharing_Windows.Resource.Styleable.AlertDialog_listLayout;
+			global::ShortDev.Android.Resource.Styleable.AlertDialog_multiChoiceItemLayout = global::Nearby_Sharing_Windows.Resource.Styleable.AlertDialog_multiChoiceItemLayout;
+			global::ShortDev.Android.Resource.Styleable.AlertDialog_showTitle = global::Nearby_Sharing_Windows.Resource.Styleable.AlertDialog_showTitle;
+			global::ShortDev.Android.Resource.Styleable.AlertDialog_singleChoiceItemLayout = global::Nearby_Sharing_Windows.Resource.Styleable.AlertDialog_singleChoiceItemLayout;
+			global::ShortDev.Android.Resource.Styleable.AnimatedStateListDrawableCompat = global::Nearby_Sharing_Windows.Resource.Styleable.AnimatedStateListDrawableCompat;
+			global::ShortDev.Android.Resource.Styleable.AnimatedStateListDrawableCompat_android_constantSize = global::Nearby_Sharing_Windows.Resource.Styleable.AnimatedStateListDrawableCompat_android_constantSize;
+			global::ShortDev.Android.Resource.Styleable.AnimatedStateListDrawableCompat_android_dither = global::Nearby_Sharing_Windows.Resource.Styleable.AnimatedStateListDrawableCompat_android_dither;
+			global::ShortDev.Android.Resource.Styleable.AnimatedStateListDrawableCompat_android_enterFadeDuration = global::Nearby_Sharing_Windows.Resource.Styleable.AnimatedStateListDrawableCompat_android_enterFadeDuration;
+			global::ShortDev.Android.Resource.Styleable.AnimatedStateListDrawableCompat_android_exitFadeDuration = global::Nearby_Sharing_Windows.Resource.Styleable.AnimatedStateListDrawableCompat_android_exitFadeDuration;
+			global::ShortDev.Android.Resource.Styleable.AnimatedStateListDrawableCompat_android_variablePadding = global::Nearby_Sharing_Windows.Resource.Styleable.AnimatedStateListDrawableCompat_android_variablePadding;
+			global::ShortDev.Android.Resource.Styleable.AnimatedStateListDrawableCompat_android_visible = global::Nearby_Sharing_Windows.Resource.Styleable.AnimatedStateListDrawableCompat_android_visible;
+			global::ShortDev.Android.Resource.Styleable.AnimatedStateListDrawableItem = global::Nearby_Sharing_Windows.Resource.Styleable.AnimatedStateListDrawableItem;
+			global::ShortDev.Android.Resource.Styleable.AnimatedStateListDrawableItem_android_drawable = global::Nearby_Sharing_Windows.Resource.Styleable.AnimatedStateListDrawableItem_android_drawable;
+			global::ShortDev.Android.Resource.Styleable.AnimatedStateListDrawableItem_android_id = global::Nearby_Sharing_Windows.Resource.Styleable.AnimatedStateListDrawableItem_android_id;
+			global::ShortDev.Android.Resource.Styleable.AnimatedStateListDrawableTransition = global::Nearby_Sharing_Windows.Resource.Styleable.AnimatedStateListDrawableTransition;
+			global::ShortDev.Android.Resource.Styleable.AnimatedStateListDrawableTransition_android_drawable = global::Nearby_Sharing_Windows.Resource.Styleable.AnimatedStateListDrawableTransition_android_drawable;
+			global::ShortDev.Android.Resource.Styleable.AnimatedStateListDrawableTransition_android_fromId = global::Nearby_Sharing_Windows.Resource.Styleable.AnimatedStateListDrawableTransition_android_fromId;
+			global::ShortDev.Android.Resource.Styleable.AnimatedStateListDrawableTransition_android_reversible = global::Nearby_Sharing_Windows.Resource.Styleable.AnimatedStateListDrawableTransition_android_reversible;
+			global::ShortDev.Android.Resource.Styleable.AnimatedStateListDrawableTransition_android_toId = global::Nearby_Sharing_Windows.Resource.Styleable.AnimatedStateListDrawableTransition_android_toId;
+			global::ShortDev.Android.Resource.Styleable.AppCompatImageView = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatImageView;
+			global::ShortDev.Android.Resource.Styleable.AppCompatImageView_android_src = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatImageView_android_src;
+			global::ShortDev.Android.Resource.Styleable.AppCompatImageView_srcCompat = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatImageView_srcCompat;
+			global::ShortDev.Android.Resource.Styleable.AppCompatImageView_tint = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatImageView_tint;
+			global::ShortDev.Android.Resource.Styleable.AppCompatImageView_tintMode = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatImageView_tintMode;
+			global::ShortDev.Android.Resource.Styleable.AppCompatSeekBar = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatSeekBar;
+			global::ShortDev.Android.Resource.Styleable.AppCompatSeekBar_android_thumb = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatSeekBar_android_thumb;
+			global::ShortDev.Android.Resource.Styleable.AppCompatSeekBar_tickMark = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatSeekBar_tickMark;
+			global::ShortDev.Android.Resource.Styleable.AppCompatSeekBar_tickMarkTint = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatSeekBar_tickMarkTint;
+			global::ShortDev.Android.Resource.Styleable.AppCompatSeekBar_tickMarkTintMode = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatSeekBar_tickMarkTintMode;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTextHelper = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTextHelper;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTextHelper_android_drawableBottom = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTextHelper_android_drawableBottom;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTextHelper_android_drawableEnd = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTextHelper_android_drawableEnd;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTextHelper_android_drawableLeft = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTextHelper_android_drawableLeft;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTextHelper_android_drawableRight = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTextHelper_android_drawableRight;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTextHelper_android_drawableStart = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTextHelper_android_drawableStart;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTextHelper_android_drawableTop = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTextHelper_android_drawableTop;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTextHelper_android_textAppearance = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTextHelper_android_textAppearance;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTextView = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTextView;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTextView_android_textAppearance = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTextView_android_textAppearance;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTextView_autoSizeMaxTextSize = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTextView_autoSizeMaxTextSize;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTextView_autoSizeMinTextSize = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTextView_autoSizeMinTextSize;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTextView_autoSizePresetSizes = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTextView_autoSizePresetSizes;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTextView_autoSizeStepGranularity = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTextView_autoSizeStepGranularity;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTextView_autoSizeTextType = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTextView_autoSizeTextType;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTextView_drawableBottomCompat = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTextView_drawableBottomCompat;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTextView_drawableEndCompat = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTextView_drawableEndCompat;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTextView_drawableLeftCompat = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTextView_drawableLeftCompat;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTextView_drawableRightCompat = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTextView_drawableRightCompat;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTextView_drawableStartCompat = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTextView_drawableStartCompat;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTextView_drawableTint = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTextView_drawableTint;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTextView_drawableTintMode = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTextView_drawableTintMode;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTextView_drawableTopCompat = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTextView_drawableTopCompat;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTextView_firstBaselineToTopHeight = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTextView_firstBaselineToTopHeight;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTextView_fontFamily = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTextView_fontFamily;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTextView_fontVariationSettings = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTextView_fontVariationSettings;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTextView_lastBaselineToBottomHeight = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTextView_lastBaselineToBottomHeight;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTextView_lineHeight = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTextView_lineHeight;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTextView_textAllCaps = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTextView_textAllCaps;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTextView_textLocale = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTextView_textLocale;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_actionBarDivider = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_actionBarDivider;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_actionBarItemBackground = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_actionBarItemBackground;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_actionBarPopupTheme = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_actionBarPopupTheme;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_actionBarSize = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_actionBarSize;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_actionBarSplitStyle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_actionBarSplitStyle;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_actionBarStyle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_actionBarStyle;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_actionBarTabBarStyle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_actionBarTabBarStyle;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_actionBarTabStyle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_actionBarTabStyle;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_actionBarTabTextStyle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_actionBarTabTextStyle;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_actionBarTheme = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_actionBarTheme;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_actionBarWidgetTheme = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_actionBarWidgetTheme;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_actionButtonStyle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_actionButtonStyle;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_actionDropDownStyle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_actionDropDownStyle;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_actionMenuTextAppearance = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_actionMenuTextAppearance;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_actionMenuTextColor = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_actionMenuTextColor;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_actionModeBackground = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_actionModeBackground;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_actionModeCloseButtonStyle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_actionModeCloseButtonStyle;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_actionModeCloseDrawable = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_actionModeCloseDrawable;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_actionModeCopyDrawable = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_actionModeCopyDrawable;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_actionModeCutDrawable = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_actionModeCutDrawable;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_actionModeFindDrawable = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_actionModeFindDrawable;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_actionModePasteDrawable = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_actionModePasteDrawable;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_actionModePopupWindowStyle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_actionModePopupWindowStyle;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_actionModeSelectAllDrawable = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_actionModeSelectAllDrawable;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_actionModeShareDrawable = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_actionModeShareDrawable;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_actionModeSplitBackground = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_actionModeSplitBackground;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_actionModeStyle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_actionModeStyle;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_actionModeWebSearchDrawable = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_actionModeWebSearchDrawable;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_actionOverflowButtonStyle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_actionOverflowButtonStyle;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_actionOverflowMenuStyle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_actionOverflowMenuStyle;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_activityChooserViewStyle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_activityChooserViewStyle;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_alertDialogButtonGroupStyle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_alertDialogButtonGroupStyle;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_alertDialogCenterButtons = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_alertDialogCenterButtons;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_alertDialogStyle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_alertDialogStyle;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_alertDialogTheme = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_alertDialogTheme;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_android_windowAnimationStyle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_android_windowAnimationStyle;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_android_windowIsFloating = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_android_windowIsFloating;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_autoCompleteTextViewStyle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_autoCompleteTextViewStyle;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_borderlessButtonStyle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_borderlessButtonStyle;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_buttonBarButtonStyle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_buttonBarButtonStyle;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_buttonBarNegativeButtonStyle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_buttonBarNegativeButtonStyle;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_buttonBarNeutralButtonStyle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_buttonBarNeutralButtonStyle;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_buttonBarPositiveButtonStyle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_buttonBarPositiveButtonStyle;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_buttonBarStyle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_buttonBarStyle;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_buttonStyle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_buttonStyle;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_buttonStyleSmall = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_buttonStyleSmall;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_checkboxStyle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_checkboxStyle;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_checkedTextViewStyle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_checkedTextViewStyle;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_colorAccent = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_colorAccent;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_colorBackgroundFloating = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_colorBackgroundFloating;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_colorButtonNormal = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_colorButtonNormal;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_colorControlActivated = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_colorControlActivated;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_colorControlHighlight = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_colorControlHighlight;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_colorControlNormal = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_colorControlNormal;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_colorError = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_colorError;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_colorPrimary = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_colorPrimary;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_colorPrimaryDark = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_colorPrimaryDark;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_colorSwitchThumbNormal = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_colorSwitchThumbNormal;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_controlBackground = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_controlBackground;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_dialogCornerRadius = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_dialogCornerRadius;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_dialogPreferredPadding = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_dialogPreferredPadding;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_dialogTheme = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_dialogTheme;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_dividerHorizontal = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_dividerHorizontal;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_dividerVertical = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_dividerVertical;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_dropdownListPreferredItemHeight = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_dropdownListPreferredItemHeight;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_dropDownListViewStyle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_dropDownListViewStyle;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_editTextBackground = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_editTextBackground;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_editTextColor = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_editTextColor;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_editTextStyle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_editTextStyle;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_homeAsUpIndicator = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_homeAsUpIndicator;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_imageButtonStyle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_imageButtonStyle;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_listChoiceBackgroundIndicator = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_listChoiceBackgroundIndicator;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_listChoiceIndicatorMultipleAnimated = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_listChoiceIndicatorMultipleAnimated;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_listChoiceIndicatorSingleAnimated = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_listChoiceIndicatorSingleAnimated;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_listDividerAlertDialog = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_listDividerAlertDialog;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_listMenuViewStyle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_listMenuViewStyle;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_listPopupWindowStyle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_listPopupWindowStyle;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_listPreferredItemHeight = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_listPreferredItemHeight;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_listPreferredItemHeightLarge = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_listPreferredItemHeightLarge;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_listPreferredItemHeightSmall = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_listPreferredItemHeightSmall;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_listPreferredItemPaddingEnd = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_listPreferredItemPaddingEnd;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_listPreferredItemPaddingLeft = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_listPreferredItemPaddingLeft;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_listPreferredItemPaddingRight = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_listPreferredItemPaddingRight;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_listPreferredItemPaddingStart = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_listPreferredItemPaddingStart;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_panelBackground = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_panelBackground;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_panelMenuListTheme = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_panelMenuListTheme;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_panelMenuListWidth = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_panelMenuListWidth;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_popupMenuStyle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_popupMenuStyle;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_popupWindowStyle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_popupWindowStyle;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_radioButtonStyle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_radioButtonStyle;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_ratingBarStyle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_ratingBarStyle;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_ratingBarStyleIndicator = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_ratingBarStyleIndicator;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_ratingBarStyleSmall = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_ratingBarStyleSmall;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_searchViewStyle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_searchViewStyle;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_seekBarStyle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_seekBarStyle;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_selectableItemBackground = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_selectableItemBackground;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_selectableItemBackgroundBorderless = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_selectableItemBackgroundBorderless;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_spinnerDropDownItemStyle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_spinnerDropDownItemStyle;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_spinnerStyle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_spinnerStyle;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_switchStyle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_switchStyle;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_textAppearanceLargePopupMenu = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_textAppearanceLargePopupMenu;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_textAppearanceListItem = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_textAppearanceListItem;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_textAppearanceListItemSecondary = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_textAppearanceListItemSecondary;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_textAppearanceListItemSmall = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_textAppearanceListItemSmall;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_textAppearancePopupMenuHeader = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_textAppearancePopupMenuHeader;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_textAppearanceSearchResultSubtitle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_textAppearanceSearchResultSubtitle;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_textAppearanceSearchResultTitle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_textAppearanceSearchResultTitle;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_textAppearanceSmallPopupMenu = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_textAppearanceSmallPopupMenu;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_textColorAlertDialogListItem = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_textColorAlertDialogListItem;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_textColorSearchUrl = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_textColorSearchUrl;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_toolbarNavigationButtonStyle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_toolbarNavigationButtonStyle;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_toolbarStyle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_toolbarStyle;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_tooltipForegroundColor = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_tooltipForegroundColor;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_tooltipFrameBackground = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_tooltipFrameBackground;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_viewInflaterClass = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_viewInflaterClass;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_windowActionBar = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_windowActionBar;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_windowActionBarOverlay = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_windowActionBarOverlay;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_windowActionModeOverlay = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_windowActionModeOverlay;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_windowFixedHeightMajor = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_windowFixedHeightMajor;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_windowFixedHeightMinor = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_windowFixedHeightMinor;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_windowFixedWidthMajor = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_windowFixedWidthMajor;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_windowFixedWidthMinor = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_windowFixedWidthMinor;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_windowMinWidthMajor = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_windowMinWidthMajor;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_windowMinWidthMinor = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_windowMinWidthMinor;
+			global::ShortDev.Android.Resource.Styleable.AppCompatTheme_windowNoTitle = global::Nearby_Sharing_Windows.Resource.Styleable.AppCompatTheme_windowNoTitle;
+			global::ShortDev.Android.Resource.Styleable.ButtonBarLayout = global::Nearby_Sharing_Windows.Resource.Styleable.ButtonBarLayout;
+			global::ShortDev.Android.Resource.Styleable.ButtonBarLayout_allowStacking = global::Nearby_Sharing_Windows.Resource.Styleable.ButtonBarLayout_allowStacking;
+			global::ShortDev.Android.Resource.Styleable.Capability = global::Nearby_Sharing_Windows.Resource.Styleable.Capability;
+			global::ShortDev.Android.Resource.Styleable.Capability_queryPatterns = global::Nearby_Sharing_Windows.Resource.Styleable.Capability_queryPatterns;
+			global::ShortDev.Android.Resource.Styleable.Capability_shortcutMatchRequired = global::Nearby_Sharing_Windows.Resource.Styleable.Capability_shortcutMatchRequired;
+			global::ShortDev.Android.Resource.Styleable.ColorStateListItem = global::Nearby_Sharing_Windows.Resource.Styleable.ColorStateListItem;
+			global::ShortDev.Android.Resource.Styleable.ColorStateListItem_alpha = global::Nearby_Sharing_Windows.Resource.Styleable.ColorStateListItem_alpha;
+			global::ShortDev.Android.Resource.Styleable.ColorStateListItem_android_alpha = global::Nearby_Sharing_Windows.Resource.Styleable.ColorStateListItem_android_alpha;
+			global::ShortDev.Android.Resource.Styleable.ColorStateListItem_android_color = global::Nearby_Sharing_Windows.Resource.Styleable.ColorStateListItem_android_color;
+			global::ShortDev.Android.Resource.Styleable.ColorStateListItem_android_lStar = global::Nearby_Sharing_Windows.Resource.Styleable.ColorStateListItem_android_lStar;
+			global::ShortDev.Android.Resource.Styleable.ColorStateListItem_lStar = global::Nearby_Sharing_Windows.Resource.Styleable.ColorStateListItem_lStar;
+			global::ShortDev.Android.Resource.Styleable.CompoundButton = global::Nearby_Sharing_Windows.Resource.Styleable.CompoundButton;
+			global::ShortDev.Android.Resource.Styleable.CompoundButton_android_button = global::Nearby_Sharing_Windows.Resource.Styleable.CompoundButton_android_button;
+			global::ShortDev.Android.Resource.Styleable.CompoundButton_buttonCompat = global::Nearby_Sharing_Windows.Resource.Styleable.CompoundButton_buttonCompat;
+			global::ShortDev.Android.Resource.Styleable.CompoundButton_buttonTint = global::Nearby_Sharing_Windows.Resource.Styleable.CompoundButton_buttonTint;
+			global::ShortDev.Android.Resource.Styleable.CompoundButton_buttonTintMode = global::Nearby_Sharing_Windows.Resource.Styleable.CompoundButton_buttonTintMode;
+			global::ShortDev.Android.Resource.Styleable.DrawerArrowToggle = global::Nearby_Sharing_Windows.Resource.Styleable.DrawerArrowToggle;
+			global::ShortDev.Android.Resource.Styleable.DrawerArrowToggle_arrowHeadLength = global::Nearby_Sharing_Windows.Resource.Styleable.DrawerArrowToggle_arrowHeadLength;
+			global::ShortDev.Android.Resource.Styleable.DrawerArrowToggle_arrowShaftLength = global::Nearby_Sharing_Windows.Resource.Styleable.DrawerArrowToggle_arrowShaftLength;
+			global::ShortDev.Android.Resource.Styleable.DrawerArrowToggle_barLength = global::Nearby_Sharing_Windows.Resource.Styleable.DrawerArrowToggle_barLength;
+			global::ShortDev.Android.Resource.Styleable.DrawerArrowToggle_color = global::Nearby_Sharing_Windows.Resource.Styleable.DrawerArrowToggle_color;
+			global::ShortDev.Android.Resource.Styleable.DrawerArrowToggle_drawableSize = global::Nearby_Sharing_Windows.Resource.Styleable.DrawerArrowToggle_drawableSize;
+			global::ShortDev.Android.Resource.Styleable.DrawerArrowToggle_gapBetweenBars = global::Nearby_Sharing_Windows.Resource.Styleable.DrawerArrowToggle_gapBetweenBars;
+			global::ShortDev.Android.Resource.Styleable.DrawerArrowToggle_spinBars = global::Nearby_Sharing_Windows.Resource.Styleable.DrawerArrowToggle_spinBars;
+			global::ShortDev.Android.Resource.Styleable.DrawerArrowToggle_thickness = global::Nearby_Sharing_Windows.Resource.Styleable.DrawerArrowToggle_thickness;
+			global::ShortDev.Android.Resource.Styleable.DrawerLayout = global::Nearby_Sharing_Windows.Resource.Styleable.DrawerLayout;
+			global::ShortDev.Android.Resource.Styleable.DrawerLayout_elevation = global::Nearby_Sharing_Windows.Resource.Styleable.DrawerLayout_elevation;
+			global::ShortDev.Android.Resource.Styleable.FontFamily = global::Nearby_Sharing_Windows.Resource.Styleable.FontFamily;
+			global::ShortDev.Android.Resource.Styleable.FontFamilyFont = global::Nearby_Sharing_Windows.Resource.Styleable.FontFamilyFont;
+			global::ShortDev.Android.Resource.Styleable.FontFamilyFont_android_font = global::Nearby_Sharing_Windows.Resource.Styleable.FontFamilyFont_android_font;
+			global::ShortDev.Android.Resource.Styleable.FontFamilyFont_android_fontStyle = global::Nearby_Sharing_Windows.Resource.Styleable.FontFamilyFont_android_fontStyle;
+			global::ShortDev.Android.Resource.Styleable.FontFamilyFont_android_fontVariationSettings = global::Nearby_Sharing_Windows.Resource.Styleable.FontFamilyFont_android_fontVariationSettings;
+			global::ShortDev.Android.Resource.Styleable.FontFamilyFont_android_fontWeight = global::Nearby_Sharing_Windows.Resource.Styleable.FontFamilyFont_android_fontWeight;
+			global::ShortDev.Android.Resource.Styleable.FontFamilyFont_android_ttcIndex = global::Nearby_Sharing_Windows.Resource.Styleable.FontFamilyFont_android_ttcIndex;
+			global::ShortDev.Android.Resource.Styleable.FontFamilyFont_font = global::Nearby_Sharing_Windows.Resource.Styleable.FontFamilyFont_font;
+			global::ShortDev.Android.Resource.Styleable.FontFamilyFont_fontStyle = global::Nearby_Sharing_Windows.Resource.Styleable.FontFamilyFont_fontStyle;
+			global::ShortDev.Android.Resource.Styleable.FontFamilyFont_fontVariationSettings = global::Nearby_Sharing_Windows.Resource.Styleable.FontFamilyFont_fontVariationSettings;
+			global::ShortDev.Android.Resource.Styleable.FontFamilyFont_fontWeight = global::Nearby_Sharing_Windows.Resource.Styleable.FontFamilyFont_fontWeight;
+			global::ShortDev.Android.Resource.Styleable.FontFamilyFont_ttcIndex = global::Nearby_Sharing_Windows.Resource.Styleable.FontFamilyFont_ttcIndex;
+			global::ShortDev.Android.Resource.Styleable.FontFamily_fontProviderAuthority = global::Nearby_Sharing_Windows.Resource.Styleable.FontFamily_fontProviderAuthority;
+			global::ShortDev.Android.Resource.Styleable.FontFamily_fontProviderCerts = global::Nearby_Sharing_Windows.Resource.Styleable.FontFamily_fontProviderCerts;
+			global::ShortDev.Android.Resource.Styleable.FontFamily_fontProviderFetchStrategy = global::Nearby_Sharing_Windows.Resource.Styleable.FontFamily_fontProviderFetchStrategy;
+			global::ShortDev.Android.Resource.Styleable.FontFamily_fontProviderFetchTimeout = global::Nearby_Sharing_Windows.Resource.Styleable.FontFamily_fontProviderFetchTimeout;
+			global::ShortDev.Android.Resource.Styleable.FontFamily_fontProviderPackage = global::Nearby_Sharing_Windows.Resource.Styleable.FontFamily_fontProviderPackage;
+			global::ShortDev.Android.Resource.Styleable.FontFamily_fontProviderQuery = global::Nearby_Sharing_Windows.Resource.Styleable.FontFamily_fontProviderQuery;
+			global::ShortDev.Android.Resource.Styleable.FontFamily_fontProviderSystemFontFamily = global::Nearby_Sharing_Windows.Resource.Styleable.FontFamily_fontProviderSystemFontFamily;
+			global::ShortDev.Android.Resource.Styleable.Fragment = global::Nearby_Sharing_Windows.Resource.Styleable.Fragment;
+			global::ShortDev.Android.Resource.Styleable.FragmentContainerView = global::Nearby_Sharing_Windows.Resource.Styleable.FragmentContainerView;
+			global::ShortDev.Android.Resource.Styleable.FragmentContainerView_android_name = global::Nearby_Sharing_Windows.Resource.Styleable.FragmentContainerView_android_name;
+			global::ShortDev.Android.Resource.Styleable.FragmentContainerView_android_tag = global::Nearby_Sharing_Windows.Resource.Styleable.FragmentContainerView_android_tag;
+			global::ShortDev.Android.Resource.Styleable.Fragment_android_id = global::Nearby_Sharing_Windows.Resource.Styleable.Fragment_android_id;
+			global::ShortDev.Android.Resource.Styleable.Fragment_android_name = global::Nearby_Sharing_Windows.Resource.Styleable.Fragment_android_name;
+			global::ShortDev.Android.Resource.Styleable.Fragment_android_tag = global::Nearby_Sharing_Windows.Resource.Styleable.Fragment_android_tag;
+			global::ShortDev.Android.Resource.Styleable.GradientColor = global::Nearby_Sharing_Windows.Resource.Styleable.GradientColor;
+			global::ShortDev.Android.Resource.Styleable.GradientColorItem = global::Nearby_Sharing_Windows.Resource.Styleable.GradientColorItem;
+			global::ShortDev.Android.Resource.Styleable.GradientColorItem_android_color = global::Nearby_Sharing_Windows.Resource.Styleable.GradientColorItem_android_color;
+			global::ShortDev.Android.Resource.Styleable.GradientColorItem_android_offset = global::Nearby_Sharing_Windows.Resource.Styleable.GradientColorItem_android_offset;
+			global::ShortDev.Android.Resource.Styleable.GradientColor_android_centerColor = global::Nearby_Sharing_Windows.Resource.Styleable.GradientColor_android_centerColor;
+			global::ShortDev.Android.Resource.Styleable.GradientColor_android_centerX = global::Nearby_Sharing_Windows.Resource.Styleable.GradientColor_android_centerX;
+			global::ShortDev.Android.Resource.Styleable.GradientColor_android_centerY = global::Nearby_Sharing_Windows.Resource.Styleable.GradientColor_android_centerY;
+			global::ShortDev.Android.Resource.Styleable.GradientColor_android_endColor = global::Nearby_Sharing_Windows.Resource.Styleable.GradientColor_android_endColor;
+			global::ShortDev.Android.Resource.Styleable.GradientColor_android_endX = global::Nearby_Sharing_Windows.Resource.Styleable.GradientColor_android_endX;
+			global::ShortDev.Android.Resource.Styleable.GradientColor_android_endY = global::Nearby_Sharing_Windows.Resource.Styleable.GradientColor_android_endY;
+			global::ShortDev.Android.Resource.Styleable.GradientColor_android_gradientRadius = global::Nearby_Sharing_Windows.Resource.Styleable.GradientColor_android_gradientRadius;
+			global::ShortDev.Android.Resource.Styleable.GradientColor_android_startColor = global::Nearby_Sharing_Windows.Resource.Styleable.GradientColor_android_startColor;
+			global::ShortDev.Android.Resource.Styleable.GradientColor_android_startX = global::Nearby_Sharing_Windows.Resource.Styleable.GradientColor_android_startX;
+			global::ShortDev.Android.Resource.Styleable.GradientColor_android_startY = global::Nearby_Sharing_Windows.Resource.Styleable.GradientColor_android_startY;
+			global::ShortDev.Android.Resource.Styleable.GradientColor_android_tileMode = global::Nearby_Sharing_Windows.Resource.Styleable.GradientColor_android_tileMode;
+			global::ShortDev.Android.Resource.Styleable.GradientColor_android_type = global::Nearby_Sharing_Windows.Resource.Styleable.GradientColor_android_type;
+			global::ShortDev.Android.Resource.Styleable.LinearLayoutCompat = global::Nearby_Sharing_Windows.Resource.Styleable.LinearLayoutCompat;
+			global::ShortDev.Android.Resource.Styleable.LinearLayoutCompat_android_baselineAligned = global::Nearby_Sharing_Windows.Resource.Styleable.LinearLayoutCompat_android_baselineAligned;
+			global::ShortDev.Android.Resource.Styleable.LinearLayoutCompat_android_baselineAlignedChildIndex = global::Nearby_Sharing_Windows.Resource.Styleable.LinearLayoutCompat_android_baselineAlignedChildIndex;
+			global::ShortDev.Android.Resource.Styleable.LinearLayoutCompat_android_gravity = global::Nearby_Sharing_Windows.Resource.Styleable.LinearLayoutCompat_android_gravity;
+			global::ShortDev.Android.Resource.Styleable.LinearLayoutCompat_android_orientation = global::Nearby_Sharing_Windows.Resource.Styleable.LinearLayoutCompat_android_orientation;
+			global::ShortDev.Android.Resource.Styleable.LinearLayoutCompat_android_weightSum = global::Nearby_Sharing_Windows.Resource.Styleable.LinearLayoutCompat_android_weightSum;
+			global::ShortDev.Android.Resource.Styleable.LinearLayoutCompat_divider = global::Nearby_Sharing_Windows.Resource.Styleable.LinearLayoutCompat_divider;
+			global::ShortDev.Android.Resource.Styleable.LinearLayoutCompat_dividerPadding = global::Nearby_Sharing_Windows.Resource.Styleable.LinearLayoutCompat_dividerPadding;
+			global::ShortDev.Android.Resource.Styleable.LinearLayoutCompat_Layout = global::Nearby_Sharing_Windows.Resource.Styleable.LinearLayoutCompat_Layout;
+			global::ShortDev.Android.Resource.Styleable.LinearLayoutCompat_Layout_android_layout_gravity = global::Nearby_Sharing_Windows.Resource.Styleable.LinearLayoutCompat_Layout_android_layout_gravity;
+			global::ShortDev.Android.Resource.Styleable.LinearLayoutCompat_Layout_android_layout_height = global::Nearby_Sharing_Windows.Resource.Styleable.LinearLayoutCompat_Layout_android_layout_height;
+			global::ShortDev.Android.Resource.Styleable.LinearLayoutCompat_Layout_android_layout_weight = global::Nearby_Sharing_Windows.Resource.Styleable.LinearLayoutCompat_Layout_android_layout_weight;
+			global::ShortDev.Android.Resource.Styleable.LinearLayoutCompat_Layout_android_layout_width = global::Nearby_Sharing_Windows.Resource.Styleable.LinearLayoutCompat_Layout_android_layout_width;
+			global::ShortDev.Android.Resource.Styleable.LinearLayoutCompat_measureWithLargestChild = global::Nearby_Sharing_Windows.Resource.Styleable.LinearLayoutCompat_measureWithLargestChild;
+			global::ShortDev.Android.Resource.Styleable.LinearLayoutCompat_showDividers = global::Nearby_Sharing_Windows.Resource.Styleable.LinearLayoutCompat_showDividers;
+			global::ShortDev.Android.Resource.Styleable.ListPopupWindow = global::Nearby_Sharing_Windows.Resource.Styleable.ListPopupWindow;
+			global::ShortDev.Android.Resource.Styleable.ListPopupWindow_android_dropDownHorizontalOffset = global::Nearby_Sharing_Windows.Resource.Styleable.ListPopupWindow_android_dropDownHorizontalOffset;
+			global::ShortDev.Android.Resource.Styleable.ListPopupWindow_android_dropDownVerticalOffset = global::Nearby_Sharing_Windows.Resource.Styleable.ListPopupWindow_android_dropDownVerticalOffset;
+			global::ShortDev.Android.Resource.Styleable.MenuGroup = global::Nearby_Sharing_Windows.Resource.Styleable.MenuGroup;
+			global::ShortDev.Android.Resource.Styleable.MenuGroup_android_checkableBehavior = global::Nearby_Sharing_Windows.Resource.Styleable.MenuGroup_android_checkableBehavior;
+			global::ShortDev.Android.Resource.Styleable.MenuGroup_android_enabled = global::Nearby_Sharing_Windows.Resource.Styleable.MenuGroup_android_enabled;
+			global::ShortDev.Android.Resource.Styleable.MenuGroup_android_id = global::Nearby_Sharing_Windows.Resource.Styleable.MenuGroup_android_id;
+			global::ShortDev.Android.Resource.Styleable.MenuGroup_android_menuCategory = global::Nearby_Sharing_Windows.Resource.Styleable.MenuGroup_android_menuCategory;
+			global::ShortDev.Android.Resource.Styleable.MenuGroup_android_orderInCategory = global::Nearby_Sharing_Windows.Resource.Styleable.MenuGroup_android_orderInCategory;
+			global::ShortDev.Android.Resource.Styleable.MenuGroup_android_visible = global::Nearby_Sharing_Windows.Resource.Styleable.MenuGroup_android_visible;
+			global::ShortDev.Android.Resource.Styleable.MenuItem = global::Nearby_Sharing_Windows.Resource.Styleable.MenuItem;
+			global::ShortDev.Android.Resource.Styleable.MenuItem_actionLayout = global::Nearby_Sharing_Windows.Resource.Styleable.MenuItem_actionLayout;
+			global::ShortDev.Android.Resource.Styleable.MenuItem_actionProviderClass = global::Nearby_Sharing_Windows.Resource.Styleable.MenuItem_actionProviderClass;
+			global::ShortDev.Android.Resource.Styleable.MenuItem_actionViewClass = global::Nearby_Sharing_Windows.Resource.Styleable.MenuItem_actionViewClass;
+			global::ShortDev.Android.Resource.Styleable.MenuItem_alphabeticModifiers = global::Nearby_Sharing_Windows.Resource.Styleable.MenuItem_alphabeticModifiers;
+			global::ShortDev.Android.Resource.Styleable.MenuItem_android_alphabeticShortcut = global::Nearby_Sharing_Windows.Resource.Styleable.MenuItem_android_alphabeticShortcut;
+			global::ShortDev.Android.Resource.Styleable.MenuItem_android_checkable = global::Nearby_Sharing_Windows.Resource.Styleable.MenuItem_android_checkable;
+			global::ShortDev.Android.Resource.Styleable.MenuItem_android_checked = global::Nearby_Sharing_Windows.Resource.Styleable.MenuItem_android_checked;
+			global::ShortDev.Android.Resource.Styleable.MenuItem_android_enabled = global::Nearby_Sharing_Windows.Resource.Styleable.MenuItem_android_enabled;
+			global::ShortDev.Android.Resource.Styleable.MenuItem_android_icon = global::Nearby_Sharing_Windows.Resource.Styleable.MenuItem_android_icon;
+			global::ShortDev.Android.Resource.Styleable.MenuItem_android_id = global::Nearby_Sharing_Windows.Resource.Styleable.MenuItem_android_id;
+			global::ShortDev.Android.Resource.Styleable.MenuItem_android_menuCategory = global::Nearby_Sharing_Windows.Resource.Styleable.MenuItem_android_menuCategory;
+			global::ShortDev.Android.Resource.Styleable.MenuItem_android_numericShortcut = global::Nearby_Sharing_Windows.Resource.Styleable.MenuItem_android_numericShortcut;
+			global::ShortDev.Android.Resource.Styleable.MenuItem_android_onClick = global::Nearby_Sharing_Windows.Resource.Styleable.MenuItem_android_onClick;
+			global::ShortDev.Android.Resource.Styleable.MenuItem_android_orderInCategory = global::Nearby_Sharing_Windows.Resource.Styleable.MenuItem_android_orderInCategory;
+			global::ShortDev.Android.Resource.Styleable.MenuItem_android_title = global::Nearby_Sharing_Windows.Resource.Styleable.MenuItem_android_title;
+			global::ShortDev.Android.Resource.Styleable.MenuItem_android_titleCondensed = global::Nearby_Sharing_Windows.Resource.Styleable.MenuItem_android_titleCondensed;
+			global::ShortDev.Android.Resource.Styleable.MenuItem_android_visible = global::Nearby_Sharing_Windows.Resource.Styleable.MenuItem_android_visible;
+			global::ShortDev.Android.Resource.Styleable.MenuItem_contentDescription = global::Nearby_Sharing_Windows.Resource.Styleable.MenuItem_contentDescription;
+			global::ShortDev.Android.Resource.Styleable.MenuItem_iconTint = global::Nearby_Sharing_Windows.Resource.Styleable.MenuItem_iconTint;
+			global::ShortDev.Android.Resource.Styleable.MenuItem_iconTintMode = global::Nearby_Sharing_Windows.Resource.Styleable.MenuItem_iconTintMode;
+			global::ShortDev.Android.Resource.Styleable.MenuItem_numericModifiers = global::Nearby_Sharing_Windows.Resource.Styleable.MenuItem_numericModifiers;
+			global::ShortDev.Android.Resource.Styleable.MenuItem_showAsAction = global::Nearby_Sharing_Windows.Resource.Styleable.MenuItem_showAsAction;
+			global::ShortDev.Android.Resource.Styleable.MenuItem_tooltipText = global::Nearby_Sharing_Windows.Resource.Styleable.MenuItem_tooltipText;
+			global::ShortDev.Android.Resource.Styleable.MenuView = global::Nearby_Sharing_Windows.Resource.Styleable.MenuView;
+			global::ShortDev.Android.Resource.Styleable.MenuView_android_headerBackground = global::Nearby_Sharing_Windows.Resource.Styleable.MenuView_android_headerBackground;
+			global::ShortDev.Android.Resource.Styleable.MenuView_android_horizontalDivider = global::Nearby_Sharing_Windows.Resource.Styleable.MenuView_android_horizontalDivider;
+			global::ShortDev.Android.Resource.Styleable.MenuView_android_itemBackground = global::Nearby_Sharing_Windows.Resource.Styleable.MenuView_android_itemBackground;
+			global::ShortDev.Android.Resource.Styleable.MenuView_android_itemIconDisabledAlpha = global::Nearby_Sharing_Windows.Resource.Styleable.MenuView_android_itemIconDisabledAlpha;
+			global::ShortDev.Android.Resource.Styleable.MenuView_android_itemTextAppearance = global::Nearby_Sharing_Windows.Resource.Styleable.MenuView_android_itemTextAppearance;
+			global::ShortDev.Android.Resource.Styleable.MenuView_android_verticalDivider = global::Nearby_Sharing_Windows.Resource.Styleable.MenuView_android_verticalDivider;
+			global::ShortDev.Android.Resource.Styleable.MenuView_android_windowAnimationStyle = global::Nearby_Sharing_Windows.Resource.Styleable.MenuView_android_windowAnimationStyle;
+			global::ShortDev.Android.Resource.Styleable.MenuView_preserveIconSpacing = global::Nearby_Sharing_Windows.Resource.Styleable.MenuView_preserveIconSpacing;
+			global::ShortDev.Android.Resource.Styleable.MenuView_subMenuArrow = global::Nearby_Sharing_Windows.Resource.Styleable.MenuView_subMenuArrow;
+			global::ShortDev.Android.Resource.Styleable.PopupWindow = global::Nearby_Sharing_Windows.Resource.Styleable.PopupWindow;
+			global::ShortDev.Android.Resource.Styleable.PopupWindowBackgroundState = global::Nearby_Sharing_Windows.Resource.Styleable.PopupWindowBackgroundState;
+			global::ShortDev.Android.Resource.Styleable.PopupWindowBackgroundState_state_above_anchor = global::Nearby_Sharing_Windows.Resource.Styleable.PopupWindowBackgroundState_state_above_anchor;
+			global::ShortDev.Android.Resource.Styleable.PopupWindow_android_popupAnimationStyle = global::Nearby_Sharing_Windows.Resource.Styleable.PopupWindow_android_popupAnimationStyle;
+			global::ShortDev.Android.Resource.Styleable.PopupWindow_android_popupBackground = global::Nearby_Sharing_Windows.Resource.Styleable.PopupWindow_android_popupBackground;
+			global::ShortDev.Android.Resource.Styleable.PopupWindow_overlapAnchor = global::Nearby_Sharing_Windows.Resource.Styleable.PopupWindow_overlapAnchor;
+			global::ShortDev.Android.Resource.Styleable.RecycleListView = global::Nearby_Sharing_Windows.Resource.Styleable.RecycleListView;
+			global::ShortDev.Android.Resource.Styleable.RecycleListView_paddingBottomNoButtons = global::Nearby_Sharing_Windows.Resource.Styleable.RecycleListView_paddingBottomNoButtons;
+			global::ShortDev.Android.Resource.Styleable.RecycleListView_paddingTopNoTitle = global::Nearby_Sharing_Windows.Resource.Styleable.RecycleListView_paddingTopNoTitle;
+			global::ShortDev.Android.Resource.Styleable.RecyclerView = global::Nearby_Sharing_Windows.Resource.Styleable.RecyclerView;
+			global::ShortDev.Android.Resource.Styleable.RecyclerView_android_clipToPadding = global::Nearby_Sharing_Windows.Resource.Styleable.RecyclerView_android_clipToPadding;
+			global::ShortDev.Android.Resource.Styleable.RecyclerView_android_descendantFocusability = global::Nearby_Sharing_Windows.Resource.Styleable.RecyclerView_android_descendantFocusability;
+			global::ShortDev.Android.Resource.Styleable.RecyclerView_android_orientation = global::Nearby_Sharing_Windows.Resource.Styleable.RecyclerView_android_orientation;
+			global::ShortDev.Android.Resource.Styleable.RecyclerView_fastScrollEnabled = global::Nearby_Sharing_Windows.Resource.Styleable.RecyclerView_fastScrollEnabled;
+			global::ShortDev.Android.Resource.Styleable.RecyclerView_fastScrollHorizontalThumbDrawable = global::Nearby_Sharing_Windows.Resource.Styleable.RecyclerView_fastScrollHorizontalThumbDrawable;
+			global::ShortDev.Android.Resource.Styleable.RecyclerView_fastScrollHorizontalTrackDrawable = global::Nearby_Sharing_Windows.Resource.Styleable.RecyclerView_fastScrollHorizontalTrackDrawable;
+			global::ShortDev.Android.Resource.Styleable.RecyclerView_fastScrollVerticalThumbDrawable = global::Nearby_Sharing_Windows.Resource.Styleable.RecyclerView_fastScrollVerticalThumbDrawable;
+			global::ShortDev.Android.Resource.Styleable.RecyclerView_fastScrollVerticalTrackDrawable = global::Nearby_Sharing_Windows.Resource.Styleable.RecyclerView_fastScrollVerticalTrackDrawable;
+			global::ShortDev.Android.Resource.Styleable.RecyclerView_layoutManager = global::Nearby_Sharing_Windows.Resource.Styleable.RecyclerView_layoutManager;
+			global::ShortDev.Android.Resource.Styleable.RecyclerView_reverseLayout = global::Nearby_Sharing_Windows.Resource.Styleable.RecyclerView_reverseLayout;
+			global::ShortDev.Android.Resource.Styleable.RecyclerView_spanCount = global::Nearby_Sharing_Windows.Resource.Styleable.RecyclerView_spanCount;
+			global::ShortDev.Android.Resource.Styleable.RecyclerView_stackFromEnd = global::Nearby_Sharing_Windows.Resource.Styleable.RecyclerView_stackFromEnd;
+			global::ShortDev.Android.Resource.Styleable.SearchView = global::Nearby_Sharing_Windows.Resource.Styleable.SearchView;
+			global::ShortDev.Android.Resource.Styleable.SearchView_android_focusable = global::Nearby_Sharing_Windows.Resource.Styleable.SearchView_android_focusable;
+			global::ShortDev.Android.Resource.Styleable.SearchView_android_imeOptions = global::Nearby_Sharing_Windows.Resource.Styleable.SearchView_android_imeOptions;
+			global::ShortDev.Android.Resource.Styleable.SearchView_android_inputType = global::Nearby_Sharing_Windows.Resource.Styleable.SearchView_android_inputType;
+			global::ShortDev.Android.Resource.Styleable.SearchView_android_maxWidth = global::Nearby_Sharing_Windows.Resource.Styleable.SearchView_android_maxWidth;
+			global::ShortDev.Android.Resource.Styleable.SearchView_closeIcon = global::Nearby_Sharing_Windows.Resource.Styleable.SearchView_closeIcon;
+			global::ShortDev.Android.Resource.Styleable.SearchView_commitIcon = global::Nearby_Sharing_Windows.Resource.Styleable.SearchView_commitIcon;
+			global::ShortDev.Android.Resource.Styleable.SearchView_defaultQueryHint = global::Nearby_Sharing_Windows.Resource.Styleable.SearchView_defaultQueryHint;
+			global::ShortDev.Android.Resource.Styleable.SearchView_goIcon = global::Nearby_Sharing_Windows.Resource.Styleable.SearchView_goIcon;
+			global::ShortDev.Android.Resource.Styleable.SearchView_iconifiedByDefault = global::Nearby_Sharing_Windows.Resource.Styleable.SearchView_iconifiedByDefault;
+			global::ShortDev.Android.Resource.Styleable.SearchView_layout = global::Nearby_Sharing_Windows.Resource.Styleable.SearchView_layout;
+			global::ShortDev.Android.Resource.Styleable.SearchView_queryBackground = global::Nearby_Sharing_Windows.Resource.Styleable.SearchView_queryBackground;
+			global::ShortDev.Android.Resource.Styleable.SearchView_queryHint = global::Nearby_Sharing_Windows.Resource.Styleable.SearchView_queryHint;
+			global::ShortDev.Android.Resource.Styleable.SearchView_searchHintIcon = global::Nearby_Sharing_Windows.Resource.Styleable.SearchView_searchHintIcon;
+			global::ShortDev.Android.Resource.Styleable.SearchView_searchIcon = global::Nearby_Sharing_Windows.Resource.Styleable.SearchView_searchIcon;
+			global::ShortDev.Android.Resource.Styleable.SearchView_submitBackground = global::Nearby_Sharing_Windows.Resource.Styleable.SearchView_submitBackground;
+			global::ShortDev.Android.Resource.Styleable.SearchView_suggestionRowLayout = global::Nearby_Sharing_Windows.Resource.Styleable.SearchView_suggestionRowLayout;
+			global::ShortDev.Android.Resource.Styleable.SearchView_voiceIcon = global::Nearby_Sharing_Windows.Resource.Styleable.SearchView_voiceIcon;
+			global::ShortDev.Android.Resource.Styleable.Spinner = global::Nearby_Sharing_Windows.Resource.Styleable.Spinner;
+			global::ShortDev.Android.Resource.Styleable.Spinner_android_dropDownWidth = global::Nearby_Sharing_Windows.Resource.Styleable.Spinner_android_dropDownWidth;
+			global::ShortDev.Android.Resource.Styleable.Spinner_android_entries = global::Nearby_Sharing_Windows.Resource.Styleable.Spinner_android_entries;
+			global::ShortDev.Android.Resource.Styleable.Spinner_android_popupBackground = global::Nearby_Sharing_Windows.Resource.Styleable.Spinner_android_popupBackground;
+			global::ShortDev.Android.Resource.Styleable.Spinner_android_prompt = global::Nearby_Sharing_Windows.Resource.Styleable.Spinner_android_prompt;
+			global::ShortDev.Android.Resource.Styleable.Spinner_popupTheme = global::Nearby_Sharing_Windows.Resource.Styleable.Spinner_popupTheme;
+			global::ShortDev.Android.Resource.Styleable.StateListDrawable = global::Nearby_Sharing_Windows.Resource.Styleable.StateListDrawable;
+			global::ShortDev.Android.Resource.Styleable.StateListDrawableItem = global::Nearby_Sharing_Windows.Resource.Styleable.StateListDrawableItem;
+			global::ShortDev.Android.Resource.Styleable.StateListDrawableItem_android_drawable = global::Nearby_Sharing_Windows.Resource.Styleable.StateListDrawableItem_android_drawable;
+			global::ShortDev.Android.Resource.Styleable.StateListDrawable_android_constantSize = global::Nearby_Sharing_Windows.Resource.Styleable.StateListDrawable_android_constantSize;
+			global::ShortDev.Android.Resource.Styleable.StateListDrawable_android_dither = global::Nearby_Sharing_Windows.Resource.Styleable.StateListDrawable_android_dither;
+			global::ShortDev.Android.Resource.Styleable.StateListDrawable_android_enterFadeDuration = global::Nearby_Sharing_Windows.Resource.Styleable.StateListDrawable_android_enterFadeDuration;
+			global::ShortDev.Android.Resource.Styleable.StateListDrawable_android_exitFadeDuration = global::Nearby_Sharing_Windows.Resource.Styleable.StateListDrawable_android_exitFadeDuration;
+			global::ShortDev.Android.Resource.Styleable.StateListDrawable_android_variablePadding = global::Nearby_Sharing_Windows.Resource.Styleable.StateListDrawable_android_variablePadding;
+			global::ShortDev.Android.Resource.Styleable.StateListDrawable_android_visible = global::Nearby_Sharing_Windows.Resource.Styleable.StateListDrawable_android_visible;
+			global::ShortDev.Android.Resource.Styleable.SwitchCompat = global::Nearby_Sharing_Windows.Resource.Styleable.SwitchCompat;
+			global::ShortDev.Android.Resource.Styleable.SwitchCompat_android_textOff = global::Nearby_Sharing_Windows.Resource.Styleable.SwitchCompat_android_textOff;
+			global::ShortDev.Android.Resource.Styleable.SwitchCompat_android_textOn = global::Nearby_Sharing_Windows.Resource.Styleable.SwitchCompat_android_textOn;
+			global::ShortDev.Android.Resource.Styleable.SwitchCompat_android_thumb = global::Nearby_Sharing_Windows.Resource.Styleable.SwitchCompat_android_thumb;
+			global::ShortDev.Android.Resource.Styleable.SwitchCompat_showText = global::Nearby_Sharing_Windows.Resource.Styleable.SwitchCompat_showText;
+			global::ShortDev.Android.Resource.Styleable.SwitchCompat_splitTrack = global::Nearby_Sharing_Windows.Resource.Styleable.SwitchCompat_splitTrack;
+			global::ShortDev.Android.Resource.Styleable.SwitchCompat_switchMinWidth = global::Nearby_Sharing_Windows.Resource.Styleable.SwitchCompat_switchMinWidth;
+			global::ShortDev.Android.Resource.Styleable.SwitchCompat_switchPadding = global::Nearby_Sharing_Windows.Resource.Styleable.SwitchCompat_switchPadding;
+			global::ShortDev.Android.Resource.Styleable.SwitchCompat_switchTextAppearance = global::Nearby_Sharing_Windows.Resource.Styleable.SwitchCompat_switchTextAppearance;
+			global::ShortDev.Android.Resource.Styleable.SwitchCompat_thumbTextPadding = global::Nearby_Sharing_Windows.Resource.Styleable.SwitchCompat_thumbTextPadding;
+			global::ShortDev.Android.Resource.Styleable.SwitchCompat_thumbTint = global::Nearby_Sharing_Windows.Resource.Styleable.SwitchCompat_thumbTint;
+			global::ShortDev.Android.Resource.Styleable.SwitchCompat_thumbTintMode = global::Nearby_Sharing_Windows.Resource.Styleable.SwitchCompat_thumbTintMode;
+			global::ShortDev.Android.Resource.Styleable.SwitchCompat_track = global::Nearby_Sharing_Windows.Resource.Styleable.SwitchCompat_track;
+			global::ShortDev.Android.Resource.Styleable.SwitchCompat_trackTint = global::Nearby_Sharing_Windows.Resource.Styleable.SwitchCompat_trackTint;
+			global::ShortDev.Android.Resource.Styleable.SwitchCompat_trackTintMode = global::Nearby_Sharing_Windows.Resource.Styleable.SwitchCompat_trackTintMode;
+			global::ShortDev.Android.Resource.Styleable.TextAppearance = global::Nearby_Sharing_Windows.Resource.Styleable.TextAppearance;
+			global::ShortDev.Android.Resource.Styleable.TextAppearance_android_fontFamily = global::Nearby_Sharing_Windows.Resource.Styleable.TextAppearance_android_fontFamily;
+			global::ShortDev.Android.Resource.Styleable.TextAppearance_android_shadowColor = global::Nearby_Sharing_Windows.Resource.Styleable.TextAppearance_android_shadowColor;
+			global::ShortDev.Android.Resource.Styleable.TextAppearance_android_shadowDx = global::Nearby_Sharing_Windows.Resource.Styleable.TextAppearance_android_shadowDx;
+			global::ShortDev.Android.Resource.Styleable.TextAppearance_android_shadowDy = global::Nearby_Sharing_Windows.Resource.Styleable.TextAppearance_android_shadowDy;
+			global::ShortDev.Android.Resource.Styleable.TextAppearance_android_shadowRadius = global::Nearby_Sharing_Windows.Resource.Styleable.TextAppearance_android_shadowRadius;
+			global::ShortDev.Android.Resource.Styleable.TextAppearance_android_textColor = global::Nearby_Sharing_Windows.Resource.Styleable.TextAppearance_android_textColor;
+			global::ShortDev.Android.Resource.Styleable.TextAppearance_android_textColorHint = global::Nearby_Sharing_Windows.Resource.Styleable.TextAppearance_android_textColorHint;
+			global::ShortDev.Android.Resource.Styleable.TextAppearance_android_textColorLink = global::Nearby_Sharing_Windows.Resource.Styleable.TextAppearance_android_textColorLink;
+			global::ShortDev.Android.Resource.Styleable.TextAppearance_android_textFontWeight = global::Nearby_Sharing_Windows.Resource.Styleable.TextAppearance_android_textFontWeight;
+			global::ShortDev.Android.Resource.Styleable.TextAppearance_android_textSize = global::Nearby_Sharing_Windows.Resource.Styleable.TextAppearance_android_textSize;
+			global::ShortDev.Android.Resource.Styleable.TextAppearance_android_textStyle = global::Nearby_Sharing_Windows.Resource.Styleable.TextAppearance_android_textStyle;
+			global::ShortDev.Android.Resource.Styleable.TextAppearance_android_typeface = global::Nearby_Sharing_Windows.Resource.Styleable.TextAppearance_android_typeface;
+			global::ShortDev.Android.Resource.Styleable.TextAppearance_fontFamily = global::Nearby_Sharing_Windows.Resource.Styleable.TextAppearance_fontFamily;
+			global::ShortDev.Android.Resource.Styleable.TextAppearance_fontVariationSettings = global::Nearby_Sharing_Windows.Resource.Styleable.TextAppearance_fontVariationSettings;
+			global::ShortDev.Android.Resource.Styleable.TextAppearance_textAllCaps = global::Nearby_Sharing_Windows.Resource.Styleable.TextAppearance_textAllCaps;
+			global::ShortDev.Android.Resource.Styleable.TextAppearance_textLocale = global::Nearby_Sharing_Windows.Resource.Styleable.TextAppearance_textLocale;
+			global::ShortDev.Android.Resource.Styleable.Toolbar = global::Nearby_Sharing_Windows.Resource.Styleable.Toolbar;
+			global::ShortDev.Android.Resource.Styleable.Toolbar_android_gravity = global::Nearby_Sharing_Windows.Resource.Styleable.Toolbar_android_gravity;
+			global::ShortDev.Android.Resource.Styleable.Toolbar_android_minHeight = global::Nearby_Sharing_Windows.Resource.Styleable.Toolbar_android_minHeight;
+			global::ShortDev.Android.Resource.Styleable.Toolbar_buttonGravity = global::Nearby_Sharing_Windows.Resource.Styleable.Toolbar_buttonGravity;
+			global::ShortDev.Android.Resource.Styleable.Toolbar_collapseContentDescription = global::Nearby_Sharing_Windows.Resource.Styleable.Toolbar_collapseContentDescription;
+			global::ShortDev.Android.Resource.Styleable.Toolbar_collapseIcon = global::Nearby_Sharing_Windows.Resource.Styleable.Toolbar_collapseIcon;
+			global::ShortDev.Android.Resource.Styleable.Toolbar_contentInsetEnd = global::Nearby_Sharing_Windows.Resource.Styleable.Toolbar_contentInsetEnd;
+			global::ShortDev.Android.Resource.Styleable.Toolbar_contentInsetEndWithActions = global::Nearby_Sharing_Windows.Resource.Styleable.Toolbar_contentInsetEndWithActions;
+			global::ShortDev.Android.Resource.Styleable.Toolbar_contentInsetLeft = global::Nearby_Sharing_Windows.Resource.Styleable.Toolbar_contentInsetLeft;
+			global::ShortDev.Android.Resource.Styleable.Toolbar_contentInsetRight = global::Nearby_Sharing_Windows.Resource.Styleable.Toolbar_contentInsetRight;
+			global::ShortDev.Android.Resource.Styleable.Toolbar_contentInsetStart = global::Nearby_Sharing_Windows.Resource.Styleable.Toolbar_contentInsetStart;
+			global::ShortDev.Android.Resource.Styleable.Toolbar_contentInsetStartWithNavigation = global::Nearby_Sharing_Windows.Resource.Styleable.Toolbar_contentInsetStartWithNavigation;
+			global::ShortDev.Android.Resource.Styleable.Toolbar_logo = global::Nearby_Sharing_Windows.Resource.Styleable.Toolbar_logo;
+			global::ShortDev.Android.Resource.Styleable.Toolbar_logoDescription = global::Nearby_Sharing_Windows.Resource.Styleable.Toolbar_logoDescription;
+			global::ShortDev.Android.Resource.Styleable.Toolbar_maxButtonHeight = global::Nearby_Sharing_Windows.Resource.Styleable.Toolbar_maxButtonHeight;
+			global::ShortDev.Android.Resource.Styleable.Toolbar_menu = global::Nearby_Sharing_Windows.Resource.Styleable.Toolbar_menu;
+			global::ShortDev.Android.Resource.Styleable.Toolbar_navigationContentDescription = global::Nearby_Sharing_Windows.Resource.Styleable.Toolbar_navigationContentDescription;
+			global::ShortDev.Android.Resource.Styleable.Toolbar_navigationIcon = global::Nearby_Sharing_Windows.Resource.Styleable.Toolbar_navigationIcon;
+			global::ShortDev.Android.Resource.Styleable.Toolbar_popupTheme = global::Nearby_Sharing_Windows.Resource.Styleable.Toolbar_popupTheme;
+			global::ShortDev.Android.Resource.Styleable.Toolbar_subtitle = global::Nearby_Sharing_Windows.Resource.Styleable.Toolbar_subtitle;
+			global::ShortDev.Android.Resource.Styleable.Toolbar_subtitleTextAppearance = global::Nearby_Sharing_Windows.Resource.Styleable.Toolbar_subtitleTextAppearance;
+			global::ShortDev.Android.Resource.Styleable.Toolbar_subtitleTextColor = global::Nearby_Sharing_Windows.Resource.Styleable.Toolbar_subtitleTextColor;
+			global::ShortDev.Android.Resource.Styleable.Toolbar_title = global::Nearby_Sharing_Windows.Resource.Styleable.Toolbar_title;
+			global::ShortDev.Android.Resource.Styleable.Toolbar_titleMargin = global::Nearby_Sharing_Windows.Resource.Styleable.Toolbar_titleMargin;
+			global::ShortDev.Android.Resource.Styleable.Toolbar_titleMarginBottom = global::Nearby_Sharing_Windows.Resource.Styleable.Toolbar_titleMarginBottom;
+			global::ShortDev.Android.Resource.Styleable.Toolbar_titleMarginEnd = global::Nearby_Sharing_Windows.Resource.Styleable.Toolbar_titleMarginEnd;
+			global::ShortDev.Android.Resource.Styleable.Toolbar_titleMargins = global::Nearby_Sharing_Windows.Resource.Styleable.Toolbar_titleMargins;
+			global::ShortDev.Android.Resource.Styleable.Toolbar_titleMarginStart = global::Nearby_Sharing_Windows.Resource.Styleable.Toolbar_titleMarginStart;
+			global::ShortDev.Android.Resource.Styleable.Toolbar_titleMarginTop = global::Nearby_Sharing_Windows.Resource.Styleable.Toolbar_titleMarginTop;
+			global::ShortDev.Android.Resource.Styleable.Toolbar_titleTextAppearance = global::Nearby_Sharing_Windows.Resource.Styleable.Toolbar_titleTextAppearance;
+			global::ShortDev.Android.Resource.Styleable.Toolbar_titleTextColor = global::Nearby_Sharing_Windows.Resource.Styleable.Toolbar_titleTextColor;
+			global::ShortDev.Android.Resource.Styleable.View = global::Nearby_Sharing_Windows.Resource.Styleable.View;
+			global::ShortDev.Android.Resource.Styleable.ViewBackgroundHelper = global::Nearby_Sharing_Windows.Resource.Styleable.ViewBackgroundHelper;
+			global::ShortDev.Android.Resource.Styleable.ViewBackgroundHelper_android_background = global::Nearby_Sharing_Windows.Resource.Styleable.ViewBackgroundHelper_android_background;
+			global::ShortDev.Android.Resource.Styleable.ViewBackgroundHelper_backgroundTint = global::Nearby_Sharing_Windows.Resource.Styleable.ViewBackgroundHelper_backgroundTint;
+			global::ShortDev.Android.Resource.Styleable.ViewBackgroundHelper_backgroundTintMode = global::Nearby_Sharing_Windows.Resource.Styleable.ViewBackgroundHelper_backgroundTintMode;
+			global::ShortDev.Android.Resource.Styleable.ViewStubCompat = global::Nearby_Sharing_Windows.Resource.Styleable.ViewStubCompat;
+			global::ShortDev.Android.Resource.Styleable.ViewStubCompat_android_id = global::Nearby_Sharing_Windows.Resource.Styleable.ViewStubCompat_android_id;
+			global::ShortDev.Android.Resource.Styleable.ViewStubCompat_android_inflatedId = global::Nearby_Sharing_Windows.Resource.Styleable.ViewStubCompat_android_inflatedId;
+			global::ShortDev.Android.Resource.Styleable.ViewStubCompat_android_layout = global::Nearby_Sharing_Windows.Resource.Styleable.ViewStubCompat_android_layout;
+			global::ShortDev.Android.Resource.Styleable.View_android_focusable = global::Nearby_Sharing_Windows.Resource.Styleable.View_android_focusable;
+			global::ShortDev.Android.Resource.Styleable.View_android_theme = global::Nearby_Sharing_Windows.Resource.Styleable.View_android_theme;
+			global::ShortDev.Android.Resource.Styleable.View_paddingEnd = global::Nearby_Sharing_Windows.Resource.Styleable.View_paddingEnd;
+			global::ShortDev.Android.Resource.Styleable.View_paddingStart = global::Nearby_Sharing_Windows.Resource.Styleable.View_paddingStart;
+			global::ShortDev.Android.Resource.Styleable.View_theme = global::Nearby_Sharing_Windows.Resource.Styleable.View_theme;
 			global::Xamarin.Essentials.Resource.Attribute.alpha = global::Nearby_Sharing_Windows.Resource.Attribute.alpha;
 			global::Xamarin.Essentials.Resource.Attribute.font = global::Nearby_Sharing_Windows.Resource.Attribute.font;
 			global::Xamarin.Essentials.Resource.Attribute.fontProviderAuthority = global::Nearby_Sharing_Windows.Resource.Attribute.fontProviderAuthority;
@@ -7883,193 +9619,211 @@ namespace Nearby_Sharing_Windows
 			public const int file_upload_48 = 2131165288;
 			
 			// aapt resource value: 0x7F070069
-			public const int ic_clock_black_24dp = 2131165289;
+			public const int fluent_bluetooth = 2131165289;
 			
 			// aapt resource value: 0x7F07006A
-			public const int ic_keyboard_black_24dp = 2131165290;
+			public const int fluent_desktop = 2131165290;
 			
 			// aapt resource value: 0x7F07006B
-			public const int ic_launcher_background = 2131165291;
+			public const int fluent_phone = 2131165291;
 			
 			// aapt resource value: 0x7F07006C
-			public const int ic_m3_chip_check = 2131165292;
+			public const int fluent_search = 2131165292;
 			
 			// aapt resource value: 0x7F07006D
-			public const int ic_m3_chip_checked_circle = 2131165293;
+			public const int fluent_send_clock = 2131165293;
 			
 			// aapt resource value: 0x7F07006E
-			public const int ic_m3_chip_close = 2131165294;
+			public const int fluent_wifi = 2131165294;
 			
 			// aapt resource value: 0x7F07006F
-			public const int ic_mtrl_checked_circle = 2131165295;
+			public const int ic_clock_black_24dp = 2131165295;
 			
 			// aapt resource value: 0x7F070070
-			public const int ic_mtrl_chip_checked_black = 2131165296;
+			public const int ic_keyboard_black_24dp = 2131165296;
 			
 			// aapt resource value: 0x7F070071
-			public const int ic_mtrl_chip_checked_circle = 2131165297;
+			public const int ic_launcher_background = 2131165297;
 			
 			// aapt resource value: 0x7F070072
-			public const int ic_mtrl_chip_close_circle = 2131165298;
+			public const int ic_m3_chip_check = 2131165298;
 			
 			// aapt resource value: 0x7F070073
-			public const int m3_appbar_background = 2131165299;
+			public const int ic_m3_chip_checked_circle = 2131165299;
 			
 			// aapt resource value: 0x7F070074
-			public const int m3_popupmenu_background_overlay = 2131165300;
+			public const int ic_m3_chip_close = 2131165300;
 			
 			// aapt resource value: 0x7F070075
-			public const int m3_radiobutton_ripple = 2131165301;
+			public const int ic_mtrl_checked_circle = 2131165301;
 			
 			// aapt resource value: 0x7F070076
-			public const int m3_selection_control_ripple = 2131165302;
+			public const int ic_mtrl_chip_checked_black = 2131165302;
 			
 			// aapt resource value: 0x7F070077
-			public const int m3_tabs_background = 2131165303;
+			public const int ic_mtrl_chip_checked_circle = 2131165303;
 			
 			// aapt resource value: 0x7F070078
-			public const int m3_tabs_line_indicator = 2131165304;
+			public const int ic_mtrl_chip_close_circle = 2131165304;
 			
 			// aapt resource value: 0x7F070079
-			public const int m3_tabs_rounded_line_indicator = 2131165305;
+			public const int m3_appbar_background = 2131165305;
 			
 			// aapt resource value: 0x7F07007A
-			public const int m3_tabs_transparent_background = 2131165306;
+			public const int m3_popupmenu_background_overlay = 2131165306;
 			
 			// aapt resource value: 0x7F07007B
-			public const int material_cursor_drawable = 2131165307;
+			public const int m3_radiobutton_ripple = 2131165307;
 			
 			// aapt resource value: 0x7F07007C
-			public const int material_ic_calendar_black_24dp = 2131165308;
+			public const int m3_selection_control_ripple = 2131165308;
 			
 			// aapt resource value: 0x7F07007D
-			public const int material_ic_clear_black_24dp = 2131165309;
+			public const int m3_tabs_background = 2131165309;
 			
 			// aapt resource value: 0x7F07007E
-			public const int material_ic_edit_black_24dp = 2131165310;
+			public const int m3_tabs_line_indicator = 2131165310;
 			
 			// aapt resource value: 0x7F07007F
-			public const int material_ic_keyboard_arrow_left_black_24dp = 2131165311;
+			public const int m3_tabs_rounded_line_indicator = 2131165311;
 			
 			// aapt resource value: 0x7F070080
-			public const int material_ic_keyboard_arrow_next_black_24dp = 2131165312;
+			public const int m3_tabs_transparent_background = 2131165312;
 			
 			// aapt resource value: 0x7F070081
-			public const int material_ic_keyboard_arrow_previous_black_24dp = 2131165313;
+			public const int material_cursor_drawable = 2131165313;
 			
 			// aapt resource value: 0x7F070082
-			public const int material_ic_keyboard_arrow_right_black_24dp = 2131165314;
+			public const int material_ic_calendar_black_24dp = 2131165314;
 			
 			// aapt resource value: 0x7F070083
-			public const int material_ic_menu_arrow_down_black_24dp = 2131165315;
+			public const int material_ic_clear_black_24dp = 2131165315;
 			
 			// aapt resource value: 0x7F070084
-			public const int material_ic_menu_arrow_up_black_24dp = 2131165316;
+			public const int material_ic_edit_black_24dp = 2131165316;
 			
 			// aapt resource value: 0x7F070085
-			public const int mtrl_dialog_background = 2131165317;
+			public const int material_ic_keyboard_arrow_left_black_24dp = 2131165317;
 			
 			// aapt resource value: 0x7F070086
-			public const int mtrl_dropdown_arrow = 2131165318;
+			public const int material_ic_keyboard_arrow_next_black_24dp = 2131165318;
 			
 			// aapt resource value: 0x7F070087
-			public const int mtrl_ic_arrow_drop_down = 2131165319;
+			public const int material_ic_keyboard_arrow_previous_black_24dp = 2131165319;
 			
 			// aapt resource value: 0x7F070088
-			public const int mtrl_ic_arrow_drop_up = 2131165320;
+			public const int material_ic_keyboard_arrow_right_black_24dp = 2131165320;
 			
 			// aapt resource value: 0x7F070089
-			public const int mtrl_ic_cancel = 2131165321;
+			public const int material_ic_menu_arrow_down_black_24dp = 2131165321;
 			
 			// aapt resource value: 0x7F07008A
-			public const int mtrl_ic_error = 2131165322;
+			public const int material_ic_menu_arrow_up_black_24dp = 2131165322;
 			
 			// aapt resource value: 0x7F07008B
-			public const int mtrl_navigation_bar_item_background = 2131165323;
+			public const int mtrl_dialog_background = 2131165323;
 			
 			// aapt resource value: 0x7F07008C
-			public const int mtrl_popupmenu_background = 2131165324;
+			public const int mtrl_dropdown_arrow = 2131165324;
 			
 			// aapt resource value: 0x7F07008D
-			public const int mtrl_popupmenu_background_overlay = 2131165325;
+			public const int mtrl_ic_arrow_drop_down = 2131165325;
 			
 			// aapt resource value: 0x7F07008E
-			public const int mtrl_tabs_default_indicator = 2131165326;
+			public const int mtrl_ic_arrow_drop_up = 2131165326;
 			
 			// aapt resource value: 0x7F07008F
-			public const int navigate_before = 2131165327;
+			public const int mtrl_ic_cancel = 2131165327;
 			
 			// aapt resource value: 0x7F070090
-			public const int navigate_next = 2131165328;
+			public const int mtrl_ic_error = 2131165328;
 			
 			// aapt resource value: 0x7F070091
-			public const int navigation_empty_icon = 2131165329;
+			public const int mtrl_navigation_bar_item_background = 2131165329;
 			
 			// aapt resource value: 0x7F070092
-			public const int nearby_share_48 = 2131165330;
+			public const int mtrl_popupmenu_background = 2131165330;
 			
 			// aapt resource value: 0x7F070093
-			public const int notification_action_background = 2131165331;
+			public const int mtrl_popupmenu_background_overlay = 2131165331;
 			
 			// aapt resource value: 0x7F070094
-			public const int notification_bg = 2131165332;
+			public const int mtrl_tabs_default_indicator = 2131165332;
 			
 			// aapt resource value: 0x7F070095
-			public const int notification_bg_low = 2131165333;
+			public const int navigate_before = 2131165333;
 			
 			// aapt resource value: 0x7F070096
-			public const int notification_bg_low_normal = 2131165334;
+			public const int navigate_next = 2131165334;
 			
 			// aapt resource value: 0x7F070097
-			public const int notification_bg_low_pressed = 2131165335;
+			public const int navigation_empty_icon = 2131165335;
 			
 			// aapt resource value: 0x7F070098
-			public const int notification_bg_normal = 2131165336;
+			public const int nearby_share_48 = 2131165336;
 			
 			// aapt resource value: 0x7F070099
-			public const int notification_bg_normal_pressed = 2131165337;
+			public const int notification_action_background = 2131165337;
 			
 			// aapt resource value: 0x7F07009A
-			public const int notification_icon_background = 2131165338;
+			public const int notification_bg = 2131165338;
 			
 			// aapt resource value: 0x7F07009B
-			public const int notification_template_icon_bg = 2131165339;
+			public const int notification_bg_low = 2131165339;
 			
 			// aapt resource value: 0x7F07009C
-			public const int notification_template_icon_low_bg = 2131165340;
+			public const int notification_bg_low_normal = 2131165340;
 			
 			// aapt resource value: 0x7F07009D
-			public const int notification_tile_bg = 2131165341;
+			public const int notification_bg_low_pressed = 2131165341;
 			
 			// aapt resource value: 0x7F07009E
-			public const int notify_panel_notification_icon_bg = 2131165342;
+			public const int notification_bg_normal = 2131165342;
 			
 			// aapt resource value: 0x7F07009F
-			public const int outline_share_24 = 2131165343;
+			public const int notification_bg_normal_pressed = 2131165343;
 			
 			// aapt resource value: 0x7F0700A0
-			public const int round_outline = 2131165344;
+			public const int notification_icon_background = 2131165344;
 			
 			// aapt resource value: 0x7F0700A1
-			public const int settings = 2131165345;
+			public const int notification_template_icon_bg = 2131165345;
 			
 			// aapt resource value: 0x7F0700A2
-			public const int test_custom_background = 2131165346;
+			public const int notification_template_icon_low_bg = 2131165346;
 			
 			// aapt resource value: 0x7F0700A3
-			public const int test_level_drawable = 2131165347;
+			public const int notification_tile_bg = 2131165347;
 			
 			// aapt resource value: 0x7F0700A4
-			public const int tooltip_frame_dark = 2131165348;
+			public const int notify_panel_notification_icon_bg = 2131165348;
 			
 			// aapt resource value: 0x7F0700A5
-			public const int tooltip_frame_light = 2131165349;
+			public const int outline_share_24 = 2131165349;
 			
 			// aapt resource value: 0x7F0700A6
-			public const int user = 2131165350;
+			public const int round_outline = 2131165350;
 			
 			// aapt resource value: 0x7F0700A7
-			public const int warning = 2131165351;
+			public const int settings = 2131165351;
+			
+			// aapt resource value: 0x7F0700A8
+			public const int test_custom_background = 2131165352;
+			
+			// aapt resource value: 0x7F0700A9
+			public const int test_level_drawable = 2131165353;
+			
+			// aapt resource value: 0x7F0700AA
+			public const int tooltip_frame_dark = 2131165354;
+			
+			// aapt resource value: 0x7F0700AB
+			public const int tooltip_frame_light = 2131165355;
+			
+			// aapt resource value: 0x7F0700AC
+			public const int user = 2131165356;
+			
+			// aapt resource value: 0x7F0700AD
+			public const int warning = 2131165357;
 			
 			static Drawable()
 			{
@@ -8541,742 +10295,751 @@ namespace Nearby_Sharing_Windows
 			public const int design_navigation_view = 2131230881;
 			
 			// aapt resource value: 0x7F0800A2
-			public const int dialog_button = 2131230882;
+			public const int deviceNameTextView = 2131230882;
 			
 			// aapt resource value: 0x7F0800A3
-			public const int dimensions = 2131230883;
+			public const int deviceSelector = 2131230883;
 			
 			// aapt resource value: 0x7F0800A4
-			public const int direct = 2131230884;
+			public const int deviceTypeImageView = 2131230884;
 			
 			// aapt resource value: 0x7F0800A5
-			public const int disableHome = 2131230885;
+			public const int dialog_button = 2131230885;
 			
 			// aapt resource value: 0x7F0800A6
-			public const int disableIntraAutoTransition = 2131230886;
+			public const int dimensions = 2131230886;
 			
 			// aapt resource value: 0x7F0800A7
-			public const int disablePostScroll = 2131230887;
+			public const int direct = 2131230887;
 			
 			// aapt resource value: 0x7F0800A8
-			public const int disableScroll = 2131230888;
+			public const int disableHome = 2131230888;
 			
 			// aapt resource value: 0x7F0800A9
-			public const int disjoint = 2131230889;
+			public const int disableIntraAutoTransition = 2131230889;
 			
 			// aapt resource value: 0x7F0800AA
-			public const int doneIndicatorImageView = 2131230890;
+			public const int disablePostScroll = 2131230890;
 			
 			// aapt resource value: 0x7F0800AB
-			public const int dragAnticlockwise = 2131230891;
+			public const int disableScroll = 2131230891;
 			
 			// aapt resource value: 0x7F0800AC
-			public const int dragClockwise = 2131230892;
+			public const int disjoint = 2131230892;
 			
 			// aapt resource value: 0x7F0800AD
-			public const int dragDown = 2131230893;
+			public const int doneIndicatorImageView = 2131230893;
 			
 			// aapt resource value: 0x7F0800AE
-			public const int dragEnd = 2131230894;
+			public const int dragAnticlockwise = 2131230894;
 			
 			// aapt resource value: 0x7F0800AF
-			public const int dragLeft = 2131230895;
+			public const int dragClockwise = 2131230895;
 			
 			// aapt resource value: 0x7F0800B0
-			public const int dragRight = 2131230896;
+			public const int dragDown = 2131230896;
 			
 			// aapt resource value: 0x7F0800B1
-			public const int dragStart = 2131230897;
+			public const int dragEnd = 2131230897;
 			
 			// aapt resource value: 0x7F0800B2
-			public const int dragUp = 2131230898;
+			public const int dragLeft = 2131230898;
 			
 			// aapt resource value: 0x7F0800B3
-			public const int dropdown_editable = 2131230899;
+			public const int dragRight = 2131230899;
 			
 			// aapt resource value: 0x7F0800B4
-			public const int dropdown_menu = 2131230900;
+			public const int dragStart = 2131230900;
 			
 			// aapt resource value: 0x7F0800B5
-			public const int dropdown_noneditable = 2131230901;
+			public const int dragUp = 2131230901;
 			
 			// aapt resource value: 0x7F0800B6
-			public const int easeIn = 2131230902;
+			public const int dropdown_editable = 2131230902;
 			
 			// aapt resource value: 0x7F0800B7
-			public const int easeInOut = 2131230903;
+			public const int dropdown_menu = 2131230903;
 			
 			// aapt resource value: 0x7F0800B8
-			public const int easeOut = 2131230904;
+			public const int dropdown_noneditable = 2131230904;
 			
 			// aapt resource value: 0x7F0800B9
-			public const int east = 2131230905;
-			
-			// aapt resource value: 0x7F0800BB
-			public const int edittext_dropdown_editable = 2131230907;
-			
-			// aapt resource value: 0x7F0800BC
-			public const int edittext_dropdown_noneditable = 2131230908;
+			public const int easeIn = 2131230905;
 			
 			// aapt resource value: 0x7F0800BA
-			public const int edit_query = 2131230906;
+			public const int easeInOut = 2131230906;
 			
-			// aapt resource value: 0x7F0800BD
-			public const int elastic = 2131230909;
+			// aapt resource value: 0x7F0800BB
+			public const int easeOut = 2131230907;
+			
+			// aapt resource value: 0x7F0800BC
+			public const int east = 2131230908;
 			
 			// aapt resource value: 0x7F0800BE
-			public const int end = 2131230910;
+			public const int edittext_dropdown_editable = 2131230910;
 			
 			// aapt resource value: 0x7F0800BF
-			public const int endToStart = 2131230911;
+			public const int edittext_dropdown_noneditable = 2131230911;
+			
+			// aapt resource value: 0x7F0800BD
+			public const int edit_query = 2131230909;
 			
 			// aapt resource value: 0x7F0800C0
-			public const int enterAlways = 2131230912;
+			public const int elastic = 2131230912;
 			
 			// aapt resource value: 0x7F0800C1
-			public const int enterAlwaysCollapsed = 2131230913;
+			public const int emptyDeviceListView = 2131230913;
 			
 			// aapt resource value: 0x7F0800C2
-			public const int exitUntilCollapsed = 2131230914;
-			
-			// aapt resource value: 0x7F0800C4
-			public const int expanded_menu = 2131230916;
+			public const int end = 2131230914;
 			
 			// aapt resource value: 0x7F0800C3
-			public const int expand_activities_button = 2131230915;
+			public const int endToStart = 2131230915;
+			
+			// aapt resource value: 0x7F0800C4
+			public const int enterAlways = 2131230916;
 			
 			// aapt resource value: 0x7F0800C5
-			public const int fade = 2131230917;
+			public const int enterAlwaysCollapsed = 2131230917;
 			
 			// aapt resource value: 0x7F0800C6
-			public const int fill = 2131230918;
-			
-			// aapt resource value: 0x7F0800C9
-			public const int filled = 2131230921;
-			
-			// aapt resource value: 0x7F0800C7
-			public const int fill_horizontal = 2131230919;
+			public const int exitUntilCollapsed = 2131230918;
 			
 			// aapt resource value: 0x7F0800C8
-			public const int fill_vertical = 2131230920;
+			public const int expanded_menu = 2131230920;
+			
+			// aapt resource value: 0x7F0800C7
+			public const int expand_activities_button = 2131230919;
+			
+			// aapt resource value: 0x7F0800C9
+			public const int fade = 2131230921;
 			
 			// aapt resource value: 0x7F0800CA
-			public const int fitCenter = 2131230922;
-			
-			// aapt resource value: 0x7F0800CB
-			public const int fitEnd = 2131230923;
-			
-			// aapt resource value: 0x7F0800CC
-			public const int fitStart = 2131230924;
+			public const int fill = 2131230922;
 			
 			// aapt resource value: 0x7F0800CD
-			public const int fitToContents = 2131230925;
+			public const int filled = 2131230925;
+			
+			// aapt resource value: 0x7F0800CB
+			public const int fill_horizontal = 2131230923;
+			
+			// aapt resource value: 0x7F0800CC
+			public const int fill_vertical = 2131230924;
 			
 			// aapt resource value: 0x7F0800CE
-			public const int fitXY = 2131230926;
+			public const int fitCenter = 2131230926;
 			
 			// aapt resource value: 0x7F0800CF
-			public const int @fixed = 2131230927;
+			public const int fitEnd = 2131230927;
 			
 			// aapt resource value: 0x7F0800D0
-			public const int flip = 2131230928;
+			public const int fitStart = 2131230928;
 			
 			// aapt resource value: 0x7F0800D1
-			public const int floating = 2131230929;
+			public const int fitToContents = 2131230929;
 			
 			// aapt resource value: 0x7F0800D2
-			public const int floating_action_button = 2131230930;
+			public const int fitXY = 2131230930;
 			
 			// aapt resource value: 0x7F0800D3
-			public const int forever = 2131230931;
+			public const int @fixed = 2131230931;
 			
 			// aapt resource value: 0x7F0800D4
-			public const int fragment_container_view_tag = 2131230932;
+			public const int flip = 2131230932;
 			
 			// aapt resource value: 0x7F0800D5
-			public const int frost = 2131230933;
+			public const int floating = 2131230933;
 			
 			// aapt resource value: 0x7F0800D6
-			public const int fullscreen_header = 2131230934;
+			public const int floating_action_button = 2131230934;
+			
+			// aapt resource value: 0x7F0800D7
+			public const int forever = 2131230935;
+			
+			// aapt resource value: 0x7F0800D8
+			public const int fragment_container_view_tag = 2131230936;
+			
+			// aapt resource value: 0x7F0800D9
+			public const int frost = 2131230937;
+			
+			// aapt resource value: 0x7F0800DA
+			public const int fullscreen_header = 2131230938;
 			
 			// aapt resource value: 0x7F080004
 			public const int FUNCTION = 2131230724;
 			
-			// aapt resource value: 0x7F0800D7
-			public const int ghost_view = 2131230935;
-			
-			// aapt resource value: 0x7F0800D8
-			public const int ghost_view_holder = 2131230936;
-			
-			// aapt resource value: 0x7F0800D9
-			public const int gone = 2131230937;
-			
-			// aapt resource value: 0x7F0800DA
-			public const int graph = 2131230938;
-			
 			// aapt resource value: 0x7F0800DB
-			public const int graph_wrap = 2131230939;
-			
-			// aapt resource value: 0x7F0800DD
-			public const int grouping = 2131230941;
-			
-			// aapt resource value: 0x7F0800DE
-			public const int groups = 2131230942;
+			public const int ghost_view = 2131230939;
 			
 			// aapt resource value: 0x7F0800DC
-			public const int group_divider = 2131230940;
+			public const int ghost_view_holder = 2131230940;
+			
+			// aapt resource value: 0x7F0800DD
+			public const int gone = 2131230941;
+			
+			// aapt resource value: 0x7F0800DE
+			public const int graph = 2131230942;
 			
 			// aapt resource value: 0x7F0800DF
-			public const int guideline = 2131230943;
-			
-			// aapt resource value: 0x7F0800E0
-			public const int header_title = 2131230944;
+			public const int graph_wrap = 2131230943;
 			
 			// aapt resource value: 0x7F0800E1
-			public const int hideable = 2131230945;
+			public const int grouping = 2131230945;
 			
 			// aapt resource value: 0x7F0800E2
-			public const int home = 2131230946;
+			public const int groups = 2131230946;
+			
+			// aapt resource value: 0x7F0800E0
+			public const int group_divider = 2131230944;
 			
 			// aapt resource value: 0x7F0800E3
-			public const int homeAsUp = 2131230947;
+			public const int guideline = 2131230947;
 			
 			// aapt resource value: 0x7F0800E4
-			public const int honorRequest = 2131230948;
+			public const int header_title = 2131230948;
 			
 			// aapt resource value: 0x7F0800E5
-			public const int horizontal_only = 2131230949;
+			public const int hideable = 2131230949;
 			
 			// aapt resource value: 0x7F0800E6
-			public const int icon = 2131230950;
+			public const int home = 2131230950;
 			
 			// aapt resource value: 0x7F0800E7
-			public const int icon_group = 2131230951;
+			public const int homeAsUp = 2131230951;
 			
 			// aapt resource value: 0x7F0800E8
-			public const int ifRoom = 2131230952;
+			public const int honorRequest = 2131230952;
 			
 			// aapt resource value: 0x7F0800E9
-			public const int ignore = 2131230953;
+			public const int horizontal_only = 2131230953;
 			
 			// aapt resource value: 0x7F0800EA
-			public const int ignoreRequest = 2131230954;
+			public const int icon = 2131230954;
 			
 			// aapt resource value: 0x7F0800EB
-			public const int image = 2131230955;
+			public const int icon_group = 2131230955;
 			
 			// aapt resource value: 0x7F0800EC
-			public const int immediateStop = 2131230956;
+			public const int ifRoom = 2131230956;
 			
 			// aapt resource value: 0x7F0800ED
-			public const int included = 2131230957;
+			public const int ignore = 2131230957;
 			
 			// aapt resource value: 0x7F0800EE
-			public const int info = 2131230958;
+			public const int ignoreRequest = 2131230958;
 			
 			// aapt resource value: 0x7F0800EF
-			public const int invisible = 2131230959;
+			public const int image = 2131230959;
 			
 			// aapt resource value: 0x7F0800F0
-			public const int inward = 2131230960;
+			public const int immediateStop = 2131230960;
 			
 			// aapt resource value: 0x7F0800F1
-			public const int italic = 2131230961;
+			public const int included = 2131230961;
 			
 			// aapt resource value: 0x7F0800F2
-			public const int item1 = 2131230962;
+			public const int info = 2131230962;
 			
 			// aapt resource value: 0x7F0800F3
-			public const int item2 = 2131230963;
+			public const int invisible = 2131230963;
 			
 			// aapt resource value: 0x7F0800F4
-			public const int item3 = 2131230964;
+			public const int inward = 2131230964;
 			
 			// aapt resource value: 0x7F0800F5
-			public const int item4 = 2131230965;
+			public const int italic = 2131230965;
 			
 			// aapt resource value: 0x7F0800F6
-			public const int item_touch_helper_previous_elevation = 2131230966;
+			public const int item1 = 2131230966;
 			
 			// aapt resource value: 0x7F0800F7
-			public const int jumpToEnd = 2131230967;
+			public const int item2 = 2131230967;
 			
 			// aapt resource value: 0x7F0800F8
-			public const int jumpToStart = 2131230968;
+			public const int item3 = 2131230968;
 			
 			// aapt resource value: 0x7F0800F9
-			public const int labeled = 2131230969;
+			public const int item4 = 2131230969;
 			
 			// aapt resource value: 0x7F0800FA
-			public const int layout = 2131230970;
+			public const int item_touch_helper_previous_elevation = 2131230970;
 			
 			// aapt resource value: 0x7F0800FB
-			public const int left = 2131230971;
+			public const int jumpToEnd = 2131230971;
 			
 			// aapt resource value: 0x7F0800FC
-			public const int leftToRight = 2131230972;
+			public const int jumpToStart = 2131230972;
 			
 			// aapt resource value: 0x7F0800FD
-			public const int legacy = 2131230973;
+			public const int labeled = 2131230973;
 			
 			// aapt resource value: 0x7F0800FE
-			public const int line1 = 2131230974;
+			public const int layout = 2131230974;
 			
 			// aapt resource value: 0x7F0800FF
-			public const int line3 = 2131230975;
+			public const int left = 2131230975;
 			
 			// aapt resource value: 0x7F080100
-			public const int linear = 2131230976;
+			public const int leftToRight = 2131230976;
 			
 			// aapt resource value: 0x7F080101
-			public const int listMode = 2131230977;
+			public const int legacy = 2131230977;
 			
 			// aapt resource value: 0x7F080102
-			public const int listView1 = 2131230978;
+			public const int line1 = 2131230978;
 			
 			// aapt resource value: 0x7F080103
-			public const int list_item = 2131230979;
+			public const int line3 = 2131230979;
 			
 			// aapt resource value: 0x7F080104
-			public const int masked = 2131230980;
+			public const int linear = 2131230980;
 			
 			// aapt resource value: 0x7F080105
-			public const int match_constraint = 2131230981;
+			public const int listMode = 2131230981;
 			
 			// aapt resource value: 0x7F080106
-			public const int match_parent = 2131230982;
+			public const int list_item = 2131230982;
 			
 			// aapt resource value: 0x7F080107
-			public const int materialCardView1 = 2131230983;
+			public const int loadingProgressIndicator = 2131230983;
 			
 			// aapt resource value: 0x7F080108
-			public const int material_clock_display = 2131230984;
+			public const int masked = 2131230984;
 			
 			// aapt resource value: 0x7F080109
-			public const int material_clock_face = 2131230985;
+			public const int match_constraint = 2131230985;
 			
 			// aapt resource value: 0x7F08010A
-			public const int material_clock_hand = 2131230986;
+			public const int match_parent = 2131230986;
 			
 			// aapt resource value: 0x7F08010B
-			public const int material_clock_period_am_button = 2131230987;
+			public const int material_clock_display = 2131230987;
 			
 			// aapt resource value: 0x7F08010C
-			public const int material_clock_period_pm_button = 2131230988;
+			public const int material_clock_face = 2131230988;
 			
 			// aapt resource value: 0x7F08010D
-			public const int material_clock_period_toggle = 2131230989;
+			public const int material_clock_hand = 2131230989;
 			
 			// aapt resource value: 0x7F08010E
-			public const int material_hour_text_input = 2131230990;
+			public const int material_clock_period_am_button = 2131230990;
 			
 			// aapt resource value: 0x7F08010F
-			public const int material_hour_tv = 2131230991;
+			public const int material_clock_period_pm_button = 2131230991;
 			
 			// aapt resource value: 0x7F080110
-			public const int material_label = 2131230992;
+			public const int material_clock_period_toggle = 2131230992;
 			
 			// aapt resource value: 0x7F080111
-			public const int material_minute_text_input = 2131230993;
+			public const int material_hour_text_input = 2131230993;
 			
 			// aapt resource value: 0x7F080112
-			public const int material_minute_tv = 2131230994;
+			public const int material_hour_tv = 2131230994;
 			
 			// aapt resource value: 0x7F080113
-			public const int material_textinput_timepicker = 2131230995;
+			public const int material_label = 2131230995;
 			
 			// aapt resource value: 0x7F080114
-			public const int material_timepicker_cancel_button = 2131230996;
+			public const int material_minute_text_input = 2131230996;
 			
 			// aapt resource value: 0x7F080115
-			public const int material_timepicker_container = 2131230997;
+			public const int material_minute_tv = 2131230997;
 			
 			// aapt resource value: 0x7F080116
-			public const int material_timepicker_edit_text = 2131230998;
+			public const int material_textinput_timepicker = 2131230998;
 			
 			// aapt resource value: 0x7F080117
-			public const int material_timepicker_mode_button = 2131230999;
+			public const int material_timepicker_cancel_button = 2131230999;
 			
 			// aapt resource value: 0x7F080118
-			public const int material_timepicker_ok_button = 2131231000;
+			public const int material_timepicker_container = 2131231000;
 			
 			// aapt resource value: 0x7F080119
-			public const int material_timepicker_view = 2131231001;
+			public const int material_timepicker_edit_text = 2131231001;
 			
 			// aapt resource value: 0x7F08011A
-			public const int material_value_index = 2131231002;
+			public const int material_timepicker_mode_button = 2131231002;
 			
 			// aapt resource value: 0x7F08011B
-			public const int matrix = 2131231003;
+			public const int material_timepicker_ok_button = 2131231003;
 			
 			// aapt resource value: 0x7F08011C
-			public const int message = 2131231004;
+			public const int material_timepicker_view = 2131231004;
+			
+			// aapt resource value: 0x7F08011D
+			public const int material_value_index = 2131231005;
+			
+			// aapt resource value: 0x7F08011E
+			public const int matrix = 2131231006;
+			
+			// aapt resource value: 0x7F08011F
+			public const int message = 2131231007;
 			
 			// aapt resource value: 0x7F080005
 			public const int META = 2131230725;
 			
-			// aapt resource value: 0x7F08011D
-			public const int middle = 2131231005;
-			
-			// aapt resource value: 0x7F08011E
-			public const int mini = 2131231006;
-			
-			// aapt resource value: 0x7F08011F
-			public const int month_grid = 2131231007;
-			
 			// aapt resource value: 0x7F080120
-			public const int month_navigation_bar = 2131231008;
+			public const int middle = 2131231008;
 			
 			// aapt resource value: 0x7F080121
-			public const int month_navigation_fragment_toggle = 2131231009;
+			public const int mini = 2131231009;
 			
 			// aapt resource value: 0x7F080122
-			public const int month_navigation_next = 2131231010;
+			public const int month_grid = 2131231010;
 			
 			// aapt resource value: 0x7F080123
-			public const int month_navigation_previous = 2131231011;
+			public const int month_navigation_bar = 2131231011;
 			
 			// aapt resource value: 0x7F080124
-			public const int month_title = 2131231012;
+			public const int month_navigation_fragment_toggle = 2131231012;
 			
 			// aapt resource value: 0x7F080125
-			public const int motion_base = 2131231013;
+			public const int month_navigation_next = 2131231013;
 			
 			// aapt resource value: 0x7F080126
-			public const int mtrl_anchor_parent = 2131231014;
-			
-			// aapt resource value: 0x7F080128
-			public const int mtrl_calendar_days_of_week = 2131231016;
+			public const int month_navigation_previous = 2131231014;
 			
 			// aapt resource value: 0x7F080127
-			public const int mtrl_calendar_day_selector_frame = 2131231015;
+			public const int month_title = 2131231015;
+			
+			// aapt resource value: 0x7F080128
+			public const int motion_base = 2131231016;
 			
 			// aapt resource value: 0x7F080129
-			public const int mtrl_calendar_frame = 2131231017;
-			
-			// aapt resource value: 0x7F08012A
-			public const int mtrl_calendar_main_pane = 2131231018;
+			public const int mtrl_anchor_parent = 2131231017;
 			
 			// aapt resource value: 0x7F08012B
-			public const int mtrl_calendar_months = 2131231019;
+			public const int mtrl_calendar_days_of_week = 2131231019;
+			
+			// aapt resource value: 0x7F08012A
+			public const int mtrl_calendar_day_selector_frame = 2131231018;
 			
 			// aapt resource value: 0x7F08012C
-			public const int mtrl_calendar_selection_frame = 2131231020;
+			public const int mtrl_calendar_frame = 2131231020;
 			
 			// aapt resource value: 0x7F08012D
-			public const int mtrl_calendar_text_input_frame = 2131231021;
+			public const int mtrl_calendar_main_pane = 2131231021;
 			
 			// aapt resource value: 0x7F08012E
-			public const int mtrl_calendar_year_selector_frame = 2131231022;
+			public const int mtrl_calendar_months = 2131231022;
 			
 			// aapt resource value: 0x7F08012F
-			public const int mtrl_card_checked_layer_id = 2131231023;
+			public const int mtrl_calendar_selection_frame = 2131231023;
 			
 			// aapt resource value: 0x7F080130
-			public const int mtrl_child_content_container = 2131231024;
+			public const int mtrl_calendar_text_input_frame = 2131231024;
 			
 			// aapt resource value: 0x7F080131
-			public const int mtrl_internal_children_alpha_tag = 2131231025;
+			public const int mtrl_calendar_year_selector_frame = 2131231025;
 			
 			// aapt resource value: 0x7F080132
-			public const int mtrl_motion_snapshot_view = 2131231026;
+			public const int mtrl_card_checked_layer_id = 2131231026;
 			
 			// aapt resource value: 0x7F080133
-			public const int mtrl_picker_fullscreen = 2131231027;
+			public const int mtrl_child_content_container = 2131231027;
 			
 			// aapt resource value: 0x7F080134
-			public const int mtrl_picker_header = 2131231028;
+			public const int mtrl_internal_children_alpha_tag = 2131231028;
 			
 			// aapt resource value: 0x7F080135
-			public const int mtrl_picker_header_selection_text = 2131231029;
+			public const int mtrl_motion_snapshot_view = 2131231029;
 			
 			// aapt resource value: 0x7F080136
-			public const int mtrl_picker_header_title_and_selection = 2131231030;
+			public const int mtrl_picker_fullscreen = 2131231030;
 			
 			// aapt resource value: 0x7F080137
-			public const int mtrl_picker_header_toggle = 2131231031;
+			public const int mtrl_picker_header = 2131231031;
 			
 			// aapt resource value: 0x7F080138
-			public const int mtrl_picker_text_input_date = 2131231032;
+			public const int mtrl_picker_header_selection_text = 2131231032;
 			
 			// aapt resource value: 0x7F080139
-			public const int mtrl_picker_text_input_range_end = 2131231033;
+			public const int mtrl_picker_header_title_and_selection = 2131231033;
 			
 			// aapt resource value: 0x7F08013A
-			public const int mtrl_picker_text_input_range_start = 2131231034;
+			public const int mtrl_picker_header_toggle = 2131231034;
 			
 			// aapt resource value: 0x7F08013B
-			public const int mtrl_picker_title_text = 2131231035;
+			public const int mtrl_picker_text_input_date = 2131231035;
 			
 			// aapt resource value: 0x7F08013C
-			public const int mtrl_view_tag_bottom_padding = 2131231036;
+			public const int mtrl_picker_text_input_range_end = 2131231036;
 			
 			// aapt resource value: 0x7F08013D
-			public const int multiply = 2131231037;
+			public const int mtrl_picker_text_input_range_start = 2131231037;
 			
 			// aapt resource value: 0x7F08013E
-			public const int navigation_bar_item_active_indicator_view = 2131231038;
+			public const int mtrl_picker_title_text = 2131231038;
 			
 			// aapt resource value: 0x7F08013F
-			public const int navigation_bar_item_icon_container = 2131231039;
+			public const int mtrl_view_tag_bottom_padding = 2131231039;
 			
 			// aapt resource value: 0x7F080140
-			public const int navigation_bar_item_icon_view = 2131231040;
+			public const int multiply = 2131231040;
 			
 			// aapt resource value: 0x7F080141
-			public const int navigation_bar_item_labels_group = 2131231041;
+			public const int navigation_bar_item_active_indicator_view = 2131231041;
 			
 			// aapt resource value: 0x7F080142
-			public const int navigation_bar_item_large_label_view = 2131231042;
+			public const int navigation_bar_item_icon_container = 2131231042;
 			
 			// aapt resource value: 0x7F080143
-			public const int navigation_bar_item_small_label_view = 2131231043;
+			public const int navigation_bar_item_icon_view = 2131231043;
 			
 			// aapt resource value: 0x7F080144
-			public const int navigation_header_container = 2131231044;
+			public const int navigation_bar_item_labels_group = 2131231044;
 			
 			// aapt resource value: 0x7F080145
-			public const int never = 2131231045;
+			public const int navigation_bar_item_large_label_view = 2131231045;
 			
 			// aapt resource value: 0x7F080146
-			public const int neverCompleteToEnd = 2131231046;
+			public const int navigation_bar_item_small_label_view = 2131231046;
 			
 			// aapt resource value: 0x7F080147
-			public const int neverCompleteToStart = 2131231047;
+			public const int navigation_header_container = 2131231047;
 			
 			// aapt resource value: 0x7F080148
-			public const int nextButton = 2131231048;
-			
-			// aapt resource value: 0x7F08014B
-			public const int none = 2131231051;
-			
-			// aapt resource value: 0x7F08014C
-			public const int normal = 2131231052;
-			
-			// aapt resource value: 0x7F08014D
-			public const int north = 2131231053;
+			public const int never = 2131231048;
 			
 			// aapt resource value: 0x7F080149
-			public const int noScroll = 2131231049;
+			public const int neverCompleteToEnd = 2131231049;
 			
 			// aapt resource value: 0x7F08014A
-			public const int noState = 2131231050;
+			public const int neverCompleteToStart = 2131231050;
+			
+			// aapt resource value: 0x7F08014B
+			public const int nextButton = 2131231051;
 			
 			// aapt resource value: 0x7F08014E
-			public const int notification_background = 2131231054;
+			public const int none = 2131231054;
 			
 			// aapt resource value: 0x7F08014F
-			public const int notification_main_column = 2131231055;
+			public const int normal = 2131231055;
 			
 			// aapt resource value: 0x7F080150
-			public const int notification_main_column_container = 2131231056;
+			public const int north = 2131231056;
+			
+			// aapt resource value: 0x7F08014C
+			public const int noScroll = 2131231052;
+			
+			// aapt resource value: 0x7F08014D
+			public const int noState = 2131231053;
+			
+			// aapt resource value: 0x7F080151
+			public const int notification_background = 2131231057;
+			
+			// aapt resource value: 0x7F080152
+			public const int notification_main_column = 2131231058;
+			
+			// aapt resource value: 0x7F080153
+			public const int notification_main_column_container = 2131231059;
 			
 			// aapt resource value: 0x7F080006
 			public const int NO_DEBUG = 2131230726;
 			
-			// aapt resource value: 0x7F080151
-			public const int off = 2131231057;
-			
-			// aapt resource value: 0x7F080152
-			public const int on = 2131231058;
-			
-			// aapt resource value: 0x7F080153
-			public const int onInterceptTouchReturnSwipe = 2131231059;
-			
 			// aapt resource value: 0x7F080154
-			public const int outline = 2131231060;
+			public const int off = 2131231060;
 			
 			// aapt resource value: 0x7F080155
-			public const int outward = 2131231061;
+			public const int on = 2131231061;
 			
 			// aapt resource value: 0x7F080156
-			public const int overshoot = 2131231062;
+			public const int onInterceptTouchReturnSwipe = 2131231062;
 			
 			// aapt resource value: 0x7F080157
-			public const int packed = 2131231063;
+			public const int outline = 2131231063;
 			
 			// aapt resource value: 0x7F080158
-			public const int parallax = 2131231064;
+			public const int outward = 2131231064;
 			
 			// aapt resource value: 0x7F080159
-			public const int parent = 2131231065;
+			public const int overshoot = 2131231065;
 			
 			// aapt resource value: 0x7F08015A
-			public const int parentPanel = 2131231066;
+			public const int packed = 2131231066;
 			
 			// aapt resource value: 0x7F08015B
-			public const int parentRelative = 2131231067;
+			public const int parallax = 2131231067;
 			
 			// aapt resource value: 0x7F08015C
-			public const int parent_matrix = 2131231068;
+			public const int parent = 2131231068;
 			
 			// aapt resource value: 0x7F08015D
-			public const int password_toggle = 2131231069;
+			public const int parentPanel = 2131231069;
 			
 			// aapt resource value: 0x7F08015E
-			public const int path = 2131231070;
+			public const int parentRelative = 2131231070;
 			
 			// aapt resource value: 0x7F08015F
-			public const int pathRelative = 2131231071;
+			public const int parent_matrix = 2131231071;
 			
 			// aapt resource value: 0x7F080160
-			public const int peekHeight = 2131231072;
+			public const int password_toggle = 2131231072;
 			
 			// aapt resource value: 0x7F080161
-			public const int percent = 2131231073;
+			public const int path = 2131231073;
 			
 			// aapt resource value: 0x7F080162
-			public const int pin = 2131231074;
+			public const int pathRelative = 2131231074;
 			
 			// aapt resource value: 0x7F080163
-			public const int position = 2131231075;
+			public const int peekHeight = 2131231075;
 			
 			// aapt resource value: 0x7F080164
-			public const int postLayout = 2131231076;
+			public const int percent = 2131231076;
 			
 			// aapt resource value: 0x7F080165
-			public const int progressUILayout = 2131231077;
+			public const int pin = 2131231077;
 			
 			// aapt resource value: 0x7F080166
-			public const int progress_circular = 2131231078;
+			public const int position = 2131231078;
 			
 			// aapt resource value: 0x7F080167
-			public const int progress_horizontal = 2131231079;
+			public const int postLayout = 2131231079;
 			
 			// aapt resource value: 0x7F080168
-			public const int radio = 2131231080;
+			public const int progressUILayout = 2131231080;
 			
 			// aapt resource value: 0x7F080169
-			public const int ratio = 2131231081;
+			public const int progress_circular = 2131231081;
 			
 			// aapt resource value: 0x7F08016A
-			public const int receiveButton = 2131231082;
+			public const int progress_horizontal = 2131231082;
 			
 			// aapt resource value: 0x7F08016B
-			public const int rectangles = 2131231083;
+			public const int radio = 2131231083;
 			
 			// aapt resource value: 0x7F08016C
-			public const int reverseSawtooth = 2131231084;
+			public const int ratio = 2131231084;
 			
 			// aapt resource value: 0x7F08016D
-			public const int right = 2131231085;
+			public const int receiveButton = 2131231085;
 			
 			// aapt resource value: 0x7F08016E
-			public const int rightToLeft = 2131231086;
+			public const int rectangles = 2131231086;
 			
 			// aapt resource value: 0x7F08016F
-			public const int right_icon = 2131231087;
+			public const int reverseSawtooth = 2131231087;
 			
 			// aapt resource value: 0x7F080170
-			public const int right_side = 2131231088;
+			public const int right = 2131231088;
 			
 			// aapt resource value: 0x7F080171
-			public const int rounded = 2131231089;
+			public const int rightToLeft = 2131231089;
 			
 			// aapt resource value: 0x7F080172
-			public const int row_index_key = 2131231090;
+			public const int right_icon = 2131231090;
 			
 			// aapt resource value: 0x7F080173
-			public const int save_non_transition_alpha = 2131231091;
+			public const int right_side = 2131231091;
 			
 			// aapt resource value: 0x7F080174
-			public const int save_overlay_view = 2131231092;
+			public const int rounded = 2131231092;
 			
 			// aapt resource value: 0x7F080175
-			public const int sawtooth = 2131231093;
+			public const int row_index_key = 2131231093;
 			
 			// aapt resource value: 0x7F080176
-			public const int scale = 2131231094;
+			public const int save_non_transition_alpha = 2131231094;
 			
 			// aapt resource value: 0x7F080177
-			public const int screen = 2131231095;
+			public const int save_overlay_view = 2131231095;
 			
 			// aapt resource value: 0x7F080178
-			public const int scroll = 2131231096;
-			
-			// aapt resource value: 0x7F08017C
-			public const int scrollable = 2131231100;
+			public const int sawtooth = 2131231096;
 			
 			// aapt resource value: 0x7F080179
-			public const int scrollIndicatorDown = 2131231097;
+			public const int scale = 2131231097;
 			
 			// aapt resource value: 0x7F08017A
-			public const int scrollIndicatorUp = 2131231098;
+			public const int screen = 2131231098;
 			
 			// aapt resource value: 0x7F08017B
-			public const int scrollView = 2131231099;
-			
-			// aapt resource value: 0x7F08017D
-			public const int search_badge = 2131231101;
-			
-			// aapt resource value: 0x7F08017E
-			public const int search_bar = 2131231102;
+			public const int scroll = 2131231099;
 			
 			// aapt resource value: 0x7F08017F
-			public const int search_button = 2131231103;
+			public const int scrollable = 2131231103;
+			
+			// aapt resource value: 0x7F08017C
+			public const int scrollIndicatorDown = 2131231100;
+			
+			// aapt resource value: 0x7F08017D
+			public const int scrollIndicatorUp = 2131231101;
+			
+			// aapt resource value: 0x7F08017E
+			public const int scrollView = 2131231102;
 			
 			// aapt resource value: 0x7F080180
-			public const int search_close_btn = 2131231104;
+			public const int search_badge = 2131231104;
 			
 			// aapt resource value: 0x7F080181
-			public const int search_edit_frame = 2131231105;
+			public const int search_bar = 2131231105;
 			
 			// aapt resource value: 0x7F080182
-			public const int search_go_btn = 2131231106;
+			public const int search_button = 2131231106;
 			
 			// aapt resource value: 0x7F080183
-			public const int search_mag_icon = 2131231107;
+			public const int search_close_btn = 2131231107;
 			
 			// aapt resource value: 0x7F080184
-			public const int search_plate = 2131231108;
+			public const int search_edit_frame = 2131231108;
 			
 			// aapt resource value: 0x7F080185
-			public const int search_src_text = 2131231109;
+			public const int search_go_btn = 2131231109;
 			
 			// aapt resource value: 0x7F080186
-			public const int search_voice_btn = 2131231110;
+			public const int search_mag_icon = 2131231110;
 			
 			// aapt resource value: 0x7F080187
-			public const int selectDeviceLayout = 2131231111;
-			
-			// aapt resource value: 0x7F080189
-			public const int selected = 2131231113;
-			
-			// aapt resource value: 0x7F08018A
-			public const int selection_type = 2131231114;
+			public const int search_plate = 2131231111;
 			
 			// aapt resource value: 0x7F080188
-			public const int select_dialog_listview = 2131231112;
+			public const int search_src_text = 2131231112;
 			
-			// aapt resource value: 0x7F08018B
-			public const int sendButton = 2131231115;
+			// aapt resource value: 0x7F080189
+			public const int search_voice_btn = 2131231113;
 			
-			// aapt resource value: 0x7F08018D
-			public const int sendingDataLayout = 2131231117;
+			// aapt resource value: 0x7F08018A
+			public const int selectDeviceLayout = 2131231114;
 			
 			// aapt resource value: 0x7F08018C
-			public const int sendProgressIndicator = 2131231116;
+			public const int selected = 2131231116;
+			
+			// aapt resource value: 0x7F08018D
+			public const int selection_type = 2131231117;
+			
+			// aapt resource value: 0x7F08018B
+			public const int select_dialog_listview = 2131231115;
 			
 			// aapt resource value: 0x7F08018E
-			public const int sharedValueSet = 2131231118;
+			public const int sendButton = 2131231118;
+			
+			// aapt resource value: 0x7F080190
+			public const int sendingDataLayout = 2131231120;
 			
 			// aapt resource value: 0x7F08018F
-			public const int sharedValueUnset = 2131231119;
+			public const int sendProgressIndicator = 2131231119;
+			
+			// aapt resource value: 0x7F080191
+			public const int sharedValueSet = 2131231121;
+			
+			// aapt resource value: 0x7F080192
+			public const int sharedValueUnset = 2131231122;
 			
 			// aapt resource value: 0x7F080007
 			public const int SHIFT = 2131230727;
 			
-			// aapt resource value: 0x7F080190
-			public const int shortcut = 2131231120;
-			
-			// aapt resource value: 0x7F080191
-			public const int showCustom = 2131231121;
-			
-			// aapt resource value: 0x7F080192
-			public const int showHome = 2131231122;
-			
 			// aapt resource value: 0x7F080193
-			public const int showTitle = 2131231123;
+			public const int shortcut = 2131231123;
+			
+			// aapt resource value: 0x7F080194
+			public const int showCustom = 2131231124;
+			
+			// aapt resource value: 0x7F080195
+			public const int showHome = 2131231125;
+			
+			// aapt resource value: 0x7F080196
+			public const int showTitle = 2131231126;
 			
 			// aapt resource value: 0x7F080008
 			public const int SHOW_ALL = 2131230728;
@@ -9287,236 +11050,236 @@ namespace Nearby_Sharing_Windows
 			// aapt resource value: 0x7F08000A
 			public const int SHOW_PROGRESS = 2131230730;
 			
-			// aapt resource value: 0x7F080194
-			public const int sin = 2131231124;
-			
-			// aapt resource value: 0x7F080195
-			public const int skipCollapsed = 2131231125;
-			
-			// aapt resource value: 0x7F080196
-			public const int skipped = 2131231126;
-			
 			// aapt resource value: 0x7F080197
-			public const int slide = 2131231127;
+			public const int sin = 2131231127;
 			
 			// aapt resource value: 0x7F080198
-			public const int snackbar_action = 2131231128;
+			public const int skipCollapsed = 2131231128;
 			
 			// aapt resource value: 0x7F080199
-			public const int snackbar_text = 2131231129;
+			public const int skipped = 2131231129;
 			
 			// aapt resource value: 0x7F08019A
-			public const int snap = 2131231130;
+			public const int slide = 2131231130;
 			
 			// aapt resource value: 0x7F08019B
-			public const int snapMargins = 2131231131;
+			public const int snackbar_action = 2131231131;
 			
 			// aapt resource value: 0x7F08019C
-			public const int south = 2131231132;
+			public const int snackbar_text = 2131231132;
 			
 			// aapt resource value: 0x7F08019D
-			public const int spacer = 2131231133;
+			public const int snap = 2131231133;
 			
 			// aapt resource value: 0x7F08019E
-			public const int special_effects_controller_view_tag = 2131231134;
+			public const int snapMargins = 2131231134;
 			
 			// aapt resource value: 0x7F08019F
-			public const int spline = 2131231135;
+			public const int south = 2131231135;
 			
 			// aapt resource value: 0x7F0801A0
-			public const int split_action_bar = 2131231136;
+			public const int spacer = 2131231136;
 			
 			// aapt resource value: 0x7F0801A1
-			public const int spread = 2131231137;
+			public const int special_effects_controller_view_tag = 2131231137;
 			
 			// aapt resource value: 0x7F0801A2
-			public const int spread_inside = 2131231138;
+			public const int spline = 2131231138;
 			
 			// aapt resource value: 0x7F0801A3
-			public const int spring = 2131231139;
+			public const int split_action_bar = 2131231139;
 			
 			// aapt resource value: 0x7F0801A4
-			public const int square = 2131231140;
+			public const int spread = 2131231140;
 			
 			// aapt resource value: 0x7F0801A5
-			public const int src_atop = 2131231141;
+			public const int spread_inside = 2131231141;
 			
 			// aapt resource value: 0x7F0801A6
-			public const int src_in = 2131231142;
+			public const int spring = 2131231142;
 			
 			// aapt resource value: 0x7F0801A7
-			public const int src_over = 2131231143;
+			public const int square = 2131231143;
 			
 			// aapt resource value: 0x7F0801A8
-			public const int standard = 2131231144;
+			public const int src_atop = 2131231144;
 			
 			// aapt resource value: 0x7F0801A9
-			public const int standard_bottom_sheet = 2131231145;
+			public const int src_in = 2131231145;
 			
 			// aapt resource value: 0x7F0801AA
-			public const int start = 2131231146;
+			public const int src_over = 2131231146;
 			
 			// aapt resource value: 0x7F0801AB
-			public const int startHorizontal = 2131231147;
+			public const int standard = 2131231147;
 			
 			// aapt resource value: 0x7F0801AC
-			public const int startToEnd = 2131231148;
+			public const int standard_bottom_sheet = 2131231148;
 			
 			// aapt resource value: 0x7F0801AD
-			public const int startVertical = 2131231149;
+			public const int start = 2131231149;
 			
 			// aapt resource value: 0x7F0801AE
-			public const int staticLayout = 2131231150;
+			public const int startHorizontal = 2131231150;
 			
 			// aapt resource value: 0x7F0801AF
-			public const int staticPostLayout = 2131231151;
+			public const int startToEnd = 2131231151;
 			
 			// aapt resource value: 0x7F0801B0
-			public const int statusTextView = 2131231152;
+			public const int startVertical = 2131231152;
 			
 			// aapt resource value: 0x7F0801B1
-			public const int stop = 2131231153;
+			public const int staticLayout = 2131231153;
 			
 			// aapt resource value: 0x7F0801B2
-			public const int stretch = 2131231154;
+			public const int staticPostLayout = 2131231154;
 			
 			// aapt resource value: 0x7F0801B3
-			public const int submenuarrow = 2131231155;
+			public const int statusTextView = 2131231155;
 			
 			// aapt resource value: 0x7F0801B4
-			public const int submit_area = 2131231156;
+			public const int stop = 2131231156;
 			
 			// aapt resource value: 0x7F0801B5
-			public const int supportScrollUp = 2131231157;
+			public const int stretch = 2131231157;
+			
+			// aapt resource value: 0x7F0801B6
+			public const int submenuarrow = 2131231158;
+			
+			// aapt resource value: 0x7F0801B7
+			public const int submit_area = 2131231159;
+			
+			// aapt resource value: 0x7F0801B8
+			public const int supportScrollUp = 2131231160;
 			
 			// aapt resource value: 0x7F08000B
 			public const int SYM = 2131230731;
 			
-			// aapt resource value: 0x7F0801B6
-			public const int tabMode = 2131231158;
-			
-			// aapt resource value: 0x7F0801B7
-			public const int tag_accessibility_actions = 2131231159;
-			
-			// aapt resource value: 0x7F0801B8
-			public const int tag_accessibility_clickable_spans = 2131231160;
-			
 			// aapt resource value: 0x7F0801B9
-			public const int tag_accessibility_heading = 2131231161;
+			public const int tabMode = 2131231161;
 			
 			// aapt resource value: 0x7F0801BA
-			public const int tag_accessibility_pane_title = 2131231162;
+			public const int tag_accessibility_actions = 2131231162;
 			
 			// aapt resource value: 0x7F0801BB
-			public const int tag_on_apply_window_listener = 2131231163;
+			public const int tag_accessibility_clickable_spans = 2131231163;
 			
 			// aapt resource value: 0x7F0801BC
-			public const int tag_on_receive_content_listener = 2131231164;
+			public const int tag_accessibility_heading = 2131231164;
 			
 			// aapt resource value: 0x7F0801BD
-			public const int tag_on_receive_content_mime_types = 2131231165;
+			public const int tag_accessibility_pane_title = 2131231165;
 			
 			// aapt resource value: 0x7F0801BE
-			public const int tag_screen_reader_focusable = 2131231166;
+			public const int tag_on_apply_window_listener = 2131231166;
 			
 			// aapt resource value: 0x7F0801BF
-			public const int tag_state_description = 2131231167;
+			public const int tag_on_receive_content_listener = 2131231167;
 			
 			// aapt resource value: 0x7F0801C0
-			public const int tag_transition_group = 2131231168;
+			public const int tag_on_receive_content_mime_types = 2131231168;
 			
 			// aapt resource value: 0x7F0801C1
-			public const int tag_unhandled_key_event_manager = 2131231169;
+			public const int tag_screen_reader_focusable = 2131231169;
 			
 			// aapt resource value: 0x7F0801C2
-			public const int tag_unhandled_key_listeners = 2131231170;
+			public const int tag_state_description = 2131231170;
 			
 			// aapt resource value: 0x7F0801C3
-			public const int tag_window_insets_animation_callback = 2131231171;
+			public const int tag_transition_group = 2131231171;
 			
 			// aapt resource value: 0x7F0801C4
-			public const int test_checkbox_android_button_tint = 2131231172;
+			public const int tag_unhandled_key_event_manager = 2131231172;
 			
 			// aapt resource value: 0x7F0801C5
-			public const int test_checkbox_app_button_tint = 2131231173;
+			public const int tag_unhandled_key_listeners = 2131231173;
 			
 			// aapt resource value: 0x7F0801C6
-			public const int test_radiobutton_android_button_tint = 2131231174;
+			public const int tag_window_insets_animation_callback = 2131231174;
 			
 			// aapt resource value: 0x7F0801C7
-			public const int test_radiobutton_app_button_tint = 2131231175;
+			public const int test_checkbox_android_button_tint = 2131231175;
 			
 			// aapt resource value: 0x7F0801C8
-			public const int text = 2131231176;
+			public const int test_checkbox_app_button_tint = 2131231176;
 			
 			// aapt resource value: 0x7F0801C9
-			public const int text2 = 2131231177;
+			public const int test_radiobutton_android_button_tint = 2131231177;
 			
 			// aapt resource value: 0x7F0801CA
-			public const int textEnd = 2131231178;
-			
-			// aapt resource value: 0x7F0801D2
-			public const int textinput_counter = 2131231186;
-			
-			// aapt resource value: 0x7F0801D3
-			public const int textinput_error = 2131231187;
-			
-			// aapt resource value: 0x7F0801D4
-			public const int textinput_helper_text = 2131231188;
-			
-			// aapt resource value: 0x7F0801D5
-			public const int textinput_placeholder = 2131231189;
-			
-			// aapt resource value: 0x7F0801D6
-			public const int textinput_prefix_text = 2131231190;
-			
-			// aapt resource value: 0x7F0801D7
-			public const int textinput_suffix_text = 2131231191;
+			public const int test_radiobutton_app_button_tint = 2131231178;
 			
 			// aapt resource value: 0x7F0801CB
-			public const int textSpacerNoButtons = 2131231179;
+			public const int text = 2131231179;
 			
 			// aapt resource value: 0x7F0801CC
-			public const int textSpacerNoTitle = 2131231180;
+			public const int text2 = 2131231180;
 			
 			// aapt resource value: 0x7F0801CD
-			public const int textStart = 2131231181;
+			public const int textEnd = 2131231181;
 			
-			// aapt resource value: 0x7F0801CE
-			public const int textTop = 2131231182;
+			// aapt resource value: 0x7F0801D5
+			public const int textinput_counter = 2131231189;
 			
-			// aapt resource value: 0x7F0801CF
-			public const int text_input_end_icon = 2131231183;
+			// aapt resource value: 0x7F0801D6
+			public const int textinput_error = 2131231190;
 			
-			// aapt resource value: 0x7F0801D0
-			public const int text_input_error_icon = 2131231184;
-			
-			// aapt resource value: 0x7F0801D1
-			public const int text_input_start_icon = 2131231185;
+			// aapt resource value: 0x7F0801D7
+			public const int textinput_helper_text = 2131231191;
 			
 			// aapt resource value: 0x7F0801D8
-			public const int time = 2131231192;
+			public const int textinput_placeholder = 2131231192;
 			
 			// aapt resource value: 0x7F0801D9
-			public const int title = 2131231193;
+			public const int textinput_prefix_text = 2131231193;
 			
 			// aapt resource value: 0x7F0801DA
-			public const int titleDividerNoCustom = 2131231194;
+			public const int textinput_suffix_text = 2131231194;
+			
+			// aapt resource value: 0x7F0801CE
+			public const int textSpacerNoButtons = 2131231182;
+			
+			// aapt resource value: 0x7F0801CF
+			public const int textSpacerNoTitle = 2131231183;
+			
+			// aapt resource value: 0x7F0801D0
+			public const int textStart = 2131231184;
+			
+			// aapt resource value: 0x7F0801D1
+			public const int textTop = 2131231185;
+			
+			// aapt resource value: 0x7F0801D2
+			public const int text_input_end_icon = 2131231186;
+			
+			// aapt resource value: 0x7F0801D3
+			public const int text_input_error_icon = 2131231187;
+			
+			// aapt resource value: 0x7F0801D4
+			public const int text_input_start_icon = 2131231188;
 			
 			// aapt resource value: 0x7F0801DB
-			public const int title_template = 2131231195;
+			public const int time = 2131231195;
 			
 			// aapt resource value: 0x7F0801DC
-			public const int toggle = 2131231196;
+			public const int title = 2131231196;
 			
 			// aapt resource value: 0x7F0801DD
-			public const int toolbar = 2131231197;
+			public const int titleDividerNoCustom = 2131231197;
 			
 			// aapt resource value: 0x7F0801DE
-			public const int top = 2131231198;
+			public const int title_template = 2131231198;
 			
 			// aapt resource value: 0x7F0801DF
-			public const int topPanel = 2131231199;
+			public const int toggle = 2131231199;
+			
+			// aapt resource value: 0x7F0801E0
+			public const int toolbar = 2131231200;
+			
+			// aapt resource value: 0x7F0801E1
+			public const int top = 2131231201;
+			
+			// aapt resource value: 0x7F0801E2
+			public const int topPanel = 2131231202;
 			
 			// aapt resource value: 0x7F08000C
 			public const int TOP_END = 2131230732;
@@ -9524,98 +11287,104 @@ namespace Nearby_Sharing_Windows
 			// aapt resource value: 0x7F08000D
 			public const int TOP_START = 2131230733;
 			
-			// aapt resource value: 0x7F0801E0
-			public const int touch_outside = 2131231200;
-			
-			// aapt resource value: 0x7F0801E1
-			public const int transitionToEnd = 2131231201;
-			
-			// aapt resource value: 0x7F0801E2
-			public const int transitionToStart = 2131231202;
-			
 			// aapt resource value: 0x7F0801E3
-			public const int transition_current_scene = 2131231203;
+			public const int touch_outside = 2131231203;
 			
 			// aapt resource value: 0x7F0801E4
-			public const int transition_layout_save = 2131231204;
+			public const int transitionToEnd = 2131231204;
 			
 			// aapt resource value: 0x7F0801E5
-			public const int transition_position = 2131231205;
+			public const int transitionToStart = 2131231205;
 			
 			// aapt resource value: 0x7F0801E6
-			public const int transition_scene_layoutid_cache = 2131231206;
+			public const int transition_current_scene = 2131231206;
 			
 			// aapt resource value: 0x7F0801E7
-			public const int transition_transform = 2131231207;
+			public const int transition_layout_save = 2131231207;
 			
 			// aapt resource value: 0x7F0801E8
-			public const int triangle = 2131231208;
+			public const int transition_position = 2131231208;
 			
 			// aapt resource value: 0x7F0801E9
-			public const int @unchecked = 2131231209;
+			public const int transition_scene_layoutid_cache = 2131231209;
 			
 			// aapt resource value: 0x7F0801EA
-			public const int uniform = 2131231210;
+			public const int transition_transform = 2131231210;
 			
 			// aapt resource value: 0x7F0801EB
-			public const int unlabeled = 2131231211;
+			public const int transportTypeImageView = 2131231211;
 			
 			// aapt resource value: 0x7F0801EC
-			public const int up = 2131231212;
+			public const int triangle = 2131231212;
 			
 			// aapt resource value: 0x7F0801ED
-			public const int useLogo = 2131231213;
+			public const int @unchecked = 2131231213;
 			
 			// aapt resource value: 0x7F0801EE
-			public const int vertical_only = 2131231214;
+			public const int uniform = 2131231214;
 			
 			// aapt resource value: 0x7F0801EF
-			public const int view_offset_helper = 2131231215;
+			public const int unlabeled = 2131231215;
 			
 			// aapt resource value: 0x7F0801F0
-			public const int view_transition = 2131231216;
+			public const int up = 2131231216;
 			
 			// aapt resource value: 0x7F0801F1
-			public const int view_tree_lifecycle_owner = 2131231217;
+			public const int useLogo = 2131231217;
 			
 			// aapt resource value: 0x7F0801F2
-			public const int view_tree_saved_state_registry_owner = 2131231218;
+			public const int vertical_only = 2131231218;
 			
 			// aapt resource value: 0x7F0801F3
-			public const int view_tree_view_model_store_owner = 2131231219;
+			public const int view_offset_helper = 2131231219;
 			
 			// aapt resource value: 0x7F0801F4
-			public const int visible = 2131231220;
+			public const int view_transition = 2131231220;
 			
 			// aapt resource value: 0x7F0801F5
-			public const int visible_removing_fragment_view_tag = 2131231221;
+			public const int view_tree_lifecycle_owner = 2131231221;
 			
 			// aapt resource value: 0x7F0801F6
-			public const int west = 2131231222;
-			
-			// aapt resource value: 0x7F0801F8
-			public const int withinBounds = 2131231224;
+			public const int view_tree_saved_state_registry_owner = 2131231222;
 			
 			// aapt resource value: 0x7F0801F7
-			public const int withText = 2131231223;
+			public const int view_tree_view_model_store_owner = 2131231223;
+			
+			// aapt resource value: 0x7F0801F8
+			public const int visible = 2131231224;
 			
 			// aapt resource value: 0x7F0801F9
-			public const int wrap = 2131231225;
+			public const int visible_removing_fragment_view_tag = 2131231225;
 			
 			// aapt resource value: 0x7F0801FA
-			public const int wrap_content = 2131231226;
+			public const int waitForAcceptanceView = 2131231226;
 			
 			// aapt resource value: 0x7F0801FB
-			public const int wrap_content_constrained = 2131231227;
-			
-			// aapt resource value: 0x7F0801FC
-			public const int x_left = 2131231228;
+			public const int west = 2131231227;
 			
 			// aapt resource value: 0x7F0801FD
-			public const int x_right = 2131231229;
+			public const int withinBounds = 2131231229;
+			
+			// aapt resource value: 0x7F0801FC
+			public const int withText = 2131231228;
 			
 			// aapt resource value: 0x7F0801FE
-			public const int zero_corner_chip = 2131231230;
+			public const int wrap = 2131231230;
+			
+			// aapt resource value: 0x7F0801FF
+			public const int wrap_content = 2131231231;
+			
+			// aapt resource value: 0x7F080200
+			public const int wrap_content_constrained = 2131231232;
+			
+			// aapt resource value: 0x7F080201
+			public const int x_left = 2131231233;
+			
+			// aapt resource value: 0x7F080202
+			public const int x_right = 2131231234;
+			
+			// aapt resource value: 0x7F080203
+			public const int zero_corner_chip = 2131231235;
 			
 			static Id()
 			{
@@ -9996,226 +11765,229 @@ namespace Nearby_Sharing_Windows
 			public const int design_text_input_start_icon = 2131427376;
 			
 			// aapt resource value: 0x7F0B0031
-			public const int m3_alert_dialog = 2131427377;
+			public const int item_device = 2131427377;
 			
 			// aapt resource value: 0x7F0B0032
-			public const int m3_alert_dialog_actions = 2131427378;
+			public const int m3_alert_dialog = 2131427378;
 			
 			// aapt resource value: 0x7F0B0033
-			public const int m3_alert_dialog_title = 2131427379;
+			public const int m3_alert_dialog_actions = 2131427379;
 			
 			// aapt resource value: 0x7F0B0034
-			public const int m3_auto_complete_simple_item = 2131427380;
+			public const int m3_alert_dialog_title = 2131427380;
 			
 			// aapt resource value: 0x7F0B0035
-			public const int material_chip_input_combo = 2131427381;
-			
-			// aapt resource value: 0x7F0B003A
-			public const int material_clockface_textview = 2131427386;
-			
-			// aapt resource value: 0x7F0B003B
-			public const int material_clockface_view = 2131427387;
+			public const int m3_auto_complete_simple_item = 2131427381;
 			
 			// aapt resource value: 0x7F0B0036
-			public const int material_clock_display = 2131427382;
+			public const int material_chip_input_combo = 2131427382;
 			
-			// aapt resource value: 0x7F0B0037
-			public const int material_clock_display_divider = 2131427383;
-			
-			// aapt resource value: 0x7F0B0038
-			public const int material_clock_period_toggle = 2131427384;
-			
-			// aapt resource value: 0x7F0B0039
-			public const int material_clock_period_toggle_land = 2131427385;
+			// aapt resource value: 0x7F0B003B
+			public const int material_clockface_textview = 2131427387;
 			
 			// aapt resource value: 0x7F0B003C
-			public const int material_radial_view_group = 2131427388;
+			public const int material_clockface_view = 2131427388;
+			
+			// aapt resource value: 0x7F0B0037
+			public const int material_clock_display = 2131427383;
+			
+			// aapt resource value: 0x7F0B0038
+			public const int material_clock_display_divider = 2131427384;
+			
+			// aapt resource value: 0x7F0B0039
+			public const int material_clock_period_toggle = 2131427385;
+			
+			// aapt resource value: 0x7F0B003A
+			public const int material_clock_period_toggle_land = 2131427386;
 			
 			// aapt resource value: 0x7F0B003D
-			public const int material_textinput_timepicker = 2131427389;
-			
-			// aapt resource value: 0x7F0B0040
-			public const int material_timepicker = 2131427392;
-			
-			// aapt resource value: 0x7F0B0041
-			public const int material_timepicker_dialog = 2131427393;
-			
-			// aapt resource value: 0x7F0B0042
-			public const int material_timepicker_textinput_display = 2131427394;
+			public const int material_radial_view_group = 2131427389;
 			
 			// aapt resource value: 0x7F0B003E
-			public const int material_time_chip = 2131427390;
+			public const int material_textinput_timepicker = 2131427390;
 			
-			// aapt resource value: 0x7F0B003F
-			public const int material_time_input = 2131427391;
+			// aapt resource value: 0x7F0B0041
+			public const int material_timepicker = 2131427393;
+			
+			// aapt resource value: 0x7F0B0042
+			public const int material_timepicker_dialog = 2131427394;
 			
 			// aapt resource value: 0x7F0B0043
-			public const int mtrl_alert_dialog = 2131427395;
+			public const int material_timepicker_textinput_display = 2131427395;
+			
+			// aapt resource value: 0x7F0B003F
+			public const int material_time_chip = 2131427391;
+			
+			// aapt resource value: 0x7F0B0040
+			public const int material_time_input = 2131427392;
 			
 			// aapt resource value: 0x7F0B0044
-			public const int mtrl_alert_dialog_actions = 2131427396;
+			public const int mtrl_alert_dialog = 2131427396;
 			
 			// aapt resource value: 0x7F0B0045
-			public const int mtrl_alert_dialog_title = 2131427397;
+			public const int mtrl_alert_dialog_actions = 2131427397;
 			
 			// aapt resource value: 0x7F0B0046
-			public const int mtrl_alert_select_dialog_item = 2131427398;
+			public const int mtrl_alert_dialog_title = 2131427398;
 			
 			// aapt resource value: 0x7F0B0047
-			public const int mtrl_alert_select_dialog_multichoice = 2131427399;
+			public const int mtrl_alert_select_dialog_item = 2131427399;
 			
 			// aapt resource value: 0x7F0B0048
-			public const int mtrl_alert_select_dialog_singlechoice = 2131427400;
+			public const int mtrl_alert_select_dialog_multichoice = 2131427400;
 			
 			// aapt resource value: 0x7F0B0049
-			public const int mtrl_auto_complete_simple_item = 2131427401;
+			public const int mtrl_alert_select_dialog_singlechoice = 2131427401;
 			
 			// aapt resource value: 0x7F0B004A
-			public const int mtrl_calendar_day = 2131427402;
-			
-			// aapt resource value: 0x7F0B004C
-			public const int mtrl_calendar_days_of_week = 2131427404;
+			public const int mtrl_auto_complete_simple_item = 2131427402;
 			
 			// aapt resource value: 0x7F0B004B
-			public const int mtrl_calendar_day_of_week = 2131427403;
+			public const int mtrl_calendar_day = 2131427403;
 			
 			// aapt resource value: 0x7F0B004D
-			public const int mtrl_calendar_horizontal = 2131427405;
+			public const int mtrl_calendar_days_of_week = 2131427405;
+			
+			// aapt resource value: 0x7F0B004C
+			public const int mtrl_calendar_day_of_week = 2131427404;
 			
 			// aapt resource value: 0x7F0B004E
-			public const int mtrl_calendar_month = 2131427406;
-			
-			// aapt resource value: 0x7F0B0051
-			public const int mtrl_calendar_months = 2131427409;
+			public const int mtrl_calendar_horizontal = 2131427406;
 			
 			// aapt resource value: 0x7F0B004F
-			public const int mtrl_calendar_month_labeled = 2131427407;
-			
-			// aapt resource value: 0x7F0B0050
-			public const int mtrl_calendar_month_navigation = 2131427408;
+			public const int mtrl_calendar_month = 2131427407;
 			
 			// aapt resource value: 0x7F0B0052
-			public const int mtrl_calendar_vertical = 2131427410;
+			public const int mtrl_calendar_months = 2131427410;
+			
+			// aapt resource value: 0x7F0B0050
+			public const int mtrl_calendar_month_labeled = 2131427408;
+			
+			// aapt resource value: 0x7F0B0051
+			public const int mtrl_calendar_month_navigation = 2131427409;
 			
 			// aapt resource value: 0x7F0B0053
-			public const int mtrl_calendar_year = 2131427411;
+			public const int mtrl_calendar_vertical = 2131427411;
 			
 			// aapt resource value: 0x7F0B0054
-			public const int mtrl_layout_snackbar = 2131427412;
+			public const int mtrl_calendar_year = 2131427412;
 			
 			// aapt resource value: 0x7F0B0055
-			public const int mtrl_layout_snackbar_include = 2131427413;
+			public const int mtrl_layout_snackbar = 2131427413;
 			
 			// aapt resource value: 0x7F0B0056
-			public const int mtrl_navigation_rail_item = 2131427414;
+			public const int mtrl_layout_snackbar_include = 2131427414;
 			
 			// aapt resource value: 0x7F0B0057
-			public const int mtrl_picker_actions = 2131427415;
+			public const int mtrl_navigation_rail_item = 2131427415;
 			
 			// aapt resource value: 0x7F0B0058
-			public const int mtrl_picker_dialog = 2131427416;
+			public const int mtrl_picker_actions = 2131427416;
 			
 			// aapt resource value: 0x7F0B0059
-			public const int mtrl_picker_fullscreen = 2131427417;
+			public const int mtrl_picker_dialog = 2131427417;
 			
 			// aapt resource value: 0x7F0B005A
-			public const int mtrl_picker_header_dialog = 2131427418;
+			public const int mtrl_picker_fullscreen = 2131427418;
 			
 			// aapt resource value: 0x7F0B005B
-			public const int mtrl_picker_header_fullscreen = 2131427419;
+			public const int mtrl_picker_header_dialog = 2131427419;
 			
 			// aapt resource value: 0x7F0B005C
-			public const int mtrl_picker_header_selection_text = 2131427420;
+			public const int mtrl_picker_header_fullscreen = 2131427420;
 			
 			// aapt resource value: 0x7F0B005D
-			public const int mtrl_picker_header_title_text = 2131427421;
+			public const int mtrl_picker_header_selection_text = 2131427421;
 			
 			// aapt resource value: 0x7F0B005E
-			public const int mtrl_picker_header_toggle = 2131427422;
+			public const int mtrl_picker_header_title_text = 2131427422;
 			
 			// aapt resource value: 0x7F0B005F
-			public const int mtrl_picker_text_input_date = 2131427423;
+			public const int mtrl_picker_header_toggle = 2131427423;
 			
 			// aapt resource value: 0x7F0B0060
-			public const int mtrl_picker_text_input_date_range = 2131427424;
+			public const int mtrl_picker_text_input_date = 2131427424;
 			
 			// aapt resource value: 0x7F0B0061
-			public const int notification_action = 2131427425;
+			public const int mtrl_picker_text_input_date_range = 2131427425;
 			
 			// aapt resource value: 0x7F0B0062
-			public const int notification_action_tombstone = 2131427426;
+			public const int notification_action = 2131427426;
 			
 			// aapt resource value: 0x7F0B0063
-			public const int notification_template_custom_big = 2131427427;
+			public const int notification_action_tombstone = 2131427427;
 			
 			// aapt resource value: 0x7F0B0064
-			public const int notification_template_icon_group = 2131427428;
+			public const int notification_template_custom_big = 2131427428;
 			
 			// aapt resource value: 0x7F0B0065
-			public const int notification_template_part_chronometer = 2131427429;
+			public const int notification_template_icon_group = 2131427429;
 			
 			// aapt resource value: 0x7F0B0066
-			public const int notification_template_part_time = 2131427430;
+			public const int notification_template_part_chronometer = 2131427430;
 			
 			// aapt resource value: 0x7F0B0067
-			public const int select_dialog_item_material = 2131427431;
+			public const int notification_template_part_time = 2131427431;
 			
 			// aapt resource value: 0x7F0B0068
-			public const int select_dialog_multichoice_material = 2131427432;
+			public const int select_dialog_item_material = 2131427432;
 			
 			// aapt resource value: 0x7F0B0069
-			public const int select_dialog_singlechoice_material = 2131427433;
+			public const int select_dialog_multichoice_material = 2131427433;
 			
 			// aapt resource value: 0x7F0B006A
-			public const int support_simple_spinner_dropdown_item = 2131427434;
+			public const int select_dialog_singlechoice_material = 2131427434;
 			
 			// aapt resource value: 0x7F0B006B
-			public const int test_action_chip = 2131427435;
+			public const int support_simple_spinner_dropdown_item = 2131427435;
 			
 			// aapt resource value: 0x7F0B006C
-			public const int test_chip_zero_corner_radius = 2131427436;
+			public const int test_action_chip = 2131427436;
 			
 			// aapt resource value: 0x7F0B006D
-			public const int test_design_checkbox = 2131427437;
+			public const int test_chip_zero_corner_radius = 2131427437;
 			
 			// aapt resource value: 0x7F0B006E
-			public const int test_design_radiobutton = 2131427438;
+			public const int test_design_checkbox = 2131427438;
 			
 			// aapt resource value: 0x7F0B006F
-			public const int test_exposed_dropdown_menu = 2131427439;
+			public const int test_design_radiobutton = 2131427439;
 			
 			// aapt resource value: 0x7F0B0070
-			public const int test_navigation_bar_item_layout = 2131427440;
+			public const int test_exposed_dropdown_menu = 2131427440;
 			
 			// aapt resource value: 0x7F0B0071
-			public const int test_reflow_chipgroup = 2131427441;
+			public const int test_navigation_bar_item_layout = 2131427441;
 			
 			// aapt resource value: 0x7F0B0072
-			public const int test_toolbar = 2131427442;
+			public const int test_reflow_chipgroup = 2131427442;
 			
 			// aapt resource value: 0x7F0B0073
-			public const int test_toolbar_custom_background = 2131427443;
+			public const int test_toolbar = 2131427443;
 			
 			// aapt resource value: 0x7F0B0074
-			public const int test_toolbar_elevation = 2131427444;
+			public const int test_toolbar_custom_background = 2131427444;
 			
 			// aapt resource value: 0x7F0B0075
-			public const int test_toolbar_surface = 2131427445;
-			
-			// aapt resource value: 0x7F0B007A
-			public const int text_view_without_line_height = 2131427450;
+			public const int test_toolbar_elevation = 2131427445;
 			
 			// aapt resource value: 0x7F0B0076
-			public const int text_view_with_line_height_from_appearance = 2131427446;
+			public const int test_toolbar_surface = 2131427446;
+			
+			// aapt resource value: 0x7F0B007B
+			public const int text_view_without_line_height = 2131427451;
 			
 			// aapt resource value: 0x7F0B0077
-			public const int text_view_with_line_height_from_layout = 2131427447;
+			public const int text_view_with_line_height_from_appearance = 2131427447;
 			
 			// aapt resource value: 0x7F0B0078
-			public const int text_view_with_line_height_from_style = 2131427448;
+			public const int text_view_with_line_height_from_layout = 2131427448;
 			
 			// aapt resource value: 0x7F0B0079
-			public const int text_view_with_theme_line_height = 2131427449;
+			public const int text_view_with_line_height_from_style = 2131427449;
+			
+			// aapt resource value: 0x7F0B007A
+			public const int text_view_with_theme_line_height = 2131427450;
 			
 			static Layout()
 			{
@@ -10423,256 +12195,259 @@ namespace Nearby_Sharing_Windows
 			public const int fallback_menu_item_share_link = 2131689516;
 			
 			// aapt resource value: 0x7F0F002D
-			public const int hide_bottom_view_on_scroll_behavior = 2131689517;
+			public const int hello = 2131689517;
 			
 			// aapt resource value: 0x7F0F002E
-			public const int icon_content_description = 2131689518;
+			public const int hide_bottom_view_on_scroll_behavior = 2131689518;
 			
 			// aapt resource value: 0x7F0F002F
-			public const int item_view_role_description = 2131689519;
+			public const int icon_content_description = 2131689519;
 			
 			// aapt resource value: 0x7F0F0030
-			public const int label = 2131689520;
+			public const int item_view_role_description = 2131689520;
 			
 			// aapt resource value: 0x7F0F0031
-			public const int m3_ref_typeface_brand_medium = 2131689521;
+			public const int label = 2131689521;
 			
 			// aapt resource value: 0x7F0F0032
-			public const int m3_ref_typeface_brand_regular = 2131689522;
+			public const int m3_ref_typeface_brand_medium = 2131689522;
 			
 			// aapt resource value: 0x7F0F0033
-			public const int m3_ref_typeface_plain_medium = 2131689523;
+			public const int m3_ref_typeface_brand_regular = 2131689523;
 			
 			// aapt resource value: 0x7F0F0034
-			public const int m3_ref_typeface_plain_regular = 2131689524;
+			public const int m3_ref_typeface_plain_medium = 2131689524;
 			
 			// aapt resource value: 0x7F0F0035
-			public const int m3_sys_motion_easing_emphasized = 2131689525;
+			public const int m3_ref_typeface_plain_regular = 2131689525;
 			
 			// aapt resource value: 0x7F0F0036
-			public const int m3_sys_motion_easing_emphasized_accelerate = 2131689526;
+			public const int m3_sys_motion_easing_emphasized = 2131689526;
 			
 			// aapt resource value: 0x7F0F0037
-			public const int m3_sys_motion_easing_emphasized_decelerate = 2131689527;
+			public const int m3_sys_motion_easing_emphasized_accelerate = 2131689527;
 			
 			// aapt resource value: 0x7F0F0038
-			public const int m3_sys_motion_easing_emphasized_path_data = 2131689528;
+			public const int m3_sys_motion_easing_emphasized_decelerate = 2131689528;
 			
 			// aapt resource value: 0x7F0F0039
-			public const int m3_sys_motion_easing_legacy = 2131689529;
+			public const int m3_sys_motion_easing_emphasized_path_data = 2131689529;
 			
 			// aapt resource value: 0x7F0F003A
-			public const int m3_sys_motion_easing_legacy_accelerate = 2131689530;
+			public const int m3_sys_motion_easing_legacy = 2131689530;
 			
 			// aapt resource value: 0x7F0F003B
-			public const int m3_sys_motion_easing_legacy_decelerate = 2131689531;
+			public const int m3_sys_motion_easing_legacy_accelerate = 2131689531;
 			
 			// aapt resource value: 0x7F0F003C
-			public const int m3_sys_motion_easing_linear = 2131689532;
+			public const int m3_sys_motion_easing_legacy_decelerate = 2131689532;
 			
 			// aapt resource value: 0x7F0F003D
-			public const int m3_sys_motion_easing_standard = 2131689533;
+			public const int m3_sys_motion_easing_linear = 2131689533;
 			
 			// aapt resource value: 0x7F0F003E
-			public const int m3_sys_motion_easing_standard_accelerate = 2131689534;
+			public const int m3_sys_motion_easing_standard = 2131689534;
 			
 			// aapt resource value: 0x7F0F003F
-			public const int m3_sys_motion_easing_standard_decelerate = 2131689535;
+			public const int m3_sys_motion_easing_standard_accelerate = 2131689535;
 			
 			// aapt resource value: 0x7F0F0040
-			public const int material_clock_display_divider = 2131689536;
+			public const int m3_sys_motion_easing_standard_decelerate = 2131689536;
 			
 			// aapt resource value: 0x7F0F0041
-			public const int material_clock_toggle_content_description = 2131689537;
+			public const int material_clock_display_divider = 2131689537;
 			
 			// aapt resource value: 0x7F0F0042
-			public const int material_hour_selection = 2131689538;
+			public const int material_clock_toggle_content_description = 2131689538;
 			
 			// aapt resource value: 0x7F0F0043
-			public const int material_hour_suffix = 2131689539;
+			public const int material_hour_selection = 2131689539;
 			
 			// aapt resource value: 0x7F0F0044
-			public const int material_minute_selection = 2131689540;
+			public const int material_hour_suffix = 2131689540;
 			
 			// aapt resource value: 0x7F0F0045
-			public const int material_minute_suffix = 2131689541;
+			public const int material_minute_selection = 2131689541;
 			
 			// aapt resource value: 0x7F0F0046
-			public const int material_motion_easing_accelerated = 2131689542;
+			public const int material_minute_suffix = 2131689542;
 			
 			// aapt resource value: 0x7F0F0047
-			public const int material_motion_easing_decelerated = 2131689543;
+			public const int material_motion_easing_accelerated = 2131689543;
 			
 			// aapt resource value: 0x7F0F0048
-			public const int material_motion_easing_emphasized = 2131689544;
+			public const int material_motion_easing_decelerated = 2131689544;
 			
 			// aapt resource value: 0x7F0F0049
-			public const int material_motion_easing_linear = 2131689545;
+			public const int material_motion_easing_emphasized = 2131689545;
 			
 			// aapt resource value: 0x7F0F004A
-			public const int material_motion_easing_standard = 2131689546;
+			public const int material_motion_easing_linear = 2131689546;
 			
 			// aapt resource value: 0x7F0F004B
-			public const int material_slider_range_end = 2131689547;
+			public const int material_motion_easing_standard = 2131689547;
 			
 			// aapt resource value: 0x7F0F004C
-			public const int material_slider_range_start = 2131689548;
+			public const int material_slider_range_end = 2131689548;
 			
 			// aapt resource value: 0x7F0F004D
-			public const int material_timepicker_am = 2131689549;
+			public const int material_slider_range_start = 2131689549;
 			
 			// aapt resource value: 0x7F0F004E
-			public const int material_timepicker_clock_mode_description = 2131689550;
+			public const int material_timepicker_am = 2131689550;
 			
 			// aapt resource value: 0x7F0F004F
-			public const int material_timepicker_hour = 2131689551;
+			public const int material_timepicker_clock_mode_description = 2131689551;
 			
 			// aapt resource value: 0x7F0F0050
-			public const int material_timepicker_minute = 2131689552;
+			public const int material_timepicker_hour = 2131689552;
 			
 			// aapt resource value: 0x7F0F0051
-			public const int material_timepicker_pm = 2131689553;
+			public const int material_timepicker_minute = 2131689553;
 			
 			// aapt resource value: 0x7F0F0052
-			public const int material_timepicker_select_time = 2131689554;
+			public const int material_timepicker_pm = 2131689554;
 			
 			// aapt resource value: 0x7F0F0053
-			public const int material_timepicker_text_input_mode_description = 2131689555;
+			public const int material_timepicker_select_time = 2131689555;
 			
 			// aapt resource value: 0x7F0F0054
-			public const int mtrl_badge_numberless_content_description = 2131689556;
+			public const int material_timepicker_text_input_mode_description = 2131689556;
 			
 			// aapt resource value: 0x7F0F0055
-			public const int mtrl_chip_close_icon_content_description = 2131689557;
+			public const int mtrl_badge_numberless_content_description = 2131689557;
 			
 			// aapt resource value: 0x7F0F0056
-			public const int mtrl_exceed_max_badge_number_content_description = 2131689558;
+			public const int mtrl_chip_close_icon_content_description = 2131689558;
 			
 			// aapt resource value: 0x7F0F0057
-			public const int mtrl_exceed_max_badge_number_suffix = 2131689559;
+			public const int mtrl_exceed_max_badge_number_content_description = 2131689559;
 			
 			// aapt resource value: 0x7F0F0058
-			public const int mtrl_picker_a11y_next_month = 2131689560;
+			public const int mtrl_exceed_max_badge_number_suffix = 2131689560;
 			
 			// aapt resource value: 0x7F0F0059
-			public const int mtrl_picker_a11y_prev_month = 2131689561;
+			public const int mtrl_picker_a11y_next_month = 2131689561;
 			
 			// aapt resource value: 0x7F0F005A
-			public const int mtrl_picker_announce_current_selection = 2131689562;
+			public const int mtrl_picker_a11y_prev_month = 2131689562;
 			
 			// aapt resource value: 0x7F0F005B
-			public const int mtrl_picker_cancel = 2131689563;
+			public const int mtrl_picker_announce_current_selection = 2131689563;
 			
 			// aapt resource value: 0x7F0F005C
-			public const int mtrl_picker_confirm = 2131689564;
+			public const int mtrl_picker_cancel = 2131689564;
 			
 			// aapt resource value: 0x7F0F005D
-			public const int mtrl_picker_date_header_selected = 2131689565;
+			public const int mtrl_picker_confirm = 2131689565;
 			
 			// aapt resource value: 0x7F0F005E
-			public const int mtrl_picker_date_header_title = 2131689566;
+			public const int mtrl_picker_date_header_selected = 2131689566;
 			
 			// aapt resource value: 0x7F0F005F
-			public const int mtrl_picker_date_header_unselected = 2131689567;
+			public const int mtrl_picker_date_header_title = 2131689567;
 			
 			// aapt resource value: 0x7F0F0060
-			public const int mtrl_picker_day_of_week_column_header = 2131689568;
+			public const int mtrl_picker_date_header_unselected = 2131689568;
 			
 			// aapt resource value: 0x7F0F0061
-			public const int mtrl_picker_invalid_format = 2131689569;
+			public const int mtrl_picker_day_of_week_column_header = 2131689569;
 			
 			// aapt resource value: 0x7F0F0062
-			public const int mtrl_picker_invalid_format_example = 2131689570;
+			public const int mtrl_picker_invalid_format = 2131689570;
 			
 			// aapt resource value: 0x7F0F0063
-			public const int mtrl_picker_invalid_format_use = 2131689571;
+			public const int mtrl_picker_invalid_format_example = 2131689571;
 			
 			// aapt resource value: 0x7F0F0064
-			public const int mtrl_picker_invalid_range = 2131689572;
+			public const int mtrl_picker_invalid_format_use = 2131689572;
 			
 			// aapt resource value: 0x7F0F0065
-			public const int mtrl_picker_navigate_to_year_description = 2131689573;
+			public const int mtrl_picker_invalid_range = 2131689573;
 			
 			// aapt resource value: 0x7F0F0066
-			public const int mtrl_picker_out_of_range = 2131689574;
+			public const int mtrl_picker_navigate_to_year_description = 2131689574;
 			
 			// aapt resource value: 0x7F0F0067
-			public const int mtrl_picker_range_header_only_end_selected = 2131689575;
+			public const int mtrl_picker_out_of_range = 2131689575;
 			
 			// aapt resource value: 0x7F0F0068
-			public const int mtrl_picker_range_header_only_start_selected = 2131689576;
+			public const int mtrl_picker_range_header_only_end_selected = 2131689576;
 			
 			// aapt resource value: 0x7F0F0069
-			public const int mtrl_picker_range_header_selected = 2131689577;
+			public const int mtrl_picker_range_header_only_start_selected = 2131689577;
 			
 			// aapt resource value: 0x7F0F006A
-			public const int mtrl_picker_range_header_title = 2131689578;
+			public const int mtrl_picker_range_header_selected = 2131689578;
 			
 			// aapt resource value: 0x7F0F006B
-			public const int mtrl_picker_range_header_unselected = 2131689579;
+			public const int mtrl_picker_range_header_title = 2131689579;
 			
 			// aapt resource value: 0x7F0F006C
-			public const int mtrl_picker_save = 2131689580;
+			public const int mtrl_picker_range_header_unselected = 2131689580;
 			
 			// aapt resource value: 0x7F0F006D
-			public const int mtrl_picker_text_input_date_hint = 2131689581;
+			public const int mtrl_picker_save = 2131689581;
 			
 			// aapt resource value: 0x7F0F006E
-			public const int mtrl_picker_text_input_date_range_end_hint = 2131689582;
+			public const int mtrl_picker_text_input_date_hint = 2131689582;
 			
 			// aapt resource value: 0x7F0F006F
-			public const int mtrl_picker_text_input_date_range_start_hint = 2131689583;
+			public const int mtrl_picker_text_input_date_range_end_hint = 2131689583;
 			
 			// aapt resource value: 0x7F0F0070
-			public const int mtrl_picker_text_input_day_abbr = 2131689584;
+			public const int mtrl_picker_text_input_date_range_start_hint = 2131689584;
 			
 			// aapt resource value: 0x7F0F0071
-			public const int mtrl_picker_text_input_month_abbr = 2131689585;
+			public const int mtrl_picker_text_input_day_abbr = 2131689585;
 			
 			// aapt resource value: 0x7F0F0072
-			public const int mtrl_picker_text_input_year_abbr = 2131689586;
+			public const int mtrl_picker_text_input_month_abbr = 2131689586;
 			
 			// aapt resource value: 0x7F0F0073
-			public const int mtrl_picker_toggle_to_calendar_input_mode = 2131689587;
+			public const int mtrl_picker_text_input_year_abbr = 2131689587;
 			
 			// aapt resource value: 0x7F0F0074
-			public const int mtrl_picker_toggle_to_day_selection = 2131689588;
+			public const int mtrl_picker_toggle_to_calendar_input_mode = 2131689588;
 			
 			// aapt resource value: 0x7F0F0075
-			public const int mtrl_picker_toggle_to_text_input_mode = 2131689589;
+			public const int mtrl_picker_toggle_to_day_selection = 2131689589;
 			
 			// aapt resource value: 0x7F0F0076
-			public const int mtrl_picker_toggle_to_year_selection = 2131689590;
+			public const int mtrl_picker_toggle_to_text_input_mode = 2131689590;
 			
 			// aapt resource value: 0x7F0F0077
-			public const int mtrl_timepicker_confirm = 2131689591;
+			public const int mtrl_picker_toggle_to_year_selection = 2131689591;
 			
 			// aapt resource value: 0x7F0F0078
-			public const int password_toggle_content_description = 2131689592;
+			public const int mtrl_timepicker_confirm = 2131689592;
 			
 			// aapt resource value: 0x7F0F0079
-			public const int path_password_eye = 2131689593;
+			public const int password_toggle_content_description = 2131689593;
 			
 			// aapt resource value: 0x7F0F007A
-			public const int path_password_eye_mask_strike_through = 2131689594;
+			public const int path_password_eye = 2131689594;
 			
 			// aapt resource value: 0x7F0F007B
-			public const int path_password_eye_mask_visible = 2131689595;
+			public const int path_password_eye_mask_strike_through = 2131689595;
 			
 			// aapt resource value: 0x7F0F007C
-			public const int path_password_strike_through = 2131689596;
+			public const int path_password_eye_mask_visible = 2131689596;
 			
 			// aapt resource value: 0x7F0F007D
-			public const int search_menu_title = 2131689597;
+			public const int path_password_strike_through = 2131689597;
 			
 			// aapt resource value: 0x7F0F007E
-			public const int settings_mac_addr = 2131689598;
+			public const int search_menu_title = 2131689598;
 			
 			// aapt resource value: 0x7F0F007F
-			public const int status_bar_notification_info_overflow = 2131689599;
+			public const int settings_mac_addr = 2131689599;
 			
 			// aapt resource value: 0x7F0F0080
-			public const int warning_exp = 2131689600;
+			public const int status_bar_notification_info_overflow = 2131689600;
+			
+			// aapt resource value: 0x7F0F0081
+			public const int warning_exp = 2131689601;
 			
 			static String()
 			{
