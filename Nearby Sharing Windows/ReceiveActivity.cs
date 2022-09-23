@@ -109,7 +109,7 @@ namespace Nearby_Sharing_Windows
                     ConnectionHeader connectionHeader = new(reader);
                     switch (connectionHeader.ConnectMessageType)
                     {
-                        case ConnectType.ConnectRequest:
+                        case ConnectionType.ConnectRequest:
                             {
                                 reader.ReadByte(); // ToDo: ??
                                 ConnectionRequest connectionRequest = new(reader);

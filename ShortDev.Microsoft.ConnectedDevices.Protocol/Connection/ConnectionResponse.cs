@@ -2,11 +2,11 @@
 
 namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Connection;
 
-public sealed class ConnectionRequest
+public sealed class ConnectionResponse
 {
-    public ConnectionRequest(BinaryReader reader)
+    public ConnectionResponse(BinaryReader reader)
     {
-        CurveType = (CurveType)reader.ReadByte();
+        Result = (ConnectionResult)reader.ReadByte();
         HMACSize = reader.ReadUInt16();
         Nonce = reader.ReadBytes(8);
         MessageFragmentSize = reader.ReadUInt32();
@@ -17,7 +17,7 @@ public sealed class ConnectionRequest
         PublicKeyY = reader.ReadBytes(publicKeyYLength);
     }
 
-    public CurveType CurveType { get; set; }
+    public ConnectionResult Result { get; set; }
     public ushort HMACSize { get; set; }
     public byte[] Nonce { get; set; }
     public uint MessageFragmentSize { get; set; }

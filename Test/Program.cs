@@ -42,10 +42,29 @@ using (BigEndianBinaryReader reader = new(stream))
     CommonHeaders headers = new();
     if (!headers.TryRead(reader))
         throw new InvalidDataException();
-    reader.ReadByte();
-    ConnectionHeader connectionHeader = new(reader);
+
+    if (headers.Type == MessageType.Connect)
+    {
+        ConnectionHeader connectionHeader = new(reader);
+        switch (connectionHeader.ConnectMessageType)
+        {
+            case ConnectionType.ConnectRequest:
+                {
+                    ConnectionRequest msg = new(reader);
+                    break;
+                }
+            case ConnectionType.ConnectResponse:
+                {
+                    ConnectionResponse msg = new(reader);
+                    break;
+                }
+            default:
+                throw new NotImplementedException();
+        }
+    }
+    else
+        throw new NotImplementedException();
     
-    ConnectionRequest connectionRequest = new(reader);
     // DiscoveryHeaders discoveryHeaders = new(reader);
     // PresenceResponse presenceResponse = new(reader);
     reader.ReadByte();

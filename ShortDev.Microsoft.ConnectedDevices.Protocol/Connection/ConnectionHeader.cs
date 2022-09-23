@@ -1,17 +1,16 @@
 ﻿using System.IO;
 
-namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Connection
+namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Connection;
+
+public sealed class ConnectionHeader
 {
-    public sealed class ConnectionHeader
+    public ConnectionHeader(BinaryReader reader)
     {
-        public ConnectionHeader(BinaryReader reader)
-        {
-            ConnectMessageType = (ConnectType)reader.ReadByte();
-            ConnectionMode = (ConnectionMode)reader.ReadByte();
-        }
-
-        public ConnectType ConnectMessageType { get; }
-
-        public ConnectionMode ConnectionMode { get; }
+        ConnectionMode = (ConnectionMode)reader.ReadInt16();
+        ConnectMessageType = (ConnectionType)reader.ReadByte();
     }
+
+    public ConnectionType ConnectMessageType { get; }
+
+    public ConnectionMode ConnectionMode { get; }
 }
