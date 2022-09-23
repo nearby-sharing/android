@@ -1,20 +1,14 @@
 ﻿#nullable enable
 
-using Android.App;
 using Android.Bluetooth;
 using Android.Bluetooth.LE;
-using Android.OS;
 using AndroidX.AppCompat.App;
 using ShortDev.Microsoft.ConnectedDevices.Protocol;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Connection;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Discovery;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms;
 using ShortDev.Networking;
-using System;
-using System.Linq;
 using System.Net.NetworkInformation;
-using System.Threading;
-using System.Threading.Tasks;
 using ManifestPermission = Android.Manifest.Permission;
 using Stream = System.IO.Stream;
 
@@ -23,8 +17,8 @@ namespace Nearby_Sharing_Windows
     [Activity(Label = "@string/app_name", Theme = "@style/AppTheme")]
     public class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler
     {
-        BluetoothAdapter _btAdapter;
-        protected override async void OnCreate(Bundle savedInstanceState)
+        BluetoothAdapter? _btAdapter;
+        protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_mac_address);
@@ -52,6 +46,7 @@ namespace Nearby_Sharing_Windows
             bluetoothAdvertisement.StartAdvertisement(new CdpDeviceAdvertiseOptions(
                 DeviceType.Android,
                 PhysicalAddress.Parse(address.Replace(":", "").ToUpper()),
+
                 _btAdapter.Name!
             ));
         }
@@ -100,19 +95,18 @@ namespace Nearby_Sharing_Windows
         {
             using (BigEndianBinaryReader reader = new(stream))
             {
-                CommonHeaders headers = new();
-                if (!headers.TryRead(reader))
+                if (!CommonHeaders.TryParse(reader, out var headers, out _) || headers == null)
                     return;
 
                 if (headers.Type == MessageType.Connect)
                 {
-                    ConnectionHeader connectionHeader = new(reader);
+                    ConnectionHeader connectionHeader = ConnectionHeader.Parse(reader);
                     switch (connectionHeader.ConnectMessageType)
                     {
                         case ConnectionType.ConnectRequest:
                             {
                                 reader.ReadByte(); // ToDo: ??
-                                ConnectionRequest connectionRequest = new(reader);
+                                ConnectionRequest connectionRequest = ConnectionRequest.Parse(reader);
                                 break;
                             }
                     }

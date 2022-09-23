@@ -1,34 +1,41 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Protocol.Connection;
 using System.IO;
-using System.Text;
+using ShortDev.Networking;
 
-namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Discovery
+namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Discovery;
+
+public class PresenceResponse : ICdpPayload<PresenceResponse>
 {
-    public class PresenceResponse
-    {
-        public PresenceResponse(BinaryReader reader)
+    public required ConnectionMode ConnectionMode { get; init; }
+
+    public required DeviceType DeviceType { get; init; }
+
+    public required string DeviceName { get; init; }
+
+    public required int DeviceIdSalt { get; init; }
+
+    public required int DeviceIdHash { get; init; }
+
+    public required int PrincipalUserNameHash { get; init; }
+
+    public static PresenceResponse Parse(BinaryReader reader)
+        => new()
         {
-            ConnectionMode = (ConnectionMode)reader.ReadInt16();
-            DeviceType = (DeviceType)reader.ReadInt16();
-            DeviceNameLength = reader.ReadUInt16();
-            DeviceName = Encoding.UTF8.GetString(reader.ReadBytes(DeviceNameLength));
-            DeviceIdSalt = reader.ReadInt32();
-            DeviceIdHash = reader.ReadInt32();
-            PrincipalUserNameHash = reader.ReadInt32();
-        }
+            ConnectionMode = (ConnectionMode)reader.ReadInt16(),
+            DeviceType = (DeviceType)reader.ReadInt16(),
+            DeviceName = reader.ReadStringWithLength(),
+            DeviceIdSalt = reader.ReadInt32(),
+            DeviceIdHash = reader.ReadInt32(),
+            PrincipalUserNameHash = reader.ReadInt32()
+        };
 
-        public ConnectionMode ConnectionMode { get; set; }
-
-        public DeviceType DeviceType { get; set; }
-
-        public ushort DeviceNameLength { get; set; }
-
-        public string DeviceName { get; set; }
-
-        public int DeviceIdSalt { get; set; }
-
-        public int DeviceIdHash { get; set; }
-
-        public int PrincipalUserNameHash { get; set; }
+    public void Write(BinaryWriter writer)
+    {
+        writer.Write((short)ConnectionMode);
+        writer.Write((short)DeviceType);
+        writer.WriteWithLength(DeviceName);
+        writer.Write((int)DeviceIdSalt);
+        writer.Write((int)DeviceIdHash);
+        writer.Write((int)PrincipalUserNameHash);
     }
 }

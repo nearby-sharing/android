@@ -39,23 +39,22 @@ BinaryConvert.AsBytes(hex, out _, buffer);
 using (MemoryStream stream = new(buffer))
 using (BigEndianBinaryReader reader = new(stream))
 {
-    CommonHeaders headers = new();
-    if (!headers.TryRead(reader))
+    if (!CommonHeaders.TryParse(reader, out var headers, out _) || headers == null)
         throw new InvalidDataException();
 
     if (headers.Type == MessageType.Connect)
     {
-        ConnectionHeader connectionHeader = new(reader);
+        ConnectionHeader connectionHeader = ConnectionHeader.Parse(reader);
         switch (connectionHeader.ConnectMessageType)
         {
             case ConnectionType.ConnectRequest:
                 {
-                    ConnectionRequest msg = new(reader);
+                    ConnectionRequest msg = ConnectionRequest.Parse(reader);
                     break;
                 }
             case ConnectionType.ConnectResponse:
                 {
-                    ConnectionResponse msg = new(reader);
+                    ConnectionResponse msg = ConnectionResponse.Parse(reader);
                     break;
                 }
             default:
@@ -64,7 +63,7 @@ using (BigEndianBinaryReader reader = new(stream))
     }
     else
         throw new NotImplementedException();
-    
+
     // DiscoveryHeaders discoveryHeaders = new(reader);
     // PresenceResponse presenceResponse = new(reader);
     reader.ReadByte();

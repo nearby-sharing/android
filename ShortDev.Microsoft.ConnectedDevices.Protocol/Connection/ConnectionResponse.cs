@@ -1,26 +1,41 @@
 ﻿using System.IO;
+using ShortDev.Networking;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Connection;
 
-public sealed class ConnectionResponse
+public sealed class ConnectionResponse : ICdpPayload<ConnectionResponse>
 {
-    public ConnectionResponse(BinaryReader reader)
+    public required ConnectionResult Result { get; set; }
+    public required ushort HMACSize { get; set; }
+    public required byte[] Nonce { get; set; }
+    public required uint MessageFragmentSize { get; set; }
+    public required byte[] PublicKeyX { get; set; }
+    public required byte[] PublicKeyY { get; set; }
+
+    public static ConnectionResponse Parse(BinaryReader reader)
+        => new()
+        {
+            Result = (ConnectionResult)reader.ReadByte(),
+            HMACSize = reader.ReadUInt16(),
+            Nonce = reader.ReadBytes(Constants.NonceLength),
+            MessageFragmentSize = reader.ReadUInt32(),
+            PublicKeyX = reader.ReadBytesWithLength(),
+            PublicKeyY = reader.ReadBytesWithLength()
+        };
+
+    public void Write(BinaryWriter writer)
     {
-        Result = (ConnectionResult)reader.ReadByte();
-        HMACSize = reader.ReadUInt16();
-        Nonce = reader.ReadBytes(8);
-        MessageFragmentSize = reader.ReadUInt32();
+        if (Nonce.Length != Constants.NonceLength)
+            throw new InvalidDataException($"{nameof(Nonce)} has to be {Constants.NonceLength} bytes long");
 
-        var publicKeyXLength = reader.ReadUInt16();
-        PublicKeyX = reader.ReadBytes(publicKeyXLength);
-        var publicKeyYLength = reader.ReadUInt16();
-        PublicKeyY = reader.ReadBytes(publicKeyYLength);
+        writer.Write((byte)Result);
+        writer.Write((ushort)HMACSize);
+        writer.Write(Nonce);
+        writer.Write((uint)MessageFragmentSize);
+
+        writer.Write((ushort)PublicKeyX.Length);
+        writer.Write(PublicKeyX);
+        writer.Write((ushort)PublicKeyY.Length);
+        writer.Write(PublicKeyY);
     }
-
-    public ConnectionResult Result { get; set; }
-    public ushort HMACSize { get; set; }
-    public byte[] Nonce { get; set; }
-    public uint MessageFragmentSize { get; set; }
-    public byte[] PublicKeyX { get; set; }
-    public byte[] PublicKeyY { get; set; }
 }

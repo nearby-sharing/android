@@ -4,14 +4,14 @@ using System.IO;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Protocol
 {
-    public sealed class CommonHeaders
+    public sealed class CommonHeaders : ICdpHeader<CommonHeaders>
     {
-        public CommonHeaders() { }
+        public static CommonHeaders Parse(BinaryReader reader)
+            => throw new NotImplementedException();
 
-        public bool TryRead(BinaryReader reader)
-            => TryRead(reader, out _);
-        public bool TryRead(BinaryReader reader, out Exception? ex)
+        public static bool TryParse(BinaryReader reader, out CommonHeaders? result, out Exception? ex)
         {
+            result = new();
             var sig = reader.ReadUInt16();
             if (sig != Constants.Signature)
             {
@@ -19,22 +19,22 @@ namespace ShortDev.Microsoft.ConnectedDevices.Protocol
                 return false;
             }
 
-            MessageLength = reader.ReadUInt16();
-            Version = reader.ReadByte();
-            if (Version != Constants.ProtocolVersion)
+            result.MessageLength = reader.ReadUInt16();
+            result.Version = reader.ReadByte();
+            if (result.Version != Constants.ProtocolVersion)
             {
-                ex = new InvalidDataException($"Wrong version. Got \"{Version}\", expected \"{Constants.ProtocolVersion}\"");
+                ex = new InvalidDataException($"Wrong version. Got \"{result.Version}\", expected \"{Constants.ProtocolVersion}\"");
                 return false;
             }
 
-            Type = (MessageType)reader.ReadByte();
-            Flags = (MessageFlags)reader.ReadInt16();
-            SequenceNumber = reader.ReadUInt32();
-            RequestID = reader.ReadUInt64();
-            FragmentIndex = reader.ReadUInt16();
-            FragmentCount = reader.ReadUInt16();
-            SessionID = reader.ReadUInt64();
-            ChannelID = reader.ReadUInt64();
+            result.Type = (MessageType)reader.ReadByte();
+            result.Flags = (MessageFlags)reader.ReadInt16();
+            result.SequenceNumber = reader.ReadUInt32();
+            result.RequestID = reader.ReadUInt64();
+            result.FragmentIndex = reader.ReadUInt16();
+            result.FragmentCount = reader.ReadUInt16();
+            result.SessionID = reader.ReadUInt64();
+            result.ChannelID = reader.ReadUInt64();
 
             NextHeaderType nextHeaderType;
             byte nextHeaderSize;
@@ -59,9 +59,9 @@ namespace ShortDev.Microsoft.ConnectedDevices.Protocol
                 return false;
             }
 
-            AdditionalHeaders = additionalHeaders.ToArray();
+            result.AdditionalHeaders = additionalHeaders.ToArray();
 
-            if (Flags.HasFlag(MessageFlags.HasHMAC))
+            if (result.Flags.HasFlag(MessageFlags.HasHMAC))
             {
                 // ToDo: HMAC ?!
             }
@@ -92,6 +92,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Protocol
             writer.Write((byte)NextHeaderType.None);
             writer.Write((byte)0);
         }
+
 
         public uint MessageLength { get; set; }
         public byte Version { get; set; }

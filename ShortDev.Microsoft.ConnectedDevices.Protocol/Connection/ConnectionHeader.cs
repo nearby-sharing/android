@@ -2,15 +2,24 @@
 
 namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Connection;
 
-public sealed class ConnectionHeader
+public sealed class ConnectionHeader : ICdpHeader<ConnectionHeader>
 {
-    public ConnectionHeader(BinaryReader reader)
+    public required ConnectionType ConnectMessageType { get; set; }
+
+    public required ConnectionMode ConnectionMode { get; set; }
+
+    public static ConnectionHeader Parse(BinaryReader reader)
     {
-        ConnectionMode = (ConnectionMode)reader.ReadInt16();
-        ConnectMessageType = (ConnectionType)reader.ReadByte();
+        return new()
+        {
+            ConnectionMode = (ConnectionMode)reader.ReadInt16(),
+            ConnectMessageType = (ConnectionType)reader.ReadByte()
+        };
     }
 
-    public ConnectionType ConnectMessageType { get; }
-
-    public ConnectionMode ConnectionMode { get; }
+    public void Write(BinaryWriter writer)
+    {
+        writer.Write((short)ConnectionMode);
+        writer.Write((byte)ConnectMessageType);
+    }
 }

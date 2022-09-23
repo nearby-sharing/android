@@ -37,12 +37,11 @@ namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Discovery
                     using (MemoryStream stream = new(result.Buffer))
                     using (BinaryReader reader = new(stream))
                     {
-                        CommonHeaders headers = new();
-                        if (headers.TryRead(reader))
+                        if (CommonHeaders.TryParse(reader, out var headers, out _) && headers != null)
                         {
                             if (headers.Type == MessageType.Discovery)
                             {
-                                DiscoveryHeaders discoveryHeaders = new(reader);
+                                DiscoveryHeader discoveryHeaders = DiscoveryHeader.Parse(reader);
                             }
                         }
                     }
