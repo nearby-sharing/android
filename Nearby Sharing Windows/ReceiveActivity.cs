@@ -154,7 +154,7 @@ namespace Nearby_Sharing_Windows
 
         public async Task ListenRfcommAsync(CdpRfcommOptions options, CancellationToken cancellationToken = default)
         {
-            var listener = _btAdapter.ListenUsingInsecureRfcommWithServiceRecord(
+            var listener = _btAdapter.ListenUsingRfcommWithServiceRecord(
                 options.ServiceName,
                 Java.Util.UUID.FromString(options.ServiceId)
             )!;
