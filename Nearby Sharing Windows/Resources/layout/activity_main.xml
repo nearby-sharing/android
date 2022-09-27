@@ -4,24 +4,25 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    android:layout_height="match_parent">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fitsSystemWindows="true">
+        app:liftOnScroll="true">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
+            app:title="Nearby Sharing"
             app:titleCentered="true"
             app:titleTextColor="#fff"
+            app:subtitle="Send data to Windows 10 / 11"
             app:subtitleCentered="true"
             app:subtitleTextColor="#efefef"
-            style="@style/AppTheme.AppBarOverlay" />
+            app:menu="@menu/menu_main" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -148,7 +149,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|right"
         android:layout_margin="16dp"
-        android:src="@drawable/outline_share_24"
+        android:src="@drawable/ic_fluent_share_android_24_selector"
         app:tint="?attr/colorOnPrimary"
         app:backgroundTint="?attr/colorPrimary"/>
 

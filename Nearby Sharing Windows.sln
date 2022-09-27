@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32421.90
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nearby Sharing Windows", "Nearby Sharing Windows\Nearby Sharing Windows.csproj", "{081AC55E-14D3-42A9-A742-29818E649650}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nearby Sharing Windows", "Nearby Sharing Windows\Nearby Sharing Windows.csproj", "{081AC55E-14D3-42A9-A742-29818E649650}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShortDev.Microsoft.ConnectedDevices.AndroidSdk", "ShortDev.Microsoft.ConnectedDevices.AndroidSdk\ShortDev.Microsoft.ConnectedDevices.AndroidSdk.csproj", "{9CD32CF6-76DC-46DE-AFA6-47B008AD17A7}"
 EndProject
@@ -14,6 +14,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test", "Test\Test.csproj", "{CB6EAF2F-0357-4C96-8A88-190E6CF3FC2A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShortDev.Networking", "ShortDev.Networking\ShortDev.Networking.csproj", "{18FCC134-71CC-4BE9-9271-3839A6FFE380}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShortDev.Android.FluentIcons", "ShortDev.Android.FluentIcons\ShortDev.Android.FluentIcons.csproj", "{71BECC85-C1AD-49FE-9F5E-689D843ADA88}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,6 +49,10 @@ Global
 		{18FCC134-71CC-4BE9-9271-3839A6FFE380}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{18FCC134-71CC-4BE9-9271-3839A6FFE380}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{18FCC134-71CC-4BE9-9271-3839A6FFE380}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71BECC85-C1AD-49FE-9F5E-689D843ADA88}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71BECC85-C1AD-49FE-9F5E-689D843ADA88}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71BECC85-C1AD-49FE-9F5E-689D843ADA88}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71BECC85-C1AD-49FE-9F5E-689D843ADA88}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

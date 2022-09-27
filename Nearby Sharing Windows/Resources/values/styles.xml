@@ -7,9 +7,13 @@
 		<item name="colorPrimaryDark">@color/colorPrimaryDark</item>
 		<item name="colorAccent">@color/colorAccent</item>
 		<item name="android:statusBarColor">?attr/colorPrimary</item>
+		<item name="actionBarTheme">@style/ThemeOverlay.Material3.Dark.ActionBar</item>
+		<item name="actionOverflowButtonStyle">@style/OverflowButtonStyle</item>
 	</style>
 
-	<style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.Material3.ActionBar" />
+	<style name="OverflowButtonStyle" parent="Widget.AppCompat.ActionButton.Overflow">
+		<item name="android:tint">#fff</item>
+	</style>
 
 	<style name="AppTheme.TranslucentOverlay" parent="AppTheme">
 		<item name="android:windowIsTranslucent">true</item>

@@ -10,7 +10,8 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fitsSystemWindows="true">
+        android:fitsSystemWindows="true"
+        app:liftOnScroll="true">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
@@ -21,7 +22,7 @@
             app:titleTextColor="#fff"
             app:subtitleCentered="true"
             app:subtitleTextColor="#efefef"
-            style="@style/AppTheme.AppBarOverlay" />
+            app:menu="@menu/menu_main" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -40,7 +41,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="75dp"
                 android:tint="#ff0000"
-                android:src="@drawable/warning"/>
+                android:src="@drawable/ic_fluent_warning_24_regular"/>
 
             <TextView
                 style="@style/TextAppearance.AppCompat.Title"
@@ -65,7 +66,7 @@
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="75dp"
-                android:src="@drawable/settings"/>
+                android:src="@drawable/ic_fluent_settings_24_regular"/>
 
             <TextView
                 style="@style/TextAppearance.AppCompat.Title"
@@ -110,7 +111,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Back" 
-                    app:icon="@drawable/navigate_before" />
+                    app:icon="@drawable/ic_fluent_chevron_left_24_regular" />
 
                 <Button
                     android:id="@+id/nextButton"
@@ -118,7 +119,7 @@
                     android:layout_height="wrap_content"
                     android:text="Next"
                     android:layout_alignParentRight="true"
-                    app:icon="@drawable/navigate_next"
+                    app:icon="@drawable/ic_fluent_chevron_right_24_regular"
                     app:iconGravity="end" />
 
             </RelativeLayout>

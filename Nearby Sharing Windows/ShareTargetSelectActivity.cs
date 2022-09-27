@@ -15,7 +15,8 @@ using Com.Microsoft.Connecteddevices.Remotesystems.Commanding.Nearshare;
 using Google.Android.Material.ProgressIndicator;
 using Google.Android.Material.Snackbar;
 using Java.Util.Concurrent;
-using Sentry;
+using Java.Util.Regex;
+//using Sentry;
 using ShortDev.Android.UI;
 using System;
 using System.Collections;
@@ -42,12 +43,12 @@ namespace Nearby_Sharing_Windows
         protected override void OnCreate(Bundle? savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-            SentryXamarin.Init(options =>
-            {
-                options.Dsn = "https://47f9f6c3642149a5af942e8484e64fe1@o646413.ingest.sentry.io/6437134";
-                options.Debug = true;
-                options.TracesSampleRate = 1.0;
-            });
+            //SentryXamarin.Init(options =>
+            //{
+            //    options.Dsn = "https://47f9f6c3642149a5af942e8484e64fe1@o646413.ingest.sentry.io/6437134";
+            //    options.Debug = true;
+            //    options.TracesSampleRate = 1.0;
+            //});
             SetContentView(Resource.Layout.activity_share);
 
             StatusTextView = FindViewById<TextView>(Resource.Id.statusTextView)!;
@@ -61,10 +62,10 @@ namespace Nearby_Sharing_Windows
                 (view, device) =>
                 {
                     view.FindViewById<ImageView>(Resource.Id.deviceTypeImageView)?.SetImageResource(
-                        device.Kind == "Desktop" ? Resource.Drawable.fluent_desktop : Resource.Drawable.fluent_phone
+                        device.Kind == "Desktop" ? Resource.Drawable.ic_fluent_desktop_20_regular : Resource.Drawable.ic_fluent_phone_20_regular
                     );
                     view.FindViewById<ImageView>(Resource.Id.transportTypeImageView)?.SetImageResource(
-                        device.Apps.FirstOrDefault()?.IsAvailableBySpatialProximity == true ? Resource.Drawable.fluent_bluetooth : Resource.Drawable.fluent_wifi
+                        device.Apps.FirstOrDefault()?.IsAvailableBySpatialProximity == true ? Resource.Drawable.ic_fluent_bluetooth_20_regular : Resource.Drawable.ic_fluent_wifi_1_20_regular
                     );
                     view.FindViewById<TextView>(Resource.Id.deviceNameTextView)!.Text = device.DisplayName;
                     view.Click += (s, e) => SendData(device);

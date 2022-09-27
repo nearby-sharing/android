@@ -17,7 +17,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:tint="#000"
-            android:src="@drawable/fluent_desktop" />
+            android:src="@drawable/ic_fluent_desktop_24_regular" />
         <ImageView
             android:id="@+id/transportTypeImageView"
             android:layout_width="20dp"
@@ -27,7 +27,7 @@
             android:padding="3dp"
             android:background="@drawable/round_outline"
             android:tint="#000"
-            android:src="@drawable/fluent_bluetooth" />
+            android:src="@drawable/ic_fluent_bluetooth_24_regular" />
     </RelativeLayout>
 
     <TextView

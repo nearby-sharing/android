@@ -12,8 +12,8 @@
         android:layout_width="match_parent"
         android:layout_gravity="bottom"
         android:id="@+id/standard_bottom_sheet"
+        style="@style/Widget.Material3.BottomSheet"
         android:layout_height="350dp"
-        android:elevation="20dp"
         android:background="@drawable/bottom_sheet_header">
 
         <LinearLayout
@@ -22,12 +22,14 @@
             android:orientation="vertical"
             android:padding="16dp"
             android:animateLayoutChanges="true">
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="#232323"
                 android:text="Scanning ..."
                 android:layout_marginLeft="10dp"
+                android:gravity="center"
                 android:id="@+id/statusTextView" />
 
             <com.google.android.material.progressindicator.LinearProgressIndicator
@@ -59,7 +61,7 @@
                         android:layout_width="80dp"
                         android:layout_height="80dp"
                         android:layout_centerInParent="true"
-                        android:src="@drawable/fluent_send_clock"/>
+                        android:src="@drawable/ic_fluent_send_clock_24_regular"/>
 
                     <LinearLayout
                         android:orientation="vertical"
@@ -141,11 +143,11 @@
                         android:layout_width="80dp"
                         android:layout_height="80dp"
                         android:layout_centerInParent="true"
-                        android:src="@drawable/fluent_search" />
+                        android:src="@drawable/ic_fluent_search_24_regular" />
                 </RelativeLayout>
                 <!-- #endregion -->
             </FrameLayout>
-
         </LinearLayout>
+
     </FrameLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

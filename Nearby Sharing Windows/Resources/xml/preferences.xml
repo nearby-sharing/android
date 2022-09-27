@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto">
+	<PreferenceCategory
+		android:key="general"
+        android:title="General">
+		<Preference
+            app:key="request_permissions"
+            app:title="Request Permissions"
+            app:summary="Grant necessary permissions to app" />
+	</PreferenceCategory>
+	<PreferenceCategory
+		android:key="device_info"
+        android:title="Device Information">
+		<Preference
+            app:key="goto_mac_address"
+            app:title="Specify Mac Address"
+            app:summary="Specify the mac address of this device" />
+	</PreferenceCategory>
+</PreferenceScreen>

@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net6.0-android</TargetFramework>
+		<TargetFramework>net6.0-android31.0</TargetFramework>
 		<OutputType>Exe</OutputType>
 		<SupportedOSPlatformVersion>21</SupportedOSPlatformVersion>
 		<LangVersion>preview</LangVersion>
@@ -11,15 +11,22 @@
 		<ApplicationDisplayVersion>1.1.0</ApplicationDisplayVersion>
 		<EnablePreviewFeatures>true</EnablePreviewFeatures>
 	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<AndroidUseAapt2>True</AndroidUseAapt2>
+		<AndroidCreatePackagePerAbi>False</AndroidCreatePackagePerAbi>
+	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Sentry.Xamarin">
-			<Version>1.4.1</Version>
-		</PackageReference>
-		<PackageReference Include="Xamarin.AndroidX.AppCompat" Version="1.4.1.1" />
-		<PackageReference Include="Xamarin.Google.Android.Material" Version="1.6.0" />
+	  <None Remove="Resources\layout\activity_settings.xml" />
+	  <None Remove="Resources\xml\preferences.xml" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Xamarin.AndroidX.AppCompat" Version="1.5.1" />
+		<PackageReference Include="Xamarin.AndroidX.Preference" Version="1.2.0.2" />
+		<PackageReference Include="Xamarin.Google.Android.Material" Version="1.6.1.1" />
 		<PackageReference Include="Xamarin.Essentials" Version="1.7.3" />
 	</ItemGroup>
 	<ItemGroup>
+		<ProjectReference Include="..\ShortDev.Android.FluentIcons\ShortDev.Android.FluentIcons.csproj" />
 		<ProjectReference Include="..\ShortDev.Android\ShortDev.Android.csproj">
 			<Project>{195c941f-5eef-45a9-a65c-16186e4bb131}</Project>
 			<Name>ShortDev.Android</Name>
@@ -36,5 +43,8 @@
 			<Project>{18fcc134-71cc-4be9-9271-3839a6ffe380}</Project>
 			<Name>ShortDev.Networking</Name>
 		</ProjectReference>
+	</ItemGroup>
+	<ItemGroup>
+	  <TransformFile Include="Resources\xml\preferences.xml" />
 	</ItemGroup>
 </Project>
