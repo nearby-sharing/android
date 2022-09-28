@@ -9,12 +9,13 @@ using ShortDev.Microsoft.ConnectedDevices.Protocol.Discovery;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms;
 using ShortDev.Networking;
 using System.Net.NetworkInformation;
+using System.Security.Cryptography;
 using ManifestPermission = Android.Manifest.Permission;
 using Stream = System.IO.Stream;
 
 namespace Nearby_Sharing_Windows
 {
-    [Activity(Label = "@string/app_name", Theme = "@style/AppTheme")]
+    [Activity(Label = "@string/app_name", Theme = "@style/AppTheme", ConfigurationChanges = Android.Content.PM.ConfigChanges.Orientation | Android.Content.PM.ConfigChanges.ScreenSize)]
     public class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler
     {
         BluetoothAdapter? _btAdapter;
@@ -39,14 +40,13 @@ namespace Nearby_Sharing_Windows
             var service = (BluetoothManager)GetSystemService(BluetoothService)!;
             _btAdapter = service.Adapter!;
 
-            string address = TryGetBtAddress(_btAdapter, out var exception) ?? "00:fa:21:3e:fb:19";
+            string address = TryGetBtAddress(_btAdapter, out var exception) ?? "00:fa:21:3e:fb:19"; // "d4:38:9c:0b:ca:ae"; //
 
             BluetoothAdvertisement bluetoothAdvertisement = new(this);
             bluetoothAdvertisement.OnDeviceConnected += BluetoothAdvertisement_OnDeviceConnected;
             bluetoothAdvertisement.StartAdvertisement(new CdpDeviceAdvertiseOptions(
                 DeviceType.Android,
                 PhysicalAddress.Parse(address.Replace(":", "").ToUpper()),
-
                 _btAdapter.Name!
             ));
         }
@@ -86,38 +86,88 @@ namespace Nearby_Sharing_Windows
             return null;
         }
 
+        ConnectionRequest connectionRequest;
+        ECDsa ownKey;
+        ECDsa remoteKey;
         private void BluetoothAdvertisement_OnDeviceConnected(CdpRfcommSocket socket)
         {
-            PrintStreamData(socket.InputStream!);
-        }
-
-        public static void PrintStreamData(Stream stream)
-        {
-            using (BigEndianBinaryReader reader = new(stream))
+            Task.Run(() =>
             {
-                if (!CommonHeaders.TryParse(reader, out var headers, out _) || headers == null)
-                    return;
-
-                if (headers.Type == MessageType.Connect)
+                using (BigEndianBinaryWriter writer = new(socket.OutputStream!))
+                using (BigEndianBinaryReader reader = new(socket.InputStream!))
                 {
-                    ConnectionHeader connectionHeader = ConnectionHeader.Parse(reader);
-                    switch (connectionHeader.ConnectMessageType)
+                    while (true)
                     {
-                        case ConnectionType.ConnectRequest:
+                        if (!CommonHeaders.TryParse(reader, out var headers, out _) || headers == null)
+                            return;
+
+                        if (headers.Type == MessageType.Connect)
+                        {
+                            ConnectionHeader connectionHeader = ConnectionHeader.Parse(reader);
+                            switch (connectionHeader.ConnectMessageType)
                             {
-                                reader.ReadByte(); // ToDo: ??
-                                ConnectionRequest connectionRequest = ConnectionRequest.Parse(reader);
-                                break;
+                                case ConnectionType.ConnectRequest:
+                                    {
+                                        connectionRequest = ConnectionRequest.Parse(reader);
+
+                                        remoteKey = ECDsa.Create(new ECParameters()
+                                        {
+                                            Curve = ECCurve.NamedCurves.nistP256,
+                                            Q = new ECPoint()
+                                            {
+                                                X = connectionRequest.PublicKeyX,
+                                                Y = connectionRequest.PublicKeyY
+                                            }
+                                        });
+
+                                        headers.Write(writer);
+
+                                        //new CommonHeaders()
+                                        //{
+                                        //    Type = MessageType.Connect,
+                                        //    MessageLength = headers.MessageLength
+                                        //}.Write(writer);
+
+                                        new ConnectionHeader()
+                                        {
+                                            ConnectionMode = ConnectionMode.Proximal,
+                                            ConnectMessageType = ConnectionType.ConnectResponse
+                                        }.Write(writer);
+
+                                        ownKey = ECDsa.Create(ECCurve.NamedCurves.nistP256);
+                                        var publicKey = ownKey.ExportExplicitParameters(false).Q;
+
+                                        new ConnectionResponse()
+                                        {
+                                            Result = ConnectionResult.Pending,
+                                            HMACSize = connectionRequest.HMACSize,
+                                            MessageFragmentSize = connectionRequest.MessageFragmentSize,
+                                            Nonce = connectionRequest.Nonce,
+                                            PublicKeyX = publicKey.X!,
+                                            PublicKeyY = publicKey.Y!
+                                        }.Write(writer);
+
+                                        writer.Flush();
+
+                                        break;
+                                    }
+                                case ConnectionType.DeviceAuthRequest:
+                                    {
+                                        break;
+                                    }
+                                default:
+                                    {
+                                        break;
+                                    }
                             }
+                        }
                     }
                 }
-            }
+            });
         }
 
-        void SendConnectResponse(ConnectionRequest request)
-        {
-
-        }
+        byte[] GenerateNonce()
+            => new byte[64];
 
         public Task ScanBLeAsync(CdpScanOptions<CdpBluetoothDevice> scanOptions, CancellationToken cancellationToken = default)
             => throw new NotImplementedException();
@@ -152,15 +202,18 @@ namespace Nearby_Sharing_Windows
                 options.ServiceName,
                 Java.Util.UUID.FromString(options.ServiceId)
             )!;
-            while (true)
+            await Task.Run(() =>
             {
-                var socket = await listener.AcceptAsync();
-                if (cancellationToken.IsCancellationRequested)
-                    return;
+                while (true)
+                {
+                    var socket = listener.Accept();
+                    if (cancellationToken.IsCancellationRequested)
+                        return;
 
-                if (socket != null)
-                    options!.OnSocketConnected!(socket.ToCdp());
-            }
+                    if (socket != null)
+                        options!.OnSocketConnected!(socket.ToCdp());
+                }
+            }, cancellationToken);
         }
 
         Task AwaitCancellation(CancellationToken cancellationToken)

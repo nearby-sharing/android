@@ -5,6 +5,8 @@ namespace ShortDev.Networking
 {
     public sealed class BigEndianBinaryWriter : BinaryWriter
     {
+        public BigEndianBinaryWriter(Stream stream) : base(stream) { }
+
         public override void Write(byte[] buffer)
             => Write(buffer, 0, buffer.Length);
 
@@ -75,10 +77,10 @@ namespace ShortDev.Networking
         }
 
 
-        public override void Write(string value)
-        {
-            throw new NotImplementedException();
-        }
+        //public override void Write(string value)
+        //{
+        //    throw new NotImplementedException();
+        //}
         public override void Write(float value)
         {
             throw new NotImplementedException();

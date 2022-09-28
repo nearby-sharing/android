@@ -95,15 +95,15 @@ namespace ShortDev.Microsoft.ConnectedDevices.Protocol
 
 
         public uint MessageLength { get; set; }
-        public byte Version { get; set; }
+        public byte Version { get; set; } = Constants.ProtocolVersion;
         public MessageType Type { get; set; }
         public MessageFlags Flags { get; set; }
-        public uint SequenceNumber { get; set; }
-        public ulong RequestID { get; set; }
-        public ushort FragmentIndex { get; set; }
-        public ushort FragmentCount { get; set; }
-        public ulong SessionID { get; set; }
-        public ulong ChannelID { get; set; }
+        public uint SequenceNumber { get; set; } = 0;
+        public ulong RequestID { get; set; } = 0;
+        public ushort FragmentIndex { get; set; } = 0;
+        public ushort FragmentCount { get; set; } = 1;
+        public ulong SessionID { get; set; } = 0;
+        public ulong ChannelID { get; set; } = 0;
 
         public AdditionalMessageHeader[] AdditionalHeaders { get; set; }
         public record AdditionalMessageHeader(NextHeaderType Type, byte[] Value);

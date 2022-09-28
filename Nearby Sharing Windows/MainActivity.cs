@@ -6,7 +6,7 @@ using Google.Android.Material.FloatingActionButton;
 
 namespace Nearby_Sharing_Windows
 {
-    [Activity(Label = "@string/app_name", Theme = "@style/AppTheme", MainLauncher = true)]
+    [Activity(Label = "@string/app_name", Theme = "@style/AppTheme", MainLauncher = true, ConfigurationChanges = Android.Content.PM.ConfigChanges.Orientation | Android.Content.PM.ConfigChanges.ScreenSize)]
     public class MainActivity : AppCompatActivity
     {
         protected override void OnCreate(Bundle? savedInstanceState)
