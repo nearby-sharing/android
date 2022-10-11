@@ -2,16 +2,18 @@
 
 using Android.Bluetooth;
 using Android.Bluetooth.LE;
+using Android.Telecom;
 using AndroidX.AppCompat.App;
 using ShortDev.Microsoft.ConnectedDevices.Protocol;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Connection;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Discovery;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms;
 using ShortDev.Networking;
+using System.Diagnostics;
 using System.Net.NetworkInformation;
 using System.Security.Cryptography;
+using ConnectionRequest = ShortDev.Microsoft.ConnectedDevices.Protocol.Connection.ConnectionRequest;
 using ManifestPermission = Android.Manifest.Permission;
-using Stream = System.IO.Stream;
 
 namespace Nearby_Sharing_Windows
 {
@@ -40,7 +42,32 @@ namespace Nearby_Sharing_Windows
             var service = (BluetoothManager)GetSystemService(BluetoothService)!;
             _btAdapter = service.Adapter!;
 
-            string address = TryGetBtAddress(_btAdapter, out var exception) ?? "00:fa:21:3e:fb:19"; // "d4:38:9c:0b:ca:ae"; //
+            //var device = _btAdapter.GetRemoteDevice("B8:9A:2A:25:79:B5");
+
+            //var msg = BinaryConvert.ToBytes("3030009a0302000000000000000000000000000000000001000000000000000200000000000000008104700000038208000000000000001f83080000000000000007000000010000002094b0aac5d36393ab000040000020a891c43b8d6227ac232e7155c52a4fc27116d113eaf65fa201fcff088b1a5bd800208f196fe9f32dfd49cb0b3719821468bb7c97b72d0c0b2762b1a5005c89feb0fd");
+            //using (var socket = device.CreateInsecureRfcommSocketToServiceRecord(Java.Util.UUID.FromString("F6545836-9428-486A-BAD3-B94B3C0659E3")))
+            //{
+            //    socket.Connect();
+            //    //using (BinaryWriter writer = new(socket.OutputStream))
+            //    //using (BinaryReader reader = new(socket.InputStream))
+            //    //{
+            //    //    writer.Write(msg);
+            //    //    writer.Flush();
+
+            //    //    var input = socket.InputStream as InputStreamInvoker;
+            //    //    var length = input.BaseInputStream.Available();
+
+            //    //    using (MemoryStream buffer = new())
+            //    //    {
+            //    //        // socket.InputStream.CopyTo(buffer);
+            //    //        Debug.Print(BinaryConvert.ToString(reader.ReadBytes(length)));
+            //    //    }
+            //    //}
+            //}
+
+            //return;
+
+            string address = TryGetBtAddress(_btAdapter, out var exception) ?? "00:fa:21:3e:fb:19"; // "d4:38:9c:0b:ca:ae"; // 
 
             BluetoothAdvertisement bluetoothAdvertisement = new(this);
             bluetoothAdvertisement.OnDeviceConnected += BluetoothAdvertisement_OnDeviceConnected;
@@ -93,15 +120,21 @@ namespace Nearby_Sharing_Windows
         {
             Task.Run(() =>
             {
+                using (MemoryStream testStream = new())
                 using (BigEndianBinaryWriter writer = new(socket.OutputStream!))
                 using (BigEndianBinaryReader reader = new(socket.InputStream!))
                 {
                     while (true)
                     {
-                        if (!CommonHeaders.TryParse(reader, out var headers, out _) || headers == null)
+                        if (!CommonHeader.TryParse(reader, out var header, out _) || header == null)
                             return;
 
-                        if (headers.Type == MessageType.Connect)
+                        foreach (var entry in header.AdditionalHeaders)
+                        {
+                            Debug.Print(entry.Type + " " + BinaryConvert.ToString(entry.Value));
+                        }
+
+                        if (header.Type == MessageType.Connect)
                         {
                             ConnectionHeader connectionHeader = ConnectionHeader.Parse(reader);
                             switch (connectionHeader.ConnectMessageType)
@@ -120,13 +153,25 @@ namespace Nearby_Sharing_Windows
                                             }
                                         });
 
-                                        headers.Write(writer);
+                                        header.AdditionalHeaders = new CommonHeader.AdditionalMessageHeader[]
+                                        {
+                                            new(
+                                                (NextHeaderType)129,
+                                                new byte[]{ 0x70,0x00,0x00,0x03 }
+                                            ),
+                                            new(
+                                                (NextHeaderType)130,
+                                                new byte[]{ 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x1F }
+                                            ),
+                                            new(
+                                                (NextHeaderType)131,
+                                                new byte[]{ 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x1F }
+                                            )
+                                        };
 
-                                        //new CommonHeaders()
-                                        //{
-                                        //    Type = MessageType.Connect,
-                                        //    MessageLength = headers.MessageLength
-                                        //}.Write(writer);
+                                        header.SessionID = 0x0000000e80000000 + header.SessionID;
+
+                                        header.Write(writer);
 
                                         new ConnectionHeader()
                                         {
@@ -135,20 +180,27 @@ namespace Nearby_Sharing_Windows
                                         }.Write(writer);
 
                                         ownKey = ECDsa.Create(ECCurve.NamedCurves.nistP256);
-                                        var publicKey = ownKey.ExportExplicitParameters(false).Q;
+                                        var publicKey = ownKey.ExportParameters(false).Q;
 
                                         new ConnectionResponse()
                                         {
                                             Result = ConnectionResult.Pending,
                                             HMACSize = connectionRequest.HMACSize,
                                             MessageFragmentSize = connectionRequest.MessageFragmentSize,
-                                            Nonce = connectionRequest.Nonce,
+                                            Nonce = new byte[] { 0xab, 0x16, 0xec, 0x3b, 0xe8, 0x4c, 0x90, 0xaa },
                                             PublicKeyX = publicKey.X!,
                                             PublicKeyY = publicKey.Y!
                                         }.Write(writer);
 
                                         writer.Flush();
+                                        Debug.Print(BinaryConvert.ToString(testStream.ToArray()));
 
+                                        break;
+                                    }
+
+                                case ConnectionType.ConnectResponse:
+                                    {
+                                        ConnectionResponse response = ConnectionResponse.Parse(reader);
                                         break;
                                     }
                                 case ConnectionType.DeviceAuthRequest:
@@ -198,7 +250,7 @@ namespace Nearby_Sharing_Windows
 
         public async Task ListenRfcommAsync(CdpRfcommOptions options, CancellationToken cancellationToken = default)
         {
-            var listener = _btAdapter.ListenUsingRfcommWithServiceRecord(
+            var listener = _btAdapter.ListenUsingInsecureRfcommWithServiceRecord(
                 options.ServiceName,
                 Java.Util.UUID.FromString(options.ServiceId)
             )!;

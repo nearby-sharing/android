@@ -12,7 +12,7 @@ namespace ShortDev.Networking
 
         public override void Write(byte[] buffer, int index, int count)
         {
-            Array.Reverse(buffer);
+            // Array.Reverse(buffer);
             base.Write(buffer, index, count);
         }
 

@@ -13,15 +13,18 @@ public sealed class ConnectionResponse : ICdpPayload<ConnectionResponse>
     public required byte[] PublicKeyY { get; set; }
 
     public static ConnectionResponse Parse(BinaryReader reader)
-        => new()
+    {
+        var result = (ConnectionResult)reader.ReadByte();
+        return new()
         {
-            Result = (ConnectionResult)reader.ReadByte(),
+            Result = result,
             HMACSize = reader.ReadUInt16(),
             Nonce = reader.ReadBytes(Constants.NonceLength),
             MessageFragmentSize = reader.ReadUInt32(),
             PublicKeyX = reader.ReadBytesWithLength(),
             PublicKeyY = reader.ReadBytesWithLength()
         };
+    }
 
     public void Write(BinaryWriter writer)
     {

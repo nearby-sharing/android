@@ -4,12 +4,16 @@ using System.IO;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Protocol
 {
-    public sealed class CommonHeaders : ICdpHeader<CommonHeaders>
+    public sealed class CommonHeader : ICdpHeader<CommonHeader>
     {
-        public static CommonHeaders Parse(BinaryReader reader)
-            => throw new NotImplementedException();
+        public static CommonHeader Parse(BinaryReader reader)
+        {
+            if (!TryParse(reader, out var result, out var ex))
+                throw ex ?? new NullReferenceException("No exception");
+            return result ?? throw new NullReferenceException("No result");
+        }
 
-        public static bool TryParse(BinaryReader reader, out CommonHeaders? result, out Exception? ex)
+        public static bool TryParse(BinaryReader reader, out CommonHeader? result, out Exception? ex)
         {
             result = new();
             var sig = reader.ReadUInt16();
@@ -87,6 +91,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Protocol
             foreach (var header in AdditionalHeaders)
             {
                 writer.Write((byte)header.Type);
+                writer.Write((byte)header.Value.Length);
                 writer.Write(header.Value);
             }
             writer.Write((byte)NextHeaderType.None);
@@ -94,7 +99,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Protocol
         }
 
 
-        public uint MessageLength { get; set; }
+        public ushort MessageLength { get; set; }
         public byte Version { get; set; } = Constants.ProtocolVersion;
         public MessageType Type { get; set; }
         public MessageFlags Flags { get; set; }
