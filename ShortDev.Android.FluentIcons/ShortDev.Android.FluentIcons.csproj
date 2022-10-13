@@ -5,5 +5,8 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Version>1.1.182</Version>
+		<Authors>Lukas Kurz</Authors>
+		<Company>ShortDevelopment</Company>
+		<Description>Use Microsoft fluent-icons in Xamarin Android project</Description>
 	</PropertyGroup>
 </Project>
