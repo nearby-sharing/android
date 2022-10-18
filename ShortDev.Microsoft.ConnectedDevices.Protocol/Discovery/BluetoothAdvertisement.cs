@@ -46,7 +46,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Discovery
             return true;
         }
 
-       public static byte[] GenerateAdvertisement(CdpDeviceAdvertiseOptions options)
+        public static byte[] GenerateAdvertisement(CdpDeviceAdvertiseOptions options)
         {
             using (MemoryStream stream = new())
             using (BinaryWriter writer = new(stream))
@@ -95,7 +95,6 @@ namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Discovery
             // Called from "StartAdvertisement"!
             if (cancellationTokenSource != null)
             {
-                cancellationTokenSource.Cancel();
                 cancellationTokenSource.Dispose();
             }
         }

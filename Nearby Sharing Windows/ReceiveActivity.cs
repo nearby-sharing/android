@@ -2,16 +2,16 @@
 
 using Android.Bluetooth;
 using Android.Bluetooth.LE;
-using Android.Telecom;
 using AndroidX.AppCompat.App;
 using ShortDev.Microsoft.ConnectedDevices.Protocol;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Connection;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Discovery;
+using ShortDev.Microsoft.ConnectedDevices.Protocol.Encryption;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms;
 using ShortDev.Networking;
 using System.Diagnostics;
 using System.Net.NetworkInformation;
-using System.Security.Cryptography;
+using System.Text.Json;
 using ConnectionRequest = ShortDev.Microsoft.ConnectedDevices.Protocol.Connection.ConnectionRequest;
 using ManifestPermission = Android.Manifest.Permission;
 
@@ -21,6 +21,7 @@ namespace Nearby_Sharing_Windows
     public class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler
     {
         BluetoothAdapter? _btAdapter;
+        BluetoothAdvertisement? _bluetoothAdvertisement;
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -67,15 +68,25 @@ namespace Nearby_Sharing_Windows
 
             //return;
 
+            Debug.Print(JsonSerializer.Serialize(localEncryption.DiffieHellman.ExportParameters(true), new JsonSerializerOptions()
+            {
+                IncludeFields = true
+            }));
+
             string address = TryGetBtAddress(_btAdapter, out var exception) ?? "00:fa:21:3e:fb:19"; // "d4:38:9c:0b:ca:ae"; // 
 
-            BluetoothAdvertisement bluetoothAdvertisement = new(this);
-            bluetoothAdvertisement.OnDeviceConnected += BluetoothAdvertisement_OnDeviceConnected;
-            bluetoothAdvertisement.StartAdvertisement(new CdpDeviceAdvertiseOptions(
+            _bluetoothAdvertisement = new(this);
+            _bluetoothAdvertisement.OnDeviceConnected += BluetoothAdvertisement_OnDeviceConnected;
+            _bluetoothAdvertisement.StartAdvertisement(new CdpDeviceAdvertiseOptions(
                 DeviceType.Android,
                 PhysicalAddress.Parse(address.Replace(":", "").ToUpper()),
                 _btAdapter.Name!
             ));
+        }
+
+        public override void Finish()
+        {
+            _bluetoothAdvertisement?.StopAdvertisement();
         }
 
         public string? TryGetBtAddress(BluetoothAdapter adapter, out System.Exception? exception)
@@ -113,9 +124,8 @@ namespace Nearby_Sharing_Windows
             return null;
         }
 
-        ConnectionRequest connectionRequest;
-        ECDsa ownKey;
-        ECDsa remoteKey;
+        CdpEncryptionInfo localEncryption = CdpEncryptionInfo.Create();
+        CdpEncryptionInfo? remoteEncryption;
         private void BluetoothAdvertisement_OnDeviceConnected(CdpRfcommSocket socket)
         {
             Task.Run(() =>
@@ -134,6 +144,19 @@ namespace Nearby_Sharing_Windows
                             Debug.Print(entry.Type + " " + BinaryConvert.ToString(entry.Value));
                         }
 
+                        if (header.Flags.HasFlag(MessageFlags.SessionEncrypted))
+                        {
+                            using (BigEndianBinaryWriter writer2 = new(testStream))
+                            {
+                                header.Write(writer2);
+                                int length = header.MessageLength - (int)((ICdpSerializable<CommonHeader>)header).CalcSize();
+                                writer2.Write(reader.ReadBytes(length));
+                                Debug.Print(BinaryConvert.ToString(testStream.ToArray()));
+                            }
+
+                            continue; // ToDo: remove
+                        }
+
                         if (header.Type == MessageType.Connect)
                         {
                             ConnectionHeader connectionHeader = ConnectionHeader.Parse(reader);
@@ -141,17 +164,8 @@ namespace Nearby_Sharing_Windows
                             {
                                 case ConnectionType.ConnectRequest:
                                     {
-                                        connectionRequest = ConnectionRequest.Parse(reader);
-
-                                        remoteKey = ECDsa.Create(new ECParameters()
-                                        {
-                                            Curve = ECCurve.NamedCurves.nistP256,
-                                            Q = new ECPoint()
-                                            {
-                                                X = connectionRequest.PublicKeyX,
-                                                Y = connectionRequest.PublicKeyY
-                                            }
-                                        });
+                                        var connectionRequest = ConnectionRequest.Parse(reader);
+                                        remoteEncryption = CdpEncryptionInfo.FromRemote(connectionRequest.PublicKeyX, connectionRequest.PublicKeyY, connectionRequest.Nonce);
 
                                         header.AdditionalHeaders = new CommonHeader.AdditionalMessageHeader[]
                                         {
@@ -179,28 +193,21 @@ namespace Nearby_Sharing_Windows
                                             ConnectMessageType = ConnectionType.ConnectResponse
                                         }.Write(writer);
 
-                                        ownKey = ECDsa.Create(ECCurve.NamedCurves.nistP256);
-                                        var publicKey = ownKey.ExportParameters(false).Q;
-
+                                        var publicKey = localEncryption.PublicKey;
                                         new ConnectionResponse()
                                         {
                                             Result = ConnectionResult.Pending,
                                             HMACSize = connectionRequest.HMACSize,
                                             MessageFragmentSize = connectionRequest.MessageFragmentSize,
-                                            Nonce = new byte[] { 0xab, 0x16, 0xec, 0x3b, 0xe8, 0x4c, 0x90, 0xaa },
+                                            Nonce = localEncryption.Nonce,
                                             PublicKeyX = publicKey.X!,
                                             PublicKeyY = publicKey.Y!
                                         }.Write(writer);
 
                                         writer.Flush();
+                                        Debug.Print(BinaryConvert.ToString(localEncryption.GenerateSharedSecret(remoteEncryption)));
                                         Debug.Print(BinaryConvert.ToString(testStream.ToArray()));
 
-                                        break;
-                                    }
-
-                                case ConnectionType.ConnectResponse:
-                                    {
-                                        ConnectionResponse response = ConnectionResponse.Parse(reader);
                                         break;
                                     }
                                 case ConnectionType.DeviceAuthRequest:
@@ -217,9 +224,6 @@ namespace Nearby_Sharing_Windows
                 }
             });
         }
-
-        byte[] GenerateNonce()
-            => new byte[64];
 
         public Task ScanBLeAsync(CdpScanOptions<CdpBluetoothDevice> scanOptions, CancellationToken cancellationToken = default)
             => throw new NotImplementedException();
@@ -240,7 +244,7 @@ namespace Nearby_Sharing_Windows
                 .Build();
 
             BLeAdvertiseCallback callback = new();
-            _btAdapter.BluetoothLeAdvertiser!.StartAdvertising(settings, data, callback);
+            _btAdapter!.BluetoothLeAdvertiser!.StartAdvertising(settings, data, callback);
 
             await AwaitCancellation(cancellationToken);
 
@@ -250,22 +254,26 @@ namespace Nearby_Sharing_Windows
 
         public async Task ListenRfcommAsync(CdpRfcommOptions options, CancellationToken cancellationToken = default)
         {
-            var listener = _btAdapter.ListenUsingInsecureRfcommWithServiceRecord(
+            using (var listener = _btAdapter!.ListenUsingInsecureRfcommWithServiceRecord(
                 options.ServiceName,
                 Java.Util.UUID.FromString(options.ServiceId)
-            )!;
-            await Task.Run(() =>
+            )!)
             {
-                while (true)
+                await Task.Run(() =>
                 {
-                    var socket = listener.Accept();
-                    if (cancellationToken.IsCancellationRequested)
-                        return;
+                    while (true)
+                    {
+                        var socket = listener.Accept();
+                        if (cancellationToken.IsCancellationRequested)
+                            return;
 
-                    if (socket != null)
-                        options!.OnSocketConnected!(socket.ToCdp());
-                }
-            }, cancellationToken);
+                        if (socket != null)
+                            options!.OnSocketConnected!(socket.ToCdp());
+                    }
+                }, cancellationToken);
+                await AwaitCancellation(cancellationToken);
+                listener.Close();
+            }
         }
 
         Task AwaitCancellation(CancellationToken cancellationToken)

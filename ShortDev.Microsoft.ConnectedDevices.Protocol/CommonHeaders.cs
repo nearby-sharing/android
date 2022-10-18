@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection.PortableExecutable;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Protocol
 {
@@ -98,7 +99,6 @@ namespace ShortDev.Microsoft.ConnectedDevices.Protocol
             writer.Write((byte)0);
         }
 
-
         public ushort MessageLength { get; set; }
         public byte Version { get; set; } = Constants.ProtocolVersion;
         public MessageType Type { get; set; }
@@ -110,7 +110,15 @@ namespace ShortDev.Microsoft.ConnectedDevices.Protocol
         public ulong SessionID { get; set; } = 0;
         public ulong ChannelID { get; set; } = 0;
 
-        public AdditionalMessageHeader[] AdditionalHeaders { get; set; }
+        public AdditionalMessageHeader[] AdditionalHeaders { get; set; } = new AdditionalMessageHeader[0];
         public record AdditionalMessageHeader(NextHeaderType Type, byte[] Value);
+
+        public bool ExistingSession
+            => SessionID >> 32 > 0;
+
+        public ulong RealSessionId // CorrectClientSessionBit
+            => SessionID << 32 >> 32;
+        public int PayloadSize
+            => MessageLength - (int)((ICdpSerializable<CommonHeader>)this).CalcSize() - 32;
     }
 }
