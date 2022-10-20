@@ -39,6 +39,9 @@ public sealed class CdpEncryptionInfo
 
     public byte[] GenerateSharedSecret(CdpEncryptionInfo remoteEncryption)
     {
-        return DiffieHellman.DeriveKeyFromHash(remoteEncryption.DiffieHellman.PublicKey, HashAlgorithmName.SHA512);
+        HashAlgorithmName hashAlgorithm = HashAlgorithmName.SHA512;
+        // var extractedSecret = DiffieHellman.DeriveKeyFromHash(remoteEncryption.DiffieHellman.PublicKey, hashAlgorithm);
+        var extractedSecret = DiffieHellman.DeriveKeyFromHmac(remoteEncryption.DiffieHellman.PublicKey, hashAlgorithm, null);
+        return extractedSecret; //  HKDF.Expand(hashAlgorithm, extractedSecret, 64);
     }
 }

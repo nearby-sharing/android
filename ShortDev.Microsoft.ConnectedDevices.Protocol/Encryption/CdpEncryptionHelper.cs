@@ -19,7 +19,7 @@ public sealed class CdpEncryptionHelper
         };
     }
 
-    public byte[] DecyptMessage(CommonHeader header, byte[] payload)
+    public byte[] DecryptMessage(CommonHeader header, byte[] payload)
     {
         byte[] encrypted = payload[0..^32];
         byte[] hmac = payload[^32..^0];
@@ -30,7 +30,7 @@ public sealed class CdpEncryptionHelper
         using (MemoryStream ivBuffer = new())
         using (BigEndianBinaryWriter ivWriter = new(ivBuffer))
         {
-            ivWriter.Write(new byte[] { 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01 });
+            ivWriter.Write((long)0x0000000f00000000 + header.RealSessionId); // 0x0000000f00000008 // new byte[] { 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01 }
             ivWriter.Write(header.SequenceNumber);
             ivWriter.Write(header.FragmentIndex);
             ivWriter.Write(header.FragmentCount);

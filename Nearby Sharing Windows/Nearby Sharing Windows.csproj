@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net6.0-android31.0</TargetFramework>
+		<TargetFramework>net6.0-android32.0</TargetFramework>
 		<OutputType>Exe</OutputType>
 		<SupportedOSPlatformVersion>21</SupportedOSPlatformVersion>
 		<LangVersion>preview</LangVersion>
@@ -10,14 +10,15 @@
 		<ApplicationVersion>8</ApplicationVersion>
 		<ApplicationDisplayVersion>1.1.0</ApplicationDisplayVersion>
 		<EnablePreviewFeatures>true</EnablePreviewFeatures>
+		<UseAndroidCrypto>true</UseAndroidCrypto>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 		<AndroidUseAapt2>True</AndroidUseAapt2>
 		<AndroidCreatePackagePerAbi>False</AndroidCreatePackagePerAbi>
 	</PropertyGroup>
 	<ItemGroup>
-	  <None Remove="Resources\layout\activity_settings.xml" />
-	  <None Remove="Resources\xml\preferences.xml" />
+		<None Remove="Resources\layout\activity_settings.xml" />
+		<None Remove="Resources\xml\preferences.xml" />
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Xamarin.AndroidX.AppCompat" Version="1.5.1" />
@@ -45,6 +46,6 @@
 		</ProjectReference>
 	</ItemGroup>
 	<ItemGroup>
-	  <TransformFile Include="Resources\xml\preferences.xml" />
+		<TransformFile Include="Resources\xml\preferences.xml" />
 	</ItemGroup>
 </Project>

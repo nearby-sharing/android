@@ -16,7 +16,7 @@ using (MemoryStream stream = new(data))
 using (BigEndianBinaryReader reader = new(stream))
 {
     CommonHeader header = CommonHeader.Parse(reader);
-    Console.WriteLine(BinaryConvert.ToString(encryptionHelper.DecyptMessage(header, reader.ReadBytes(header.PayloadSize))));
+    Console.WriteLine(BinaryConvert.ToString(encryptionHelper.DecryptMessage(header, reader.ReadBytes(header.PayloadSize))));
 }
 
 return;

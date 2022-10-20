@@ -43,37 +43,7 @@ namespace Nearby_Sharing_Windows
             var service = (BluetoothManager)GetSystemService(BluetoothService)!;
             _btAdapter = service.Adapter!;
 
-            //var device = _btAdapter.GetRemoteDevice("B8:9A:2A:25:79:B5");
-
-            //var msg = BinaryConvert.ToBytes("3030009a0302000000000000000000000000000000000001000000000000000200000000000000008104700000038208000000000000001f83080000000000000007000000010000002094b0aac5d36393ab000040000020a891c43b8d6227ac232e7155c52a4fc27116d113eaf65fa201fcff088b1a5bd800208f196fe9f32dfd49cb0b3719821468bb7c97b72d0c0b2762b1a5005c89feb0fd");
-            //using (var socket = device.CreateInsecureRfcommSocketToServiceRecord(Java.Util.UUID.FromString("F6545836-9428-486A-BAD3-B94B3C0659E3")))
-            //{
-            //    socket.Connect();
-            //    //using (BinaryWriter writer = new(socket.OutputStream))
-            //    //using (BinaryReader reader = new(socket.InputStream))
-            //    //{
-            //    //    writer.Write(msg);
-            //    //    writer.Flush();
-
-            //    //    var input = socket.InputStream as InputStreamInvoker;
-            //    //    var length = input.BaseInputStream.Available();
-
-            //    //    using (MemoryStream buffer = new())
-            //    //    {
-            //    //        // socket.InputStream.CopyTo(buffer);
-            //    //        Debug.Print(BinaryConvert.ToString(reader.ReadBytes(length)));
-            //    //    }
-            //    //}
-            //}
-
-            //return;
-
-            Debug.Print(JsonSerializer.Serialize(localEncryption.DiffieHellman.ExportParameters(true), new JsonSerializerOptions()
-            {
-                IncludeFields = true
-            }));
-
-            string address = TryGetBtAddress(_btAdapter, out var exception) ?? "00:fa:21:3e:fb:19"; // "d4:38:9c:0b:ca:ae"; // 
+            string address = TryGetBtAddress(_btAdapter, out var exception) ?? "00:fa:21:3e:fb:19"; // "d4:38:9c:0b:ca:ae"; //
 
             _bluetoothAdvertisement = new(this);
             _bluetoothAdvertisement.OnDeviceConnected += BluetoothAdvertisement_OnDeviceConnected;
