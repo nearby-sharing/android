@@ -113,11 +113,14 @@ namespace ShortDev.Microsoft.ConnectedDevices.Protocol
         public AdditionalMessageHeader[] AdditionalHeaders { get; set; } = new AdditionalMessageHeader[0];
         public record AdditionalMessageHeader(NextHeaderType Type, byte[] Value);
 
+        public const long SessionIdExistingSessionFlag = 0x0000000e00000000;
         public bool ExistingSession
-            => SessionID >> 32 > 0;
+            => (SessionID >> 32) > 0;
 
-        public ulong RealSessionId // CorrectClientSessionBit
-            => SessionID << 32 >> 32;
+        public const long SessionIdHostFlag = 0x80000000;
+        public void CorrectClientSessionBit()
+            => SessionID = SessionID ^ SessionIdHostFlag;
+
         public int PayloadSize
             => MessageLength - (int)((ICdpSerializable<CommonHeader>)this).CalcSize() - 32;
     }

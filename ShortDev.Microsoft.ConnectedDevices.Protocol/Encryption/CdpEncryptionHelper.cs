@@ -9,15 +9,8 @@ namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Encryption;
 public sealed class CdpEncryptionHelper
 {
     byte[] _secret { get; init; }
-    private CdpEncryptionHelper() { }
-
-    public static CdpEncryptionHelper FromSecret(byte[] sharedSecret)
-    {
-        return new()
-        {
-            _secret = sharedSecret
-        };
-    }
+    public CdpEncryptionHelper(byte[] sharedSecret)
+        => _secret = sharedSecret;
 
     public byte[] DecryptMessage(CommonHeader header, byte[] payload)
     {
@@ -30,7 +23,7 @@ public sealed class CdpEncryptionHelper
         using (MemoryStream ivBuffer = new())
         using (BigEndianBinaryWriter ivWriter = new(ivBuffer))
         {
-            ivWriter.Write((long)0x0000000f00000000 + header.RealSessionId); // 0x0000000f00000008 // new byte[] { 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01 }
+            ivWriter.Write(header.SessionID);
             ivWriter.Write(header.SequenceNumber);
             ivWriter.Write(header.FragmentIndex);
             ivWriter.Write(header.FragmentCount);

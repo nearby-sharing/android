@@ -11,7 +11,6 @@
         public const string RfcommServiceName = "CDP Proximal Transport";
 
         public const int DefaultMessageFragmentSize = 16384;
-
         public const int NonceLength = 8;
     }
 }

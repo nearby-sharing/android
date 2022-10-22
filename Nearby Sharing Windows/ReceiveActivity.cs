@@ -94,7 +94,7 @@ namespace Nearby_Sharing_Windows
             return null;
         }
 
-        CdpEncryptionInfo localEncryption = CdpEncryptionInfo.Create();
+        CdpEncryptionInfo localEncryption = CdpEncryptionInfo.Create(CdpEncryptionParams.Default);
         CdpEncryptionInfo? remoteEncryption;
         private void BluetoothAdvertisement_OnDeviceConnected(CdpRfcommSocket socket)
         {
@@ -135,7 +135,7 @@ namespace Nearby_Sharing_Windows
                                 case ConnectionType.ConnectRequest:
                                     {
                                         var connectionRequest = ConnectionRequest.Parse(reader);
-                                        remoteEncryption = CdpEncryptionInfo.FromRemote(connectionRequest.PublicKeyX, connectionRequest.PublicKeyY, connectionRequest.Nonce);
+                                        remoteEncryption = CdpEncryptionInfo.FromRemote(connectionRequest.PublicKeyX, connectionRequest.PublicKeyY, connectionRequest.Nonce, CdpEncryptionParams.Default);
 
                                         header.AdditionalHeaders = new CommonHeader.AdditionalMessageHeader[]
                                         {
@@ -153,7 +153,8 @@ namespace Nearby_Sharing_Windows
                                             )
                                         };
 
-                                        header.SessionID = 0x0000000e80000000 + header.SessionID;
+                                        header.SessionID |= CommonHeader.SessionIdExistingSessionFlag;
+                                        header.CorrectClientSessionBit();
 
                                         header.Write(writer);
 

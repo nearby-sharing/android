@@ -16,4 +16,8 @@
 		<ProjectReference Include="..\ShortDev.Networking\ShortDev.Networking.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<None Include="../docs/Crypt.md" Link="Encryption\Crypt.md" />
+	</ItemGroup>
+
 </Project>

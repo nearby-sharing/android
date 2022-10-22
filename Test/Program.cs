@@ -11,7 +11,7 @@ using Windows.Win32.Security.Cryptography;
 var secret = BinaryConvert.ToBytes(AnsiConsole.Ask<string>("Secret"));
 var data = BinaryConvert.ToBytes(AnsiConsole.Ask<string>("Message"));
 
-var encryptionHelper = CdpEncryptionHelper.FromSecret(secret);
+CdpEncryptionHelper encryptionHelper = new(secret);
 using (MemoryStream stream = new(data))
 using (BigEndianBinaryReader reader = new(stream))
 {

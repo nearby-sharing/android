@@ -4,26 +4,26 @@ namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Encryption;
 
 public sealed class CdpEncryptionInfo
 {
-    public static readonly ECCurve CurveType = ECCurve.NamedCurves.nistP256;
-
     public required CdpNonce Nonce { get; init; }
     public required ECDiffieHellman DiffieHellman { get; init; }
+    public required CdpEncryptionParams EncryptionParams { get; init; }
 
     public ECPoint PublicKey
         => DiffieHellman.ExportParameters(false).Q;
 
-    public static CdpEncryptionInfo Create()
+    public static CdpEncryptionInfo Create(CdpEncryptionParams encryptionParams)
         => new()
         {
-            DiffieHellman = ECDiffieHellman.Create(CurveType),
-            Nonce = CdpNonce.Create()
+            DiffieHellman = ECDiffieHellman.Create(encryptionParams.Curve),
+            Nonce = CdpNonce.Create(),
+            EncryptionParams = encryptionParams
         };
 
-    public static CdpEncryptionInfo FromRemote(byte[] publicX, byte[] publicY, CdpNonce nonce)
+    public static CdpEncryptionInfo FromRemote(byte[] publicX, byte[] publicY, CdpNonce nonce, CdpEncryptionParams encryptionParams)
     {
         var diffieHellman = ECDiffieHellman.Create(new ECParameters()
         {
-            Curve = CurveType,
+            Curve = encryptionParams.Curve,
             Q = new ECPoint()
             {
                 X = publicX,
@@ -33,15 +33,11 @@ public sealed class CdpEncryptionInfo
         return new()
         {
             DiffieHellman = diffieHellman,
-            Nonce = nonce
+            Nonce = nonce,
+            EncryptionParams = encryptionParams
         };
     }
 
     public byte[] GenerateSharedSecret(CdpEncryptionInfo remoteEncryption)
-    {
-        HashAlgorithmName hashAlgorithm = HashAlgorithmName.SHA512;
-        // var extractedSecret = DiffieHellman.DeriveKeyFromHash(remoteEncryption.DiffieHellman.PublicKey, hashAlgorithm);
-        var extractedSecret = DiffieHellman.DeriveKeyFromHmac(remoteEncryption.DiffieHellman.PublicKey, hashAlgorithm, null);
-        return extractedSecret; //  HKDF.Expand(hashAlgorithm, extractedSecret, 64);
-    }
+        => DiffieHellman.DeriveKeyFromHash(remoteEncryption.DiffieHellman.PublicKey, EncryptionParams.HashAlgorithm, EncryptionParams.SecretPrepend, EncryptionParams.SecretAppend);
 }
