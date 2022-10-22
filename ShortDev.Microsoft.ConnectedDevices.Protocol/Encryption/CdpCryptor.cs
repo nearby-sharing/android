@@ -1,22 +1,17 @@
 ﻿using ShortDev.Networking;
-using System;
-using System.Diagnostics;
 using System.IO;
 using System.Security.Cryptography;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Encryption;
 
-public sealed class CdpEncryptionHelper
+public sealed class CdpCryptor
 {
     byte[] _secret { get; init; }
-    public CdpEncryptionHelper(byte[] sharedSecret)
+    public CdpCryptor(byte[] sharedSecret)
         => _secret = sharedSecret;
 
-    public byte[] DecryptMessage(CommonHeader header, byte[] payload)
+    public byte[] DecryptMessage(CommonHeader header, byte[] payload, byte[]? hmac = null)
     {
-        byte[] encrypted = payload[0..^32];
-        byte[] hmac = payload[^32..^0];
-
         var aes = Aes.Create();
         aes.Key = _secret[16..32];
         byte[] iv;
@@ -32,6 +27,6 @@ public sealed class CdpEncryptionHelper
         }
 
         aes.Key = _secret[0..16];
-        return aes.DecryptCbc(encrypted, iv, PaddingMode.None);
+        return aes.DecryptCbc(payload, iv);
     }
 }
