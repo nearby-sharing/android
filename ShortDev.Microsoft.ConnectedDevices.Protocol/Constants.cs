@@ -12,5 +12,6 @@
 
         public const int DefaultMessageFragmentSize = 16384;
         public const int NonceLength = 8;
+        public const int HmacSize = 32;
     }
 }

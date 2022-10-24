@@ -66,11 +66,6 @@ namespace ShortDev.Microsoft.ConnectedDevices.Protocol
 
             result.AdditionalHeaders = additionalHeaders.ToArray();
 
-            if (result.Flags.HasFlag(MessageFlags.HasHMAC))
-            {
-                // ToDo: HMAC ?!
-            }
-
             ex = null;
             return true;
         }
@@ -113,15 +108,22 @@ namespace ShortDev.Microsoft.ConnectedDevices.Protocol
         public AdditionalMessageHeader[] AdditionalHeaders { get; set; } = new AdditionalMessageHeader[0];
         public record AdditionalMessageHeader(NextHeaderType Type, byte[] Value);
 
+        public bool HasFlag(MessageFlags flag)
+            => (Flags & flag) != 0;
+
         public const long SessionIdExistingSessionFlag = 0x0000000e00000000;
         public bool ExistingSession
             => (SessionID >> 32) > 0;
+
 
         public const long SessionIdHostFlag = 0x80000000;
         public void CorrectClientSessionBit()
             => SessionID = SessionID ^ SessionIdHostFlag;
 
         public int PayloadSize
-            => MessageLength - (int)((ICdpSerializable<CommonHeader>)this).CalcSize() - 32;
+            => MessageLength - (int)((ICdpSerializable<CommonHeader>)this).CalcSize() - Constants.HmacSize;
+
+        public const int FlagsOffset = 6;
+        public const int MessageLengthOffset = 2;
     }
 }

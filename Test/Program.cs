@@ -11,28 +11,15 @@ using Spectre.Console;
 var secret = BinaryConvert.ToBytes(AnsiConsole.Ask<string>("Secret"));
 var buffer = BinaryConvert.ToBytes(AnsiConsole.Ask<string>("Message"));
 
+CdpCryptor cryptor = new(secret);
+
 using (MemoryStream stream = new(buffer))
 using (BigEndianBinaryReader reader = new(stream))
 {
     if (!CommonHeader.TryParse(reader, out var header, out _) || header == null)
         throw new InvalidDataException();
 
-    if ((int)(header.Flags & MessageFlags.SessionEncrypted) > 0)
-    {
-        CdpCryptor encryptionHelper = new(secret);
-        var payload = encryptionHelper.DecryptMessage(header, reader.ReadBytes(header.PayloadSize));
-        using (MemoryStream payloadStream = new(payload))
-        using (BigEndianBinaryReader payloadReader = new(payloadStream))
-        {
-            var payloadLength = payloadReader.ReadUInt32();
-            if (payloadLength != payload.Length - 4)
-                throw new InvalidDataException($"Expected payload to be {payloadLength} bytes long");
-
-            HandleMessage(header, payloadReader);
-        }
-    }
-    else
-        HandleMessage(header, reader);
+    HandleMessage(header, cryptor.Read(reader, header));
 }
 
 void HandleMessage(CommonHeader header, BinaryReader reader)

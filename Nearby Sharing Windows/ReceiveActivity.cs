@@ -5,6 +5,7 @@ using Android.Bluetooth.LE;
 using AndroidX.AppCompat.App;
 using ShortDev.Microsoft.ConnectedDevices.Protocol;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Connection;
+using ShortDev.Microsoft.ConnectedDevices.Protocol.Connection.Authentication;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Discovery;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Encryption;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms;
@@ -57,6 +58,7 @@ namespace Nearby_Sharing_Windows
         public override void Finish()
         {
             _bluetoothAdvertisement?.StopAdvertisement();
+            base.Finish();
         }
 
         public string? TryGetBtAddress(BluetoothAdapter adapter, out System.Exception? exception)
@@ -94,8 +96,6 @@ namespace Nearby_Sharing_Windows
             return null;
         }
 
-        CdpEncryptionInfo localEncryption = CdpEncryptionInfo.Create(CdpEncryptionParams.Default);
-        CdpEncryptionInfo? remoteEncryption;
         private void BluetoothAdvertisement_OnDeviceConnected(CdpRfcommSocket socket)
         {
             Task.Run(() =>
@@ -104,93 +104,97 @@ namespace Nearby_Sharing_Windows
                 using (BigEndianBinaryWriter writer = new(socket.OutputStream!))
                 using (BigEndianBinaryReader reader = new(socket.InputStream!))
                 {
+                    ulong localSessionId = 1;
+                    CdpEncryptionInfo localEncryption = CdpEncryptionInfo.Create(CdpEncryptionParams.Default);
+
+                    CdpCryptor? cryptor = null;
+                    CdpEncryptionInfo? remoteEncryption = null;
                     while (true)
                     {
                         if (!CommonHeader.TryParse(reader, out var header, out _) || header == null)
                             return;
 
-                        foreach (var entry in header.AdditionalHeaders)
+                        BinaryReader payloadReader = cryptor?.Read(reader, header) ?? reader;
                         {
-                            Debug.Print(entry.Type + " " + BinaryConvert.ToString(entry.Value));
-                        }
-
-                        if (header.Flags.HasFlag(MessageFlags.SessionEncrypted))
-                        {
-                            using (BigEndianBinaryWriter writer2 = new(testStream))
+                            if (header.Type == MessageType.Connect)
                             {
-                                header.Write(writer2);
-                                int length = header.MessageLength - (int)((ICdpSerializable<CommonHeader>)header).CalcSize();
-                                writer2.Write(reader.ReadBytes(length));
-                                Debug.Print(BinaryConvert.ToString(testStream.ToArray()));
-                            }
-
-                            continue; // ToDo: remove
-                        }
-
-                        if (header.Type == MessageType.Connect)
-                        {
-                            ConnectionHeader connectionHeader = ConnectionHeader.Parse(reader);
-                            switch (connectionHeader.ConnectMessageType)
-                            {
-                                case ConnectionType.ConnectRequest:
-                                    {
-                                        var connectionRequest = ConnectionRequest.Parse(reader);
-                                        remoteEncryption = CdpEncryptionInfo.FromRemote(connectionRequest.PublicKeyX, connectionRequest.PublicKeyY, connectionRequest.Nonce, CdpEncryptionParams.Default);
-
-                                        header.AdditionalHeaders = new CommonHeader.AdditionalMessageHeader[]
+                                ConnectionHeader connectionHeader = ConnectionHeader.Parse(payloadReader);
+                                switch (connectionHeader.ConnectMessageType)
+                                {
+                                    case ConnectionType.ConnectRequest:
                                         {
-                                            new(
-                                                (NextHeaderType)129,
-                                                new byte[]{ 0x70,0x00,0x00,0x03 }
-                                            ),
-                                            new(
-                                                (NextHeaderType)130,
-                                                new byte[]{ 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x1F }
-                                            ),
-                                            new(
-                                                (NextHeaderType)131,
-                                                new byte[]{ 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x1F }
-                                            )
-                                        };
+                                            var connectionRequest = ConnectionRequest.Parse(payloadReader);
+                                            remoteEncryption = CdpEncryptionInfo.FromRemote(connectionRequest.PublicKeyX, connectionRequest.PublicKeyY, connectionRequest.Nonce, CdpEncryptionParams.Default);
+                                            cryptor = new(localEncryption.GenerateSharedSecret(remoteEncryption));
 
-                                        header.SessionID |= CommonHeader.SessionIdExistingSessionFlag;
-                                        header.CorrectClientSessionBit();
+                                            header.AdditionalHeaders = new CommonHeader.AdditionalMessageHeader[]
+                                            {
+                                                new(
+                                                    (NextHeaderType)129,
+                                                    new byte[]{ 0x70,0x00,0x00,0x03 }
+                                                ),
+                                                new(
+                                                    (NextHeaderType)130,
+                                                    new byte[]{ 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x1F }
+                                                ),
+                                                new(
+                                                    (NextHeaderType)131,
+                                                    new byte[]{ 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x1F }
+                                                )
+                                            };
+                                            header.SessionID |= localSessionId << 32;
+                                            header.CorrectClientSessionBit();
+                                            header.Write(writer);
 
-                                        header.Write(writer);
+                                            new ConnectionHeader()
+                                            {
+                                                ConnectionMode = ConnectionMode.Proximal,
+                                                ConnectMessageType = ConnectionType.ConnectResponse
+                                            }.Write(writer);
 
-                                        new ConnectionHeader()
+                                            var publicKey = localEncryption.PublicKey;
+                                            new ConnectionResponse()
+                                            {
+                                                Result = ConnectionResult.Pending,
+                                                HMACSize = connectionRequest.HMACSize,
+                                                MessageFragmentSize = connectionRequest.MessageFragmentSize,
+                                                Nonce = localEncryption.Nonce,
+                                                PublicKeyX = publicKey.X!,
+                                                PublicKeyY = publicKey.Y!
+                                            }.Write(writer);
+
+                                            break;
+                                        }
+                                    case ConnectionType.DeviceAuthRequest:
                                         {
-                                            ConnectionMode = ConnectionMode.Proximal,
-                                            ConnectMessageType = ConnectionType.ConnectResponse
-                                        }.Write(writer);
+                                            var authRequest = DeviceAuthenticationMessage.Parse(payloadReader);
 
-                                        var publicKey = localEncryption.PublicKey;
-                                        new ConnectionResponse()
+                                            header.CorrectClientSessionBit();
+
+                                            cryptor!.EncryptMessage(writer, header, new ICdpWriteable[]
+                                            {
+                                                new ConnectionHeader()
+                                                {
+                                                    ConnectionMode = ConnectionMode.Proximal,
+                                                    ConnectMessageType = ConnectionType.DeviceAuthResponse
+                                                },
+                                                DeviceAuthenticationMessage.FromCertificate(
+                                                    localEncryption.DeviceCertificate!,
+                                                    localEncryption.Nonce, remoteEncryption!.Nonce
+                                                )
+                                            });
+
+                                            break;
+                                        }
+                                    default:
                                         {
-                                            Result = ConnectionResult.Pending,
-                                            HMACSize = connectionRequest.HMACSize,
-                                            MessageFragmentSize = connectionRequest.MessageFragmentSize,
-                                            Nonce = localEncryption.Nonce,
-                                            PublicKeyX = publicKey.X!,
-                                            PublicKeyY = publicKey.Y!
-                                        }.Write(writer);
-
-                                        writer.Flush();
-                                        Debug.Print(BinaryConvert.ToString(localEncryption.GenerateSharedSecret(remoteEncryption)));
-                                        Debug.Print(BinaryConvert.ToString(testStream.ToArray()));
-
-                                        break;
-                                    }
-                                case ConnectionType.DeviceAuthRequest:
-                                    {
-                                        break;
-                                    }
-                                default:
-                                    {
-                                        break;
-                                    }
+                                            break;
+                                        }
+                                }
                             }
                         }
+
+                        writer.Flush();
                     }
                 }
             });

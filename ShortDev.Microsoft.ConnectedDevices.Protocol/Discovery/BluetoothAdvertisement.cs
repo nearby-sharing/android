@@ -46,7 +46,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Discovery
             return true;
         }
 
-        public static byte[] GenerateAdvertisement(CdpDeviceAdvertiseOptions options)
+        static byte[] GenerateAdvertisement(CdpDeviceAdvertiseOptions options)
         {
             using (MemoryStream stream = new())
             using (BinaryWriter writer = new(stream))
