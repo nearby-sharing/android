@@ -19,6 +19,7 @@
 
 	<ItemGroup>
 		<None Include="../docs/Crypt.md" Link="Encryption\Crypt.md" />
+		<None Include="../docs/CdpDllFlow.md" />
 	</ItemGroup>
 
 </Project>

@@ -104,7 +104,7 @@ namespace Nearby_Sharing_Windows
                 using (BigEndianBinaryWriter writer = new(socket.OutputStream!))
                 using (BigEndianBinaryReader reader = new(socket.InputStream!))
                 {
-                    ulong localSessionId = 1;
+                    ulong localSessionId = 2;
                     CdpEncryptionInfo localEncryption = CdpEncryptionInfo.Create(CdpEncryptionParams.Default);
 
                     CdpCryptor? cryptor = null;
@@ -168,6 +168,10 @@ namespace Nearby_Sharing_Windows
                                     case ConnectionType.DeviceAuthRequest:
                                         {
                                             var authRequest = DeviceAuthenticationMessage.Parse(payloadReader);
+                                            if (!authRequest.VerifyThumbprint(localEncryption.Nonce, remoteEncryption!.Nonce))
+                                            {
+                                                throw new Exception("Invalid thumbprint");
+                                            }
 
                                             header.CorrectClientSessionBit();
 
@@ -183,6 +187,11 @@ namespace Nearby_Sharing_Windows
                                                     localEncryption.Nonce, remoteEncryption!.Nonce
                                                 )
                                             });
+
+                                            var test = DeviceAuthenticationMessage.FromCertificate(
+                                                    localEncryption.DeviceCertificate!,
+                                                    localEncryption.Nonce, remoteEncryption!.Nonce
+                                                ).VerifyThumbprint(localEncryption.Nonce, remoteEncryption!.Nonce);
 
                                             break;
                                         }

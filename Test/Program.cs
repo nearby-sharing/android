@@ -13,13 +13,25 @@ var buffer = BinaryConvert.ToBytes(AnsiConsole.Ask<string>("Message"));
 
 CdpCryptor cryptor = new(secret);
 
+bool flag = true;
+loop:
 using (MemoryStream stream = new(buffer))
 using (BigEndianBinaryReader reader = new(stream))
 {
     if (!CommonHeader.TryParse(reader, out var header, out _) || header == null)
         throw new InvalidDataException();
 
-    HandleMessage(header, cryptor.Read(reader, header));
+    if (flag)
+        HandleMessage(header, cryptor.Read(reader, header));
+    else
+    {
+        using (MemoryStream stream2 = new())
+        using (BigEndianBinaryWriter writer = new(stream))
+        {
+        }
+        flag = true;
+        goto loop;
+    }
 }
 
 void HandleMessage(CommonHeader header, BinaryReader reader)
