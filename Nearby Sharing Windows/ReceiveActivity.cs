@@ -7,6 +7,7 @@ using ShortDev.Microsoft.ConnectedDevices.Protocol.Connection.Authentication;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Discovery;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Encryption;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms;
+using ShortDev.Microsoft.ConnectedDevices.Protocol.Session.AppControl;
 using ShortDev.Networking;
 using System.Diagnostics;
 using System.Net.NetworkInformation;
@@ -116,6 +117,8 @@ namespace Nearby_Sharing_Windows
                         {
                             if (header.Type == MessageType.Connect)
                             {
+                                header.CorrectClientSessionBit();
+
                                 ConnectionHeader connectionHeader = ConnectionHeader.Parse(payloadReader);
                                 switch (connectionHeader.ConnectMessageType)
                                 {
@@ -145,7 +148,6 @@ namespace Nearby_Sharing_Windows
                                                 )
                                             };
                                             header.SessionID |= localSessionId << 32;
-                                            header.CorrectClientSessionBit();
                                             header.Write(writer);
 
                                             new ConnectionHeader()
@@ -168,12 +170,11 @@ namespace Nearby_Sharing_Windows
                                             break;
                                         }
                                     case ConnectionType.DeviceAuthRequest:
+                                    case ConnectionType.UserDeviceAuthRequest:
                                         {
                                             var authRequest = AuthenticationPayload.Parse(payloadReader);
                                             if (!authRequest.VerifyThumbprint(localEncryption.Nonce, remoteEncryption!.Nonce))
                                                 throw new Exception("Invalid thumbprint");
-                                            
-                                            header.CorrectClientSessionBit();
 
                                             header.Flags = 0;
                                             cryptor!.EncryptMessage(writer, header, new ICdpWriteable[]
@@ -181,7 +182,7 @@ namespace Nearby_Sharing_Windows
                                                 new ConnectionHeader()
                                                 {
                                                     ConnectionMode = ConnectionMode.Proximal,
-                                                    ConnectMessageType = ConnectionType.DeviceAuthResponse
+                                                    ConnectMessageType = connectionHeader.ConnectMessageType == ConnectionType.DeviceAuthRequest ?  ConnectionType.DeviceAuthResponse : ConnectionType.UserDeviceAuthResponse
                                                 },
                                                 AuthenticationPayload.Create(
                                                     localEncryption.DeviceCertificate!,
@@ -191,11 +192,65 @@ namespace Nearby_Sharing_Windows
 
                                             break;
                                         }
+                                    case ConnectionType.UpgradeRequest:
+                                        {
+                                            header.Flags = 0;
+                                            cryptor!.EncryptMessage(writer, header, new ICdpWriteable[]
+                                            {
+                                                new ConnectionHeader()
+                                                {
+                                                    ConnectionMode = ConnectionMode.Proximal,
+                                                    ConnectMessageType = ConnectionType.UpgradeFailure // We currently only support BT
+                                                },
+                                                new HResultPayload()
+                                                {
+                                                    HResult = 1 // Anything != 0
+                                                }
+                                            });
+                                            break;
+                                        }
+                                    case ConnectionType.AuthDoneRequest:
+                                        {
+                                            header.Flags = 0;
+                                            cryptor!.EncryptMessage(writer, header, new ICdpWriteable[]
+                                            {
+                                                new ConnectionHeader()
+                                                {
+                                                    ConnectionMode = ConnectionMode.Proximal,
+                                                    ConnectMessageType = ConnectionType.AuthDoneRespone
+                                                },
+                                                new HResultPayload()
+                                                {
+                                                    HResult = 0
+                                                }
+                                            });
+                                            break;
+                                        }
+                                    case ConnectionType.DeviceInfoMessage:
+                                        {
+                                            // Ack
+                                            header.Flags = 0;
+                                            cryptor!.EncryptMessage(writer, header, new ICdpWriteable[]
+                                            {
+                                                new ConnectionHeader()
+                                                {
+                                                    ConnectionMode = ConnectionMode.Proximal,
+                                                    ConnectMessageType = ConnectionType.DeviceInfoResponseMessage
+                                                }
+                                            });
+                                            break;
+                                        }
                                     default:
                                         {
+                                            var type = connectionHeader.ConnectMessageType;
                                             break;
                                         }
                                 }
+                            }
+                            else if (header.Type == MessageType.Control)
+                            {
+                                var msgType = AppControlHeader.Parse(payloadReader);
+                                var uri = payloadReader.ReadStringWithLength();
                             }
                             else
                             {

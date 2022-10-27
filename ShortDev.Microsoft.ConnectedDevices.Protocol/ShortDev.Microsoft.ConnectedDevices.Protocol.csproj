@@ -22,4 +22,8 @@
 		<None Include="../docs/CdpDllFlow.md" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Connection\TransportUpgrade\" />
+	</ItemGroup>
+
 </Project>
