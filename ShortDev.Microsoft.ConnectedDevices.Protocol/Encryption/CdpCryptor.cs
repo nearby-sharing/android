@@ -87,7 +87,7 @@ public sealed class CdpCryptor
             byte[] iv = GenerateIV(header);
             aes.Key = AesKey;
 
-            int payloadLength = 0;
+            int payloadLength = sizeof(Int32); // Size of "EncryptedPayloadSize" field
             List<byte[]> payloadBuffer = new();
             foreach (var writable in body)
             {
