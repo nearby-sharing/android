@@ -17,7 +17,7 @@ public sealed class CdpEncryptionInfo
 
     public static CdpEncryptionInfo Create(CdpEncryptionParams encryptionParams)
     {
-        CertificateRequest certRequest = new("CN=Ms-Cdp", ECDsa.Create(), HashAlgorithmName.SHA256);
+        CertificateRequest certRequest = new("CN=Ms-Cdp", ECDsa.Create(encryptionParams.Curve), HashAlgorithmName.SHA256);
         return new()
         {
             DiffieHellman = ECDiffieHellman.Create(encryptionParams.Curve),
