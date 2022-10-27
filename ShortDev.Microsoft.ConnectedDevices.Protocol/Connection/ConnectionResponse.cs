@@ -20,7 +20,7 @@ public sealed class ConnectionResponse : ICdpPayload<ConnectionResponse>
         {
             Result = result,
             HMACSize = reader.ReadUInt16(),
-            Nonce = new(reader.ReadBytes(Constants.NonceLength)),
+            Nonce = new(reader.ReadUInt16()),
             MessageFragmentSize = reader.ReadUInt32(),
             PublicKeyX = reader.ReadBytesWithLength(),
             PublicKeyY = reader.ReadBytesWithLength()

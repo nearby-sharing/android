@@ -18,7 +18,7 @@ public sealed class ConnectionRequest : ICdpPayload<ConnectionRequest>
         {
             CurveType = (CurveType)reader.ReadByte(),
             HMACSize = reader.ReadUInt16(),
-            Nonce = new(reader.ReadBytes(Constants.NonceLength)),
+            Nonce = new(reader.ReadUInt64()),
             MessageFragmentSize = reader.ReadUInt32(),
             PublicKeyX = reader.ReadBytesWithLength(),
             PublicKeyY = reader.ReadBytesWithLength()

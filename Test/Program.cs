@@ -53,7 +53,7 @@ void HandleMessage(CommonHeader header, BinaryReader reader)
                 }
             case ConnectionType.DeviceAuthRequest:
                 {
-                    DeviceAuthenticationMessage msg = DeviceAuthenticationMessage.Parse(reader);
+                    AuthenticationPayload msg = AuthenticationPayload.Parse(reader);
                     break;
                 }
             default:

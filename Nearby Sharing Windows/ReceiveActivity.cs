@@ -167,7 +167,7 @@ namespace Nearby_Sharing_Windows
                                         }
                                     case ConnectionType.DeviceAuthRequest:
                                         {
-                                            var authRequest = DeviceAuthenticationMessage.Parse(payloadReader);
+                                            var authRequest = AuthenticationPayload.Parse(payloadReader);
                                             if (!authRequest.VerifyThumbprint(localEncryption.Nonce, remoteEncryption!.Nonce))
                                             {
                                                 throw new Exception("Invalid thumbprint");
@@ -182,16 +182,11 @@ namespace Nearby_Sharing_Windows
                                                     ConnectionMode = ConnectionMode.Proximal,
                                                     ConnectMessageType = ConnectionType.DeviceAuthResponse
                                                 },
-                                                DeviceAuthenticationMessage.FromCertificate(
+                                                AuthenticationPayload.Create(
                                                     localEncryption.DeviceCertificate!,
                                                     localEncryption.Nonce, remoteEncryption!.Nonce
                                                 )
                                             });
-
-                                            var test = DeviceAuthenticationMessage.FromCertificate(
-                                                    localEncryption.DeviceCertificate!,
-                                                    localEncryption.Nonce, remoteEncryption!.Nonce
-                                                ).VerifyThumbprint(localEncryption.Nonce, remoteEncryption!.Nonce);
 
                                             break;
                                         }

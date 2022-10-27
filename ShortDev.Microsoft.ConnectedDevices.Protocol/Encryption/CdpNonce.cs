@@ -1,27 +1,23 @@
-﻿using System.IO;
+﻿using System;
 using System.Security.Cryptography;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Encryption;
 
 public readonly struct CdpNonce
 {
-    public readonly byte[] Value;
+    public readonly ulong Value;
 
-    public CdpNonce(byte[] value)
-    {
-        if (value.Length != Constants.NonceLength)
-            throw new InvalidDataException("Invalid nonce length");
+    public CdpNonce(ulong value)
+        => Value = value;
 
-        Value = value;
-    }
-
-    public static CdpNonce Create()
+    public static unsafe CdpNonce Create()
     {
         using (RandomNumberGenerator cryptographicRandom = RandomNumberGenerator.Create())
         {
-            byte[] buffer = new byte[Constants.NonceLength];
+            Span<byte> buffer = stackalloc byte[sizeof(Int64)];
             cryptographicRandom.GetBytes(buffer);
-            return new(buffer);
+            fixed (byte* pBuffer = buffer)
+                return new(*(ulong*)pBuffer);
         }
     }
 }
