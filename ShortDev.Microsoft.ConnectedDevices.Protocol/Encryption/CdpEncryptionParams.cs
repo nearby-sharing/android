@@ -18,7 +18,7 @@ public sealed class CdpEncryptionParams
 
     public ECCurve Curve { get; } = ECCurve.NamedCurves.nistP256;
 
-    public HashAlgorithmName HashAlgorithm { get; } = HashAlgorithmName.SHA512;
+    public HashAlgorithmName KeyDerivationHashAlgorithm { get; } = HashAlgorithmName.SHA512;
 
     public byte[] SecretPrepend { get; } = new byte[] { 0x0D6, 0x37, 0x0F1, 0x0AA, 0x0E2, 0x0F0, 0x41, 0x8C };
 

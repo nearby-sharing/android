@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using Android.Bluetooth;
+﻿using Android.Bluetooth;
 using Android.Bluetooth.LE;
 using AndroidX.AppCompat.App;
 using ShortDev.Microsoft.ConnectedDevices.Protocol;
@@ -12,7 +10,6 @@ using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms;
 using ShortDev.Networking;
 using System.Diagnostics;
 using System.Net.NetworkInformation;
-using System.Text.Json;
 using ConnectionRequest = ShortDev.Microsoft.ConnectedDevices.Protocol.Connection.ConnectionRequest;
 using ManifestPermission = Android.Manifest.Permission;
 
@@ -61,7 +58,8 @@ namespace Nearby_Sharing_Windows
             base.Finish();
         }
 
-        public string? TryGetBtAddress(BluetoothAdapter adapter, out System.Exception? exception)
+        [DebuggerHidden]
+        public string? TryGetBtAddress(BluetoothAdapter adapter, out Exception? exception)
         {
             exception = null;
 
@@ -125,7 +123,11 @@ namespace Nearby_Sharing_Windows
                                         {
                                             var connectionRequest = ConnectionRequest.Parse(payloadReader);
                                             remoteEncryption = CdpEncryptionInfo.FromRemote(connectionRequest.PublicKeyX, connectionRequest.PublicKeyY, connectionRequest.Nonce, CdpEncryptionParams.Default);
-                                            cryptor = new(localEncryption.GenerateSharedSecret(remoteEncryption));
+
+                                            var secret = localEncryption.GenerateSharedSecret(remoteEncryption);
+                                            Debug.Print(BinaryConvert.ToString(secret));
+                                            Debug.Print(remoteEncryption!.Nonce.ToString());
+                                            cryptor = new(secret);
 
                                             header.AdditionalHeaders = new CommonHeader.AdditionalMessageHeader[]
                                             {
@@ -169,12 +171,11 @@ namespace Nearby_Sharing_Windows
                                         {
                                             var authRequest = AuthenticationPayload.Parse(payloadReader);
                                             if (!authRequest.VerifyThumbprint(localEncryption.Nonce, remoteEncryption!.Nonce))
-                                            {
                                                 throw new Exception("Invalid thumbprint");
-                                            }
-
+                                            
                                             header.CorrectClientSessionBit();
 
+                                            header.Flags = 0;
                                             cryptor!.EncryptMessage(writer, header, new ICdpWriteable[]
                                             {
                                                 new ConnectionHeader()
@@ -195,6 +196,10 @@ namespace Nearby_Sharing_Windows
                                             break;
                                         }
                                 }
+                            }
+                            else
+                            {
+
                             }
                         }
 

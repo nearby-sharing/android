@@ -120,10 +120,18 @@ namespace ShortDev.Microsoft.ConnectedDevices.Protocol
         public void CorrectClientSessionBit()
             => SessionID = SessionID ^ SessionIdHostFlag;
 
+        /// <summary>
+        /// Returns size of the whole rest of the message (excluding headers) (including hmac)
+        /// </summary>
         public int PayloadSize
-            => MessageLength - (int)((ICdpSerializable<CommonHeader>)this).CalcSize() - Constants.HmacSize;
+            => MessageLength - (int)((ICdpSerializable<CommonHeader>)this).CalcSize();
 
         public const int FlagsOffset = 6;
         public const int MessageLengthOffset = 2;
+
+        public void SetMessageLength(int payloadSize)
+        {
+            MessageLength = (ushort)(payloadSize + ((ICdpSerializable<CommonHeader>)this).CalcSize());
+        }
     }
 }

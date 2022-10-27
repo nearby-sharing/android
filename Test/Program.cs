@@ -9,29 +9,45 @@ using Spectre.Console;
 //Debug.Print(adapter.BluetoothAddress.ToString("X"));
 
 var secret = BinaryConvert.ToBytes(AnsiConsole.Ask<string>("Secret"));
+var remoteNonce = AnsiConsole.Ask<ulong>("Remote Nonce");
 var buffer = BinaryConvert.ToBytes(AnsiConsole.Ask<string>("Message"));
 
+var localEncryption = CdpEncryptionInfo.Create(CdpEncryptionParams.Default);
 CdpCryptor cryptor = new(secret);
 
-bool flag = true;
-loop:
+CommonHeader headerA;
+using (MemoryStream stream = new(buffer))
+using (BigEndianBinaryReader reader = new(stream))
+{
+    headerA = CommonHeader.Parse(reader);
+}
+
+using (MemoryStream stream = new())
+using (BigEndianBinaryWriter writer = new(stream))
+{
+    headerA.Flags = 0;
+    cryptor!.EncryptMessage(writer, headerA!, new ICdpWriteable[]
+    {
+        new ConnectionHeader()
+        {
+            ConnectionMode = ConnectionMode.Proximal,
+            ConnectMessageType = ConnectionType.DeviceAuthResponse
+        },
+        AuthenticationPayload.Create(
+            localEncryption.DeviceCertificate!,
+            localEncryption.Nonce, new(remoteNonce)
+        )
+    });
+    buffer = stream.ToArray();
+}
+
 using (MemoryStream stream = new(buffer))
 using (BigEndianBinaryReader reader = new(stream))
 {
     if (!CommonHeader.TryParse(reader, out var header, out _) || header == null)
         throw new InvalidDataException();
 
-    if (flag)
-        HandleMessage(header, cryptor.Read(reader, header));
-    else
-    {
-        using (MemoryStream stream2 = new())
-        using (BigEndianBinaryWriter writer = new(stream))
-        {
-        }
-        flag = true;
-        goto loop;
-    }
+    HandleMessage(header, cryptor.Read(reader, header));
 }
 
 void HandleMessage(CommonHeader header, BinaryReader reader)
@@ -52,6 +68,7 @@ void HandleMessage(CommonHeader header, BinaryReader reader)
                     break;
                 }
             case ConnectionType.DeviceAuthRequest:
+            case ConnectionType.DeviceAuthResponse:
                 {
                     AuthenticationPayload msg = AuthenticationPayload.Parse(reader);
                     break;

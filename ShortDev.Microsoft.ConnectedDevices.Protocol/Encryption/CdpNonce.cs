@@ -7,6 +7,9 @@ public readonly struct CdpNonce
 {
     public readonly ulong Value;
 
+    public override string ToString()
+        => Value.ToString();
+
     public CdpNonce(ulong value)
         => Value = value;
 
