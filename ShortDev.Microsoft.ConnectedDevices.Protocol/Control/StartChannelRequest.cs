@@ -2,11 +2,11 @@
 using System;
 using System.IO;
 
-namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Session.Channel;
+namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Control;
 
-public sealed class StartRequest : ICdpPayload<StartRequest>
+public sealed class StartChannelRequest : ICdpPayload<StartChannelRequest>
 {
-    public static StartRequest Parse(BinaryReader reader)
+    public static StartChannelRequest Parse(BinaryReader reader)
         => new()
         {
             Id = reader.ReadStringWithLength(zeroByte: true),

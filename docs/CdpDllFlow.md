@@ -3,10 +3,23 @@
 ## Receive Message
 ```
 ?OnMessageReceived@ProximalConnector@cdp@@UEAAXAEBUEndpoint@shared@@PEBVITransportMessage@2@@Z
+?HandleMessageInternal@InboundDecryptionBucket@cdp@@MEAAXAEBUEndpoint@shared@@$$QEAV?$unique_ptr@$$CBVITransportMessage@cdp@@U?$default_delete@$$CBVITransportMessage@cdp@@@std@@@std@@@Z
 ```
 
 ```
-?HandleMessageInternal@InboundDecryptionBucket@cdp@@MEAAXAEBUEndpoint@shared@@$$QEAV?$unique_ptr@$$CBVITransportMessage@cdp@@U?$default_delete@$$CBVITransportMessage@cdp@@@std@@@std@@@Z
+?OnTransportReceivedDataInternal@TransportManager@cdp@@AEAAXAEBUEndpoint@shared@@AEBV?$vector@EV?$allocator@E@std@@@std@@@Z
+?OnTransportReceivedMessageInternal@TransportManager@cdp@@AEAAXAEBUEndpoint@shared@@V?$unique_ptr@VITransportMessage@cdp@@U?$default_delete@VITransportMessage@cdp@@@std@@@std@@@Z
+?VerifyAndDecryptMessage@TransportManager@cdp@@AEAA?AV?$unique_ptr@$$CBVITransportMessage@cdp@@U?$default_delete@$$CBVITransportMessage@cdp@@@std@@@std@@AEBV?$shared_ptr@VSession@shared@@@4@AEBVITransportMessage@2@@Z
+?HandleSessionMessage@TransportManager@cdp@@AEAAX$$QEAV?$unique_ptr@$$CBVITransportMessage@cdp@@U?$default_delete@$$CBVITransportMessage@cdp@@@std@@@std@@_N@Z
+```
+
+```
+?VerifyAndDecryptMessage@TransportManager@cdp@@AEAA?AV?$unique_ptr@$$CBVITransportMessage@cdp@@U?$default_delete@$$CBVITransportMessage@cdp@@@std@@@std@@AEBV?$shared_ptr@VSession@shared@@@4@AEBVITransportMessage@2@@Z
+?EncryptAndSignMessage@TransportManager@cdp@@AEAA?AV?$unique_ptr@VITransportMessage@cdp@@U?$default_delete@VITransportMessage@cdp@@@std@@@std@@AEBV?$shared_ptr@VSession@shared@@@4@AEBVITransportMessage@2@@Z
+```
+
+```
+?InternalSend@TransportManager@cdp@@AEAAX$$QEAV?$unique_ptr@USendQueueItem@cdp@@U?$default_delete@USendQueueItem@cdp@@@std@@@std@@@Z
 ```
 
 ## App Control
@@ -39,6 +52,24 @@ cdp.dll!cdp::ClientChannelManager::StartChannel(struct CDPTarget const &,unsigne
 cdp.dll!cdp::BinaryClient::Listen(struct CDPTarget const &,class ICDPBinaryClientCallback *)	Unknown
 ```
 
+## Session
+
 ```
+?HandleMessage@ClientBroker@cdp@@UEAAXPEBVITransportMessage@2@@Z
 ?HandleControlMessage@ClientBroker@cdp@@AEAAXPEBVITransportMessage@2@@Z
+
+```
+
+```
+cdp.dll!cdp::ClientChannelManager::HandleStartChannelResponse(unsigned __int64,unsigned __int64,enum cdp::ChannelMessage::Result,enum CDPHostSettings)	Unknown
+cdp.dll!cdp::ClientBroker::HandleControlMessage(class cdp::ITransportMessage const *)	Unknown
+cdp.dll!cdp::ClientBroker::HandleMessage(class cdp::ITransportMessage const *)	Unknown
+cdp.dll!cdp::ClientBroker::TransportManagerObserver::OnSessionMessageReceived(class std::unique_ptr<class cdp::ITransportMessage const ,struct std::default_delete<class cdp::ITransportMessage const > > const &)	Unknown
+cdp.dll!shared::detail::BaseObservable<shared::Observable<cdp::ITransportManager,cdp::ITransportManagerObserver>,cdp::ITransportManager,cdp::ITransportManagerObserver>::RaiseEventFunctor::operator()()	Unknown
+cdp.dll!cdp::OneCoreWorkItemDispatcher::ProcessWorkitems()	Unknown
+cdp.dll!cdp::OneCoreWorkItemDispatcher::ThreadPoolProc(struct _TP_CALLBACK_INSTANCE *,void *,struct _TP_WORK *)	Unknown
+ntdll.dll!TppWorkpExecuteCallback()	Unknown
+ntdll.dll!TppWorkerThread()	Unknown
+kernel32.dll!00007ff9ba817034()	Unknown
+ntdll.dll!RtlUserThreadStart()	Unknown
 ```

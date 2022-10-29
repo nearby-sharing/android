@@ -4,11 +4,12 @@ using AndroidX.AppCompat.App;
 using ShortDev.Microsoft.ConnectedDevices.Protocol;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Connection;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Connection.Authentication;
+using ShortDev.Microsoft.ConnectedDevices.Protocol.Connection.DeviceInfo;
+using ShortDev.Microsoft.ConnectedDevices.Protocol.Control;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Discovery;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Encryption;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Session.AppControl;
-using ShortDev.Microsoft.ConnectedDevices.Protocol.Session.Channel;
 using ShortDev.Networking;
 using System.Diagnostics;
 using System.Net.NetworkInformation;
@@ -96,6 +97,7 @@ namespace Nearby_Sharing_Windows
             return null;
         }
 
+        long counter = 0;
         private void BluetoothAdvertisement_OnDeviceConnected(CdpRfcommSocket socket)
         {
             Task.Run(() =>
@@ -116,10 +118,11 @@ namespace Nearby_Sharing_Windows
 
                         BinaryReader payloadReader = cryptor?.Read(reader, header) ?? reader;
                         {
+                            header.CorrectClientSessionBit();
+
                             if (header.Type == MessageType.Connect)
                             {
-                                header.CorrectClientSessionBit();
-
+                                header.SessionID |= localSessionId << 32;
                                 ConnectionHeader connectionHeader = ConnectionHeader.Parse(payloadReader);
                                 switch (connectionHeader.ConnectMessageType)
                                 {
@@ -129,26 +132,11 @@ namespace Nearby_Sharing_Windows
                                             remoteEncryption = CdpEncryptionInfo.FromRemote(connectionRequest.PublicKeyX, connectionRequest.PublicKeyY, connectionRequest.Nonce, CdpEncryptionParams.Default);
 
                                             var secret = localEncryption.GenerateSharedSecret(remoteEncryption);
-                                            Debug.Print(BinaryConvert.ToString(secret));
-                                            Debug.Print(remoteEncryption!.Nonce.ToString());
+
                                             cryptor = new(secret);
 
-                                            header.AdditionalHeaders = new CommonHeader.AdditionalMessageHeader[]
-                                            {
-                                                new(
-                                                    (NextHeaderType)129,
-                                                    new byte[]{ 0x70,0x00,0x00,0x03 }
-                                                ),
-                                                new(
-                                                    (NextHeaderType)130,
-                                                    new byte[]{ 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x1F }
-                                                ),
-                                                new(
-                                                    (NextHeaderType)131,
-                                                    new byte[]{ 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x1F }
-                                                )
-                                            };
-                                            header.SessionID |= localSessionId << 32;
+                                            //header.AdditionalHeaders.Clear();
+
                                             header.Write(writer);
 
                                             new ConnectionHeader()
@@ -229,6 +217,8 @@ namespace Nearby_Sharing_Windows
                                         }
                                     case ConnectionType.DeviceInfoMessage:
                                         {
+                                            var msg = DeviceInfoMessage.Parse(payloadReader);
+
                                             header.Flags = 0;
                                             cryptor!.EncryptMessage(writer, header, new ICdpWriteable[]
                                             {
@@ -249,24 +239,53 @@ namespace Nearby_Sharing_Windows
                             }
                             else if (header.Type == MessageType.Control)
                             {
+                                var controlHeader = ControlHeader.Parse(payloadReader);
+                                switch (controlHeader.MessageType)
+                                {
+                                    case ControlMessageType.StartChannelRequest:
+                                        {
+                                            var msg = StartChannelRequest.Parse(payloadReader);
+
+                                            header.SetReplyToId(header.RequestID);
+                                            header.SequenceNumber += 1;
+
+                                            header.Flags = 0;
+                                            cryptor!.EncryptMessage(writer, header, new ICdpWriteable[]
+                                            {
+                                                new ControlHeader()
+                                                {
+                                                    MessageType = ControlMessageType.StartChannelResponse
+                                                },
+                                                new StartChannelResponse()
+                                                {
+                                                    ReponseId = 0,
+                                                    Unknown = 0 // Success?!
+                                                }
+                                            });
+                                            break;
+                                        }
+                                    default:
+                                        break;
+                                }
+                            }
+                            else if (header.Type == MessageType.Session)
+                            {
                                 var appControlHeader = AppControlHeader.Parse(payloadReader);
-                                var channelType = (ChannelType)appControlHeader.MessageType;
                                 switch (appControlHeader.MessageType)
                                 {
                                     case AppControlType.LaunchUri:
                                         {
-                                            var msg = StartRequest.Parse(payloadReader);
-                                            cryptor!.EncryptMessage(writer, header, new ICdpWriteable[]
+                                            var abc = payloadReader.ReadPayload();
+                                            // var msg = LaunchUriRequest.Parse(payloadReader);
+                                            header.SetReplyToId(header.RequestID);
+                                            header.SequenceNumber += 1;
+
+                                            header.Flags = 0;
+                                            cryptor!.EncryptMessage(writer, header, (payloadWriter) =>
                                             {
-                                                new AppControlHeader()
-                                                {
-                                                    MessageType = (AppControlType)ChannelType.StartResponse
-                                                },
-                                                new StartResponse()
-                                                {
-                                                    ReponseId = 0x12345,
-                                                    Unknown = 0 // Success?!
-                                                }
+                                                payloadWriter.Write(
+                                                    BinaryConvert.ToBytes("000001000000000000002d120a0217530065006c006500630074006500640050006c006100740066006f0072006d00560065007200730069006f006e00100ac568010016560065007200730069006f006e00480061006e0064005300680061006b00650052006500730075006c007400100ac568")
+                                                );
                                             });
                                             break;
                                         }

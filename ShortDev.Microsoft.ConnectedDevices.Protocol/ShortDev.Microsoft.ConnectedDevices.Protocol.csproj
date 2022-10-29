@@ -20,6 +20,7 @@
 	<ItemGroup>
 		<None Include="../docs/Crypt.md" Link="Encryption\Crypt.md" />
 		<None Include="../docs/CdpDllFlow.md" />
+		<None Include="../docs/Logging.md" />
 		<None Include="../docs/NearShare.md" Link="Session\AppControl\NearShare.md" />
 	</ItemGroup>
 

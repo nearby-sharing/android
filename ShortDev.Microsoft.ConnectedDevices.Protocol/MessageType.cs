@@ -7,6 +7,7 @@
         Connect,
         Control,
         Session,
-        Ack
+        Ack,
+        ReliabilityResponse
     }
 }

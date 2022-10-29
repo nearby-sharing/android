@@ -1,11 +1,11 @@
 ﻿using System;
 using System.IO;
 
-namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Session.Channel;
+namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Control;
 
-public sealed class StartResponse : ICdpPayload<StartResponse>
+public sealed class StartChannelResponse : ICdpPayload<StartChannelResponse>
 {
-    public static StartResponse Parse(BinaryReader reader)
+    public static StartChannelResponse Parse(BinaryReader reader)
     {
         throw new NotImplementedException();
     }

@@ -80,6 +80,15 @@ public sealed class CdpCryptor
 
     public unsafe void EncryptMessage(BinaryWriter writer, CommonHeader header, ICdpWriteable[] body)
     {
+        EncryptMessage(writer, header, (payloadWriter) =>
+        {
+            foreach (var item in body)
+                item.Write(payloadWriter);
+        });
+    }
+
+    public unsafe void EncryptMessage(BinaryWriter writer, CommonHeader header, Action<BinaryWriter> bodyCallback)
+    {
         using (MemoryStream msgStream = new())
         using (BigEndianBinaryWriter msgWriter = new(msgStream))
         using (var aes = Aes.Create())
@@ -88,12 +97,13 @@ public sealed class CdpCryptor
             aes.Key = AesKey;
 
             int payloadLength = sizeof(Int32); // Size of "EncryptedPayloadSize" field
-            List<byte[]> payloadBuffer = new();
-            foreach (var writable in body)
+            byte[] payloadBuffer;
+            using (MemoryStream bodyStream = new())
+            using (BigEndianBinaryWriter bodyWriter = new(bodyStream))
             {
-                var buffer = writable.ToArray();
-                payloadLength += buffer.Length;
-                payloadBuffer.Add(buffer);
+                bodyCallback(bodyWriter);
+                payloadBuffer = bodyStream.ToArray();
+                payloadLength += payloadBuffer.Length;
             }
 
             using (MemoryStream payloadStream = new())
@@ -101,8 +111,7 @@ public sealed class CdpCryptor
             {
                 payloadWriter.Write((uint)payloadLength);
 
-                foreach (var payload in payloadBuffer)
-                    payloadWriter.Write(payload);
+                payloadWriter.Write(payloadBuffer);
 
                 var encryptedPayload = aes.EncryptCbc(payloadStream.ToArray(), iv);
 

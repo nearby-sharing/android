@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection.PortableExecutable;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Protocol
 {
@@ -64,7 +64,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Protocol
                 return false;
             }
 
-            result.AdditionalHeaders = additionalHeaders.ToArray();
+            result.AdditionalHeaders = additionalHeaders;
 
             ex = null;
             return true;
@@ -105,20 +105,9 @@ namespace ShortDev.Microsoft.ConnectedDevices.Protocol
         public ulong SessionID { get; set; } = 0;
         public ulong ChannelID { get; set; } = 0;
 
-        public AdditionalMessageHeader[] AdditionalHeaders { get; set; } = new AdditionalMessageHeader[0];
+        public List<AdditionalMessageHeader> AdditionalHeaders { get; set; } = new();
         public record AdditionalMessageHeader(NextHeaderType Type, byte[] Value);
 
-        public bool HasFlag(MessageFlags flag)
-            => (Flags & flag) != 0;
-
-        public const long SessionIdExistingSessionFlag = 0x0000000e00000000;
-        public bool ExistingSession
-            => (SessionID >> 32) > 0;
-
-
-        public const long SessionIdHostFlag = 0x80000000;
-        public void CorrectClientSessionBit()
-            => SessionID = SessionID ^ SessionIdHostFlag;
 
         /// <summary>
         /// Returns size of the whole rest of the message (excluding headers) (including hmac)
@@ -126,12 +115,42 @@ namespace ShortDev.Microsoft.ConnectedDevices.Protocol
         public int PayloadSize
             => MessageLength - (int)((ICdpSerializable<CommonHeader>)this).CalcSize();
 
-        public const int FlagsOffset = 6;
-        public const int MessageLengthOffset = 2;
 
+        #region Flags
+        public const int FlagsOffset = 6;
+
+        public bool HasFlag(MessageFlags flag)
+            => (Flags & flag) != 0;
+        #endregion
+
+        #region Session
+        public bool ExistingSession
+            => (SessionID >> 32) > 0;
+
+        public const long SessionIdHostFlag = 0x80000000;
+        public void CorrectClientSessionBit()
+            => SessionID = SessionID ^ SessionIdHostFlag;
+        #endregion
+
+        #region Message Length
+        public const int MessageLengthOffset = 2;
         public void SetMessageLength(int payloadSize)
         {
             MessageLength = (ushort)(payloadSize + ((ICdpSerializable<CommonHeader>)this).CalcSize());
+        }
+        #endregion
+
+        public void SetReplyToId(ulong requestId)
+        {
+            AdditionalHeaders.RemoveAll((x) => x.Type == NextHeaderType.ReplyToId);
+
+            byte[] value = new byte[sizeof(ulong)];
+            BinaryPrimitives.WriteUInt64LittleEndian(value, requestId);
+
+            AdditionalHeaders.Add(new(
+                NextHeaderType.ReplyToId,
+                value
+            ));
         }
     }
 }
