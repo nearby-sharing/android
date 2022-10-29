@@ -4,6 +4,7 @@ using ShortDev.Microsoft.ConnectedDevices.Protocol.Connection.Authentication;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Encryption;
 using ShortDev.Networking;
 using Spectre.Console;
+using Windows.System;
 
 //var adapter = await BluetoothAdapter.GetDefaultAsync();
 //Debug.Print(adapter.BluetoothAddress.ToString("X"));

@@ -8,6 +8,7 @@ using ShortDev.Microsoft.ConnectedDevices.Protocol.Discovery;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Encryption;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Session.AppControl;
+using ShortDev.Microsoft.ConnectedDevices.Protocol.Session.Channel;
 using ShortDev.Networking;
 using System.Diagnostics;
 using System.Net.NetworkInformation;
@@ -185,7 +186,7 @@ namespace Nearby_Sharing_Windows
                                                     ConnectMessageType = connectionHeader.ConnectMessageType == ConnectionType.DeviceAuthRequest ?  ConnectionType.DeviceAuthResponse : ConnectionType.UserDeviceAuthResponse
                                                 },
                                                 AuthenticationPayload.Create(
-                                                    localEncryption.DeviceCertificate!,
+                                                    localEncryption.DeviceCertificate!, // ToDo: User cert
                                                     localEncryption.Nonce, remoteEncryption!.Nonce
                                                 )
                                             });
@@ -204,7 +205,7 @@ namespace Nearby_Sharing_Windows
                                                 },
                                                 new HResultPayload()
                                                 {
-                                                    HResult = 1 // Anything != 0
+                                                    HResult = 1 // Failure: Anything != 0
                                                 }
                                             });
                                             break;
@@ -217,25 +218,24 @@ namespace Nearby_Sharing_Windows
                                                 new ConnectionHeader()
                                                 {
                                                     ConnectionMode = ConnectionMode.Proximal,
-                                                    ConnectMessageType = ConnectionType.AuthDoneRespone
+                                                    ConnectMessageType = ConnectionType.AuthDoneRespone // Ack
                                                 },
                                                 new HResultPayload()
                                                 {
-                                                    HResult = 0
+                                                    HResult = 0 // No error
                                                 }
                                             });
                                             break;
                                         }
                                     case ConnectionType.DeviceInfoMessage:
                                         {
-                                            // Ack
                                             header.Flags = 0;
                                             cryptor!.EncryptMessage(writer, header, new ICdpWriteable[]
                                             {
                                                 new ConnectionHeader()
                                                 {
                                                     ConnectionMode = ConnectionMode.Proximal,
-                                                    ConnectMessageType = ConnectionType.DeviceInfoResponseMessage
+                                                    ConnectMessageType = ConnectionType.DeviceInfoResponseMessage // Ack
                                                 }
                                             });
                                             break;
@@ -249,8 +249,30 @@ namespace Nearby_Sharing_Windows
                             }
                             else if (header.Type == MessageType.Control)
                             {
-                                var msgType = AppControlHeader.Parse(payloadReader);
-                                var uri = payloadReader.ReadStringWithLength();
+                                var appControlHeader = AppControlHeader.Parse(payloadReader);
+                                var channelType = (ChannelType)appControlHeader.MessageType;
+                                switch (appControlHeader.MessageType)
+                                {
+                                    case AppControlType.LaunchUri:
+                                        {
+                                            var msg = StartRequest.Parse(payloadReader);
+                                            cryptor!.EncryptMessage(writer, header, new ICdpWriteable[]
+                                            {
+                                                new AppControlHeader()
+                                                {
+                                                    MessageType = (AppControlType)ChannelType.StartResponse
+                                                },
+                                                new StartResponse()
+                                                {
+                                                    ReponseId = 0x12345,
+                                                    Unknown = 0 // Success?!
+                                                }
+                                            });
+                                            break;
+                                        }
+                                    default:
+                                        break;
+                                }
                             }
                             else
                             {
@@ -289,6 +311,7 @@ namespace Nearby_Sharing_Windows
 
             _btAdapter.BluetoothLeAdvertiser.StopAdvertising(callback);
         }
+
         class BLeAdvertiseCallback : AdvertiseCallback { }
 
         public async Task ListenRfcommAsync(CdpRfcommOptions options, CancellationToken cancellationToken = default)

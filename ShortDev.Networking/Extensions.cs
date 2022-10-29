@@ -8,11 +8,16 @@ public static class Extensions
     static readonly Encoding DefaultEncoding = Encoding.UTF8;
 
     #region BinaryReader
-    public static string ReadStringWithLength(this BinaryReader @this)
-        => @this.ReadStringWithLength(DefaultEncoding);
+    public static string ReadStringWithLength(this BinaryReader @this, bool zeroByte = false)
+        => @this.ReadStringWithLength(DefaultEncoding, zeroByte);
 
-    public static string ReadStringWithLength(this BinaryReader @this, Encoding encoding)
-        => encoding.GetString(@this.ReadBytesWithLength());
+    public static string ReadStringWithLength(this BinaryReader @this, Encoding encoding, bool zeroByte = false)
+    {
+        var result = encoding.GetString(@this.ReadBytesWithLength());
+        if (zeroByte)
+            @this.ReadByte();
+        return result;
+    }
 
     public static byte[] ReadBytesWithLength(this BinaryReader @this)
     {
