@@ -250,17 +250,13 @@ namespace Nearby_Sharing_Windows
                                             header.SequenceNumber += 1;
 
                                             header.Flags = 0;
-                                            cryptor!.EncryptMessage(writer, header, new ICdpWriteable[]
+                                            cryptor!.EncryptMessage(writer, header, (writer) =>
                                             {
                                                 new ControlHeader()
                                                 {
                                                     MessageType = ControlMessageType.StartChannelResponse
-                                                },
-                                                new StartChannelResponse()
-                                                {
-                                                    ReponseId = 0,
-                                                    Unknown = 0 // Success?!
-                                                }
+                                                }.Write(writer);
+                                                writer.Write(BinaryConvert.ToBytes("0000000000000000000000000000"));
                                             });
                                             break;
                                         }
@@ -276,7 +272,6 @@ namespace Nearby_Sharing_Windows
                                     case AppControlType.LaunchUri:
                                         {
                                             var abc = payloadReader.ReadPayload();
-                                            // var msg = LaunchUriRequest.Parse(payloadReader);
                                             header.SetReplyToId(header.RequestID);
                                             header.SequenceNumber += 1;
 
@@ -284,7 +279,7 @@ namespace Nearby_Sharing_Windows
                                             cryptor!.EncryptMessage(writer, header, (payloadWriter) =>
                                             {
                                                 payloadWriter.Write(
-                                                    BinaryConvert.ToBytes("000001000000000000002d120a0217530065006c006500630074006500640050006c006100740066006f0072006d00560065007200730069006f006e00100ac568010016560065007200730069006f006e00480061006e0064005300680061006b00650052006500730075006c007400100ac568")
+                                                    BinaryConvert.ToBytes("0000000100000000000000012D120A0217530065006C006500630074006500640050006C006100740066006F0072006D00560065007200730069006F006E00100AC568010016560065007200730069006F006E00480061006E0064005300680061006B00650052006500730075006C007400100AC568010000")
                                                 );
                                             });
                                             break;

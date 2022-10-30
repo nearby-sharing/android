@@ -13,6 +13,7 @@
 ?HandleSessionMessage@TransportManager@cdp@@AEAAX$$QEAV?$unique_ptr@$$CBVITransportMessage@cdp@@U?$default_delete@$$CBVITransportMessage@cdp@@@std@@@std@@_N@Z
 ```
 
+## Encryption
 ```
 ?VerifyAndDecryptMessage@TransportManager@cdp@@AEAA?AV?$unique_ptr@$$CBVITransportMessage@cdp@@U?$default_delete@$$CBVITransportMessage@cdp@@@std@@@std@@AEBV?$shared_ptr@VSession@shared@@@4@AEBVITransportMessage@2@@Z
 ?EncryptAndSignMessage@TransportManager@cdp@@AEAA?AV?$unique_ptr@VITransportMessage@cdp@@U?$default_delete@VITransportMessage@cdp@@@std@@@std@@AEBV?$shared_ptr@VSession@shared@@@4@AEBVITransportMessage@2@@Z
@@ -72,4 +73,21 @@ ntdll.dll!TppWorkpExecuteCallback()	Unknown
 ntdll.dll!TppWorkerThread()	Unknown
 kernel32.dll!00007ff9ba817034()	Unknown
 ntdll.dll!RtlUserThreadStart()	Unknown
+```
+
+## NearShare
+`cdprt.dll` in `sihost.exe`
+
+## Extract Key
+
+```
+?ComputeMessageContext@Message@CryptoPolicy@shared@@SAXPEAVICrypto@3@PEBVIPrivateAsymmetricKey@3@PEBVIPublicAsymmetricKey@3@AEAUKeyHashPair@3@PEAV?$vector@EV?$allocator@E@std@@@std@@@Z
+```
+
+```
+
+```
+
+```cpp
+*(void**)rax
 ```
