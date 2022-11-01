@@ -3,7 +3,7 @@
 using ShortDev.Networking;
 using System;
 using System.Buffers.Binary;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -33,6 +33,13 @@ public sealed class CdpCryptor
             }
         }
     }
+
+#if DEBUG
+
+    public void PrintSecret()
+        => Debug.Print(BinaryConvert.ToString(_secret));
+
+#endif
 
     byte[] AesKey
         => _secret[0..16];
@@ -96,22 +103,22 @@ public sealed class CdpCryptor
             byte[] iv = GenerateIV(header);
             aes.Key = AesKey;
 
-            int payloadLength = sizeof(Int32); // Size of "EncryptedPayloadSize" field
             byte[] payloadBuffer;
             using (MemoryStream bodyStream = new())
             using (BigEndianBinaryWriter bodyWriter = new(bodyStream))
             {
                 bodyCallback(bodyWriter);
+                bodyWriter.Flush();
+
                 payloadBuffer = bodyStream.ToArray();
-                payloadLength += payloadBuffer.Length;
             }
 
             using (MemoryStream payloadStream = new())
             using (BigEndianBinaryWriter payloadWriter = new(payloadStream))
             {
-                payloadWriter.Write((uint)payloadLength);
-
+                payloadWriter.Write((uint)(payloadBuffer.Length)); // Size of "EncryptedPayloadSize" field
                 payloadWriter.Write(payloadBuffer);
+                payloadWriter.Flush();
 
                 var encryptedPayload = aes.EncryptCbc(payloadStream.ToArray(), iv);
 
@@ -120,6 +127,7 @@ public sealed class CdpCryptor
                 header.Write(msgWriter);
 
                 msgWriter.Write(encryptedPayload);
+                msgWriter.Flush();
             }
 
             byte[] msgBuffer = msgStream.ToArray();
