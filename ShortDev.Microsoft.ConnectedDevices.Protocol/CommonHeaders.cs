@@ -140,7 +140,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Protocol
         }
         #endregion
 
-        public void SetReplyToId(ulong requestId)
+        public void SetReplyToId(ulong requestId, bool userMessage = false)
         {
             AdditionalHeaders.RemoveAll((x) => x.Type == NextHeaderType.ReplyToId);
 
@@ -148,7 +148,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Protocol
             BinaryPrimitives.WriteUInt64LittleEndian(value, requestId);
 
             AdditionalHeaders.Add(new(
-                NextHeaderType.ReplyToId,
+                userMessage ? NextHeaderType.UserMessageRequestId : NextHeaderType.ReplyToId,
                 value
             ));
         }

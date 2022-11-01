@@ -23,6 +23,14 @@
 ?InternalSend@TransportManager@cdp@@AEAAX$$QEAV?$unique_ptr@USendQueueItem@cdp@@U?$default_delete@USendQueueItem@cdp@@@std@@@std@@@Z
 ```
 
+## Handshake
+```
+cdprt.dll!cdp::sdk::SenderStateMachine::Start(class std::shared_ptr<class cdp::sdk::ISenderStateMachineCallbacks>)	Unknown
+cdprt.dll!cdp::sdk::ShareSendOperation::OnHandShakeComplete(struct cdp::sdk::HandshakeResponse const &)	Unknown
+cdprt.dll!cdp::sdk::ShareSendOperation::HandshakeCallback::OnResponse(struct cdp::sdk::HandshakeResponse const &)	Unknown
+cdprt.dll!cdp::sdk::SenderHandshake::DataReceived(unsigned char const *,unsigned int)	Unknown
+```
+
 ## App Control
 
 ### Handler

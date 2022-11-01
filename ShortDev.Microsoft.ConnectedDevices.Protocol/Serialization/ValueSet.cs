@@ -5,7 +5,7 @@ using System.IO;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Serialization;
 
-public partial class ValueSet
+public partial class ValueSet : ICdpPayload<ValueSet>
 {
     public static ValueSet Parse(byte[] data)
     {
@@ -13,16 +13,30 @@ public partial class ValueSet
             return Parse(stream);
     }
 
+    public static ValueSet Parse(BinaryReader reader)
+        => Parse(reader.BaseStream);
+
     public static ValueSet Parse(Stream stream)
     {
         CompactBinaryReader<InputStream> reader = new(new(stream));
         return Deserialize<ValueSet>.From(reader);
     }
 
+    public void Write(BinaryWriter writer)
+    {
+        OutputStream stream = new(writer.BaseStream);
+        CompactBinaryWriter<OutputStream> bondWriter = new(stream);
+        Serialize.To(bondWriter, this);
+        stream.Flush();
+    }
+
     /// <summary>
     /// Get's the value of the specified key <br/>
     /// Throws if the key is not found
     /// </summary>
-    public T GetValue<T>(string key)
+    public T Get<T>(string key)
         => Entries[key].Get<T>();
+
+    public void Add<T>(string key, T value)
+        => Entries.Add(key, PropertyValue.Create(value));
 }

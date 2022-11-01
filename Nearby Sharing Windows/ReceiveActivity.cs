@@ -9,6 +9,7 @@ using ShortDev.Microsoft.ConnectedDevices.Protocol.Control;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Discovery;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Encryption;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms;
+using ShortDev.Microsoft.ConnectedDevices.Protocol.Serialization;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Session.AppControl;
 using ShortDev.Networking;
 using System.Diagnostics;
@@ -122,7 +123,6 @@ namespace Nearby_Sharing_Windows
 
                             if (header.Type == MessageType.Connect)
                             {
-                                header.SessionID |= localSessionId << 32;
                                 ConnectionHeader connectionHeader = ConnectionHeader.Parse(payloadReader);
                                 switch (connectionHeader.ConnectMessageType)
                                 {
@@ -136,6 +136,7 @@ namespace Nearby_Sharing_Windows
                                             cryptor = new(secret);
 
                                             //header.AdditionalHeaders.Clear();
+                                            header.SessionID |= localSessionId << 32;
 
                                             header.Write(writer);
 
@@ -168,15 +169,15 @@ namespace Nearby_Sharing_Windows
                                             header.Flags = 0;
                                             cryptor!.EncryptMessage(writer, header, new ICdpWriteable[]
                                             {
-                                                new ConnectionHeader()
-                                                {
-                                                    ConnectionMode = ConnectionMode.Proximal,
-                                                    ConnectMessageType = connectionHeader.ConnectMessageType == ConnectionType.DeviceAuthRequest ?  ConnectionType.DeviceAuthResponse : ConnectionType.UserDeviceAuthResponse
-                                                },
-                                                AuthenticationPayload.Create(
-                                                    localEncryption.DeviceCertificate!, // ToDo: User cert
-                                                    localEncryption.Nonce, remoteEncryption!.Nonce
-                                                )
+                                            new ConnectionHeader()
+                                            {
+                                                ConnectionMode = ConnectionMode.Proximal,
+                                                ConnectMessageType = connectionHeader.ConnectMessageType == ConnectionType.DeviceAuthRequest ? ConnectionType.DeviceAuthResponse : ConnectionType.UserDeviceAuthResponse
+                                            },
+                                            AuthenticationPayload.Create(
+                                                localEncryption.DeviceCertificate!, // ToDo: User cert
+                                                localEncryption.Nonce, remoteEncryption!.Nonce
+                                            )
                                             });
 
                                             break;
@@ -186,15 +187,15 @@ namespace Nearby_Sharing_Windows
                                             header.Flags = 0;
                                             cryptor!.EncryptMessage(writer, header, new ICdpWriteable[]
                                             {
-                                                new ConnectionHeader()
-                                                {
-                                                    ConnectionMode = ConnectionMode.Proximal,
-                                                    ConnectMessageType = ConnectionType.UpgradeFailure // We currently only support BT
-                                                },
-                                                new HResultPayload()
-                                                {
-                                                    HResult = 1 // Failure: Anything != 0
-                                                }
+                                            new ConnectionHeader()
+                                            {
+                                                ConnectionMode = ConnectionMode.Proximal,
+                                                ConnectMessageType = ConnectionType.UpgradeFailure // We currently only support BT
+                                            },
+                                            new HResultPayload()
+                                            {
+                                                HResult = 1 // Failure: Anything != 0
+                                            }
                                             });
                                             break;
                                         }
@@ -203,15 +204,15 @@ namespace Nearby_Sharing_Windows
                                             header.Flags = 0;
                                             cryptor!.EncryptMessage(writer, header, new ICdpWriteable[]
                                             {
-                                                new ConnectionHeader()
-                                                {
-                                                    ConnectionMode = ConnectionMode.Proximal,
-                                                    ConnectMessageType = ConnectionType.AuthDoneRespone // Ack
-                                                },
-                                                new HResultPayload()
-                                                {
-                                                    HResult = 0 // No error
-                                                }
+                                            new ConnectionHeader()
+                                            {
+                                                ConnectionMode = ConnectionMode.Proximal,
+                                                ConnectMessageType = ConnectionType.AuthDoneRespone // Ack
+                                            },
+                                            new HResultPayload()
+                                            {
+                                                HResult = 0 // No error
+                                            }
                                             });
                                             break;
                                         }
@@ -222,11 +223,11 @@ namespace Nearby_Sharing_Windows
                                             header.Flags = 0;
                                             cryptor!.EncryptMessage(writer, header, new ICdpWriteable[]
                                             {
-                                                new ConnectionHeader()
-                                                {
-                                                    ConnectionMode = ConnectionMode.Proximal,
-                                                    ConnectMessageType = ConnectionType.DeviceInfoResponseMessage // Ack
-                                                }
+                                            new ConnectionHeader()
+                                            {
+                                                ConnectionMode = ConnectionMode.Proximal,
+                                                ConnectMessageType = ConnectionType.DeviceInfoResponseMessage // Ack
+                                            }
                                             });
                                             break;
                                         }
@@ -247,7 +248,7 @@ namespace Nearby_Sharing_Windows
                                             var msg = StartChannelRequest.Parse(payloadReader);
 
                                             header.SetReplyToId(header.RequestID);
-                                            header.SequenceNumber += 1;
+                                            // header.SequenceNumber += 1;
 
                                             header.Flags = 0;
                                             cryptor!.EncryptMessage(writer, header, (writer) =>
@@ -261,32 +262,30 @@ namespace Nearby_Sharing_Windows
                                             break;
                                         }
                                     default:
-                                        break;
+                                        {
+                                            payloadReader.PrintPayload();
+                                            break;
+                                        }
                                 }
                             }
                             else if (header.Type == MessageType.Session)
                             {
-                                var appControlHeader = AppControlHeader.Parse(payloadReader);
-                                switch (appControlHeader.MessageType)
-                                {
-                                    case AppControlType.LaunchUri:
-                                        {
-                                            var abc = payloadReader.ReadPayload();
-                                            header.SetReplyToId(header.RequestID);
-                                            header.SequenceNumber += 1;
+                                var prepend = payloadReader.ReadBytes(0x0000000C);
+                                var payload = ValueSet.Parse(payloadReader.ReadPayload());
 
-                                            header.Flags = 0;
-                                            cryptor!.EncryptMessage(writer, header, (payloadWriter) =>
-                                            {
-                                                payloadWriter.Write(
-                                                    BinaryConvert.ToBytes("0000000100000000000000012D120A0217530065006C006500630074006500640050006C006100740066006F0072006D00560065007200730069006F006E00100AC568010016560065007200730069006F006E00480061006E0064005300680061006B00650052006500730075006C007400100AC568010000")
-                                                );
-                                            });
-                                            break;
-                                        }
-                                    default:
-                                        break;
-                                }
+                                header.AdditionalHeaders.Clear();
+                                // header.SetReplyToId(header.RequestID);
+
+                                header.Flags = 0;
+                                cryptor!.EncryptMessage(writer, header, (payloadWriter) =>
+                                {
+                                    payloadWriter.Write(prepend);
+                                    ValueSet response = new();
+                                    response.Add("SelectedPlatformVersion", 1u);
+                                    response.Add("VersionHandShakeResult", 1u);
+                                    response.Write(payloadWriter);
+                                });
+                                break;
                             }
                             else
                             {

@@ -1,5 +1,6 @@
 ﻿using Bond;
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Serialization;
 
@@ -26,20 +27,29 @@ public partial class PropertyValue
         throw new NotImplementedException();
     }
 
-    public T Get<T>(T value)
+    public static PropertyValue Create<T>(T value)
+    {
+        PropertyValue result = new();
+        result.Set(value);
+        return result;
+    }
+
+    public void Set<T>(T value)
     {
         switch (value)
         {
             case UInt32 uint32Value:
+                Type = (int)PropertyType.PropertyType_UInt32;
                 this.UInt32Value = uint32Value;
                 break;
-            case string stringValue:
-                this.StringValue = stringValue;
-                break;
-            case Guid guidArrayValue:
-                this.GuidArrayValue = new() { UUID.FromGuid(guidArrayValue) };
-                break;
+            //case string stringValue:
+            //    this.StringValue = stringValue;
+            //    break;
+            //case Guid guidArrayValue:
+            //    this.GuidArrayValue = new() { UUID.FromGuid(guidArrayValue) };
+            //    break;
+            default:
+                throw new NotImplementedException();
         }
-        throw new NotImplementedException();
     }
 }
