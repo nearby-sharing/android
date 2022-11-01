@@ -1,30 +1,26 @@
-﻿using ShortDev.Microsoft.ConnectedDevices.Protocol;
+﻿using Bond.IO.Unsafe;
+using Bond.Protocols;
+using ShortDev.Microsoft.ConnectedDevices.Protocol;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Connection;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Connection.Authentication;
+using ShortDev.Microsoft.ConnectedDevices.Protocol.Connection.DeviceInfo;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Encryption;
+using ShortDev.Microsoft.ConnectedDevices.Protocol.Serialization;
 using ShortDev.Networking;
 using Spectre.Console;
 
 //var adapter = await BluetoothAdapter.GetDefaultAsync();
 //Debug.Print(adapter.BluetoothAddress.ToString("X"));
 
-//var requestData = /* 00000100000000000000 */ "2B2D120A040E43006F006E00740072006F006C004D00650073007300610067006500100AC5680600124D006100780050006C006100740066006F0072006D00560065007200730069006F006E00100AC5680100124D0069006E0050006C006100740066006F0072006D00560065007200730069006F006E00100AC56801000B4F007000650072006100740069006F006E0049006400101ECB720A0105BA8FA2D70D248BC70244A296016699F198A8BDC8EAF10A000000";
-//// Response: 2d120a0217530065006c006500630074006500640050006c006100740066006f0072006d00560065007200730069006f006e00100ac568010016560065007200730069006f006e00480061006e0064005300680061006b00650052006500730075006c007400100ac5680100000000000000000000000000
+{
+    MemoryStream stream = new(new byte[] { 0xc9, 0x77 });
+    CompactBinaryReader<InputStream> reader = new(new(stream));
+    reader.ReadFieldBegin(out var type, out var id);
+    Console.WriteLine($"Field: Type = {type}, Id = {id}");
+    Console.ReadLine();
+}
 
-
-//// var schema = Schema<CdpCryptor>.RuntimeSchema.SchemaDef;
-//var bondReader = new CompactBinaryReader<InputStream>(new InputStream(new MemoryStream(BinaryConvert.ToBytes(requestData))), 2);
-//bondReader.ReadStructBegin();
-//bondReader.ReadFieldBegin(out var fieldType2, out var fieldId2);
-//bondReader.ReadContainerBegin(out var count, out var keyType, out var valueType);
-//for (int i = 0; i < count; i++)
-//{
-//    var str = bondReader.ReadWString();
-//    // bondReader.ReadBytes(1);
-//    var abc = bondReader.ReadInt32();
-//}
-
-var secret = BinaryConvert.ToBytes(AnsiConsole.Ask<string>("Secret"));
+var secret = BinaryConvert.ToBytes("37fc508508ba8d6d7ba7ddc79ad29fecdf855879e2a48b6811f310e80dcab98a81500925c1c8019c05b418d3bc22a870fc52d3735b43babc85c57a1fe12d4fb4"); // AnsiConsole.Ask<string>("Secret"));
 CdpCryptor cryptor = new(secret);
 
 while (true)
@@ -66,7 +62,19 @@ void HandleMessage(CommonHeader header, BinaryReader reader)
                     AuthenticationPayload msg = AuthenticationPayload.Parse(reader);
                     break;
                 }
+            case ConnectionType.DeviceInfoMessage:
+                {
+                    var msg = DeviceInfoMessage.Parse(reader);
+                    break;
+                }
         }
+    }
+    else if (header.Type == MessageType.Session)
+    {
+        //Console.WriteLine();
+        //Console.WriteLine(BinaryConvert.ToString(reader.ReadPayload()));
+        var prepend = reader.ReadBytes(0x0000000C);
+        var valueSet = ValueSet.Parse(reader.BaseStream);
     }
     else
     {

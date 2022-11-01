@@ -1,5 +1,6 @@
 ﻿using ShortDev.Networking;
 using System.IO;
+using System.Text.Json;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Connection.DeviceInfo;
 
@@ -8,13 +9,13 @@ public sealed class DeviceInfoMessage : ICdpPayload<DeviceInfoMessage>
     public static DeviceInfoMessage Parse(BinaryReader reader)
         => new()
         {
-            JsonData = reader.ReadStringWithLength()
+            DeviceInfo = JsonSerializer.Deserialize<CdpDeviceInfo>(reader.ReadStringWithLength()) ?? throw new InvalidDataException()
         };
 
-    public required string JsonData { get; init; }
+    public required CdpDeviceInfo DeviceInfo { get; init; }
 
     public void Write(BinaryWriter writer)
     {
-        writer.WriteWithLength(JsonData);
+        writer.WriteWithLength(JsonSerializer.Serialize(DeviceInfo));
     }
 }
