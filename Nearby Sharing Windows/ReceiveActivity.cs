@@ -1,5 +1,6 @@
 ﻿using Android.Bluetooth;
 using Android.Bluetooth.LE;
+using Android.Content;
 using AndroidX.AppCompat.App;
 using ShortDev.Microsoft.ConnectedDevices.Protocol;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Connection;
@@ -16,6 +17,7 @@ using System.Diagnostics;
 using System.Net.NetworkInformation;
 using ConnectionRequest = ShortDev.Microsoft.ConnectedDevices.Protocol.Connection.ConnectionRequest;
 using ManifestPermission = Android.Manifest.Permission;
+using AndroidUri = Android.Net.Uri;
 
 namespace Nearby_Sharing_Windows
 {
@@ -98,7 +100,12 @@ namespace Nearby_Sharing_Windows
             return null;
         }
 
-        long counter = 0;
+        // ToDo: Session Object
+        ulong localSessionId = 2;
+        CdpEncryptionInfo localEncryption = CdpEncryptionInfo.Create(CdpEncryptionParams.Default);
+
+        CdpCryptor? cryptor = null;
+        CdpEncryptionInfo? remoteEncryption = null;
         private void BluetoothAdvertisement_OnDeviceConnected(CdpRfcommSocket socket)
         {
             Task.Run(() =>
@@ -107,11 +114,7 @@ namespace Nearby_Sharing_Windows
                 using (BigEndianBinaryWriter writer = new(socket.OutputStream!))
                 using (BigEndianBinaryReader reader = new(socket.InputStream!))
                 {
-                    ulong localSessionId = 2;
-                    CdpEncryptionInfo localEncryption = CdpEncryptionInfo.Create(CdpEncryptionParams.Default);
 
-                    CdpCryptor? cryptor = null;
-                    CdpEncryptionInfo? remoteEncryption = null;
                     while (true)
                     {
                         if (!CommonHeader.TryParse(reader, out var header, out _) || header == null)
@@ -247,8 +250,14 @@ namespace Nearby_Sharing_Windows
                                         {
                                             var msg = StartChannelRequest.Parse(payloadReader);
 
+                                            header.AdditionalHeaders.Clear();
                                             header.SetReplyToId(header.RequestID);
-                                            // header.SequenceNumber += 1;
+                                            header.AdditionalHeaders.Add(new(
+                                                (NextHeaderType)129,
+                                                new byte[] { 0x30, 0x0, 0x0, 0x1 }
+                                            ));
+
+                                            header.RequestID = 0;
 
                                             header.Flags = 0;
                                             cryptor!.EncryptMessage(writer, header, (writer) =>
@@ -257,13 +266,12 @@ namespace Nearby_Sharing_Windows
                                                 {
                                                     MessageType = ControlMessageType.StartChannelResponse
                                                 }.Write(writer);
-                                                writer.Write(BinaryConvert.ToBytes("0000000000000000000000000000"));
+                                                writer.Write(BinaryConvert.ToBytes("000000000000000001")); // 000000000000000001
                                             });
                                             break;
                                         }
                                     default:
                                         {
-                                            payloadReader.PrintPayload();
                                             break;
                                         }
                                 }
@@ -271,18 +279,28 @@ namespace Nearby_Sharing_Windows
                             else if (header.Type == MessageType.Session)
                             {
                                 var prepend = payloadReader.ReadBytes(0x0000000C);
-                                var payload = ValueSet.Parse(payloadReader.ReadPayload());
+                                var buffer = payloadReader.ReadPayload();
+                                var payload = ValueSet.Parse(buffer);
+                                Debug.Print(BinaryConvert.ToString(buffer));
+                                header.AdditionalHeaders.RemoveAll((x) => x.Type == NextHeaderType.CorrelationVector);
 
-                                header.AdditionalHeaders.Clear();
-                                // header.SetReplyToId(header.RequestID);
+                                ValueSet response = new();
+                                if (payload.ContainsKey("Uri"))
+                                {
+                                    AndroidUri uri = AndroidUri.Parse(payload.Get<string>("Uri"))!;
+                                    StartActivity(new Intent(Intent.ActionView, uri));
+                                    response.Add("ControlMessage", 2u);
+                                }
+                                else
+                                {
+                                    response.Add("SelectedPlatformVersion", 1u);
+                                    response.Add("VersionHandShakeResult", 1u);
+                                }
 
                                 header.Flags = 0;
                                 cryptor!.EncryptMessage(writer, header, (payloadWriter) =>
                                 {
                                     payloadWriter.Write(prepend);
-                                    ValueSet response = new();
-                                    response.Add("SelectedPlatformVersion", 1u);
-                                    response.Add("VersionHandShakeResult", 1u);
                                     response.Write(payloadWriter);
                                 });
                                 break;

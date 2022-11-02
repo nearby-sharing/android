@@ -39,4 +39,7 @@ public partial class ValueSet : ICdpPayload<ValueSet>
 
     public void Add<T>(string key, T value)
         => Entries.Add(key, PropertyValue.Create(value));
+
+    public bool ContainsKey(string key)
+        => Entries.ContainsKey(key);
 }

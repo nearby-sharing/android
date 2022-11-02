@@ -12,6 +12,11 @@ using Spectre.Console;
 //var adapter = await BluetoothAdapter.GetDefaultAsync();
 //Debug.Print(adapter.BluetoothAddress.ToString("X"));
 
+var correlationVector = BinaryConvert.ToBytes("647532586432705668596d7971363048"); // 2e31
+Console.WriteLine(new Guid(correlationVector.Reverse()));
+Console.WriteLine(BinaryConvert.ToString(Convert.FromBase64String(System.Text.Encoding.UTF8.GetString(correlationVector))));
+Console.ReadLine();
+
 {
     MemoryStream stream = new(new byte[] { 0xc9, 0x77 });
     CompactBinaryReader<InputStream> reader = new(new(stream));
@@ -28,7 +33,7 @@ using Spectre.Console;
     Console.ReadLine();
 }
 
-var secret = BinaryConvert.ToBytes("51B2BA95E1DC36AB9888BC175B2AA6E27A5F7ED8C55A0F83A6CF451E65EE4ADBCB4A38FFC1594CE159EC31981A0BAD2FFC9122B911C21A0A36C2D4F04660B00B"); //  37fc508508ba8d6d7ba7ddc79ad29fecdf855879e2a48b6811f310e80dcab98a81500925c1c8019c05b418d3bc22a870fc52d3735b43babc85c57a1fe12d4fb4"); // AnsiConsole.Ask<string>("Secret"));
+var secret = BinaryConvert.ToBytes("37fc508508ba8d6d7ba7ddc79ad29fecdf855879e2a48b6811f310e80dcab98a81500925c1c8019c05b418d3bc22a870fc52d3735b43babc85c57a1fe12d4fb4"); // AnsiConsole.Ask<string>("Secret"));
 CdpCryptor cryptor = new(secret);
 
 while (true)
@@ -79,7 +84,7 @@ void HandleMessage(CommonHeader header, BinaryReader reader)
     }
     else if (header.Type == MessageType.Session)
     {
-        reader.PrintPayload();
+        // reader.PrintPayload();
         var prepend = reader.ReadBytes(0x0000000C);
         var valueSet = ValueSet.Parse(reader.BaseStream);
     }
