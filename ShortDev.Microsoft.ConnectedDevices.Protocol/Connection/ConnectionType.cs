@@ -1,5 +1,9 @@
 ﻿namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Connection;
 
+/// <summary>
+/// Indicates the current connection type. <br/>
+/// (See <see cref="ConnectionHeader.MessageType"/>)
+/// </summary>
 public enum ConnectionType : byte
 {
     /// <summary>

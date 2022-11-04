@@ -10,6 +10,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="PolySharp" Version="1.7.1" />
 		<PackageReference Include="System.Memory" Version="4.5.5" />
 		<PackageReference Include="Bond.CSharp" Version="10.0.0" />
 	</ItemGroup>

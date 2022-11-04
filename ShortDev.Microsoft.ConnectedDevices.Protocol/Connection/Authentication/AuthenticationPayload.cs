@@ -7,6 +7,9 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Connection.Authentication;
 
+/// <summary>
+/// For all authentication, devices send their device / user certificate, which is self-signed.
+/// </summary>
 public sealed class AuthenticationPayload : ICdpPayload<AuthenticationPayload>
 {
     private AuthenticationPayload() { }
@@ -18,6 +21,13 @@ public sealed class AuthenticationPayload : ICdpPayload<AuthenticationPayload>
             SignedThumbprint = reader.ReadBytesWithLength()
         };
 
+    /// <summary>
+    /// Creates a new <see cref="AuthenticationPayload"/> based on a self-signed device / user certificat and host and client <see cref="CdpNonce"/>.
+    /// </summary>
+    /// <param name="cert">Self signed certificat</param>
+    /// <param name="hostNonce"><see cref="CdpNonce"/> of host device</param>
+    /// <param name="clientNonce"><see cref="CdpNonce"/> of client device</param>
+    /// <returns>The generated payload</returns>
     public static AuthenticationPayload Create(X509Certificate2 cert, CdpNonce hostNonce, CdpNonce clientNonce)
         => new()
         {
@@ -25,7 +35,13 @@ public sealed class AuthenticationPayload : ICdpPayload<AuthenticationPayload>
             SignedThumbprint = CreateSignedThumbprint(cert, hostNonce, clientNonce)
         };
 
+    /// <summary>
+    /// A Device / User Certificate.
+    /// </summary>
     public required X509Certificate2 Certificate { get; init; }
+    /// <summary>
+    /// A signed Device Cert Thumbprint.
+    /// </summary>
     public required byte[] SignedThumbprint { get; init; }    
 
     public void Write(BinaryWriter writer)
@@ -34,6 +50,13 @@ public sealed class AuthenticationPayload : ICdpPayload<AuthenticationPayload>
         writer.WriteWithLength(SignedThumbprint);
     }
 
+    /// <summary>
+    /// Checks wether the transmitted tumbprint is valid given both host and client <see cref="CdpNonce"/>.
+    /// </summary>
+    /// <param name="hostNonce"><see cref="CdpNonce"/> of host device</param>
+    /// <param name="clientNonce"><see cref="CdpNonce"/> of client device</param>
+    /// <returns>Wether the thumbprint of the current certificat is valid</returns>
+    /// <exception cref="InvalidDataException"></exception>
     public bool VerifyThumbprint(CdpNonce hostNonce, CdpNonce clientNonce)
     {
         var publicKey = Certificate.GetECDsaPublicKey() ?? throw new InvalidDataException("Invalid certificate!");

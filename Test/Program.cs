@@ -18,10 +18,12 @@ Console.WriteLine(BinaryConvert.ToString(Convert.FromBase64String(System.Text.En
 Console.ReadLine();
 
 {
-    MemoryStream stream = new(new byte[] { 0xc9, 0x77 });
+    MemoryStream stream = new(new byte[] { 0x10, 0x0e, 0xc6, 0x0e, 0xc6 });
     CompactBinaryReader<InputStream> reader = new(new(stream));
     reader.ReadFieldBegin(out var type, out var id);
-    Console.WriteLine($"Field: Type = {type}, Id = {id}");
+    var propertyType = reader.ReadInt32();
+    reader.ReadFieldBegin(out type, out id);
+    Console.WriteLine($"Field: Type = {type}, Id = {id}, PropType = {propertyType}");
     Console.ReadLine();
 }
 
@@ -57,7 +59,7 @@ void HandleMessage(CommonHeader header, BinaryReader reader)
     if (header.Type == MessageType.Connect)
     {
         ConnectionHeader connectionHeader = ConnectionHeader.Parse(reader);
-        switch (connectionHeader.ConnectMessageType)
+        switch (connectionHeader.MessageType)
         {
             case ConnectionType.ConnectRequest:
                 {

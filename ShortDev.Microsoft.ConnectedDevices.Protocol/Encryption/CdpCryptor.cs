@@ -3,7 +3,6 @@
 using ShortDev.Networking;
 using System;
 using System.Buffers.Binary;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -24,7 +23,7 @@ public sealed class CdpCryptor
             using (MemoryStream stream = new())
             using (BigEndianBinaryWriter writer = new(stream)) // Big-endian format!
             {
-                writer.Write(header.SessionID);
+                writer.Write(header.SessionId);
                 writer.Write(header.SequenceNumber);
                 writer.Write(header.FragmentIndex);
                 writer.Write(header.FragmentCount);
@@ -33,13 +32,6 @@ public sealed class CdpCryptor
             }
         }
     }
-
-#if DEBUG
-
-    public void PrintSecret()
-        => Debug.Print(BinaryConvert.ToString(_secret));
-
-#endif
 
     byte[] AesKey
         => _secret[0..16];
@@ -85,15 +77,6 @@ public sealed class CdpCryptor
         return decryptedPayload;
     }
 
-    public unsafe void EncryptMessage(BinaryWriter writer, CommonHeader header, ICdpWriteable[] body)
-    {
-        EncryptMessage(writer, header, (payloadWriter) =>
-        {
-            foreach (var item in body)
-                item.Write(payloadWriter);
-        });
-    }
-
     public unsafe void EncryptMessage(BinaryWriter writer, CommonHeader header, Action<BinaryWriter> bodyCallback)
     {
         using (MemoryStream msgStream = new())
@@ -116,7 +99,7 @@ public sealed class CdpCryptor
             using (MemoryStream payloadStream = new())
             using (BigEndianBinaryWriter payloadWriter = new(payloadStream))
             {
-                payloadWriter.Write((uint)(payloadBuffer.Length)); // Size of "EncryptedPayloadSize" field
+                payloadWriter.Write((uint)payloadBuffer.Length);
                 payloadWriter.Write(payloadBuffer);
                 payloadWriter.Flush();
 

@@ -3,154 +3,192 @@ using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.IO;
 
-namespace ShortDev.Microsoft.ConnectedDevices.Protocol
+namespace ShortDev.Microsoft.ConnectedDevices.Protocol;
+
+/// <summary>
+/// The <see cref="CommonHeader"/> is common for all Messages.
+/// </summary>
+public sealed class CommonHeader : ICdpHeader<CommonHeader>
 {
-    public sealed class CommonHeader : ICdpHeader<CommonHeader>
+    public static CommonHeader Parse(BinaryReader reader)
     {
-        public static CommonHeader Parse(BinaryReader reader)
+        if (!TryParse(reader, out var result, out var ex))
+            throw ex ?? new NullReferenceException("No exception");
+        return result ?? throw new NullReferenceException("No result");
+    }
+
+    public static bool TryParse(BinaryReader reader, out CommonHeader? result, out Exception? ex)
+    {
+        result = new();
+        var sig = reader.ReadUInt16();
+        if (sig != Constants.Signature)
         {
-            if (!TryParse(reader, out var result, out var ex))
-                throw ex ?? new NullReferenceException("No exception");
-            return result ?? throw new NullReferenceException("No result");
+            ex = new InvalidDataException($"Wrong signature. Expected \"{Constants.Signature}\"");
+            return false;
         }
 
-        public static bool TryParse(BinaryReader reader, out CommonHeader? result, out Exception? ex)
+        result.MessageLength = reader.ReadUInt16();
+        result.Version = reader.ReadByte();
+        if (result.Version != Constants.ProtocolVersion)
         {
-            result = new();
-            var sig = reader.ReadUInt16();
-            if (sig != Constants.Signature)
-            {
-                ex = new InvalidDataException($"Wrong signature. Expected \"{Constants.Signature}\"");
-                return false;
-            }
-
-            result.MessageLength = reader.ReadUInt16();
-            result.Version = reader.ReadByte();
-            if (result.Version != Constants.ProtocolVersion)
-            {
-                ex = new InvalidDataException($"Wrong version. Got \"{result.Version}\", expected \"{Constants.ProtocolVersion}\"");
-                return false;
-            }
-
-            result.Type = (MessageType)reader.ReadByte();
-            result.Flags = (MessageFlags)reader.ReadInt16();
-            result.SequenceNumber = reader.ReadUInt32();
-            result.RequestID = reader.ReadUInt64();
-            result.FragmentIndex = reader.ReadUInt16();
-            result.FragmentCount = reader.ReadUInt16();
-            result.SessionID = reader.ReadUInt64();
-            result.ChannelID = reader.ReadUInt64();
-
-            NextHeaderType nextHeaderType;
-            byte nextHeaderSize;
-            List<AdditionalMessageHeader> additionalHeaders = new();
-            while (true)
-            {
-                nextHeaderType = (NextHeaderType)reader.ReadByte();
-                nextHeaderSize = reader.ReadByte();
-
-                if (nextHeaderType != NextHeaderType.None)
-                {
-                    var value = reader.ReadBytes(nextHeaderSize);
-                    additionalHeaders.Add(new(nextHeaderType, value));
-                }
-                else
-                    break;
-            }
-
-            if (nextHeaderSize != 0)
-            {
-                ex = new InvalidDataException("Invalid header size, end-of-header cannot have a size greather than 0");
-                return false;
-            }
-
-            result.AdditionalHeaders = additionalHeaders;
-
-            ex = null;
-            return true;
+            ex = new InvalidDataException($"Wrong version. Got \"{result.Version}\", expected \"{Constants.ProtocolVersion}\"");
+            return false;
         }
 
-        public void Write(BinaryWriter writer)
-        {
-            writer.Write(Constants.Signature);
-            writer.Write(MessageLength);
-            writer.Write(Constants.ProtocolVersion);
-            writer.Write((byte)Type);
-            writer.Write((short)Flags);
-            writer.Write(SequenceNumber);
-            writer.Write(RequestID);
-            writer.Write(FragmentIndex);
-            writer.Write(FragmentCount);
-            writer.Write(SessionID);
-            writer.Write(ChannelID);
+        result.Type = (MessageType)reader.ReadByte();
+        result.Flags = (MessageFlags)reader.ReadInt16();
+        result.SequenceNumber = reader.ReadUInt32();
+        result.RequestID = reader.ReadUInt64();
+        result.FragmentIndex = reader.ReadUInt16();
+        result.FragmentCount = reader.ReadUInt16();
+        result.SessionId = reader.ReadUInt64();
+        result.ChannelId = reader.ReadUInt64();
 
-            foreach (var header in AdditionalHeaders)
+        AdditionalHeaderType nextHeaderType;
+        byte nextHeaderSize;
+        List<AdditionalHeader> additionalHeaders = new();
+        while (true)
+        {
+            nextHeaderType = (AdditionalHeaderType)reader.ReadByte();
+            nextHeaderSize = reader.ReadByte();
+
+            if (nextHeaderType != AdditionalHeaderType.None)
             {
-                writer.Write((byte)header.Type);
-                writer.Write((byte)header.Value.Length);
-                writer.Write(header.Value);
+                var value = reader.ReadBytes(nextHeaderSize);
+                additionalHeaders.Add(new(nextHeaderType, value));
             }
-            writer.Write((byte)NextHeaderType.None);
-            writer.Write((byte)0);
+            else
+                break;
         }
 
-        public ushort MessageLength { get; set; }
-        public byte Version { get; set; } = Constants.ProtocolVersion;
-        public MessageType Type { get; set; }
-        public MessageFlags Flags { get; set; }
-        public uint SequenceNumber { get; set; } = 0;
-        public ulong RequestID { get; set; } = 0;
-        public ushort FragmentIndex { get; set; } = 0;
-        public ushort FragmentCount { get; set; } = 1;
-        public ulong SessionID { get; set; } = 0;
-        public ulong ChannelID { get; set; } = 0;
-
-        public List<AdditionalMessageHeader> AdditionalHeaders { get; set; } = new();
-        public record AdditionalMessageHeader(NextHeaderType Type, byte[] Value);
-
-
-        /// <summary>
-        /// Returns size of the whole rest of the message (excluding headers) (including hmac)
-        /// </summary>
-        public int PayloadSize
-            => MessageLength - (int)((ICdpSerializable<CommonHeader>)this).CalcSize();
-
-
-        #region Flags
-        public const int FlagsOffset = 6;
-
-        public bool HasFlag(MessageFlags flag)
-            => (Flags & flag) != 0;
-        #endregion
-
-        #region Session
-        public bool ExistingSession
-            => (SessionID >> 32) > 0;
-
-        public const long SessionIdHostFlag = 0x80000000;
-        public void CorrectClientSessionBit()
-            => SessionID = SessionID ^ SessionIdHostFlag;
-        #endregion
-
-        #region Message Length
-        public const int MessageLengthOffset = 2;
-        public void SetMessageLength(int payloadSize)
+        if (nextHeaderSize != 0)
         {
-            MessageLength = (ushort)(payloadSize + ((ICdpSerializable<CommonHeader>)this).CalcSize());
+            ex = new InvalidDataException("Invalid header size, end-of-header cannot have a size greather than 0");
+            return false;
         }
-        #endregion
 
-        public void SetReplyToId(ulong requestId)
+        result.AdditionalHeaders = additionalHeaders;
+
+        ex = null;
+        return true;
+    }
+
+    public void Write(BinaryWriter writer)
+    {
+        writer.Write(Constants.Signature);
+        writer.Write(MessageLength);
+        writer.Write(Constants.ProtocolVersion);
+        writer.Write((byte)Type);
+        writer.Write((short)Flags);
+        writer.Write(SequenceNumber);
+        writer.Write(RequestID);
+        writer.Write(FragmentIndex);
+        writer.Write(FragmentCount);
+        writer.Write(SessionId);
+        writer.Write(ChannelId);
+
+        foreach (var header in AdditionalHeaders)
         {
-            AdditionalHeaders.RemoveAll((x) => x.Type == NextHeaderType.ReplyToId);
-
-            byte[] value = new byte[sizeof(ulong)];
-            BinaryPrimitives.WriteUInt64LittleEndian(value, requestId);
-
-            AdditionalHeaders.Add(new(
-                NextHeaderType.ReplyToId,
-                value
-            ));
+            writer.Write((byte)header.Type);
+            writer.Write((byte)header.Value.Length);
+            writer.Write(header.Value);
         }
+        writer.Write((byte)AdditionalHeaderType.None);
+        writer.Write((byte)0);
+    }
+
+    /// <summary>
+    /// Entire message length in bytes including signature.
+    /// </summary>
+    public ushort MessageLength { get; set; }
+    /// <summary>
+    /// Protocol version the sender is using. For this protocol version, this value is always 3. <br/>
+    /// Lower values indicate older versions of the protocol.
+    /// </summary>
+    public byte Version { get; set; } = Constants.ProtocolVersion;
+    /// <summary>
+    /// Indicates current message type.
+    /// </summary>
+    public MessageType Type { get; set; }
+    /// <summary>
+    /// A value describing the message properties.
+    /// </summary>
+    public MessageFlags Flags { get; set; }
+    /// <summary>
+    /// Current message number for this session.
+    /// </summary>
+    public uint SequenceNumber { get; set; } = 0;
+    /// <summary>
+    /// A monotonically increasing number, generated on the sending side, that uniquely identifies the message. <br/>
+    /// It can then be used to correlate response messages to their corresponding request messages. <br/>
+    /// <br/>
+    /// (See <see cref="SetReplyToId(ulong)"/>) <br/>
+    /// (See <see cref="AdditionalHeaderType.ReplyToId"/> and <see cref="AdditionalHeaderType.UserMessageRequestId"/>)
+    /// </summary>
+    public ulong RequestID { get; set; } = 0;
+    /// <summary>
+    /// Current fragment for current message.
+    /// </summary>
+    public ushort FragmentIndex { get; set; } = 0;
+    /// <summary>
+    /// Number of total fragments for current message.
+    /// </summary>
+    public ushort FragmentCount { get; set; } = 1;
+    /// <summary>
+    /// ID representing the session.
+    /// </summary>
+    public ulong SessionId { get; set; } = 0;
+    /// <summary>
+    /// Zero if the <see cref="SessionId"/> is zero.
+    /// </summary>
+    public ulong ChannelId { get; set; } = 0;
+
+    /// <summary>
+    /// If an additional header record is included, this value indicates the type. <br/>
+    /// Some values are implementation-specific.
+    /// </summary>
+    public List<AdditionalHeader> AdditionalHeaders { get; set; } = new();
+
+
+    /// <summary>
+    /// Returns size of the whole rest of the message (excluding headers) (including hmac)
+    /// </summary>
+    public int PayloadSize
+        => MessageLength - (int)((ICdpSerializable<CommonHeader>)this).CalcSize();
+
+
+    #region Flags
+    public const int FlagsOffset = 6;
+
+    public bool HasFlag(MessageFlags flag)
+        => (Flags & flag) != 0;
+    #endregion
+
+    #region Session
+
+    public const ulong SessionIdHostFlag = 0x80000000;
+    public void CorrectClientSessionBit()
+        => SessionId = SessionId ^ SessionIdHostFlag;
+    #endregion
+
+    #region Message Length
+    public const int MessageLengthOffset = 2;
+    public void SetMessageLength(int payloadSize)
+    {
+        MessageLength = (ushort)(payloadSize + ((ICdpSerializable<CommonHeader>)this).CalcSize());
+    }
+    #endregion
+
+    public void SetReplyToId(ulong requestId)
+    {
+        AdditionalHeaders.RemoveAll((x) => x.Type == AdditionalHeaderType.ReplyToId);
+
+        byte[] value = new byte[sizeof(ulong)];
+        BinaryPrimitives.WriteUInt64LittleEndian(value, requestId);
+
+        AdditionalHeaders.Add(new(
+            AdditionalHeaderType.ReplyToId,
+            value
+        ));
     }
 }

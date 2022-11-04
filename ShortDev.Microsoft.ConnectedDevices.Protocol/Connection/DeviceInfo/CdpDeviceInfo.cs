@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Connection.DeviceInfo;
 
-public partial class CdpDeviceInfo
+public sealed class CdpDeviceInfo
 {
     public byte[]? DeduplicationHint { get; set; }
 
@@ -23,7 +23,7 @@ public partial class CdpDeviceInfo
     public DeviceType Type { get; set; }
 }
 
-public partial class Endpoint
+public sealed class Endpoint
 {
     [JsonPropertyName("endpointType")]
     public long EndpointType { get; set; }
