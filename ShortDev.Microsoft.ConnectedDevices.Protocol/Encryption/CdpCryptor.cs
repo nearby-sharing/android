@@ -58,7 +58,16 @@ public sealed class CdpCryptor
         {
             byte[] iv = GenerateIV(header);
             aes.Key = AesKey;
-            decryptedPayload = aes.DecryptCbc(payload, iv);
+            try
+            {
+                decryptedPayload = aes.DecryptCbc(payload, iv);
+            }
+            catch (Exception ex)
+            {
+                // Some devices (phones) sometimes don't apply padding
+                // Try again and ignore padding
+                decryptedPayload = aes.DecryptCbc(payload, iv, PaddingMode.None);
+            }
         }
 
         if (header.HasFlag(MessageFlags.HasHMAC))

@@ -2,6 +2,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -36,5 +37,12 @@ public static class Extensions
         TaskCompletionSource<bool> promise = new();
         @this.Register(() => promise.SetResult(true));
         return promise.Task;
+    }
+
+    public static ECDsa ToECDsa(this ECDiffieHellman @this)
+    {
+        ECDsa result = ECDsa.Create();
+        result.ImportParameters(@this.ExportParameters(true));
+        return result;
     }
 }
