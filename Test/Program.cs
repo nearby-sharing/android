@@ -1,6 +1,4 @@
-﻿using Bond.IO.Unsafe;
-using Bond.Protocols;
-using ShortDev.Microsoft.ConnectedDevices.Protocol;
+﻿using ShortDev.Microsoft.ConnectedDevices.Protocol;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Connection;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Connection.Authentication;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Connection.DeviceInfo;
@@ -12,28 +10,24 @@ using Spectre.Console;
 //var adapter = await BluetoothAdapter.GetDefaultAsync();
 //Debug.Print(adapter.BluetoothAddress.ToString("X"));
 
-var correlationVector = BinaryConvert.ToBytes("647532586432705668596d7971363048"); // 2e31
-Console.WriteLine(new Guid(correlationVector.Reverse()));
-Console.WriteLine(BinaryConvert.ToString(Convert.FromBase64String(System.Text.Encoding.UTF8.GetString(correlationVector))));
+
+var valueSet = ValueSet.Parse(BinaryConvert.ToBytes(AnsiConsole.Ask<string>("Bytes")));
 Console.ReadLine();
 
-{
-    MemoryStream stream = new(new byte[] { 0x10, 0x0e, 0xc6, 0x0e, 0xc6 });
-    CompactBinaryReader<InputStream> reader = new(new(stream));
-    reader.ReadFieldBegin(out var type, out var id);
-    var propertyType = reader.ReadInt32();
-    reader.ReadFieldBegin(out type, out id);
-    Console.WriteLine($"Field: Type = {type}, Id = {id}, PropType = {propertyType}");
-    Console.ReadLine();
-}
+//while (true)
+//{
+//    MemoryStream stream = new(BinaryConvert.ToBytes(AnsiConsole.Ask<string>("Bytes")));
+//    CompactBinaryReader<InputStream> reader = new(new(stream));
+//    reader.ReadFieldBegin(out _, out _);
+//    var typeId = reader.ReadInt32();
+//    reader.ReadFieldBegin(out var fieldType, out var fieldId);
+//    bool array = fieldType == Bond.BondDataType.BT_LIST;
+//    if (array)
+//        reader.ReadContainerBegin(out _, out fieldType);
+//    Console.WriteLine($"{fieldType} = {typeId}; {fieldId}: {(array ? "array" : "")}");
 
-{
-    ValueSet response = new();
-    response.Add("SelectedPlatformVersion", 1u);
-    response.Add("VersionHandShakeResult", 1u);
-    Console.WriteLine(BinaryConvert.ToString(((ICdpWriteable)response).ToArray()));
-    Console.ReadLine();
-}
+//    Console.ReadLine();
+//}
 
 var secret = BinaryConvert.ToBytes("37fc508508ba8d6d7ba7ddc79ad29fecdf855879e2a48b6811f310e80dcab98a81500925c1c8019c05b418d3bc22a870fc52d3735b43babc85c57a1fe12d4fb4"); // AnsiConsole.Ask<string>("Secret"));
 CdpCryptor cryptor = new(secret);
