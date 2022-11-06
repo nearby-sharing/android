@@ -132,10 +132,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
-                    android:enabled="false"
                     android:text="Receive"
-                    android:visibility="gone"
-                    app:icon="@drawable/file_download_48"
+                    app:icon="@drawable/ic_fluent_mail_inbox_24_regular"
                     style="@style/AppTheme.NearbyShareButton" />
             </LinearLayout>
         </LinearLayout>
@@ -144,23 +142,13 @@
 
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/floating_action_button"
+        android:id="@+id/floating_receive_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|right"
         android:layout_margin="16dp"
-        android:src="@drawable/ic_fluent_share_android_24_selector"
+        android:src="@drawable/ic_fluent_mail_inbox_24_regular"
         app:tint="?attr/colorOnPrimary"
         app:backgroundTint="?attr/colorPrimary"/>
-
-    <!-- <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/open_nearby_share_android_fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|left"
-        android:layout_margin="16dp"
-        android:src="@drawable/nearby_share_48"
-        app:tint="?attr/colorOnPrimary"
-        app:backgroundTint="?attr/colorPrimary"/> -->
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

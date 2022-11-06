@@ -85,6 +85,7 @@ public sealed class CdpSession : IDisposable
             if (header.Type == MessageType.Connect)
             {
                 ConnectionHeader connectionHeader = ConnectionHeader.Parse(payloadReader);
+                PlatformHandler?.Log(0, $"Received {header.Type} message {connectionHeader.MessageType} from session {header.SessionId.ToString("X")}");
                 switch (connectionHeader.MessageType)
                 {
                     case ConnectionType.ConnectRequest:
@@ -93,7 +94,6 @@ public sealed class CdpSession : IDisposable
                             _remoteEncryption = CdpEncryptionInfo.FromRemote(connectionRequest.PublicKeyX, connectionRequest.PublicKeyY, connectionRequest.Nonce, CdpEncryptionParams.Default);
 
                             var secret = _localEncryption.GenerateSharedSecret(_remoteEncryption);
-
                             _cryptor = new(secret);
 
                             header.SessionId |= (ulong)LocalSessionId << 32;
@@ -196,6 +196,7 @@ public sealed class CdpSession : IDisposable
             else if (header.Type == MessageType.Control)
             {
                 var controlHeader = ControlHeader.Parse(payloadReader);
+                PlatformHandler?.Log(0, $"Received {header.Type} message {controlHeader.MessageType} from session {header.SessionId.ToString("X")}");
                 switch (controlHeader.MessageType)
                 {
                     case ControlMessageType.StartChannelRequest:
@@ -237,7 +238,9 @@ public sealed class CdpSession : IDisposable
                 ValueSet response = new();
                 if (payload.ContainsKey("Uri"))
                 {
-                    PlatformHandler?.LaunchUri(payload.Get<string>("Uri"));
+                    var uri = payload.Get<string>("Uri");
+                    PlatformHandler?.Log(0, $"Received uri {uri} from session {header.SessionId.ToString("X")}");
+                    PlatformHandler?.LaunchUri(uri);
                     expectMessage = false;
                     response.Add("ControlMessage", 2u);
                 }
@@ -258,6 +261,7 @@ public sealed class CdpSession : IDisposable
             {
                 // We might receive a "ReliabilityResponse"
                 // ignore
+                PlatformHandler?.Log(0, $"Received {header.Type} message from session {header.SessionId.ToString("X")}");
             }
         }
 

@@ -6,7 +6,7 @@ enum PropertyType {
   PropertyType_UInt32 = 5,
   // PropertyType_Int64 = 6,
   PropertyType_UInt64 = 7,
-  PropertyType_String = 12,
+  PropertyType_String = 39,
   PropertyType_GuidArray = 15,
   PropertyType_UInt32Array = 24,
   PropertyType_UInt64Array = 26,

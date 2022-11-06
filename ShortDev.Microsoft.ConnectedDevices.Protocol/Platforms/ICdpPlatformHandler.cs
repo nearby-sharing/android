@@ -2,5 +2,6 @@
 
 public interface ICdpPlatformHandler
 {
+    void Log(int level, string message);
     void LaunchUri(string uri);
 }

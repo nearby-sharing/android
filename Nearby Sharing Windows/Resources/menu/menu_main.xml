@@ -5,7 +5,7 @@
         android:id="@+id/action_sponsor"
 		android:icon="@drawable/ic_fluent_handshake_24_selector"
         android:title="Sponsor"
-		android:showAsAction="ifRoom" />
+		android:showAsAction="always" />
 	<item
         android:id="@+id/action_settings"
         android:icon="@drawable/ic_fluent_settings_24_selector"
