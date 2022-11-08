@@ -1,6 +1,7 @@
 ﻿namespace ShortDev.Microsoft.ConnectedDevices.Protocol.NearShare;
 
-public enum DataKind
+internal enum DataKind
 {
-
+    Uri = 1,
+    File = 2
 }

@@ -1,26 +1,25 @@
 ﻿using AndroidX.AppCompat.App;
 using AndroidX.Preference;
 
-namespace Nearby_Sharing_Windows
+namespace Nearby_Sharing_Windows;
+
+[Activity(Label = "@string/app_name", Theme = "@style/AppTheme", ConfigurationChanges = Constants.ConfigChangesFlags)]
+public sealed class SettingsActivity : AppCompatActivity
 {
-    [Activity(Label = "@string/app_name", Theme = "@style/AppTheme", ConfigurationChanges = Android.Content.PM.ConfigChanges.Orientation | Android.Content.PM.ConfigChanges.ScreenSize)]
-    public class SettingsActivity : AppCompatActivity
+    protected override void OnCreate(Bundle? savedInstanceState)
     {
-        protected override void OnCreate(Bundle? savedInstanceState)
-        {
-            base.OnCreate(savedInstanceState);
-            SetContentView(Resource.Layout.activity_settings);
+        base.OnCreate(savedInstanceState);
+        SetContentView(Resource.Layout.activity_settings);
 
-            SupportFragmentManager
-                .BeginTransaction()
-                .Replace(Resource.Id.settings_container, new SettingsFragment())
-                .Commit();
-        }
+        SupportFragmentManager
+            .BeginTransaction()
+            .Replace(Resource.Id.settings_container, new SettingsFragment())
+            .Commit();
+    }
 
-        class SettingsFragment : PreferenceFragmentCompat
-        {
-            public override void OnCreatePreferences(Bundle? savedInstanceState, string? rootKey)
-                => SetPreferencesFromResource(Resource.Xml.preferences, rootKey);
-        }
+    class SettingsFragment : PreferenceFragmentCompat
+    {
+        public override void OnCreatePreferences(Bundle? savedInstanceState, string? rootKey)
+            => SetPreferencesFromResource(Resource.Xml.preferences, rootKey);
     }
 }

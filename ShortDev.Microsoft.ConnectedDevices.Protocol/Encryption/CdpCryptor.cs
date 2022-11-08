@@ -3,6 +3,7 @@
 using ShortDev.Networking;
 using System;
 using System.Buffers.Binary;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -58,14 +59,14 @@ public sealed class CdpCryptor
         {
             byte[] iv = GenerateIV(header);
             aes.Key = AesKey;
+
             try
             {
                 decryptedPayload = aes.DecryptCbc(payload, iv);
             }
-            catch (Exception ex)
+            catch
             {
-                // Some devices (phones) sometimes don't apply padding
-                // Try again and ignore padding
+                // If payload size is an exact multiple of block length (16 bytes) no padding is applied
                 decryptedPayload = aes.DecryptCbc(payload, iv, PaddingMode.None);
             }
         }
@@ -112,7 +113,10 @@ public sealed class CdpCryptor
                 payloadWriter.Write(payloadBuffer);
                 payloadWriter.Flush();
 
-                var encryptedPayload = aes.EncryptCbc(payloadStream.ToArray(), iv);
+                var buffer = payloadStream.ToArray();
+                // If payload size is an exact multiple of block length (16 bytes) no padding is applied
+                PaddingMode paddingMode = buffer.Length % 16 == 0 ? PaddingMode.None : PaddingMode.PKCS7;
+                var encryptedPayload = aes.EncryptCbc(buffer, iv, paddingMode);
 
                 header.Flags |= MessageFlags.SessionEncrypted | MessageFlags.HasHMAC;
                 header.SetMessageLength(encryptedPayload.Length);

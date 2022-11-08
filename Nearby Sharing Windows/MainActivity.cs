@@ -1,6 +1,7 @@
 ﻿using Android.Content;
 using Android.Content.PM;
 using Android.Runtime;
+using Android.Views;
 using AndroidX.AppCompat.App;
 using Google.Android.Material.FloatingActionButton;
 
@@ -61,6 +62,17 @@ public sealed class MainActivity : AppCompatActivity
             intent.PutExtra(Intent.ExtraStream, data.Data);
             StartActivity(intent);
         }
+    }
+
+    public override bool OnOptionsItemSelected(IMenuItem item)
+    {
+        switch (item.ItemId)
+        {
+            case Resource.Id.action_settings:
+                StartActivity(new Intent(this, typeof(SettingsActivity)));
+                return true;
+        }
+        return false;
     }
 }
 

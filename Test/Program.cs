@@ -1,8 +1,12 @@
-﻿using ShortDev.Microsoft.ConnectedDevices.Protocol;
+﻿using Bond;
+using Bond.IO.Unsafe;
+using Bond.Protocols;
+using ShortDev.Microsoft.ConnectedDevices.Protocol;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Connection;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Connection.Authentication;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Connection.DeviceInfo;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Encryption;
+using ShortDev.Microsoft.ConnectedDevices.Protocol.NearShare;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Serialization;
 using ShortDev.Networking;
 using Spectre.Console;
@@ -11,25 +15,26 @@ using Spectre.Console;
 //Debug.Print(adapter.BluetoothAddress.ToString("X"));
 
 
-var valueSet = ValueSet.Parse(BinaryConvert.ToBytes(AnsiConsole.Ask<string>("Bytes")));
-Console.ReadLine();
+//var valueSet = ValueSet.Parse(BinaryConvert.ToBytes(AnsiConsole.Ask<string>("Bytes")));
+//Console.ReadLine();
 
-//while (true)
-//{
-//    MemoryStream stream = new(BinaryConvert.ToBytes(AnsiConsole.Ask<string>("Bytes")));
-//    CompactBinaryReader<InputStream> reader = new(new(stream));
-//    reader.ReadFieldBegin(out _, out _);
-//    var typeId = reader.ReadInt32();
-//    reader.ReadFieldBegin(out var fieldType, out var fieldId);
-//    bool array = fieldType == Bond.BondDataType.BT_LIST;
-//    if (array)
-//        reader.ReadContainerBegin(out _, out fieldType);
-//    Console.WriteLine($"{fieldType} = {typeId}; {fieldId}: {(array ? "array" : "")}");
+while (false)
+{
+    MemoryStream stream = new(BinaryConvert.ToBytes(AnsiConsole.Ask<string>("Bytes")));
+    CompactBinaryReader<InputStream> reader = new(new(stream));
+    reader.ReadFieldBegin(out var a, out var b);
+    var typeId = reader.ReadInt32();
+    reader.ReadFieldBegin(out var fieldType, out var fieldId);
+    bool array = fieldType == Bond.BondDataType.BT_LIST;
+    int length = 0;
+    //if (array)
+        reader.ReadContainerBegin(out length, out fieldType, out var test);
+    Console.WriteLine($"{fieldType} = {typeId}; {fieldId}: {(array ? $"array Count = {length}" : "")}");
 
-//    Console.ReadLine();
-//}
+    Console.ReadLine();
+}
 
-var secret = BinaryConvert.ToBytes("37fc508508ba8d6d7ba7ddc79ad29fecdf855879e2a48b6811f310e80dcab98a81500925c1c8019c05b418d3bc22a870fc52d3735b43babc85c57a1fe12d4fb4"); // AnsiConsole.Ask<string>("Secret"));
+var secret = BinaryConvert.ToBytes("941b1425b0d03cc96206b8b76a3b9e1486b703a3068022753bbaf72894a1a126189a78b0252cc38097621c81fe338b5dd8734ec74f862175eacf10f0086e8d09"); //  37fc508508ba8d6d7ba7ddc79ad29fecdf855879e2a48b6811f310e80dcab98a81500925c1c8019c05b418d3bc22a870fc52d3735b43babc85c57a1fe12d4fb4"); // AnsiConsole.Ask<string>("Secret"));
 CdpCryptor cryptor = new(secret);
 
 while (true)

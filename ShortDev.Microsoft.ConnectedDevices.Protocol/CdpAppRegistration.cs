@@ -1,15 +1,49 @@
-﻿using System;
+﻿using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Protocol;
 
 public static class CdpAppRegistration
 {
-    public static void RegisterApp(Guid id, string name)
-    {
+    readonly record struct AppId(string Id, string Name, Func<ICdpApp> Factory);
 
+    static Dictionary<string, AppId> _registration = new();
+
+    public static void RegisterApp<TApp>() where TApp : ICdpApp, ICdpAppId, new()
+        => RegisterApp(TApp.Id, TApp.Name, () => new TApp());
+
+    public static void RegisterApp<TApp>(Func<TApp> factory) where TApp : ICdpApp, ICdpAppId
+        => RegisterApp(TApp.Id, TApp.Name, () => factory());
+
+    public static void RegisterApp(string id, string name, Func<ICdpApp> factory)
+    {
+        id = id.ToLower();
+        lock (_registration)
+        {
+            if (_registration.ContainsKey(id))
+                throw new ArgumentException($"Id {id} already exists!", nameof(id));
+
+            _registration.Add(id, new(id, name, factory));
+        }
     }
+
+    internal static ICdpApp InstantiateApp(string id, string name)
+    {
+        id = id.ToLower();
+        lock (_registration)
+            return _registration[id].Factory();
+    }
+}
+
+public interface ICdpApp
+{
+    void HandleMessage(CdpRfcommSocket socket, CommonHeader header, BinaryReader reader, BinaryWriter writer, ref bool expectMessage);
+}
+
+public interface ICdpAppId
+{
+    static abstract string Id { get; }
+    static abstract string Name { get; }
 }

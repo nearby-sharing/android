@@ -4,6 +4,7 @@ using Android.Content;
 using AndroidX.AppCompat.App;
 using ShortDev.Microsoft.ConnectedDevices.Protocol;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Discovery;
+using ShortDev.Microsoft.ConnectedDevices.Protocol.NearShare;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms;
 using ShortDev.Networking;
 using System.Diagnostics;
@@ -50,6 +51,8 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
         FindViewById<TextView>(Resource.Id.deviceInfoTextView)!.Text = $"Visible as {_btAdapter.Name!}.\n" +
             $"Address: {address}";
         debugLogTextView = FindViewById<TextView>(Resource.Id.debugLogTextView)!;
+
+        CdpAppRegistration.RegisterApp<NearShareHandshakeApp>(() => new() { PlatformHandler = this });
 
         _bluetoothAdvertisement = new(this);
         _bluetoothAdvertisement.OnDeviceConnected += BluetoothAdvertisement_OnDeviceConnected;

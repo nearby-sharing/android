@@ -201,7 +201,7 @@ public sealed class CdpSession : IDisposable
                 {
                     case ControlMessageType.StartChannelRequest:
                         {
-                            var msg = StartChannelRequest.Parse(payloadReader);
+                            var request = StartChannelRequest.Parse(payloadReader);
 
                             header.AdditionalHeaders.Clear();
                             header.SetReplyToId(header.RequestID);
@@ -219,7 +219,8 @@ public sealed class CdpSession : IDisposable
                                 {
                                     MessageType = ControlMessageType.StartChannelResponse
                                 }.Write(writer);
-                                writer.Write(BinaryConvert.ToBytes("000000000000000001")); // 000000000000000001
+                                writer.Write((byte)0);
+                                writer.Write(StartChannel(request));
                             });
                             break;
                         }
@@ -229,33 +230,39 @@ public sealed class CdpSession : IDisposable
             }
             else if (header.Type == MessageType.Session)
             {
-                var prepend = payloadReader.ReadBytes(0x0000000C);
-                var buffer = payloadReader.ReadPayload();
-                var payload = ValueSet.Parse(buffer);
-                Debug.Print(BinaryConvert.ToString(buffer));
-                header.AdditionalHeaders.RemoveAll((x) => x.Type == AdditionalHeaderType.CorrelationVector);
+                bool sendResponse = true;
+                BinaryReader fragmentReader = payloadReader;
+                if (header.FragmentCount != 1)
+                {
+                    uint msgId = header.SequenceNumber;
 
-                ValueSet response = new();
-                if (payload.ContainsKey("Uri"))
-                {
-                    var uri = payload.Get<string>("Uri");
-                    PlatformHandler?.Log(0, $"Received uri {uri} from session {header.SessionId.ToString("X")}");
-                    PlatformHandler?.LaunchUri(uri);
-                    expectMessage = false;
-                    response.Add("ControlMessage", 2u);
-                }
-                else
-                {
-                    response.Add("SelectedPlatformVersion", 1u);
-                    response.Add("VersionHandShakeResult", 1u);
+                    if (header.FragmentIndex == 0)
+                        _fragmentRegistry.Add(msgId, new());
+
+                    List<byte> buffer = _fragmentRegistry[msgId];
+                    buffer.AddRange(payloadReader.ReadPayload());
+
+                    sendResponse = header.FragmentIndex == header.FragmentCount - 1;
+
+                    if (sendResponse)
+                    {
+                        fragmentReader = new BigEndianBinaryReader(new MemoryStream(buffer.ToArray()));
+                        _fragmentRegistry.Remove(msgId);
+                    }
                 }
 
-                header.Flags = 0;
-                _cryptor!.EncryptMessage(writer, header, (payloadWriter) =>
+                if (sendResponse)
                 {
-                    payloadWriter.Write(prepend);
-                    response.Write(payloadWriter);
-                });
+                    header.Flags = 0;
+                    bool expectMessage2 = expectMessage;
+                    _cryptor!.EncryptMessage(writer, header, (payloadWriter) =>
+                    {
+                        bool expectMessageCache = true;
+                        _channelRegistry[header.ChannelId].HandleMessage(socket, header, fragmentReader, payloadWriter, ref expectMessageCache);
+                        expectMessage2 = expectMessageCache;
+                    });
+                    expectMessage = expectMessage2;
+                }
             }
             else
             {
@@ -267,6 +274,25 @@ public sealed class CdpSession : IDisposable
 
         writer.Flush();
     }
+
+    #region Fragments
+    readonly Dictionary<uint, List<byte>> _fragmentRegistry = new();
+    #endregion
+
+    #region Channels
+    ulong channelCounter = 1;
+    readonly Dictionary<ulong, ICdpApp> _channelRegistry = new();
+
+    ulong StartChannel(StartChannelRequest request)
+    {
+        lock (_channelRegistry)
+        {
+            var app = CdpAppRegistration.InstantiateApp(request.Id, request.Name);
+            _channelRegistry.Add(channelCounter, app);
+            return channelCounter++;
+        }
+    }
+    #endregion
 
     Exception UnexpectedMessage(string? info = null)
         => new SecurityException($"Recieved unexpected message {info ?? "null"}");

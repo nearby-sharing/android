@@ -20,7 +20,7 @@
             app:title="Nearby Sharing"
             app:titleCentered="true"
             app:titleTextColor="#fff"
-            app:subtitle="Send data to Windows 10 / 11"
+            app:subtitle="Settings"
             app:subtitleCentered="true"
             app:subtitleTextColor="#efefef"
             app:menu="@menu/menu_main" />

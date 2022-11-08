@@ -1,6 +1,7 @@
 ﻿using Bond;
 using Bond.IO.Unsafe;
 using Bond.Protocols;
+using System;
 using System.IO;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Serialization;

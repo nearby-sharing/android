@@ -12,6 +12,8 @@ public partial class PropertyValue
         {
             case PropertyType.PropertyType_Empty:
                 throw new NullReferenceException();
+            case PropertyType.PropertyType_UInt8Array:
+                return UInt8ArrayValue;
             case PropertyType.PropertyType_UInt32:
                 return UInt32Value;
             case PropertyType.PropertyType_UInt32Array:
@@ -34,7 +36,7 @@ public partial class PropertyValue
     {
         var value = Get();
         if (typeof(T) == typeof(Guid))
-            return (T)(object)((UUID)value).ToGuid();
+            return (T)(object)((List<UUID>)value)[0].ToGuid();
 
         return (T)value;
     }
@@ -50,6 +52,10 @@ public partial class PropertyValue
     {
         switch (value)
         {
+            case IEnumerable<byte> uint8ArrayValue:
+                Type = PropertyType.PropertyType_UInt8Array;
+                // this.UInt8ArrayValue = uint8ArrayValue.ToList();
+                break;
             case uint uint32Value:
                 Type = PropertyType.PropertyType_UInt32;
                 this.UInt32Value = uint32Value;
@@ -82,4 +88,7 @@ public partial class PropertyValue
                 throw new NotImplementedException();
         }
     }
+
+    public override string ToString()
+        => $"{{ Type = {Type}, Value = {Get()} }}";
 }
