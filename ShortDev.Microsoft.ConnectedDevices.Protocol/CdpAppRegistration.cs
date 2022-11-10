@@ -1,5 +1,4 @@
-﻿using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -29,6 +28,18 @@ public static class CdpAppRegistration
         }
     }
 
+    public static void UnregisterApp<TApp>() where TApp : ICdpAppId
+        => UnregisterApp(TApp.Id, TApp.Name);
+
+    public static void UnregisterApp(string id, string name)
+    {
+        id = id.ToLower();
+        lock (_registration)
+        {
+            _registration.Remove(id);
+        }
+    }
+
     internal static ICdpApp InstantiateApp(string id, string name)
     {
         id = id.ToLower();
@@ -37,9 +48,9 @@ public static class CdpAppRegistration
     }
 }
 
-public interface ICdpApp
+public interface ICdpApp : IDisposable
 {
-    void HandleMessage(CdpRfcommSocket socket, CommonHeader header, BinaryReader reader, BinaryWriter writer, ref bool expectMessage);
+    bool HandleMessage(CdpSession session, CdpMessage msg, BinaryWriter payloadWriter);
 }
 
 public interface ICdpAppId

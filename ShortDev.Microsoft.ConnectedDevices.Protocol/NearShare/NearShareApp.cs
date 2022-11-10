@@ -12,9 +12,15 @@ public class NearShareApp : ICdpApp
     public static string Name { get; } = "NearSharePlatform";
 
     public required ICdpPlatformHandler PlatformHandler { get; init; }
+    public required string Id { get; init; }
 
-    public void HandleMessage(CdpRfcommSocket socket, CommonHeader header, BinaryReader payloadReader, BinaryWriter payloadWriter, ref bool expectMessage)
+    public bool HandleMessage(CdpSession session, CdpMessage msg, BinaryWriter payloadWriter)
     {
+        bool expectMessage = true;
+
+        CommonHeader header = msg.Header;
+        BinaryReader payloadReader = msg.Read();
+
         var prepend = payloadReader.ReadBytes(0x0000000C);
         var buffer = payloadReader.ReadPayload();
         Debug.Print(BinaryConvert.ToString(buffer));
@@ -45,7 +51,6 @@ public class NearShareApp : ICdpApp
                             PlatformHandler?.Log(0, $"Received uri {uri} from session {header.SessionId.ToString("X")}");
                             PlatformHandler?.LaunchUri(uri);
                             expectMessage = false;
-                            response.Add("ControlMessage", (uint)ControlMessageType.StartResponse);
                         }
                         else
                             throw new NotImplementedException($"DataKind {dataKind} not implemented");
@@ -59,11 +64,22 @@ public class NearShareApp : ICdpApp
             }
         }
         else
+            expectMessage = false;
+
+        if (!expectMessage)
         {
+            // Finished
             response.Add("ControlMessage", (uint)ControlMessageType.StartResponse);
+            session.Dispose();
+
+            CdpAppRegistration.UnregisterApp(Id, Name);
         }
 
         payloadWriter.Write(prepend);
         response.Write(payloadWriter);
+
+        return expectMessage;
     }
+
+    public void Dispose() { }
 }

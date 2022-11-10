@@ -4,11 +4,8 @@ using ShortDev.Microsoft.ConnectedDevices.Protocol.Connection.DeviceInfo;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Control;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Encryption;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms;
-using ShortDev.Microsoft.ConnectedDevices.Protocol.Serialization;
-using ShortDev.Networking;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Security;
 
@@ -74,9 +71,11 @@ public sealed class CdpSession : IDisposable
     CdpCryptor? _cryptor = null;
     readonly CdpEncryptionInfo _localEncryption = CdpEncryptionInfo.Create(CdpEncryptionParams.Default);
     CdpEncryptionInfo? _remoteEncryption = null;
-    public void HandleMessage(CdpRfcommSocket socket, CommonHeader header, BinaryReader reader, BinaryWriter writer, ref bool expectMessage)
+    public bool HandleMessage(CommonHeader header, BinaryReader reader, BinaryWriter writer)
     {
         ThrowIfDisposed();
+
+        bool expectMessage = true;
 
         BinaryReader payloadReader = _cryptor?.Read(reader, header) ?? reader;
         {
@@ -230,38 +229,34 @@ public sealed class CdpSession : IDisposable
             }
             else if (header.Type == MessageType.Session)
             {
-                bool sendResponse = true;
-                BinaryReader fragmentReader = payloadReader;
-                if (header.FragmentCount != 1)
+                CdpMessage msg = GetOrCreateMessage(header);
+                msg.AddFragment(payloadReader.ReadPayload());
+
+                if (msg.IsComplete)
                 {
-                    uint msgId = header.SequenceNumber;
-
-                    if (header.FragmentIndex == 0)
-                        _fragmentRegistry.Add(msgId, new());
-
-                    List<byte> buffer = _fragmentRegistry[msgId];
-                    buffer.AddRange(payloadReader.ReadPayload());
-
-                    sendResponse = header.FragmentIndex == header.FragmentCount - 1;
-
-                    if (sendResponse)
+                    try
                     {
-                        fragmentReader = new BigEndianBinaryReader(new MemoryStream(buffer.ToArray()));
-                        _fragmentRegistry.Remove(msgId);
+                        var channel = _channelRegistry[header.ChannelId];
+
+                        bool channelExpectMessage = true;
+
+                        header.Flags = 0;
+                        _cryptor!.EncryptMessage(writer, header, (payloadWriter) =>
+                        {
+                            channelExpectMessage = channel.HandleMessage(this, msg, payloadWriter);
+                        });
+
+                        if (!channelExpectMessage)
+                        {
+                            _channelRegistry.Remove(header.ChannelId);
+                            channel.Dispose();
+                        }
                     }
-                }
-
-                if (sendResponse)
-                {
-                    header.Flags = 0;
-                    bool expectMessage2 = expectMessage;
-                    _cryptor!.EncryptMessage(writer, header, (payloadWriter) =>
+                    finally
                     {
-                        bool expectMessageCache = true;
-                        _channelRegistry[header.ChannelId].HandleMessage(socket, header, fragmentReader, payloadWriter, ref expectMessageCache);
-                        expectMessage2 = expectMessageCache;
-                    });
-                    expectMessage = expectMessage2;
+                        _msgRegistry.Remove(msg.Id);
+                        msg.Dispose();
+                    }
                 }
             }
             else
@@ -273,10 +268,24 @@ public sealed class CdpSession : IDisposable
         }
 
         writer.Flush();
+
+        if (IsDisposed)
+            return false;
+        return expectMessage;
     }
 
-    #region Fragments
-    readonly Dictionary<uint, List<byte>> _fragmentRegistry = new();
+    #region Messages
+    readonly Dictionary<uint, CdpMessage> _msgRegistry = new();
+
+    CdpMessage GetOrCreateMessage(CommonHeader header)
+    {
+        if (_msgRegistry.TryGetValue(header.SequenceNumber, out var result))
+            return result;
+
+        result = new(header);
+        _msgRegistry.Add(header.SequenceNumber, result);
+        return result;
+    }
     #endregion
 
     #region Channels
@@ -307,6 +316,21 @@ public sealed class CdpSession : IDisposable
 
     public void Dispose()
     {
+        if (IsDisposed)
+            return;
         IsDisposed = true;
+
+        lock (_registration)
+        {
+            _registration.Remove(LocalSessionId);
+        }
+
+        foreach (var channel in _channelRegistry.Values)
+            channel.Dispose();
+        _channelRegistry.Clear();
+
+        foreach (var msg in _msgRegistry.Values)
+            msg.Dispose();
+        _msgRegistry.Clear();
     }
 }

@@ -13,16 +13,24 @@ public class NearShareHandshakeApp : ICdpApp, ICdpAppId
 
     public required ICdpPlatformHandler PlatformHandler { get; init; }
 
-    public void HandleMessage(CdpRfcommSocket socket, CommonHeader header, BinaryReader payloadReader, BinaryWriter payloadWriter, ref bool expectMessage)
+    public bool HandleMessage(CdpSession session, CdpMessage msg, BinaryWriter payloadWriter)
     {
+        CommonHeader header = msg.Header;
+        BinaryReader payloadReader = msg.Read();
+
         var prepend = payloadReader.ReadBytes(0x0000000C);
         var payload = ValueSet.Parse(payloadReader.ReadPayload());
         header.AdditionalHeaders.RemoveAll((x) => x.Type == AdditionalHeaderType.CorrelationVector);
 
+        string id = payload.Get<Guid>("OperationId").ToString();
         CdpAppRegistration.RegisterApp(
-            payload.Get<Guid>("OperationId").ToString(), 
-            NearShareApp.Name, 
-            () => new NearShareApp() { PlatformHandler = PlatformHandler }
+            id,
+            NearShareApp.Name,
+            () => new NearShareApp()
+            {
+                Id = id,
+                PlatformHandler = PlatformHandler
+            }
         );
 
         ValueSet response = new();
@@ -31,5 +39,9 @@ public class NearShareHandshakeApp : ICdpApp, ICdpAppId
 
         payloadWriter.Write(prepend);
         response.Write(payloadWriter);
+
+        return false;
     }
+
+    public void Dispose() { }
 }

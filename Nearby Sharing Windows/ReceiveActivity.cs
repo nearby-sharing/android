@@ -114,23 +114,23 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
             using (BigEndianBinaryWriter writer = new(socket.OutputStream!))
             using (BigEndianBinaryReader reader = new(socket.InputStream!))
             {
-                bool expectMessage = true;
-                CdpSession? session = null;
-                while (expectMessage)
+                bool expectMessage;
+                do
                 {
+                    CdpSession? session = null;
                     try
                     {
                         var header = CommonHeader.Parse(reader);
                         session = CdpSession.GetOrCreate(socket.RemoteDevice ?? throw new InvalidDataException(), header);
                         session.PlatformHandler = this;
-                        session.HandleMessage(socket, header, reader, writer, ref expectMessage);
+                        expectMessage = session.HandleMessage(header, reader, writer);
                     }
                     catch (Exception ex)
                     {
                         Log(1, $"{ex.GetType().Name} in session {session?.LocalSessionId.ToString() ?? "null"} \n {ex.Message}");
                         throw;
                     }
-                }
+                } while (expectMessage);
             }
         });
     }
