@@ -27,7 +27,6 @@ struct PropertyValue {
 	106: uint64 UInt64Value;
 	114: vector<UUID> GuidArrayValue;
 	119: string StringValue;
-	// 200: vector<uint8> UInt8ArrayValue;
 	200: vector<uint8> UInt8ArrayValue;
 	204: vector<uint32> UInt32ArrayValue;
 	206: vector<uint64> UInt64ArrayValue;

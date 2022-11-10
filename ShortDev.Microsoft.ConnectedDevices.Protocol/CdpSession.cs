@@ -6,6 +6,7 @@ using ShortDev.Microsoft.ConnectedDevices.Protocol.Encryption;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms;
 using System;
 using System.Collections.Generic;
+using System.Formats.Asn1;
 using System.IO;
 using System.Security;
 
@@ -68,7 +69,7 @@ public sealed class CdpSession : IDisposable
 
     public ICdpPlatformHandler? PlatformHandler { get; set; } = null;
 
-    CdpCryptor? _cryptor = null;
+    internal CdpCryptor? _cryptor = null;
     readonly CdpEncryptionInfo _localEncryption = CdpEncryptionInfo.Create(CdpEncryptionParams.Default);
     CdpEncryptionInfo? _remoteEncryption = null;
     public bool HandleMessage(CommonHeader header, BinaryReader reader, BinaryWriter writer)
@@ -211,6 +212,8 @@ public sealed class CdpSession : IDisposable
 
                             header.RequestID = 0;
 
+                            StartChannel(request, writer, out var channelId);
+
                             header.Flags = 0;
                             _cryptor!.EncryptMessage(writer, header, (writer) =>
                             {
@@ -219,7 +222,7 @@ public sealed class CdpSession : IDisposable
                                     MessageType = ControlMessageType.StartChannelResponse
                                 }.Write(writer);
                                 writer.Write((byte)0);
-                                writer.Write(StartChannel(request));
+                                writer.Write(channelId);
                             });
                             break;
                         }
@@ -237,20 +240,7 @@ public sealed class CdpSession : IDisposable
                     try
                     {
                         var channel = _channelRegistry[header.ChannelId];
-
-                        bool channelExpectMessage = true;
-
-                        header.Flags = 0;
-                        _cryptor!.EncryptMessage(writer, header, (payloadWriter) =>
-                        {
-                            channelExpectMessage = channel.HandleMessage(this, msg, payloadWriter);
-                        });
-
-                        if (!channelExpectMessage)
-                        {
-                            _channelRegistry.Remove(header.ChannelId);
-                            channel.Dispose();
-                        }
+                        channel.HandleMessage(msg);
                     }
                     finally
                     {
@@ -290,15 +280,17 @@ public sealed class CdpSession : IDisposable
 
     #region Channels
     ulong channelCounter = 1;
-    readonly Dictionary<ulong, ICdpApp> _channelRegistry = new();
+    internal readonly Dictionary<ulong, CdpChannel> _channelRegistry = new();
 
-    ulong StartChannel(StartChannelRequest request)
+    ulong StartChannel(StartChannelRequest request, BinaryWriter writer, out ulong channelId)
     {
+        channelId = channelCounter++;
         lock (_channelRegistry)
         {
             var app = CdpAppRegistration.InstantiateApp(request.Id, request.Name);
-            _channelRegistry.Add(channelCounter, app);
-            return channelCounter++;
+            CdpChannel channel = new(this, channelId, app, writer);
+            _channelRegistry.Add(channelId, channel);
+            return channelId;
         }
     }
     #endregion

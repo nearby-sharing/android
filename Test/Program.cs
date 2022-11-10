@@ -10,15 +10,22 @@ using ShortDev.Microsoft.ConnectedDevices.Protocol.NearShare;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Serialization;
 using ShortDev.Networking;
 using Spectre.Console;
+using System.IO;
+using System.Reflection.PortableExecutable;
 
 //var adapter = await BluetoothAdapter.GetDefaultAsync();
 //Debug.Print(adapter.BluetoothAddress.ToString("X"));
 
 
-//var valueSet = ValueSet.Parse(BinaryConvert.ToBytes(AnsiConsole.Ask<string>("Bytes")));
-//Console.ReadLine();
+// var valueSet = ValueSet.Parse(File.OpenRead(@"D:\test.bin")); // BinaryConvert.ToBytes(AnsiConsole.Ask<string>("Bytes")));
+{
+    CompactBinaryReader<InputStream> reader = new(new(File.OpenRead(@"D:\test2.bin")));
+    reader.ReadFieldBegin(out var a, out var b);
+    // var xyz = Deserialize<PropertyValue>.From(reader);
+}
+Console.ReadLine();
 
-while (false)
+while (true)
 {
     MemoryStream stream = new(BinaryConvert.ToBytes(AnsiConsole.Ask<string>("Bytes")));
     CompactBinaryReader<InputStream> reader = new(new(stream));
@@ -27,8 +34,8 @@ while (false)
     reader.ReadFieldBegin(out var fieldType, out var fieldId);
     bool array = fieldType == Bond.BondDataType.BT_LIST;
     int length = 0;
-    //if (array)
-        reader.ReadContainerBegin(out length, out fieldType, out var test);
+    if (array)
+        reader.ReadContainerBegin(out length, out fieldType);
     Console.WriteLine($"{fieldType} = {typeId}; {fieldId}: {(array ? $"array Count = {length}" : "")}");
 
     Console.ReadLine();

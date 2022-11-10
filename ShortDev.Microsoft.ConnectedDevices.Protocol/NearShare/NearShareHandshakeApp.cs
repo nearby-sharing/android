@@ -13,7 +13,7 @@ public class NearShareHandshakeApp : ICdpApp, ICdpAppId
 
     public required ICdpPlatformHandler PlatformHandler { get; init; }
 
-    public bool HandleMessage(CdpSession session, CdpMessage msg, BinaryWriter payloadWriter)
+    public void HandleMessage(CdpChannel channel, CdpMessage msg)
     {
         CommonHeader header = msg.Header;
         BinaryReader payloadReader = msg.Read();
@@ -37,10 +37,14 @@ public class NearShareHandshakeApp : ICdpApp, ICdpAppId
         response.Add("SelectedPlatformVersion", 1u);
         response.Add("VersionHandShakeResult", 1u);
 
-        payloadWriter.Write(prepend);
-        response.Write(payloadWriter);
+        header.Flags = 0;
+        channel.SendMessage(header, (payloadWriter) =>
+        {
+            payloadWriter.Write(prepend);
+            response.Write(payloadWriter);
+        });
 
-        return false;
+        channel.Dispose();
     }
 
     public void Dispose() { }

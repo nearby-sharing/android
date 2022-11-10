@@ -50,7 +50,7 @@ public static class CdpAppRegistration
 
 public interface ICdpApp : IDisposable
 {
-    bool HandleMessage(CdpSession session, CdpMessage msg, BinaryWriter payloadWriter);
+    void HandleMessage(CdpChannel channel, CdpMessage msg);
 }
 
 public interface ICdpAppId
