@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Protocol.NearShare;
 
@@ -15,7 +16,10 @@ public class NearShareApp : ICdpApp
     public required ICdpPlatformHandler PlatformHandler { get; init; }
     public required string Id { get; init; }
 
-    const uint PartitionSize = 1024u; // 131072u
+    const uint PartitionSize = 102400u; // 131072u
+
+    ulong bytesToSend = 0;
+    FileStream? _fileStream;
 
     public void HandleMessage(CdpChannel channel, CdpMessage msg)
     {
@@ -52,8 +56,11 @@ public class NearShareApp : ICdpApp
 
                             PlatformHandler.Log(0, $"Receiving file \"{fileNames[0]}\" from session {header.SessionId.ToString("X")}");
 
-                            var bytesToSend = payload.Get<ulong>("BytesToSend");
-                            for (uint requestedPosition = 0; requestedPosition < bytesToSend; requestedPosition += PartitionSize)
+                            _fileStream = File.Create($"/sdcard/Download/{fileNames[0]}");
+
+                            bytesToSend = payload.Get<ulong>("BytesToSend");
+
+                            for (uint requestedPosition = 0; requestedPosition < bytesToSend + PartitionSize; requestedPosition += PartitionSize)
                             {
                                 ValueSet request = new();
                                 request.Add("BlobPosition", (ulong)requestedPosition);
@@ -85,6 +92,18 @@ public class NearShareApp : ICdpApp
                 case ControlMessageType.FetchDataResponse:
                     {
                         expectMessage = true;
+
+                        if (_fileStream == null)
+                            throw new InvalidOperationException();
+
+                        var position = payload.Get<ulong>("BlobPosition");
+                        var blob = payload.Get<List<byte>>("DataBlob");
+                        PlatformHandler.Log(0, $"BlobPosition: {position}; ({(position + (ulong)blob.Count) * 100 / bytesToSend}%)");
+                        lock (_fileStream)
+                        {
+                            _fileStream.Position = (long)position;
+                            _fileStream.Write(CollectionsMarshal.AsSpan(blob));
+                        }
                         break;
                     }
             }

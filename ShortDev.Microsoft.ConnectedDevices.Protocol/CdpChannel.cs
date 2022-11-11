@@ -1,7 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Reflection.PortableExecutable;
-using System.Threading.Channels;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Protocol;
 
@@ -26,6 +24,7 @@ public sealed class CdpChannel : IDisposable
     public void SendAck(CommonHeader header)
     {
         CommonHeader newHeader = new();
+        newHeader.SequenceNumber = header.SequenceNumber + 1;
         newHeader.Type = MessageType.Ack;
         newHeader.SetReplyToId(header.RequestID);
         newHeader.Write(_writer);
@@ -36,6 +35,8 @@ public sealed class CdpChannel : IDisposable
         if (Session._cryptor == null)
             throw new InvalidOperationException("Invalid session state!");
 
+        header.RequestID++;
+        header.SequenceNumber++;
         Session._cryptor.EncryptMessage(_writer, header, bodyCallback);
     }
 

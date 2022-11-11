@@ -37,7 +37,9 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
             ManifestPermission.BluetoothScan,
             ManifestPermission.BluetoothConnect,
             ManifestPermission.BluetoothAdvertise,
-            ManifestPermission.AccessBackgroundLocation
+            ManifestPermission.AccessBackgroundLocation,
+            ManifestPermission.ReadExternalStorage,
+            ManifestPermission.WriteExternalStorage
         }, 0);
 
         //UdpAdvertisement advertisement = new();
