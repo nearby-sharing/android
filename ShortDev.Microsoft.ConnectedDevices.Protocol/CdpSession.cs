@@ -3,6 +3,7 @@ using ShortDev.Microsoft.ConnectedDevices.Protocol.Connection.Authentication;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Connection.DeviceInfo;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Control;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Encryption;
+using ShortDev.Microsoft.ConnectedDevices.Protocol.NearShare;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms;
 using System;
 using System.Collections.Generic;
@@ -19,14 +20,14 @@ public sealed class CdpSession : IDisposable
 {
     public required uint LocalSessionId { get; init; }
     public required uint RemoteSessionId { get; init; }
-    public required ICdpDeviceId DeviceId { get; init; }
+    public required ICdpDevice Device { get; init; }
 
     internal CdpSession() { }
 
     #region Registration
     static uint sessionIdCounter = 0xe;
     static Dictionary<uint, CdpSession> _registration = new();
-    public static CdpSession GetOrCreate(ICdpDeviceId deviceId, CommonHeader header)
+    public static CdpSession GetOrCreate(ICdpDevice deviceId, CommonHeader header)
     {
         var sessionId = header.SessionId;
         var localSessionId = sessionId.HighValue();
@@ -43,7 +44,7 @@ public sealed class CdpSession : IDisposable
                 if (result.RemoteSessionId != remoteSessionId)
                     throw new Exception($"Wrong {nameof(RemoteSessionId)}");
 
-                if (result.DeviceId.Address != deviceId.Address)
+                if (result.Device.Address != deviceId.Address)
                     throw new Exception("Wrong device!");
 
                 result.ThrowIfDisposed();
@@ -57,7 +58,7 @@ public sealed class CdpSession : IDisposable
             localSessionId = sessionIdCounter++;
             CdpSession result = new()
             {
-                DeviceId = deviceId,
+                Device = deviceId,
                 LocalSessionId = localSessionId,
                 RemoteSessionId = remoteSessionId
             };
@@ -67,7 +68,7 @@ public sealed class CdpSession : IDisposable
     }
     #endregion
 
-    public ICdpPlatformHandler? PlatformHandler { get; set; } = null;
+    public INearSharePlatformHandler? PlatformHandler { get; set; } = null;
 
     internal CdpCryptor? _cryptor = null;
     readonly CdpEncryptionInfo _localEncryption = CdpEncryptionInfo.Create(CdpEncryptionParams.Default);

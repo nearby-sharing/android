@@ -1,6 +1,7 @@
 ﻿namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms;
 
-public interface ICdpDeviceId
+public interface ICdpDevice
 {
+    public string? Name { get; init; }
     string? Address { get; }
 }

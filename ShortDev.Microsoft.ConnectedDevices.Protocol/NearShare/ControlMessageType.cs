@@ -1,6 +1,6 @@
 ﻿namespace ShortDev.Microsoft.ConnectedDevices.Protocol.NearShare;
 
-internal enum ControlMessageType
+internal enum ShareControlMessageType
 {
     StartRequest = 1,
     StartResponse = 2,

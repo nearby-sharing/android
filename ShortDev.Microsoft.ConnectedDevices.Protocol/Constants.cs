@@ -12,4 +12,8 @@ public static class Constants
 
     public const int DefaultMessageFragmentSize = 16384;
     public const int HMacSize = 32;
+
+    public const int KB = 1024;
+    public const int MB = 1024 * KB;
+    public const int GB = 1024 * MB;
 }

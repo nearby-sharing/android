@@ -1,5 +1,4 @@
-﻿using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms;
-using ShortDev.Microsoft.ConnectedDevices.Protocol.Serialization;
+﻿using ShortDev.Microsoft.ConnectedDevices.Protocol.Serialization;
 using ShortDev.Networking;
 using System;
 using System.Collections.Generic;
@@ -13,7 +12,7 @@ public class NearShareApp : ICdpApp
 {
     public static string Name { get; } = "NearSharePlatform";
 
-    public required ICdpPlatformHandler PlatformHandler { get; init; }
+    public required INearSharePlatformHandler PlatformHandler { get; init; }
     public required string Id { get; init; }
 
     const uint PartitionSize = 102400u; // 131072u
@@ -21,7 +20,7 @@ public class NearShareApp : ICdpApp
     ulong bytesToSend = 0;
     FileStream? _fileStream;
 
-    public void HandleMessage(CdpChannel channel, CdpMessage msg)
+    public async void HandleMessage(CdpChannel channel, CdpMessage msg)
     {
         bool expectMessage = true;
 
@@ -42,10 +41,10 @@ public class NearShareApp : ICdpApp
 
         if (payload.ContainsKey("ControlMessage"))
         {
-            var msgType = (ControlMessageType)payload.Get<uint>("ControlMessage");
+            var msgType = (ShareControlMessageType)payload.Get<uint>("ControlMessage");
             switch (msgType)
             {
-                case ControlMessageType.StartRequest:
+                case ShareControlMessageType.StartRequest:
                     {
                         var dataKind = (DataKind)payload.Get<uint>("DataKind");
                         if (dataKind == DataKind.File)
@@ -56,9 +55,17 @@ public class NearShareApp : ICdpApp
 
                             PlatformHandler.Log(0, $"Receiving file \"{fileNames[0]}\" from session {header.SessionId.ToString("X")}");
 
-                            _fileStream = File.Create($"/sdcard/Download/{fileNames[0]}");
-
                             bytesToSend = payload.Get<ulong>("BytesToSend");
+
+                            FileTransferToken fileTransferToken = new()
+                            {
+                                DeviceName = channel.Session.Device.Name ?? "UNKNOWN",
+                                FileName = fileNames[0],
+                                FileSize = bytesToSend
+                            };
+                            PlatformHandler.OnFileTransfer(fileTransferToken);
+
+                            _fileStream = await fileTransferToken;
 
                             for (uint requestedPosition = 0; requestedPosition < bytesToSend + PartitionSize; requestedPosition += PartitionSize)
                             {
@@ -66,7 +73,7 @@ public class NearShareApp : ICdpApp
                                 request.Add("BlobPosition", (ulong)requestedPosition);
                                 request.Add("BlobSize", PartitionSize);
                                 request.Add("ContentId", 0u);
-                                request.Add("ControlMessage", (uint)ControlMessageType.FetchDataRequest);
+                                request.Add("ControlMessage", (uint)ShareControlMessageType.FetchDataRequest);
 
                                 header.Flags = 0;
                                 channel.SendMessage(header, (payloadWriter) =>
@@ -82,14 +89,18 @@ public class NearShareApp : ICdpApp
                         {
                             var uri = payload.Get<string>("Uri");
                             PlatformHandler.Log(0, $"Received uri \"{uri}\" from session {header.SessionId.ToString("X")}");
-                            PlatformHandler.LaunchUri(uri);
+                            PlatformHandler.OnReceivedUri(new()
+                            {
+                                DeviceName = channel.Session.Device.Name ?? "UNKNOWN",
+                                Uri = uri
+                            });
                             expectMessage = false;
                         }
                         else
                             throw new NotImplementedException($"DataKind {dataKind} not implemented");
                         break;
                     }
-                case ControlMessageType.FetchDataResponse:
+                case ShareControlMessageType.FetchDataResponse:
                     {
                         expectMessage = true;
 
@@ -114,11 +125,11 @@ public class NearShareApp : ICdpApp
         if (!expectMessage)
         {
             // Finished
-            response.Add("ControlMessage", (uint)ControlMessageType.StartResponse);
+            response.Add("ControlMessage", (uint)ShareControlMessageType.StartResponse);
             channel.Session.Dispose();
             channel.Dispose();
 
-            CdpAppRegistration.UnregisterApp(Id, Name);
+            CdpAppRegistration.TryUnregisterApp(Id);
         }
 
         header.Flags = 0;

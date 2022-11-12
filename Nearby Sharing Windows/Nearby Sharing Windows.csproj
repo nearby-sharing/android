@@ -19,6 +19,7 @@
 	<ItemGroup>
 		<None Remove="Resources\layout\activity_receive.xml" />
 		<None Remove="Resources\layout\activity_settings.xml" />
+		<None Remove="Resources\layout\item_transfer_notification.xml" />
 		<None Remove="Resources\xml\preferences.xml" />
 	</ItemGroup>
 	<ItemGroup>

@@ -1,5 +1,4 @@
-﻿using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms;
-using ShortDev.Microsoft.ConnectedDevices.Protocol.Serialization;
+﻿using ShortDev.Microsoft.ConnectedDevices.Protocol.Serialization;
 using System;
 using System.IO;
 
@@ -11,7 +10,7 @@ public class NearShareHandshakeApp : ICdpApp, ICdpAppId
 
     public static string Name { get; } = "NearSharePlatform";
 
-    public required ICdpPlatformHandler PlatformHandler { get; init; }
+    public required INearSharePlatformHandler PlatformHandler { get; init; }
 
     public void HandleMessage(CdpChannel channel, CdpMessage msg)
     {
@@ -23,7 +22,7 @@ public class NearShareHandshakeApp : ICdpApp, ICdpAppId
         header.AdditionalHeaders.RemoveAll((x) => x.Type == AdditionalHeaderType.CorrelationVector);
 
         string id = payload.Get<Guid>("OperationId").ToString();
-        CdpAppRegistration.RegisterApp(
+        CdpAppRegistration.TryRegisterApp(
             id,
             NearShareApp.Name,
             () => new NearShareApp()

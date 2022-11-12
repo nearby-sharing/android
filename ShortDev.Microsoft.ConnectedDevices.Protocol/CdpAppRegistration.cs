@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Protocol;
 
@@ -10,33 +9,30 @@ public static class CdpAppRegistration
 
     static Dictionary<string, AppId> _registration = new();
 
-    public static void RegisterApp<TApp>() where TApp : ICdpApp, ICdpAppId, new()
-        => RegisterApp(TApp.Id, TApp.Name, () => new TApp());
+    public static bool TryRegisterApp<TApp>() where TApp : ICdpApp, ICdpAppId, new()
+        => TryRegisterApp(TApp.Id, TApp.Name, () => new TApp());
 
-    public static void RegisterApp<TApp>(Func<TApp> factory) where TApp : ICdpApp, ICdpAppId
-        => RegisterApp(TApp.Id, TApp.Name, () => factory());
+    public static bool TryRegisterApp<TApp>(Func<TApp> factory) where TApp : ICdpApp, ICdpAppId
+        => TryRegisterApp(TApp.Id, TApp.Name, () => factory());
 
-    public static void RegisterApp(string id, string name, Func<ICdpApp> factory)
+    public static bool TryRegisterApp(string id, string name, Func<ICdpApp> factory)
     {
         id = id.ToLower();
         lock (_registration)
         {
-            if (_registration.ContainsKey(id))
-                throw new ArgumentException($"Id {id} already exists!", nameof(id));
-
-            _registration.Add(id, new(id, name, factory));
+            return _registration.TryAdd(id, new(id, name, factory));
         }
     }
 
-    public static void UnregisterApp<TApp>() where TApp : ICdpAppId
-        => UnregisterApp(TApp.Id, TApp.Name);
+    public static bool TryUnregisterApp<TApp>() where TApp : ICdpAppId
+        => TryUnregisterApp(TApp.Id);
 
-    public static void UnregisterApp(string id, string name)
+    public static bool TryUnregisterApp(string id)
     {
         id = id.ToLower();
         lock (_registration)
         {
-            _registration.Remove(id);
+            return _registration.Remove(id);
         }
     }
 
