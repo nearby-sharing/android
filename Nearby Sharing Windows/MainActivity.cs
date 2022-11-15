@@ -1,5 +1,4 @@
 ﻿using Android.Content;
-using Android.Content.PM;
 using Android.Runtime;
 using Android.Views;
 using AndroidX.AppCompat.App;
@@ -7,7 +6,7 @@ using Google.Android.Material.FloatingActionButton;
 
 namespace Nearby_Sharing_Windows;
 
-[Activity(Label = "@string/app_name", Theme = "@style/AppTheme", MainLauncher = true, ConfigurationChanges = Constants.ConfigChangesFlags)]
+[Activity(Label = "@string/app_name", Theme = "@style/AppTheme", MainLauncher = true, ConfigurationChanges = UIHelper.ConfigChangesFlags)]
 public sealed class MainActivity : AppCompatActivity
 {
     protected override void OnCreate(Bundle? savedInstanceState)
@@ -65,18 +64,5 @@ public sealed class MainActivity : AppCompatActivity
     }
 
     public override bool OnOptionsItemSelected(IMenuItem item)
-    {
-        switch (item.ItemId)
-        {
-            case Resource.Id.action_settings:
-                StartActivity(new Intent(this, typeof(SettingsActivity)));
-                return true;
-        }
-        return false;
-    }
-}
-
-public static class Constants
-{
-    public const ConfigChanges ConfigChangesFlags = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.Density;
+        => UIHelper.OnOptionsItemSelected(this, item);
 }

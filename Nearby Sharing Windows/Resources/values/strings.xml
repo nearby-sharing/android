@@ -10,6 +10,7 @@
 		Because of privacy concerns (ads), android does not allow apps to read the bluetooth mac address any more.
 		\nThe mac address is required to tell the other device where to send your data.
 		\nTo proceed, please insert your bluetooth mac address below.
+		\nYou can find it in the settings at System > About > Bluetooth MAC address.
 		\nIf this address is invalid, you will not be able to receive any data.
 	</string>
 </resources>

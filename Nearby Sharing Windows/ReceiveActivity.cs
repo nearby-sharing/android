@@ -1,6 +1,6 @@
 ﻿using Android.Bluetooth;
 using Android.Bluetooth.LE;
-using Android.Content;
+using Android.Views;
 using AndroidX.AppCompat.App;
 using AndroidX.RecyclerView.Widget;
 using Google.Android.Material.ProgressIndicator;
@@ -12,13 +12,11 @@ using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms;
 using ShortDev.Networking;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Net.NetworkInformation;
-using AndroidUri = Android.Net.Uri;
 using ManifestPermission = Android.Manifest.Permission;
 
 namespace Nearby_Sharing_Windows;
 
-[Activity(Label = "@string/app_name", Theme = "@style/AppTheme", ConfigurationChanges = Constants.ConfigChangesFlags)]
+[Activity(Label = "@string/app_name", Theme = "@style/AppTheme", ConfigurationChanges = UIHelper.ConfigChangesFlags)]
 public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, INearSharePlatformHandler
 {
     BluetoothAdapter? _btAdapter;
@@ -32,11 +30,15 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
     protected override void OnCreate(Bundle savedInstanceState)
     {
         base.OnCreate(savedInstanceState);
-
-        // ToDo: Mac address settings
-        // SetContentView(Resource.Layout.activity_mac_address);
-
         SetContentView(Resource.Layout.activity_receive);
+
+        if (ReceiveSetupActivity.IsSetupRequired(this) || !ReceiveSetupActivity.TryGetBtAddress(this, out var btAddress) || btAddress == null)
+        {
+            StartActivity(new Android.Content.Intent(this, typeof(ReceiveSetupActivity)));
+
+            Finish();
+            return;
+        }
 
         RequestPermissions(new[] {
             ManifestPermission.AccessFineLocation,
@@ -79,10 +81,7 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
                     fileNameTextView.Text = uriTranfer.Uri;
                     detailsTextView.Text = uriTranfer.DeviceName;
 
-                    acceptButton.Click += (s, e) =>
-                    {
-                        StartActivity(new Intent(Intent.ActionView, AndroidUri.Parse(uriTranfer.Uri)!));
-                    };
+                    acceptButton.Click += (s, e) => UIHelper.DisplayWebSite(this, uriTranfer.Uri);
                 }
 
                 view.FindViewById<Button>(Resource.Id.cancelButton)!.Click += (s, e) =>
@@ -99,10 +98,8 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
         var service = (BluetoothManager)GetSystemService(BluetoothService)!;
         _btAdapter = service.Adapter!;
 
-        string address = TryGetBtAddress(_btAdapter, out var exception) ?? "00:fa:21:3e:fb:19"; // "d4:38:9c:0b:ca:ae"; //
-
         FindViewById<TextView>(Resource.Id.deviceInfoTextView)!.Text = $"Visible as {_btAdapter.Name!}.\n" +
-            $"Address: {address}";
+            $"Address: {btAddress}";
         debugLogTextView = FindViewById<TextView>(Resource.Id.debugLogTextView)!;
 
         CdpAppRegistration.TryUnregisterApp<NearShareHandshakeApp>();
@@ -112,10 +109,13 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
         _bluetoothAdvertisement.OnDeviceConnected += BluetoothAdvertisement_OnDeviceConnected;
         _bluetoothAdvertisement.StartAdvertisement(new CdpDeviceAdvertiseOptions(
             DeviceType.Android,
-            PhysicalAddress.Parse(address.Replace(":", "").ToUpper()),
+            btAddress, // "00:fa:21:3e:fb:19"
             _btAdapter.Name!
         ));
     }
+
+    public override bool OnOptionsItemSelected(IMenuItem item)
+        => UIHelper.OnOptionsItemSelected(this, item);
 
     public override void Finish()
     {
@@ -124,41 +124,6 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
     }
 
     #region Communication
-    public string? TryGetBtAddress(BluetoothAdapter adapter, out Exception? exception)
-    {
-        exception = null;
-
-        try
-        {
-            var mServiceField = adapter.Class.GetDeclaredFields().FirstOrDefault((x) => x.Name.Contains("service", StringComparison.OrdinalIgnoreCase));
-            if (mServiceField == null)
-                throw new MissingFieldException("No service field found!");
-
-            mServiceField.Accessible = true;
-            var serviceProxy = mServiceField.Get(adapter)!;
-            var method = serviceProxy.Class.GetDeclaredMethod("getAddress");
-            if (method == null)
-                throw new MissingMethodException("No method \"getAddress\"");
-
-            method.Accessible = true;
-            try
-            {
-                return (string?)method.Invoke(serviceProxy);
-            }
-            catch (Java.Lang.Reflect.InvocationTargetException ex)
-            {
-                if (ex.Cause == null)
-                    throw;
-                throw ex.Cause;
-            }
-        }
-        catch (System.Exception ex)
-        {
-            exception = ex;
-        }
-        return null;
-    }
-
     #region Not implemented
     public Task ScanBLeAsync(CdpScanOptions<CdpBluetoothDevice> scanOptions, CancellationToken cancellationToken = default)
         => throw new NotImplementedException();

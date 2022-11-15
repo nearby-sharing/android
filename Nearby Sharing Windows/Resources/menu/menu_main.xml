@@ -2,6 +2,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 	<item
+        android:id="@+id/action_help"
+		android:icon="@drawable/ic_fluent_chat_help_24_regular"
+        android:title="Sponsor"
+		android:showAsAction="always" />
+	<item
         android:id="@+id/action_sponsor"
 		android:icon="@drawable/ic_fluent_handshake_24_selector"
         android:title="Sponsor"

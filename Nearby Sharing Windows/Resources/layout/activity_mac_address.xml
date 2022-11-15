@@ -63,16 +63,10 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="15dp" />
 
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="75dp"
-                android:src="@drawable/ic_fluent_settings_24_regular"/>
-
             <TextView
                 style="@style/TextAppearance.AppCompat.Title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
                 android:layout_marginBottom="3dp"
                 android:text="Settings" />
 
@@ -80,6 +74,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/settings_mac_addr" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="15dp"/>
+
+            <Button
+                android:id="@+id/launchSettingsButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Open Settings" />
 
             <View
                 android:layout_width="match_parent"
@@ -110,7 +114,7 @@
                     android:id="@+id/backButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Back" 
+                    android:text="Back"
                     app:icon="@drawable/ic_fluent_chevron_left_24_regular" />
 
                 <Button

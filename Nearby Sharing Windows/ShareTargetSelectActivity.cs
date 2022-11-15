@@ -23,7 +23,7 @@ namespace Nearby_Sharing_Windows;
 
 [IntentFilter(new[] { Intent.ActionSend, Intent.ActionSendMultiple }, Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable }, DataMimeType = "*/*", Label = "Share file")]
 [IntentFilter(new[] { Intent.ActionSend }, Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable }, DataMimeType = "text/plain", Label = "Share url")]
-[Activity(Label = "@string/app_name", Exported = true, Theme = "@style/AppTheme.TranslucentOverlay", ConfigurationChanges = Constants.ConfigChangesFlags)]
+[Activity(Label = "@string/app_name", Exported = true, Theme = "@style/AppTheme.TranslucentOverlay", ConfigurationChanges = UIHelper.ConfigChangesFlags)]
 public sealed class ShareTargetSelectActivity : AppCompatActivity, View.IOnApplyWindowInsetsListener
 {
     [AllowNull] NearShareSender NearShareSender;
