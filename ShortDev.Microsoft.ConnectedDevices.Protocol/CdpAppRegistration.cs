@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Protocol;
 
@@ -46,7 +47,7 @@ public static class CdpAppRegistration
 
 public interface ICdpApp : IDisposable
 {
-    void HandleMessage(CdpChannel channel, CdpMessage msg);
+    ValueTask HandleMessageAsync(CdpChannel channel, CdpMessage msg);
 }
 
 public interface ICdpAppId

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Protocol.NearShare;
 
@@ -20,7 +21,7 @@ public class NearShareApp : ICdpApp
     ulong bytesToSend = 0;
     FileStream? _fileStream;
 
-    public async void HandleMessage(CdpChannel channel, CdpMessage msg)
+    public async ValueTask HandleMessageAsync(CdpChannel channel, CdpMessage msg)
     {
         bool expectMessage = true;
 
@@ -109,11 +110,19 @@ public class NearShareApp : ICdpApp
 
                         var position = payload.Get<ulong>("BlobPosition");
                         var blob = payload.Get<List<byte>>("DataBlob");
-                        PlatformHandler.Log(0, $"BlobPosition: {position}; ({(position + (ulong)blob.Count) * 100 / bytesToSend}%)");
+
+                        var newPosition = position + (ulong)blob.Count;
+                        if (newPosition > bytesToSend + PartitionSize)
+                            throw new InvalidOperationException("Device tried to send too much data!");
+
+                        PlatformHandler.Log(0, $"BlobPosition: {position}; ({newPosition * 100 / bytesToSend}%)");
                         lock (_fileStream)
                         {
                             _fileStream.Position = (long)position;
-                            _fileStream.Write(CollectionsMarshal.AsSpan(blob));
+                            if (newPosition > bytesToSend)
+                                _fileStream.Write(CollectionsMarshal.AsSpan(blob).Slice(0, (int)(bytesToSend - position)));
+                            else
+                                _fileStream.Write(CollectionsMarshal.AsSpan(blob));
                         }
                         break;
                     }

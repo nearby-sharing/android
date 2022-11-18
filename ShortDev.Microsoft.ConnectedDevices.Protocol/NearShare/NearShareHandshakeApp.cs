@@ -1,6 +1,7 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Protocol.Serialization;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Protocol.NearShare;
 
@@ -12,7 +13,7 @@ public class NearShareHandshakeApp : ICdpApp, ICdpAppId
 
     public required INearSharePlatformHandler PlatformHandler { get; init; }
 
-    public void HandleMessage(CdpChannel channel, CdpMessage msg)
+    public ValueTask HandleMessageAsync(CdpChannel channel, CdpMessage msg)
     {
         CommonHeader header = msg.Header;
         BinaryReader payloadReader = msg.Read();
@@ -44,6 +45,8 @@ public class NearShareHandshakeApp : ICdpApp, ICdpAppId
         });
 
         channel.Dispose();
+
+        return ValueTask.CompletedTask;
     }
 
     public void Dispose() { }

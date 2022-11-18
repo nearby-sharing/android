@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Protocol;
 
@@ -18,8 +19,8 @@ public sealed class CdpChannel : IDisposable
     public ICdpApp App { get; }
     public ulong ChannelId { get; }
 
-    public void HandleMessage(CdpMessage msg)
-        => App.HandleMessage(this, msg);
+    public async ValueTask HandleMessageAsync(CdpMessage msg)
+        => await App.HandleMessageAsync(this, msg);
 
     public void SendAck(CommonHeader header)
     {

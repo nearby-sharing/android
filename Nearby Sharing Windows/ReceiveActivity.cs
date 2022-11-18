@@ -184,7 +184,7 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
     private void BluetoothAdvertisement_OnDeviceConnected(CdpRfcommSocket socket)
     {
         Log(0, $"Device {socket.RemoteDevice!.Name} ({socket.RemoteDevice!.Address}) connected via rfcomm");
-        Task.Run(() =>
+        Task.Run(async () =>
         {
             using (BigEndianBinaryWriter writer = new(socket.OutputStream!))
             using (BigEndianBinaryReader reader = new(socket.InputStream!))
@@ -198,7 +198,7 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
                         var header = CommonHeader.Parse(reader);
                         session = CdpSession.GetOrCreate(socket.RemoteDevice ?? throw new InvalidDataException(), header);
                         session.PlatformHandler = this;
-                        expectMessage = session.HandleMessage(header, reader, writer);
+                        expectMessage = await session.HandleMessageAsync(header, reader, writer);
                     }
                     catch (Exception ex)
                     {

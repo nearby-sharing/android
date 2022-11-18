@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Formats.Asn1;
 using System.IO;
 using System.Security;
+using System.Threading.Tasks;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Protocol;
 
@@ -73,7 +74,7 @@ public sealed class CdpSession : IDisposable
     internal CdpCryptor? _cryptor = null;
     readonly CdpEncryptionInfo _localEncryption = CdpEncryptionInfo.Create(CdpEncryptionParams.Default);
     CdpEncryptionInfo? _remoteEncryption = null;
-    public bool HandleMessage(CommonHeader header, BinaryReader reader, BinaryWriter writer)
+    public async ValueTask<bool> HandleMessageAsync(CommonHeader header, BinaryReader reader, BinaryWriter writer)
     {
         ThrowIfDisposed();
 
@@ -241,10 +242,11 @@ public sealed class CdpSession : IDisposable
                     try
                     {
                         var channel = _channelRegistry[header.ChannelId];
-                        channel.HandleMessage(msg);
+                        await channel.HandleMessageAsync(msg);
                     }
                     finally
                     {
+
                         _msgRegistry.Remove(msg.Id);
                         msg.Dispose();
                     }
