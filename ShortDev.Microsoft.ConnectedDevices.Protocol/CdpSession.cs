@@ -7,30 +7,32 @@ using ShortDev.Microsoft.ConnectedDevices.Protocol.NearShare;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms;
 using System;
 using System.Collections.Generic;
-using System.Formats.Asn1;
 using System.IO;
 using System.Security;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Protocol;
 
 /// <summary>
-/// These messages are sent across during an active session between two connected and authenticated devices.
+/// Handles messages that are sent across during an active session between two connected and authenticated devices. <br/>
+/// Persists basic state (e.g. encryption) across sockets and transports (e.g. bt, wifi, ...).
 /// </summary>
 public sealed class CdpSession : IDisposable
 {
     public required uint LocalSessionId { get; init; }
     public required uint RemoteSessionId { get; init; }
-    public required ICdpDevice Device { get; init; }
+    public required CdpDevice Device { get; init; }
 
     internal CdpSession() { }
 
     #region Registration
     static uint sessionIdCounter = 0xe;
-    static Dictionary<uint, CdpSession> _registration = new();
-    public static CdpSession GetOrCreate(ICdpDevice deviceId, CommonHeader header)
+    static readonly Dictionary<uint, CdpSession> _registration = new();
+    public static CdpSession GetOrCreate(CdpDevice device, CommonHeader header)
     {
+        ArgumentNullException.ThrowIfNull(device);
+        ArgumentNullException.ThrowIfNull(header);
+
         var sessionId = header.SessionId;
         var localSessionId = sessionId.HighValue();
         var remoteSessionId = sessionId.LowValue() & ~(uint)CommonHeader.SessionIdHostFlag;
@@ -46,7 +48,7 @@ public sealed class CdpSession : IDisposable
                 if (result.RemoteSessionId != remoteSessionId)
                     throw new Exception($"Wrong {nameof(RemoteSessionId)}");
 
-                if (result.Device.Address != deviceId.Address)
+                if (result.Device.Address != device.Address)
                     throw new Exception("Wrong device!");
 
                 result.ThrowIfDisposed();
@@ -60,7 +62,7 @@ public sealed class CdpSession : IDisposable
             localSessionId = sessionIdCounter++;
             CdpSession result = new()
             {
-                Device = deviceId,
+                Device = device,
                 LocalSessionId = localSessionId,
                 RemoteSessionId = remoteSessionId
             };
@@ -72,14 +74,15 @@ public sealed class CdpSession : IDisposable
 
     public INearSharePlatformHandler? PlatformHandler { get; set; } = null;
 
-    internal CdpCryptor? _cryptor = null;
+    internal CdpCryptor? Cryptor = null;
     readonly CdpEncryptionInfo _localEncryption = CdpEncryptionInfo.Create(CdpEncryptionParams.Default);
     CdpEncryptionInfo? _remoteEncryption = null;
-    public void HandleMessage(CommonHeader header, BinaryReader reader, BinaryWriter writer)
+    public void HandleMessage(CdpSocket socket, CommonHeader header, BinaryReader reader)
     {
         ThrowIfDisposed();
 
-        BinaryReader payloadReader = _cryptor?.Read(reader, header) ?? reader;
+        var writer = socket.Writer;
+        BinaryReader payloadReader = Cryptor?.Read(reader, header) ?? reader;
         {
             header.CorrectClientSessionBit();
 
@@ -95,7 +98,7 @@ public sealed class CdpSession : IDisposable
                             _remoteEncryption = CdpEncryptionInfo.FromRemote(connectionRequest.PublicKeyX, connectionRequest.PublicKeyY, connectionRequest.Nonce, CdpEncryptionParams.Default);
 
                             var secret = _localEncryption.GenerateSharedSecret(_remoteEncryption);
-                            _cryptor = new(secret);
+                            Cryptor = new(secret);
 
                             header.SessionId |= (ulong)LocalSessionId << 32;
 
@@ -127,7 +130,7 @@ public sealed class CdpSession : IDisposable
                                 throw new Exception("Invalid thumbprint");
 
                             header.Flags = 0;
-                            _cryptor!.EncryptMessage(writer, header, (writer) =>
+                            Cryptor!.EncryptMessage(writer, header, (writer) =>
                             {
                                 new ConnectionHeader()
                                 {
@@ -144,7 +147,7 @@ public sealed class CdpSession : IDisposable
                     case ConnectionType.UpgradeRequest:
                         {
                             header.Flags = 0;
-                            _cryptor!.EncryptMessage(writer, header, (writer) =>
+                            Cryptor!.EncryptMessage(writer, header, (writer) =>
                             {
                                 new ConnectionHeader()
                                 {
@@ -161,7 +164,7 @@ public sealed class CdpSession : IDisposable
                     case ConnectionType.AuthDoneRequest:
                         {
                             header.Flags = 0;
-                            _cryptor!.EncryptMessage(writer, header, (writer) =>
+                            Cryptor!.EncryptMessage(writer, header, (writer) =>
                             {
                                 new ConnectionHeader()
                                 {
@@ -180,7 +183,7 @@ public sealed class CdpSession : IDisposable
                             var msg = DeviceInfoMessage.Parse(payloadReader);
 
                             header.Flags = 0;
-                            _cryptor!.EncryptMessage(writer, header, (writer) =>
+                            Cryptor!.EncryptMessage(writer, header, (writer) =>
                             {
                                 new ConnectionHeader()
                                 {
@@ -213,10 +216,10 @@ public sealed class CdpSession : IDisposable
 
                             header.RequestID = 0;
 
-                            StartChannel(request, writer, out var channelId);
+                            StartChannel(request, socket, out var channelId);
 
                             header.Flags = 0;
-                            _cryptor!.EncryptMessage(writer, header, (writer) =>
+                            Cryptor!.EncryptMessage(writer, header, (writer) =>
                             {
                                 new ControlHeader()
                                 {
@@ -282,15 +285,23 @@ public sealed class CdpSession : IDisposable
     ulong channelCounter = 1;
     internal readonly Dictionary<ulong, CdpChannel> _channelRegistry = new();
 
-    ulong StartChannel(StartChannelRequest request, BinaryWriter writer, out ulong channelId)
+    ulong StartChannel(StartChannelRequest request, CdpSocket socket, out ulong channelId)
     {
-        channelId = channelCounter++;
         lock (_channelRegistry)
         {
+            channelId = channelCounter++;
             var app = CdpAppRegistration.InstantiateApp(request.Id, request.Name);
-            CdpChannel channel = new(this, channelId, app, writer);
+            CdpChannel channel = new(this, channelId, app, socket);
             _channelRegistry.Add(channelId, channel);
             return channelId;
+        }
+    }
+
+    internal void UnregisterChannel(CdpChannel channel)
+    {
+        lock (_channelRegistry)
+        {
+            _channelRegistry.Remove(channel.ChannelId);
         }
     }
     #endregion
@@ -317,12 +328,18 @@ public sealed class CdpSession : IDisposable
             _registration.Remove(LocalSessionId);
         }
 
-        foreach (var channel in _channelRegistry.Values)
-            channel.Dispose();
-        _channelRegistry.Clear();
+        lock (_channelRegistry)
+        {
+            foreach (var channel in _channelRegistry.Values)
+                channel.Dispose();
+            _channelRegistry.Clear();
+        }
 
-        foreach (var msg in _msgRegistry.Values)
-            msg.Dispose();
-        _msgRegistry.Clear();
+        lock (_msgRegistry)
+        {
+            foreach (var msg in _msgRegistry.Values)
+                msg.Dispose();
+            _msgRegistry.Clear();
+        }
     }
 }

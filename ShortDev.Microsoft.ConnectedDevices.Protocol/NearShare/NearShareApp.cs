@@ -4,14 +4,12 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Reflection.PortableExecutable;
 using System.Runtime.InteropServices;
-using System.Threading.Channels;
 using System.Threading.Tasks;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Protocol.NearShare;
 
-public class NearShareApp : ICdpApp
+public sealed class NearShareApp : CdpAppBase
 {
     public static string Name { get; } = "NearSharePlatform";
 
@@ -24,7 +22,7 @@ public class NearShareApp : ICdpApp
     ulong bytesToSend = 0;
     FileTransferToken? _fileTransferToken;
 
-    public async ValueTask HandleMessageAsync(CdpChannel channel, CdpMessage msg)
+    public override async ValueTask HandleMessageAsync(CdpMessage msg)
     {
         bool expectMessage = true;
 
@@ -39,7 +37,7 @@ public class NearShareApp : ICdpApp
         header.AdditionalHeaders.RemoveAll((x) => x.Type == AdditionalHeaderType.CorrelationVector);
 
         if (header.HasFlag(MessageFlags.ShouldAck))
-            channel.SendAck(header);
+            Channel.SendAck(header);
 
         ValueSet response = new();
 
@@ -63,7 +61,7 @@ public class NearShareApp : ICdpApp
 
                             _fileTransferToken = new()
                             {
-                                DeviceName = channel.Session.Device.Name ?? "UNKNOWN",
+                                DeviceName = Channel.Session.Device.Name ?? "UNKNOWN",
                                 FileName = fileNames[0],
                                 FileSize = bytesToSend
                             };
@@ -80,7 +78,7 @@ public class NearShareApp : ICdpApp
                                 request.Add("ControlMessage", (uint)ShareControlMessageType.FetchDataRequest);
 
                                 header.Flags = 0;
-                                channel.SendMessage(header, (payloadWriter) =>
+                                Channel.SendMessage(header, (payloadWriter) =>
                                 {
                                     payloadWriter.Write(prepend);
                                     request.Write(payloadWriter);
@@ -95,7 +93,7 @@ public class NearShareApp : ICdpApp
                             PlatformHandler.Log(0, $"Received uri \"{uri}\" from session {header.SessionId.ToString("X")}");
                             PlatformHandler.OnReceivedUri(new()
                             {
-                                DeviceName = channel.Session.Device.Name ?? "UNKNOWN",
+                                DeviceName = Channel.Session.Device.Name ?? "UNKNOWN",
                                 Uri = uri
                             });
                             expectMessage = false;
@@ -144,19 +142,16 @@ public class NearShareApp : ICdpApp
         {
             // Finished
             response.Add("ControlMessage", (uint)ShareControlMessageType.StartResponse);
-            channel.Session.Dispose();
-            channel.Dispose();
 
+            Channel.Dispose(closeSession: true);
             CdpAppRegistration.TryUnregisterApp(Id);
         }
 
         header.Flags = 0;
-        channel.SendMessage(header, (payloadWriter) =>
+        Channel.SendMessage(header, (payloadWriter) =>
         {
             payloadWriter.Write(prepend);
             response.Write(payloadWriter);
         });
     }
-
-    public void Dispose() { }
 }

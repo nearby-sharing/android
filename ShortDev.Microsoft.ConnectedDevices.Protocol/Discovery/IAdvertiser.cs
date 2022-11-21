@@ -1,8 +1,7 @@
-﻿namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Discovery
+﻿namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Discovery;
+
+public interface IAdvertiser
 {
-    public interface IAdvertiser
-    {
-        void StartAdvertisement(CdpDeviceAdvertiseOptions options);
-        void StopAdvertisement();
-    }
+    void StartAdvertisement(CdpDeviceAdvertiseOptions options);
+    void StopAdvertisement();
 }

@@ -1,26 +1,53 @@
-﻿using System;
+﻿using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Protocol;
 
+/// <summary>
+/// Provides the interface between a <see cref="CdpAppBase"/> and a <see cref="CdpSession"/>. <br/>
+/// Every app has a unique <see cref="CdpSocket"/> managed from within this channel.
+/// </summary>
 public sealed class CdpChannel : IDisposable
 {
     BinaryWriter _writer;
-    internal CdpChannel(CdpSession session, ulong channelId, ICdpApp app, BinaryWriter writer)
+    internal CdpChannel(CdpSession session, ulong channelId, CdpAppBase app, CdpSocket socket)
     {
         Session = session;
         ChannelId = channelId;
         App = app;
-        _writer = writer;
+        app.Channel = this;
+        Socket = socket;
+        _writer = socket.Writer;
     }
 
+    /// <summary>
+    /// Get's the corresponding <see cref="CdpSession"/>. <br/>
+    /// <inheritdoc cref="CdpSession"/>
+    /// </summary>
     public CdpSession Session { get; }
-    public ICdpApp App { get; }
+
+    /// <summary>
+    /// Get's the corresponding <see cref="CdpSocket"/>. <br/>
+    /// <inheritdoc cref="CdpSocket" />
+    /// </summary>
+    public CdpSocket Socket { get; }
+
+    /// <summary>
+    /// Get's the corresponding <see cref="CdpAppBase"/>. <br/>
+    /// <inheritdoc cref="CdpAppBase"/>
+    /// </summary>
+    public CdpAppBase App { get; }
+
+    /// <summary>
+    /// Get's the unique id for the channel. <br/>
+    /// The id is unique as long as the channel is active.
+    /// </summary>
     public ulong ChannelId { get; }
 
     public async ValueTask HandleMessageAsync(CdpMessage msg)
-        => await App.HandleMessageAsync(this, msg);
+        => await App.HandleMessageAsync(msg);
 
     public void SendAck(CommonHeader header)
     {
@@ -33,20 +60,24 @@ public sealed class CdpChannel : IDisposable
 
     public void SendMessage(CommonHeader header, Action<BinaryWriter> bodyCallback)
     {
-        if (Session._cryptor == null)
+        if (Session.Cryptor == null)
             throw new InvalidOperationException("Invalid session state!");
 
         header.RequestID++;
         header.SequenceNumber++;
-        Session._cryptor.EncryptMessage(_writer, header, bodyCallback);
+        Session.Cryptor.EncryptMessage(_writer, header, bodyCallback);
     }
 
-    public void Dispose()
+    void IDisposable.Dispose()
+        => Dispose();
+
+    public void Dispose(bool closeSession = false, bool closeSocket = false)
     {
-        lock (Session._channelRegistry)
-        {
-            Session._channelRegistry.Remove(ChannelId);
-        }
+        Session.UnregisterChannel(this);
         App.Dispose();
+        if (closeSocket)
+            Socket.Dispose();
+        if (closeSession)
+            Session.Dispose();
     }
 }

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Protocol.NearShare;
 
-public class NearShareHandshakeApp : ICdpApp, ICdpAppId
+public class NearShareHandshakeApp : CdpAppBase, ICdpAppId
 {
     public static string Id { get; } = "0D472C30-80B5-4722-A279-0F3B97F0DCF2";
 
@@ -13,7 +13,7 @@ public class NearShareHandshakeApp : ICdpApp, ICdpAppId
 
     public required INearSharePlatformHandler PlatformHandler { get; init; }
 
-    public ValueTask HandleMessageAsync(CdpChannel channel, CdpMessage msg)
+    public override ValueTask HandleMessageAsync(CdpMessage msg)
     {
         CommonHeader header = msg.Header;
         BinaryReader payloadReader = msg.Read();
@@ -38,16 +38,14 @@ public class NearShareHandshakeApp : ICdpApp, ICdpAppId
         response.Add("VersionHandShakeResult", 1u);
 
         header.Flags = 0;
-        channel.SendMessage(header, (payloadWriter) =>
+        Channel.SendMessage(header, (payloadWriter) =>
         {
             payloadWriter.Write(prepend);
             response.Write(payloadWriter);
         });
 
-        channel.Dispose();
+        Channel.Dispose();
 
         return ValueTask.CompletedTask;
     }
-
-    public void Dispose() { }
 }

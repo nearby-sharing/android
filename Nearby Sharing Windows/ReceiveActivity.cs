@@ -117,7 +117,7 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
         CdpAppRegistration.TryRegisterApp<NearShareHandshakeApp>(() => new() { PlatformHandler = this });
 
         _bluetoothAdvertisement = new(this);
-        _bluetoothAdvertisement.OnDeviceConnected += BluetoothAdvertisement_OnDeviceConnected;
+        _bluetoothAdvertisement.OnDeviceConnected += OnDeviceConnected;
         _bluetoothAdvertisement.StartAdvertisement(new CdpDeviceAdvertiseOptions(
             DeviceType.Android,
             btAddress, // "00:fa:21:3e:fb:19"
@@ -159,7 +159,7 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
     public Task ScanBLeAsync(CdpScanOptions<CdpBluetoothDevice> scanOptions, CancellationToken cancellationToken = default)
         => throw new NotImplementedException();
 
-    public Task<CdpRfcommSocket> ConnectRfcommAsync(CdpBluetoothDevice device, CdpRfcommOptions options, CancellationToken cancellationToken = default)
+    public Task<CdpSocket> ConnectRfcommAsync(CdpBluetoothDevice device, CdpRfcommOptions options, CancellationToken cancellationToken = default)
         => throw new NotImplementedException();
     #endregion
 
@@ -218,15 +218,14 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
         }
     }
 
-    private void BluetoothAdvertisement_OnDeviceConnected(CdpRfcommSocket socket)
+    private void OnDeviceConnected(CdpSocket socket)
     {
         Log(0, $"Device {socket.RemoteDevice!.Name} ({socket.RemoteDevice!.Address}) connected via rfcomm");
         Task.Run(() =>
         {
-            using (BigEndianBinaryWriter writer = new(socket.OutputStream!))
-            using (BigEndianBinaryReader reader = new(socket.InputStream!))
+            var reader = socket.Reader;
+            using (socket)
             {
-                CancellationTokenSource cancellationTokenSource = new();
                 do
                 {
                     CdpSession? session = null;
@@ -235,14 +234,14 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
                         var header = CommonHeader.Parse(reader);
                         session = CdpSession.GetOrCreate(socket.RemoteDevice ?? throw new InvalidDataException(), header);
                         session.PlatformHandler = this;
-                        session.HandleMessage(header, reader, writer);
+                        session.HandleMessage(socket, header, reader);
                     }
                     catch (Exception ex)
                     {
                         Log(1, $"{ex.GetType().Name} in session {session?.LocalSessionId.ToString() ?? "null"} \n {ex.Message}");
                         throw;
                     }
-                } while (!cancellationTokenSource.IsCancellationRequested);
+                } while (!socket.IsClosed);
             }
         });
     }
@@ -289,7 +288,7 @@ static class Extensions
             BeaconData = beaconData
         };
 
-    public static CdpRfcommSocket ToCdp(this BluetoothSocket @this)
+    public static CdpSocket ToCdp(this BluetoothSocket @this)
         => new()
         {
             InputStream = @this.InputStream,

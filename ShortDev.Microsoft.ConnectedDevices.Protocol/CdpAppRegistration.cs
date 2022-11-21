@@ -1,22 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Protocol;
 
+/// <summary>
+/// Provides a global registry for static apps. <br/>
+/// (See <see cref="CdpAppBase"/>)
+/// </summary>
 public static class CdpAppRegistration
 {
-    readonly record struct AppId(string Id, string Name, Func<ICdpApp> Factory);
+    /// <summary>
+    /// Signature of a <see cref="CdpAppBase"/> factory.
+    /// </summary>
+    public delegate T CdpAppFactory<out T>() where T : CdpAppBase;
 
-    static Dictionary<string, AppId> _registration = new();
+    readonly record struct AppId(string Id, string Name, CdpAppFactory<CdpAppBase> Factory);
 
-    public static bool TryRegisterApp<TApp>() where TApp : ICdpApp, ICdpAppId, new()
+    static readonly Dictionary<string, AppId> _registration = new();
+
+    public static bool TryRegisterApp<TApp>() where TApp : CdpAppBase, ICdpAppId, new()
         => TryRegisterApp(TApp.Id, TApp.Name, () => new TApp());
 
-    public static bool TryRegisterApp<TApp>(Func<TApp> factory) where TApp : ICdpApp, ICdpAppId
-        => TryRegisterApp(TApp.Id, TApp.Name, () => factory());
+    public static bool TryRegisterApp<TApp>(CdpAppFactory<TApp> factory) where TApp : CdpAppBase, ICdpAppId
+        => TryRegisterApp(TApp.Id, TApp.Name, factory);
 
-    public static bool TryRegisterApp(string id, string name, Func<ICdpApp> factory)
+    public static bool TryRegisterApp(string id, string name, CdpAppFactory<CdpAppBase> factory)
     {
         id = id.ToLower();
         lock (_registration)
@@ -37,7 +47,7 @@ public static class CdpAppRegistration
         }
     }
 
-    internal static ICdpApp InstantiateApp(string id, string name)
+    internal static CdpAppBase InstantiateApp(string id, string name)
     {
         id = id.ToLower();
         lock (_registration)
@@ -45,11 +55,27 @@ public static class CdpAppRegistration
     }
 }
 
-public interface ICdpApp : IDisposable
+/// <summary>
+/// A cdp app is responsible for the application layer communication over an established <see cref="CdpChannel"/>. <br/>
+/// Every channel has a unique app.
+/// </summary>
+public abstract class CdpAppBase : IDisposable
 {
-    ValueTask HandleMessageAsync(CdpChannel channel, CdpMessage msg);
+    [AllowNull]
+    public CdpChannel Channel { get; internal set; }
+
+    public abstract ValueTask HandleMessageAsync(CdpMessage msg);
+
+    /// <summary>
+    /// Releases resources potentially used by the app itself.
+    /// </summary>
+    public virtual void Dispose() { }
 }
 
+/// <summary>
+/// Describes a static cdp app with well known id. <br/>
+/// Implementing apps can be instantiated without prior handshake.
+/// </summary>
 public interface ICdpAppId
 {
     static abstract string Id { get; }

@@ -1,8 +1,7 @@
-﻿namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Discovery
+﻿namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Discovery;
+
+public interface IDiscovery
 {
-    public interface IDiscovery
-    {
-        void StartDiscovery();
-        void StopDiscovery();
-    }
+    void StartDiscovery();
+    void StopDiscovery();
 }

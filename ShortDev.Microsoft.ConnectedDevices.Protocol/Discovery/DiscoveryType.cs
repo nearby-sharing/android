@@ -1,8 +1,7 @@
-﻿namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Discovery
+﻿namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Discovery;
+
+public enum DiscoveryType : byte
 {
-    public enum DiscoveryType : byte
-    {
-        ResenceRequest,
-        ResenceResponse,
-    }
+    ResenceRequest,
+    ResenceResponse,
 }

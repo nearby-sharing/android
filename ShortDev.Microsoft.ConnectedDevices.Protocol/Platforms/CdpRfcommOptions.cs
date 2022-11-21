@@ -6,6 +6,6 @@ namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms
     {
         public string? ServiceId { get; set; }
         public string? ServiceName { get; set; }
-        public Action<CdpRfcommSocket>? OnSocketConnected { get; set; }
+        public Action<CdpSocket>? OnSocketConnected { get; set; }
     }
 }
