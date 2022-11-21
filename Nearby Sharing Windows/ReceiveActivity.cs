@@ -2,6 +2,7 @@
 using Android.Bluetooth.LE;
 using Android.Views;
 using AndroidX.AppCompat.App;
+using AndroidX.Core.App;
 using AndroidX.RecyclerView.Widget;
 using Google.Android.Material.ProgressIndicator;
 using ShortDev.Android.UI;
@@ -22,12 +23,12 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
     BluetoothAdapter? _btAdapter;
     BluetoothAdvertisement? _bluetoothAdvertisement;
 
-    TextView debugLogTextView;
+    [AllowNull] TextView debugLogTextView;
 
     [AllowNull] AdapterDescriptor<TranferToken> adapterDescriptor;
     [AllowNull] RecyclerView notificationsRecyclerView;
     readonly List<TranferToken> _notifications = new();
-    protected override void OnCreate(Bundle savedInstanceState)
+    protected override void OnCreate(Bundle? savedInstanceState)
     {
         base.OnCreate(savedInstanceState);
         SetContentView(Resource.Layout.activity_receive);
@@ -40,7 +41,7 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
             return;
         }
 
-        RequestPermissions(new[] {
+        ActivityCompat.RequestPermissions(this, new[] {
             ManifestPermission.AccessFineLocation,
             ManifestPermission.AccessCoarseLocation,
             ManifestPermission.Bluetooth,
@@ -66,14 +67,24 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
                 if (transfer is FileTransferToken fileTransfer)
                 {
                     fileNameTextView.Text = fileTransfer.FileName;
-                    detailsTextView.Text = $"{fileTransfer.DeviceName} • {fileTransfer.FileSizeFormatted}";
+                    detailsTextView.Text = $"{fileTransfer.DeviceName} • {FileTransferToken.FormatFileSize(fileTransfer.FileSize)}";
 
                     var loadingProgressIndicator = view.FindViewById<CircularProgressIndicator>(Resource.Id.loadingProgressIndicator)!;
                     acceptButton.Click += (s, e) =>
                     {
-                        fileTransfer.Accept(File.Create($"/sdcard/Download/{fileTransfer.FileName}"));
-                        view.FindViewById(Resource.Id.actionsContainer)!.Visibility = Android.Views.ViewStates.Gone;
-                        loadingProgressIndicator.Visibility = Android.Views.ViewStates.Visible;
+                        fileTransfer.Accept(CreateFile(fileTransfer.FileName));
+                        view.FindViewById(Resource.Id.actionsContainer)!.Visibility = ViewStates.Gone;
+
+                        loadingProgressIndicator.Visibility = ViewStates.Visible;
+                        loadingProgressIndicator.Progress = 0;
+                        fileTransfer.Progress += (s) => RunOnUiThread(() =>
+                        {
+                            int progress = Math.Min((int)(fileTransfer.ReceivedBytes * 100 / fileTransfer.FileSize), 100);
+                            if (OperatingSystem.IsAndroidVersionAtLeast(24))
+                                loadingProgressIndicator.SetProgress(progress, true);
+                            else
+                                loadingProgressIndicator.Progress = progress;
+                        });
                     };
                 }
                 else if (transfer is UriTranferToken uriTranfer)
@@ -112,6 +123,26 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
             btAddress, // "00:fa:21:3e:fb:19"
             _btAdapter.Name!
         ));
+    }
+
+    Stream CreateFile(string name)
+    {
+        var downloadDir = Path.Combine(GetExternalMediaDirs()?.FirstOrDefault()?.AbsolutePath ?? "/sdcard/", "Download");
+        if (!Directory.Exists(downloadDir))
+            Directory.CreateDirectory(downloadDir);
+
+        var path = Path.Combine(
+            downloadDir,
+            name
+        );
+        Log(0, $"Saving file to \"{path}\"");
+        return File.Create(path);
+
+        // OutputStream cannot seek!
+        //ContentValues contentValues = new();
+        //contentValues.Put(MediaStore.IMediaColumns.RelativePath, Path.Combine(Android.OS.Environment.DirectoryDownloads!, name));
+        //var uri = ContentResolver!.Insert(MediaStore.Files.GetContentUri("external")!, contentValues)!;
+        //return ContentResolver!.OpenOutputStream(uri, "rwt")!;
     }
 
     public override bool OnOptionsItemSelected(IMenuItem item)
@@ -159,37 +190,43 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
     #region Rfcomm
     public async Task ListenRfcommAsync(CdpRfcommOptions options, CancellationToken cancellationToken = default)
     {
-        using (var listener = _btAdapter!.ListenUsingInsecureRfcommWithServiceRecord(
+        using (var securelistener = _btAdapter!.ListenUsingRfcommWithServiceRecord(
+            options.ServiceName,
+            Java.Util.UUID.FromString(options.ServiceId)
+        )!)
+        using (var insecureListener = _btAdapter!.ListenUsingInsecureRfcommWithServiceRecord(
             options.ServiceName,
             Java.Util.UUID.FromString(options.ServiceId)
         )!)
         {
-            await Task.Run(() =>
+            Func<BluetoothServerSocket, Task> processor = async (listener) =>
             {
                 while (true)
                 {
-                    var socket = listener.Accept();
+                    var socket = await listener.AcceptAsync();
                     if (cancellationToken.IsCancellationRequested)
                         return;
 
                     if (socket != null)
                         options!.OnSocketConnected!(socket.ToCdp());
                 }
-            }, cancellationToken);
-            await cancellationToken.AwaitCancellation();
-            listener.Close();
+            };
+            await Task.WhenAny(new[] {
+                Task.Run(() => processor(securelistener), cancellationToken),
+                Task.Run(() => processor(insecureListener), cancellationToken)
+            });
         }
     }
 
     private void BluetoothAdvertisement_OnDeviceConnected(CdpRfcommSocket socket)
     {
         Log(0, $"Device {socket.RemoteDevice!.Name} ({socket.RemoteDevice!.Address}) connected via rfcomm");
-        Task.Run(async () =>
+        Task.Run(() =>
         {
             using (BigEndianBinaryWriter writer = new(socket.OutputStream!))
             using (BigEndianBinaryReader reader = new(socket.InputStream!))
             {
-                bool expectMessage;
+                CancellationTokenSource cancellationTokenSource = new();
                 do
                 {
                     CdpSession? session = null;
@@ -198,14 +235,14 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
                         var header = CommonHeader.Parse(reader);
                         session = CdpSession.GetOrCreate(socket.RemoteDevice ?? throw new InvalidDataException(), header);
                         session.PlatformHandler = this;
-                        expectMessage = await session.HandleMessageAsync(header, reader, writer);
+                        session.HandleMessage(header, reader, writer);
                     }
                     catch (Exception ex)
                     {
                         Log(1, $"{ex.GetType().Name} in session {session?.LocalSessionId.ToString() ?? "null"} \n {ex.Message}");
                         throw;
                     }
-                } while (expectMessage);
+                } while (!cancellationTokenSource.IsCancellationRequested);
             }
         });
     }
@@ -247,7 +284,7 @@ static class Extensions
         => new()
         {
             Address = @this.Address,
-            Alias = @this.Alias,
+            Alias = OperatingSystem.IsAndroidVersionAtLeast(30) ? @this.Alias : null,
             Name = @this.Name,
             BeaconData = beaconData
         };

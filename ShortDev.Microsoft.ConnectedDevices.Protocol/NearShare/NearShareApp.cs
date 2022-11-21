@@ -4,7 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection.PortableExecutable;
 using System.Runtime.InteropServices;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Protocol.NearShare;
@@ -18,8 +20,9 @@ public class NearShareApp : ICdpApp
 
     const uint PartitionSize = 102400u; // 131072u
 
+    ulong transferedBytes = 0;
     ulong bytesToSend = 0;
-    FileStream? _fileStream;
+    FileTransferToken? _fileTransferToken;
 
     public async ValueTask HandleMessageAsync(CdpChannel channel, CdpMessage msg)
     {
@@ -58,17 +61,17 @@ public class NearShareApp : ICdpApp
 
                             bytesToSend = payload.Get<ulong>("BytesToSend");
 
-                            FileTransferToken fileTransferToken = new()
+                            _fileTransferToken = new()
                             {
                                 DeviceName = channel.Session.Device.Name ?? "UNKNOWN",
                                 FileName = fileNames[0],
                                 FileSize = bytesToSend
                             };
-                            PlatformHandler.OnFileTransfer(fileTransferToken);
+                            PlatformHandler.OnFileTransfer(_fileTransferToken);
 
-                            _fileStream = await fileTransferToken;
+                            await _fileTransferToken.WaitForAcceptance();
 
-                            for (uint requestedPosition = 0; requestedPosition < bytesToSend + PartitionSize; requestedPosition += PartitionSize)
+                            for (uint requestedPosition = 0; requestedPosition < bytesToSend; requestedPosition += PartitionSize)
                             {
                                 ValueSet request = new();
                                 request.Add("BlobPosition", (ulong)requestedPosition);
@@ -105,25 +108,31 @@ public class NearShareApp : ICdpApp
                     {
                         expectMessage = true;
 
-                        if (_fileStream == null)
+                        if (_fileTransferToken == null)
                             throw new InvalidOperationException();
 
                         var position = payload.Get<ulong>("BlobPosition");
                         var blob = payload.Get<List<byte>>("DataBlob");
+                        var blobSize = (ulong)blob.Count;
 
-                        var newPosition = position + (ulong)blob.Count;
-                        if (newPosition > bytesToSend + PartitionSize)
+                        var newPosition = position + blobSize;
+                        // ToDo: Why are we hitting this?!
+                        if (position > bytesToSend || blobSize > PartitionSize)
                             throw new InvalidOperationException("Device tried to send too much data!");
 
-                        PlatformHandler.Log(0, $"BlobPosition: {position}; ({newPosition * 100 / bytesToSend}%)");
-                        lock (_fileStream)
+                        // PlatformHandler.Log(0, $"BlobPosition: {position}; ({newPosition * 100 / bytesToSend}%)");
+                        lock (_fileTransferToken)
                         {
-                            _fileStream.Position = (long)position;
+                            var stream = _fileTransferToken.Stream;
+                            stream.Position = (long)position;
                             if (newPosition > bytesToSend)
-                                _fileStream.Write(CollectionsMarshal.AsSpan(blob).Slice(0, (int)(bytesToSend - position)));
+                                stream.Write(CollectionsMarshal.AsSpan(blob).Slice(0, (int)(bytesToSend - position)));
                             else
-                                _fileStream.Write(CollectionsMarshal.AsSpan(blob));
+                                stream.Write(CollectionsMarshal.AsSpan(blob));
                         }
+
+                        transferedBytes += blobSize;
+                        _fileTransferToken.ReceivedBytes = transferedBytes;
                         break;
                     }
             }

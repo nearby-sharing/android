@@ -5,6 +5,7 @@ using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using AndroidX.AppCompat.App;
+using AndroidX.Core.App;
 using AndroidX.RecyclerView.Widget;
 using Com.Microsoft.Connecteddevices;
 using Com.Microsoft.Connecteddevices.Remotesystems;
@@ -75,7 +76,7 @@ public sealed class ShareTargetSelectActivity : AppCompatActivity, View.IOnApply
 
         if (Build.VERSION.SdkInt >= BuildVersionCodes.S)
         {
-            RequestPermissions(new[] {
+            ActivityCompat.RequestPermissions(this, new[] {
                 ManifestPermission.AccessFineLocation,
                 ManifestPermission.AccessCoarseLocation,
                 ManifestPermission.BluetoothScan,
@@ -84,7 +85,7 @@ public sealed class ShareTargetSelectActivity : AppCompatActivity, View.IOnApply
         }
         else
         {
-            RequestPermissions(new[] {
+            ActivityCompat.RequestPermissions(this, new[] {
                 ManifestPermission.AccessFineLocation,
                 ManifestPermission.AccessCoarseLocation
             }, 0);
@@ -99,7 +100,7 @@ public sealed class ShareTargetSelectActivity : AppCompatActivity, View.IOnApply
     {
         if (windowInsets != null)
         {
-            if (Build.VERSION.SdkInt >= BuildVersionCodes.R)
+            if (OperatingSystem.IsAndroidVersionAtLeast(30))
             {
                 var insets = windowInsets.GetInsetsIgnoringVisibility(WindowInsets.Type.SystemBars());
                 bottomSheetFrame.SetPadding(
@@ -137,7 +138,7 @@ public sealed class ShareTargetSelectActivity : AppCompatActivity, View.IOnApply
     [AllowNull] ConnectedDevicesPlatform Platform { get; set; }
     async void InitializePlatform()
     {
-        Platform = new ConnectedDevicesPlatform(ApplicationContext);
+        Platform = new ConnectedDevicesPlatform(ApplicationContext!);
 
         // Pseudo subscriptions to make api happy
         new EventListener(Platform.AccountManager.AccessTokenRequested());
@@ -158,8 +159,8 @@ public sealed class ShareTargetSelectActivity : AppCompatActivity, View.IOnApply
         System.Diagnostics.Debug.Assert(Watcher == null, "Watcher already has been started!");
 
         List<IRemoteSystemFilter> filters = new List<IRemoteSystemFilter>();
-        filters.Add(new RemoteSystemStatusTypeFilter(RemoteSystemStatusType.Any));
-        filters.Add(new RemoteSystemAuthorizationKindFilter(RemoteSystemAuthorizationKind.Anonymous));
+        filters.Add(new RemoteSystemStatusTypeFilter(RemoteSystemStatusType.Any!));
+        filters.Add(new RemoteSystemAuthorizationKindFilter(RemoteSystemAuthorizationKind.Anonymous!));
 
         Watcher = new RemoteSystemWatcher(filters);
         new EventListener<RemoteSystemWatcher, RemoteSystemAddedEventArgs>(Watcher.RemoteSystemAdded()).Event += OnRemoteSystemAdded;
@@ -323,7 +324,7 @@ public sealed class ShareTargetSelectActivity : AppCompatActivity, View.IOnApply
         FindViewById(Resource.Id.progressUILayout)!.Visibility = ViewStates.Visible;
     }
 
-    private void CancelButton_Click(object sender, EventArgs e)
+    private void CancelButton_Click(object? sender, EventArgs e)
     {
         fileTransferOperation?.Cancel(true);
     }

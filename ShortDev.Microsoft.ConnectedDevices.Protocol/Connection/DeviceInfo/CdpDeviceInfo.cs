@@ -1,5 +1,4 @@
-﻿using ShortDev.Microsoft.ConnectedDevices.Protocol.Discovery;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Connection.DeviceInfo;
 

@@ -27,33 +27,56 @@ public sealed class FileTransferToken : TranferToken
     public required string FileName { get; init; }
 
     public required ulong FileSize { get; init; }
-    public string FileSizeFormatted
+
+
+    #region Formatting
+    public static string FormatFileSize(ulong fileSize)
     {
-        get
-        {
-            if (FileSize > Constants.GB)
-                return $"{CalcSize(FileSize, Constants.GB)} GB";
+        if (fileSize > Constants.GB)
+            return $"{CalcSize(fileSize, Constants.GB)} GB";
 
-            if (FileSize > Constants.MB)
-                return $"{CalcSize(FileSize, Constants.MB)} MB";
+        if (fileSize > Constants.MB)
+            return $"{CalcSize(fileSize, Constants.MB)} MB";
 
-            if (FileSize > Constants.KB)
-                return $"{CalcSize(FileSize, Constants.KB)} KB";
+        if (fileSize > Constants.KB)
+            return $"{CalcSize(fileSize, Constants.KB)} KB";
 
-            return $"{FileSize} B";
-        }
+        return $"{fileSize} B";
     }
 
-    decimal CalcSize(ulong size, uint unit)
+    static decimal CalcSize(ulong size, uint unit)
         => Math.Round((decimal)size / unit, 2);
+    #endregion
 
-    TaskCompletionSource<FileStream> _promise = new();
-    internal TaskAwaiter<FileStream> GetAwaiter()
-        => _promise.Task.GetAwaiter();
 
-    public void Accept(FileStream fileStream)
+    #region Acceptance
+    TaskCompletionSource<Stream> _promise = new();
+    internal Task WaitForAcceptance()
+        => _promise.Task;
+
+    internal Stream Stream
+        => _promise.Task.Result;
+
+    public void Accept(Stream fileStream)
         => _promise.SetResult(fileStream);
 
     public void Cancel()
         => _promise.SetCanceled();
+    #endregion
+
+
+    #region Progress
+    ulong _receivedBytes;
+    public ulong ReceivedBytes
+    {
+        get => _receivedBytes;
+        internal set
+        {
+            _receivedBytes = value;
+            Progress?.Invoke(this);
+        }
+    }
+
+    public event Action<FileTransferToken>? Progress;
+    #endregion
 }

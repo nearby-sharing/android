@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Formats.Asn1;
 using System.IO;
 using System.Security;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Protocol;
@@ -74,11 +75,9 @@ public sealed class CdpSession : IDisposable
     internal CdpCryptor? _cryptor = null;
     readonly CdpEncryptionInfo _localEncryption = CdpEncryptionInfo.Create(CdpEncryptionParams.Default);
     CdpEncryptionInfo? _remoteEncryption = null;
-    public async ValueTask<bool> HandleMessageAsync(CommonHeader header, BinaryReader reader, BinaryWriter writer)
+    public void HandleMessage(CommonHeader header, BinaryReader reader, BinaryWriter writer)
     {
         ThrowIfDisposed();
-
-        bool expectMessage = true;
 
         BinaryReader payloadReader = _cryptor?.Read(reader, header) ?? reader;
         {
@@ -239,17 +238,19 @@ public sealed class CdpSession : IDisposable
 
                 if (msg.IsComplete)
                 {
-                    try
+                    _ = Task.Run(async () =>
                     {
-                        var channel = _channelRegistry[header.ChannelId];
-                        await channel.HandleMessageAsync(msg);
-                    }
-                    finally
-                    {
-
-                        _msgRegistry.Remove(msg.Id);
-                        msg.Dispose();
-                    }
+                        try
+                        {
+                            var channel = _channelRegistry[header.ChannelId];
+                            await channel.HandleMessageAsync(msg);
+                        }
+                        finally
+                        {
+                            _msgRegistry.Remove(msg.Id);
+                            msg.Dispose();
+                        }
+                    });
                 }
             }
             else
@@ -261,10 +262,6 @@ public sealed class CdpSession : IDisposable
         }
 
         writer.Flush();
-
-        if (IsDisposed)
-            return false;
-        return expectMessage;
     }
 
     #region Messages
