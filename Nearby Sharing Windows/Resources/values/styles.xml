@@ -9,6 +9,7 @@
 		<item name="android:statusBarColor">?attr/colorPrimary</item>
 		<item name="actionBarTheme">@style/ThemeOverlay.Material3.Dark.ActionBar</item>
 		<item name="actionOverflowButtonStyle">@style/OverflowButtonStyle</item>
+		<item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
 	</style>
 
 	<style name="OverflowButtonStyle" parent="Widget.AppCompat.ActionButton.Overflow">

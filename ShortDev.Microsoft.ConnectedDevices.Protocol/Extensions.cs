@@ -2,6 +2,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Net.NetworkInformation;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
@@ -45,4 +46,7 @@ public static class Extensions
         result.ImportParameters(@this.ExportParameters(true));
         return result;
     }
+
+    public static string ToStringFormatted(this PhysicalAddress @this)
+        => string.Join(':', Array.ConvertAll(@this.GetAddressBytes(), (x) => x.ToString("X2")));
 }

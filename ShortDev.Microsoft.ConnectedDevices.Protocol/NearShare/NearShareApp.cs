@@ -43,10 +43,10 @@ public sealed class NearShareApp : CdpAppBase
 
         if (payload.ContainsKey("ControlMessage"))
         {
-            var msgType = (ShareControlMessageType)payload.Get<uint>("ControlMessage");
+            var msgType = (NearShareControlMsgType)payload.Get<uint>("ControlMessage");
             switch (msgType)
             {
-                case ShareControlMessageType.StartRequest:
+                case NearShareControlMsgType.StartChannelRequest:
                     {
                         var dataKind = (DataKind)payload.Get<uint>("DataKind");
                         if (dataKind == DataKind.File)
@@ -75,7 +75,7 @@ public sealed class NearShareApp : CdpAppBase
                                 request.Add("BlobPosition", (ulong)requestedPosition);
                                 request.Add("BlobSize", PartitionSize);
                                 request.Add("ContentId", 0u);
-                                request.Add("ControlMessage", (uint)ShareControlMessageType.FetchDataRequest);
+                                request.Add("ControlMessage", (uint)NearShareControlMsgType.FetchDataRequest);
 
                                 header.Flags = 0;
                                 Channel.SendMessage(header, (payloadWriter) =>
@@ -102,7 +102,7 @@ public sealed class NearShareApp : CdpAppBase
                             throw new NotImplementedException($"DataKind {dataKind} not implemented");
                         break;
                     }
-                case ShareControlMessageType.FetchDataResponse:
+                case NearShareControlMsgType.FetchDataResponse:
                     {
                         expectMessage = true;
 
@@ -141,9 +141,9 @@ public sealed class NearShareApp : CdpAppBase
         if (!expectMessage)
         {
             // Finished
-            response.Add("ControlMessage", (uint)ShareControlMessageType.StartResponse);
+            response.Add("ControlMessage", (uint)NearShareControlMsgType.StartChannelResponse);
 
-            Channel.Dispose(closeSession: true);
+            Channel.Dispose(closeSession: true, closeSocket: true);
             CdpAppRegistration.TryUnregisterApp(Id);
         }
 

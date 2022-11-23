@@ -7,35 +7,21 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
-    <com.google.android.material.appbar.AppBarLayout
+    <include
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fitsSystemWindows="true">
-
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:title="Nearby Sharing"
-            app:titleCentered="true"
-            app:titleTextColor="#fff"
-            app:subtitle="Settings"
-            app:subtitleCentered="true"
-            app:subtitleTextColor="#efefef"
-            app:menu="@menu/menu_main" />
-
-    </com.google.android.material.appbar.AppBarLayout>
+        layout="@layout/layout_appbar" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <fragment
+        <LinearLayout
             android:id="@+id/settings_container"
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
 
     </androidx.core.widget.NestedScrollView>
 

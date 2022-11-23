@@ -22,6 +22,8 @@ public sealed class MainActivity : AppCompatActivity
         //    StartActivity(intent);
         //};
 
+        UIHelper.SetupToolBar(this, "Send data to Windows 10 / 11");
+
         Button sendButton = FindViewById<Button>(Resource.Id.sendButton)!;
         sendButton.Click += SendButton_Click;
 
@@ -62,6 +64,9 @@ public sealed class MainActivity : AppCompatActivity
             StartActivity(intent);
         }
     }
+
+    public override bool OnCreateOptionsMenu(IMenu? menu)
+        => UIHelper.OnCreateOptionsMenu(this, menu);
 
     public override bool OnOptionsItemSelected(IMenuItem item)
         => UIHelper.OnOptionsItemSelected(this, item);

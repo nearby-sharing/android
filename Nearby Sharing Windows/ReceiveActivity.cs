@@ -2,7 +2,6 @@
 using Android.Bluetooth.LE;
 using Android.Views;
 using AndroidX.AppCompat.App;
-using AndroidX.Core.App;
 using AndroidX.RecyclerView.Widget;
 using Google.Android.Material.ProgressIndicator;
 using ShortDev.Android.UI;
@@ -10,10 +9,8 @@ using ShortDev.Microsoft.ConnectedDevices.Protocol;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Discovery;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.NearShare;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms;
-using ShortDev.Networking;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using ManifestPermission = Android.Manifest.Permission;
 
 namespace Nearby_Sharing_Windows;
 
@@ -31,7 +28,6 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
     protected override void OnCreate(Bundle? savedInstanceState)
     {
         base.OnCreate(savedInstanceState);
-        SetContentView(Resource.Layout.activity_receive);
 
         if (ReceiveSetupActivity.IsSetupRequired(this) || !ReceiveSetupActivity.TryGetBtAddress(this, out var btAddress) || btAddress == null)
         {
@@ -41,17 +37,10 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
             return;
         }
 
-        ActivityCompat.RequestPermissions(this, new[] {
-            ManifestPermission.AccessFineLocation,
-            ManifestPermission.AccessCoarseLocation,
-            ManifestPermission.Bluetooth,
-            ManifestPermission.BluetoothScan,
-            ManifestPermission.BluetoothConnect,
-            ManifestPermission.BluetoothAdvertise,
-            ManifestPermission.AccessBackgroundLocation,
-            ManifestPermission.ReadExternalStorage,
-            ManifestPermission.WriteExternalStorage
-        }, 0);
+        SetContentView(Resource.Layout.activity_receive);
+
+        UIHelper.RequestReceivePermissions(this);
+        UIHelper.SetupToolBar(this, "Receive data from Windows 10 / 11");
 
         notificationsRecyclerView = FindViewById<RecyclerView>(Resource.Id.notificationsRecyclerView)!;
         notificationsRecyclerView.SetLayoutManager(new LinearLayoutManager(this));
@@ -110,7 +99,7 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
         _btAdapter = service.Adapter!;
 
         FindViewById<TextView>(Resource.Id.deviceInfoTextView)!.Text = $"Visible as {_btAdapter.Name!}.\n" +
-            $"Address: {btAddress}";
+            $"Address: {btAddress.ToStringFormatted()}";
         debugLogTextView = FindViewById<TextView>(Resource.Id.debugLogTextView)!;
 
         CdpAppRegistration.TryUnregisterApp<NearShareHandshakeApp>();
@@ -144,6 +133,9 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
         //var uri = ContentResolver!.Insert(MediaStore.Files.GetContentUri("external")!, contentValues)!;
         //return ContentResolver!.OpenOutputStream(uri, "rwt")!;
     }
+
+    public override bool OnCreateOptionsMenu(IMenu? menu)
+        => UIHelper.OnCreateOptionsMenu(this, menu);
 
     public override bool OnOptionsItemSelected(IMenuItem item)
         => UIHelper.OnOptionsItemSelected(this, item);

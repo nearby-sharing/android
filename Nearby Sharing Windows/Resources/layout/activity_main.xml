@@ -6,25 +6,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.google.android.material.appbar.AppBarLayout
+    <include
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:liftOnScroll="true">
-
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:title="Nearby Sharing"
-            app:titleCentered="true"
-            app:titleTextColor="#fff"
-            app:subtitle="Send data to Windows 10 / 11"
-            app:subtitleCentered="true"
-            app:subtitleTextColor="#efefef"
-            app:menu="@menu/menu_main" />
-
-    </com.google.android.material.appbar.AppBarLayout>
+        layout="@layout/layout_appbar" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"

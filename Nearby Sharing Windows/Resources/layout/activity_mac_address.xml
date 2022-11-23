@@ -7,24 +7,10 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
-    <com.google.android.material.appbar.AppBarLayout
+    <include
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fitsSystemWindows="true"
-        app:liftOnScroll="true">
-
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:titleCentered="true"
-            app:titleTextColor="#fff"
-            app:subtitleCentered="true"
-            app:subtitleTextColor="#efefef"
-            app:menu="@menu/menu_main" />
-
-    </com.google.android.material.appbar.AppBarLayout>
+        layout="@layout/layout_appbar" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -49,31 +35,14 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="3dp"
-                android:text="Warning" />
+                android:text="Important" />
 
             <TextView
+                android:id="@+id/infoTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/warning_exp"
                 android:autoLink="web"
                 android:linksClickable="true" />
-
-            <com.google.android.material.divider.MaterialDivider
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="15dp" />
-
-            <TextView
-                style="@style/TextAppearance.AppCompat.Title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="3dp"
-                android:text="Settings" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/settings_mac_addr" />
 
             <View
                 android:layout_width="match_parent"

@@ -17,9 +17,11 @@
 		<AndroidCreatePackagePerAbi>False</AndroidCreatePackagePerAbi>
 	</PropertyGroup>
 	<ItemGroup>
+		<None Remove="Assets\MacAddressInfo.html" />
 		<None Remove="Resources\layout\activity_receive.xml" />
 		<None Remove="Resources\layout\activity_settings.xml" />
 		<None Remove="Resources\layout\item_transfer_notification.xml" />
+		<None Remove="Resources\layout\layout_appbar.xml" />
 		<None Remove="Resources\xml\preferences.xml" />
 	</ItemGroup>
 	<ItemGroup>

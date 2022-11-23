@@ -4,13 +4,13 @@
 	<item
         android:id="@+id/action_help"
 		android:icon="@drawable/ic_fluent_chat_help_24_regular"
-        android:title="Sponsor"
-		android:showAsAction="always" />
+        android:title="Help"
+		android:showAsAction="ifRoom" />
 	<item
         android:id="@+id/action_sponsor"
 		android:icon="@drawable/ic_fluent_handshake_24_selector"
         android:title="Sponsor"
-		android:showAsAction="always" />
+		android:showAsAction="ifRoom" />
 	<item
         android:id="@+id/action_settings"
         android:icon="@drawable/ic_fluent_settings_24_selector"

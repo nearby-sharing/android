@@ -1,7 +1,9 @@
 ﻿using Android.Bluetooth;
 using Android.Content;
+using Android.Views;
 using AndroidX.AppCompat.App;
 using Google.Android.Material.TextField;
+using ShortDev.Microsoft.ConnectedDevices.Protocol;
 using System.Net.NetworkInformation;
 
 namespace Nearby_Sharing_Windows;
@@ -14,6 +16,7 @@ public sealed class ReceiveSetupActivity : AppCompatActivity
         base.OnCreate(savedInstanceState);
 
         SetContentView(Resource.Layout.activity_mac_address);
+        UIHelper.SetupToolBar(this, "Setup / Information");
 
         var preferences = GetPreferences(this);
 
@@ -29,6 +32,7 @@ public sealed class ReceiveSetupActivity : AppCompatActivity
             btAddress = preferences.GetString(Preference_MacAddress, null);
         }
 
+        FindViewById<TextView>(Resource.Id.infoTextView)!.TextFormatted = UIHelper.LoadHtmlAsset(this, "MacAddressInfo.html");
         FindViewById<Button>(Resource.Id.launchSettingsButton)!.Click += (s, e) => StartActivity(new Intent(Android.Provider.Settings.ActionDeviceInfoSettings));
 
         var inputLayout = FindViewById<TextInputLayout>(Resource.Id.btMacAddressTextInputLayout)!;
@@ -51,7 +55,7 @@ public sealed class ReceiveSetupActivity : AppCompatActivity
                 inputLayout.Error = null;
 
                 preferences?.Edit()!
-                    .PutString(Preference_MacAddress, address.ToString())!
+                    .PutString(Preference_MacAddress, address.ToStringFormatted())!
                     .Commit();
 
                 StartActivity(new Intent(this, typeof(ReceiveActivity)));
@@ -106,4 +110,10 @@ public sealed class ReceiveSetupActivity : AppCompatActivity
 
         return PhysicalAddress.TryParse(addressStr.Replace(":", "").ToUpper(), out btAddress);
     }
+
+    public override bool OnCreateOptionsMenu(IMenu? menu)
+        => UIHelper.OnCreateOptionsMenu(this, menu);
+
+    public override bool OnOptionsItemSelected(IMenuItem item)
+        => UIHelper.OnOptionsItemSelected(this, item);
 }
