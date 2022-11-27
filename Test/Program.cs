@@ -1,31 +1,18 @@
-﻿using Bond;
-using Bond.IO.Unsafe;
+﻿using Bond.IO.Unsafe;
 using Bond.Protocols;
 using ShortDev.Microsoft.ConnectedDevices.Protocol;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Connection;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Connection.Authentication;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Connection.DeviceInfo;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Encryption;
-using ShortDev.Microsoft.ConnectedDevices.Protocol.NearShare;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Serialization;
 using ShortDev.Networking;
 using Spectre.Console;
-using System.IO;
-using System.Reflection.PortableExecutable;
 
 //var adapter = await BluetoothAdapter.GetDefaultAsync();
 //Debug.Print(adapter.BluetoothAddress.ToString("X"));
 
-
-// var valueSet = ValueSet.Parse(File.OpenRead(@"D:\test.bin")); // BinaryConvert.ToBytes(AnsiConsole.Ask<string>("Bytes")));
-{
-    CompactBinaryReader<InputStream> reader = new(new(File.OpenRead(@"D:\test2.bin")));
-    reader.ReadFieldBegin(out var a, out var b);
-    // var xyz = Deserialize<PropertyValue>.From(reader);
-}
-Console.ReadLine();
-
-while (true)
+while (false)
 {
     MemoryStream stream = new(BinaryConvert.ToBytes(AnsiConsole.Ask<string>("Bytes")));
     CompactBinaryReader<InputStream> reader = new(new(stream));
@@ -41,7 +28,7 @@ while (true)
     Console.ReadLine();
 }
 
-var secret = BinaryConvert.ToBytes("941b1425b0d03cc96206b8b76a3b9e1486b703a3068022753bbaf72894a1a126189a78b0252cc38097621c81fe338b5dd8734ec74f862175eacf10f0086e8d09"); //  37fc508508ba8d6d7ba7ddc79ad29fecdf855879e2a48b6811f310e80dcab98a81500925c1c8019c05b418d3bc22a870fc52d3735b43babc85c57a1fe12d4fb4"); // AnsiConsole.Ask<string>("Secret"));
+var secret = BinaryConvert.ToBytes("3036f355c9b027833f5ab36fdc0bf313bb6382394a01a40667c6e5f974ad180ab99d444f8b30cff7665c0a7c4ebd870488fdb8f44c9dd5800a060b67484c2116");
 CdpCryptor cryptor = new(secret);
 
 while (true)

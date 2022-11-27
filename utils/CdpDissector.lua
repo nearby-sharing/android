@@ -26,6 +26,7 @@ function TypeToString(type)
     if type == 3 then return "Control" end
     if type == 4 then return "Session" end
     if type == 5 then return "Ack" end
+    if type == 6 then return "ReliabilityResponse" end
     return "Unknown"
 end
 
