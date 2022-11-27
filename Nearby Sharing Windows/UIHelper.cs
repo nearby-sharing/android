@@ -50,6 +50,14 @@ internal static class UIHelper
         intent.LaunchUrl(activity, Android.Net.Uri.Parse(url));
     }
 
+    public static void OpenFile(Activity activity, string path)
+    {
+        Intent intent = new(Intent.ActionView);
+        intent.SetData(Android.Net.Uri.FromFile(new Java.IO.File(path)));
+        intent.SetFlags(ActivityFlags.GrantReadUriPermission | ActivityFlags.NewTask);
+        activity.StartActivity(intent);
+    }
+
     public static void SetupToolBar(AppCompatActivity activity, string? subtitle = null)
     {
         var toolbar = activity.FindViewById<CompatToolbar>(Resource.Id.toolbar)!;

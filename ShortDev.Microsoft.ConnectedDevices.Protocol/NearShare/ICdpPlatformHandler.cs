@@ -49,18 +49,23 @@ public sealed class FileTransferToken : TranferToken
 
 
     #region Acceptance
-    TaskCompletionSource<Stream> _promise = new();
+    TaskCompletionSource<FileStream> _promise = new();
     internal Task WaitForAcceptance()
         => _promise.Task;
 
-    internal Stream Stream
+    internal FileStream Stream
         => _promise.Task.Result;
 
-    public void Accept(Stream fileStream)
-        => _promise.SetResult(fileStream);
+    public bool IsAccepted { get; private set; }
+
+    public void Accept(FileStream fileStream)
+    {
+        _promise.SetResult(fileStream);
+        IsAccepted = true;
+    }
 
     public void Cancel()
-        => _promise.SetCanceled();
+        => _promise.TrySetCanceled();
     #endregion
 
 
@@ -72,10 +77,21 @@ public sealed class FileTransferToken : TranferToken
         internal set
         {
             _receivedBytes = value;
+            if (value >= FileSize)
+                IsTransferComplete = true;
+
             Progress?.Invoke(this);
         }
     }
 
+    public bool IsTransferComplete { get; private set; }
+
     public event Action<FileTransferToken>? Progress;
+
+    public void SetProgressListener(Action<FileTransferToken> listener)
+    {
+        ArgumentNullException.ThrowIfNull(listener);
+        Progress = listener;
+    }
     #endregion
 }

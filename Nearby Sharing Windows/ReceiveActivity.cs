@@ -9,6 +9,7 @@ using ShortDev.Microsoft.ConnectedDevices.Protocol;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Discovery;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.NearShare;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms;
+using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
@@ -50,6 +51,7 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
             (view, transfer) =>
             {
                 var acceptButton = view.FindViewById<Button>(Resource.Id.acceptButton)!;
+                var openButton = view.FindViewById<Button>(Resource.Id.openButton)!;
                 var fileNameTextView = view.FindViewById<TextView>(Resource.Id.fileNameTextView)!;
                 var detailsTextView = view.FindViewById<TextView>(Resource.Id.detailsTextView)!;
 
@@ -59,39 +61,65 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
                     detailsTextView.Text = $"{fileTransfer.DeviceName} • {FileTransferToken.FormatFileSize(fileTransfer.FileSize)}";
 
                     var loadingProgressIndicator = view.FindViewById<CircularProgressIndicator>(Resource.Id.loadingProgressIndicator)!;
-                    acceptButton.Click += (s, e) =>
+                    Action onCompleted = () =>
                     {
-                        fileTransfer.Accept(CreateFile(fileTransfer.FileName));
-                        view.FindViewById(Resource.Id.actionsContainer)!.Visibility = ViewStates.Gone;
-
-                        loadingProgressIndicator.Visibility = ViewStates.Visible;
-                        loadingProgressIndicator.Progress = 0;
-                        fileTransfer.Progress += (s) => RunOnUiThread(() =>
-                        {
-                            int progress = Math.Min((int)(fileTransfer.ReceivedBytes * 100 / fileTransfer.FileSize), 100);
-                            if (OperatingSystem.IsAndroidVersionAtLeast(24))
-                                loadingProgressIndicator.SetProgress(progress, true);
-                            else
-                                loadingProgressIndicator.Progress = progress;
-                        });
+                        acceptButton.Visibility = ViewStates.Gone;
+                        loadingProgressIndicator.Visibility = ViewStates.Gone;
+                        openButton.Visibility = ViewStates.Visible;
+                        openButton.SetOnClickListener(new DelegateClickListener((s, e) => UIHelper.OpenFile(this, GetFilePath(fileTransfer.FileName))));
                     };
+                    if (fileTransfer.IsTransferComplete)
+                        onCompleted();
+                    else
+                    {
+                        Action onAccept = () =>
+                        {
+                            if (!fileTransfer.IsAccepted)
+                                fileTransfer.Accept(CreateFile(fileTransfer.FileName));
+
+                            acceptButton.Visibility = ViewStates.Gone;
+                            loadingProgressIndicator.Visibility = ViewStates.Visible;
+
+                            loadingProgressIndicator.Progress = 0;
+                            Action<bool> onProgress = (animate) =>
+                            {
+                                int progress = Math.Min((int)(fileTransfer.ReceivedBytes * 100 / fileTransfer.FileSize), 100);
+                                if (OperatingSystem.IsAndroidVersionAtLeast(24))
+                                    loadingProgressIndicator.SetProgress(progress, animate);
+                                else
+                                    loadingProgressIndicator.Progress = progress;
+
+                                if (fileTransfer.IsTransferComplete)
+                                    onCompleted();
+                            };
+                            fileTransfer.SetProgressListener((s) => RunOnUiThread(() => onProgress(/*animate*/true)));
+                            onProgress(/*animate*/false);
+                        };
+                        if (fileTransfer.IsAccepted)
+                            onAccept();
+                        else
+                            acceptButton.SetOnClickListener(new DelegateClickListener((s, e) => onAccept()));
+                    }
                 }
                 else if (transfer is UriTranferToken uriTranfer)
                 {
                     fileNameTextView.Text = uriTranfer.Uri;
                     detailsTextView.Text = uriTranfer.DeviceName;
 
-                    acceptButton.Click += (s, e) => UIHelper.DisplayWebSite(this, uriTranfer.Uri);
+                    acceptButton.Visibility = ViewStates.Gone;
+                    openButton.Visibility = ViewStates.Visible;
+
+                    openButton.SetOnClickListener(new DelegateClickListener((s, e) => UIHelper.DisplayWebSite(this, uriTranfer.Uri)));
                 }
 
-                view.FindViewById<Button>(Resource.Id.cancelButton)!.Click += (s, e) =>
+                view.FindViewById<Button>(Resource.Id.cancelButton)!.SetOnClickListener(new DelegateClickListener((s, e) =>
                 {
                     _notifications.Remove(transfer);
                     UpdateUI();
 
                     if (transfer is FileTransferToken fileTransfer)
                         fileTransfer.Cancel();
-                };
+                }));
             }
         );
 
@@ -114,16 +142,21 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
         ));
     }
 
-    Stream CreateFile(string name)
+    string GetFilePath(string name)
     {
         var downloadDir = Path.Combine(GetExternalMediaDirs()?.FirstOrDefault()?.AbsolutePath ?? "/sdcard/", "Download");
         if (!Directory.Exists(downloadDir))
             Directory.CreateDirectory(downloadDir);
 
-        var path = Path.Combine(
+        return Path.Combine(
             downloadDir,
             name
         );
+    }
+
+    FileStream CreateFile(string name)
+    {
+        var path = GetFilePath(name);
         Log(0, $"Saving file to \"{path}\"");
         return File.Create(path);
 
