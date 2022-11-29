@@ -31,5 +31,9 @@ Check if "Nearby Sharing" is enabled in the settings of your windows device (<a 
 
 > **Note**   
 > I'm currently working on this feature   
-> It might become available as a preview version soon   
 > Track the status in [Issue #8](https://github.com/ShortDevelopment/Nearby-Sharing-Windows/issues/8)
+
+Feedback: https://forms.office.com/r/j2Fp5biXKB
+
+### My PC does not connect
+Please ensure that **no** device is connected!
