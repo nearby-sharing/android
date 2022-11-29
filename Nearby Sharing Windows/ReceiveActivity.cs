@@ -83,6 +83,8 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
                             loadingProgressIndicator.Progress = 0;
                             Action<bool> onProgress = (animate) =>
                             {
+                                loadingProgressIndicator.Indeterminate = false;
+
                                 int progress = Math.Min((int)(fileTransfer.ReceivedBytes * 100 / fileTransfer.FileSize), 100);
                                 if (OperatingSystem.IsAndroidVersionAtLeast(24))
                                     loadingProgressIndicator.SetProgress(progress, animate);
@@ -93,7 +95,7 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
                                     onCompleted();
                             };
                             fileTransfer.SetProgressListener((s) => RunOnUiThread(() => onProgress(/*animate*/true)));
-                            onProgress(/*animate*/false);
+                            loadingProgressIndicator.Indeterminate = true;
                         };
                         if (fileTransfer.IsAccepted)
                             onAccept();
@@ -215,11 +217,14 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
     #region Rfcomm
     public async Task ListenRfcommAsync(CdpRfcommOptions options, CancellationToken cancellationToken = default)
     {
-        using (var securelistener = _btAdapter!.ListenUsingRfcommWithServiceRecord(
+        if (_btAdapter == null)
+            throw new InvalidOperationException($"{nameof(_btAdapter)} is null");
+        
+        using (var insecureListener = _btAdapter.ListenUsingInsecureRfcommWithServiceRecord(
             options.ServiceName,
             Java.Util.UUID.FromString(options.ServiceId)
         )!)
-        using (var insecureListener = _btAdapter!.ListenUsingInsecureRfcommWithServiceRecord(
+        using (var securelistener = _btAdapter.ListenUsingRfcommWithServiceRecord(
             options.ServiceName,
             Java.Util.UUID.FromString(options.ServiceId)
         )!)
