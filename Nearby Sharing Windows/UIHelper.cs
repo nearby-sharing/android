@@ -5,6 +5,7 @@ using Android.Views;
 using AndroidX.AppCompat.App;
 using AndroidX.Browser.CustomTabs;
 using AndroidX.Core.App;
+using AndroidX.Core.Content;
 using CompatToolbar = AndroidX.AppCompat.Widget.Toolbar;
 using ManifestPermission = Android.Manifest.Permission;
 
@@ -53,9 +54,17 @@ internal static class UIHelper
     public static void OpenFile(Activity activity, string path)
     {
         Intent intent = new(Intent.ActionView);
-        intent.SetData(Android.Net.Uri.FromFile(new Java.IO.File(path)));
+        var contentUri = FileProvider.GetUriForFile(activity, "de.shortdev.nearshare.FileProvider", new Java.IO.File(path))!;
+
+        var mimeType = activity.ContentResolver?.GetType(contentUri);
+        if (string.IsNullOrEmpty(mimeType))
+            intent.SetData(contentUri);
+        else
+            intent.SetDataAndType(contentUri, mimeType);
+
         intent.SetFlags(ActivityFlags.GrantReadUriPermission | ActivityFlags.NewTask);
-        activity.StartActivity(intent);
+        var chooserIntent = Intent.CreateChooser(intent, $"Open {Path.GetFileName(path)}");
+        activity.StartActivity(chooserIntent);
     }
 
     public static void SetupToolBar(AppCompatActivity activity, string? subtitle = null)

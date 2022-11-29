@@ -22,6 +22,7 @@
 		<None Remove="Resources\layout\activity_settings.xml" />
 		<None Remove="Resources\layout\item_transfer_notification.xml" />
 		<None Remove="Resources\layout\layout_appbar.xml" />
+		<None Remove="Resources\xml\file_paths.xml" />
 		<None Remove="Resources\xml\preferences.xml" />
 	</ItemGroup>
 	<ItemGroup>
