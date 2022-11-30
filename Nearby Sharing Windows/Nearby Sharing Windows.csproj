@@ -7,14 +7,18 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<ApplicationId>de.shortdev.nearby_sharing_windows</ApplicationId>
-		<ApplicationVersion>8</ApplicationVersion>
-		<ApplicationDisplayVersion>1.1.0</ApplicationDisplayVersion>
+		<ApplicationVersion>9</ApplicationVersion>
+		<ApplicationDisplayVersion>1.2.0-alpha</ApplicationDisplayVersion>
 		<EnablePreviewFeatures>true</EnablePreviewFeatures>
 		<UseAndroidCrypto>true</UseAndroidCrypto>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 		<AndroidUseAapt2>True</AndroidUseAapt2>
 		<AndroidCreatePackagePerAbi>False</AndroidCreatePackagePerAbi>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+	  <EnableLLVM>True</EnableLLVM>
+	  <RunAOTCompilation>True</RunAOTCompilation>
 	</PropertyGroup>
 	<ItemGroup>
 		<None Remove="Assets\MacAddressInfo.html" />
