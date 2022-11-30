@@ -1,16 +1,18 @@
 # Nearby-Sharing-Windows
-`Nearby-Sharing-Windows` is an app for `Android`, to send files and urls from your phone to a `Windows 10 / 11` device using the windows buildin sharing functionality ([Project Rome]( https://github.com/microsoft/project-rome)).
+`Nearby-Sharing-Windows` is an app for `Android`, to send files and urls from your phone to a `Windows 10 / 11` device using the windows built-in sharing functionality ([Project Rome]( https://github.com/microsoft/project-rome)).
 
-[![grafic](https://img.shields.io/static/v1?label=PlayStore&labelColor=444&message=Download&color=green&style=for-the-badge&logo=google-play)](https://play.google.com/store/apps/details?id=de.shortdev.nearby_sharing_windows)
-
-[![grafic](https://img.shields.io/static/v1?label=Help&labelColor=444&message=FAQ&color=8BCBF0&style=for-the-badge)](/docs/FAQ)
+[![grafic](https://img.shields.io/static/v1?label=PlayStore&labelColor=444&message=Stable&color=green&style=for-the-badge&logo=google-play)](https://play.google.com/store/apps/details?id=de.shortdev.nearby_sharing_windows)
+[![grafic](https://img.shields.io/static/v1?label=PlayStore&labelColor=444&message=Preview&color=yellow&style=for-the-badge&logo=google-play)](https://play.google.com/apps/testing/de.shortdev.nearby_sharing_windows)
 
 [![grafic](https://img.shields.io/static/v1?label=Support&labelColor=efefef&message=GitHub%20Sponsors&color=EA4AAA&style=for-the-badge&logo=github-sponsors)](https://github.com/sponsors/ShortDevelopment)
+[![grafic](https://img.shields.io/static/v1?label=Help&labelColor=efefef&message=FAQ&color=8BCBF0&style=for-the-badge)](/docs/FAQ)
 
 ## Receive data
 I’m currently working on a receiving functionality (PC ➜ Android).   
-That involves creating a custom implementation of the protocol (including encryption).    
-You can track the status in [Issue #8](https://github.com/ShortDevelopment/Nearby-Sharing-Windows/issues/8).
+You can track the status in [Issue #8](https://github.com/ShortDevelopment/Nearby-Sharing-Windows/issues/8).   
+   
+[Join the Preview](https://play.google.com/apps/testing/de.shortdev.nearby_sharing_windows) to test fresh dev versions of this feature!   
+Feedback: https://forms.office.com/r/j2Fp5biXKB
 
 ## Building
 This is a new `Xamarin.Android` project based on `net6.0`.   
