@@ -7,18 +7,25 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<ApplicationId>de.shortdev.nearby_sharing_windows</ApplicationId>
-		<ApplicationVersion>9</ApplicationVersion>
-		<ApplicationDisplayVersion>1.2.0-alpha</ApplicationDisplayVersion>
+		<ApplicationVersion>10</ApplicationVersion>
+		<ApplicationDisplayVersion>1.2.1-alpha</ApplicationDisplayVersion>
 		<EnablePreviewFeatures>true</EnablePreviewFeatures>
 		<UseAndroidCrypto>true</UseAndroidCrypto>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 		<AndroidUseAapt2>True</AndroidUseAapt2>
 		<AndroidCreatePackagePerAbi>False</AndroidCreatePackagePerAbi>
+		<TrimMode>copyused</TrimMode>
+		<AndroidLinkTool>r8</AndroidLinkTool>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 	  <EnableLLVM>True</EnableLLVM>
-	  <RunAOTCompilation>True</RunAOTCompilation>
+	  <RunAOTCompilation>False</RunAOTCompilation>
+	  <TrimMode>copyused</TrimMode>
+	  <AndroidLinkTool>r8</AndroidLinkTool>
+	  <AndroidPackageFormat>aab</AndroidPackageFormat>
+	  <AndroidUseAapt2>True</AndroidUseAapt2>
+	  <AndroidCreatePackagePerAbi>False</AndroidCreatePackagePerAbi>
 	</PropertyGroup>
 	<ItemGroup>
 		<None Remove="Assets\MacAddressInfo.html" />
