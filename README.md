@@ -5,14 +5,16 @@
 [![grafic](https://img.shields.io/static/v1?label=PlayStore&labelColor=444&message=Preview&color=yellow&style=for-the-badge&logo=google-play)](https://play.google.com/apps/testing/de.shortdev.nearby_sharing_windows)
 
 [![grafic](https://img.shields.io/static/v1?label=Support&labelColor=efefef&message=GitHub%20Sponsors&color=EA4AAA&style=for-the-badge&logo=github-sponsors)](https://github.com/sponsors/ShortDevelopment)
-[![grafic](https://img.shields.io/static/v1?label=Help&labelColor=efefef&message=FAQ&color=8BCBF0&style=for-the-badge)](/docs/FAQ)
+
+[![grafic](https://img.shields.io/static/v1?label=Help&message=FAQ&color=8BCBF0&style=for-the-badge&logo=GitHubPages)](/docs/FAQ)
+[![grafic](https://img.shields.io/static/v1?label=GitHub&message=Source-Code&style=for-the-badge&logo=GitHub)](https://github.com/ShortDevelopment/Nearby-Sharing-Windows/)
 
 ## Receive data
 I’m currently working on a receiving functionality (PC ➜ Android).   
 You can track the status in [Issue #8](https://github.com/ShortDevelopment/Nearby-Sharing-Windows/issues/8).   
    
 [Join the Preview](https://play.google.com/apps/testing/de.shortdev.nearby_sharing_windows) to test fresh dev versions of this feature!   
-Feedback: https://forms.office.com/r/j2Fp5biXKB
+Feedback: [forms.office.com](https://forms.office.com/r/j2Fp5biXKB)
 
 ## Building
 This is a new `Xamarin.Android` project based on `net6.0`.   
