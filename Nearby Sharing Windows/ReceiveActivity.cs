@@ -1,5 +1,7 @@
 ﻿using Android.Bluetooth;
 using Android.Bluetooth.LE;
+using Android.Content.PM;
+using Android.Runtime;
 using Android.Views;
 using AndroidX.AppCompat.App;
 using AndroidX.RecyclerView.Widget;
@@ -9,9 +11,9 @@ using ShortDev.Microsoft.ConnectedDevices.Protocol;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Discovery;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.NearShare;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms;
-using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Net.NetworkInformation;
 
 namespace Nearby_Sharing_Windows;
 
@@ -26,11 +28,13 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
     [AllowNull] AdapterDescriptor<TranferToken> adapterDescriptor;
     [AllowNull] RecyclerView notificationsRecyclerView;
     readonly List<TranferToken> _notifications = new();
+
+    PhysicalAddress? btAddress = null;
     protected override void OnCreate(Bundle? savedInstanceState)
     {
         base.OnCreate(savedInstanceState);
 
-        if (ReceiveSetupActivity.IsSetupRequired(this) || !ReceiveSetupActivity.TryGetBtAddress(this, out var btAddress) || btAddress == null)
+        if (ReceiveSetupActivity.IsSetupRequired(this) || !ReceiveSetupActivity.TryGetBtAddress(this, out btAddress) || btAddress == null)
         {
             StartActivity(new Android.Content.Intent(this, typeof(ReceiveSetupActivity)));
 
@@ -124,6 +128,12 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
                 }));
             }
         );
+    }
+
+    void InitializeCDP()
+    {
+        if (btAddress == null)
+            throw new NullReferenceException(nameof(btAddress));
 
         var service = (BluetoothManager)GetSystemService(BluetoothService)!;
         _btAdapter = service.Adapter!;
@@ -167,6 +177,14 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
         //contentValues.Put(MediaStore.IMediaColumns.RelativePath, Path.Combine(Android.OS.Environment.DirectoryDownloads!, name));
         //var uri = ContentResolver!.Insert(MediaStore.Files.GetContentUri("external")!, contentValues)!;
         //return ContentResolver!.OpenOutputStream(uri, "rwt")!;
+    }
+
+    public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
+    {
+        if (!grantResults.All((x) => x != Permission.Granted))
+            InitializeCDP();
+        else
+            Toast.MakeText(this, "Can't receive without permissions!", ToastLength.Long)!.Show();
     }
 
     public override bool OnCreateOptionsMenu(IMenu? menu)
@@ -219,7 +237,7 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
     {
         if (_btAdapter == null)
             throw new InvalidOperationException($"{nameof(_btAdapter)} is null");
-        
+
         using (var insecureListener = _btAdapter.ListenUsingInsecureRfcommWithServiceRecord(
             options.ServiceName,
             Java.Util.UUID.FromString(options.ServiceId)
