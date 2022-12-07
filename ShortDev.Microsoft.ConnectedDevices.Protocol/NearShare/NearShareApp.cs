@@ -142,9 +142,6 @@ public sealed class NearShareApp : CdpAppBase
         {
             // Finished
             response.Add("ControlMessage", (uint)NearShareControlMsgType.StartChannelResponse);
-
-            Channel.Dispose(closeSession: true, closeSocket: true);
-            CdpAppRegistration.TryUnregisterApp(Id);
         }
 
         header.Flags = 0;
@@ -153,5 +150,11 @@ public sealed class NearShareApp : CdpAppBase
             payloadWriter.Write(prepend);
             response.Write(payloadWriter);
         });
+
+        if (!expectMessage)
+        {
+            Channel.Dispose(closeSession: true, closeSocket: true);
+            CdpAppRegistration.TryUnregisterApp(Id);
+        }
     }
 }
