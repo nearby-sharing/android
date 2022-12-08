@@ -45,7 +45,7 @@ public sealed class NearShareApp : CdpAppBase
             var msgType = (NearShareControlMsgType)payload.Get<uint>("ControlMessage");
             switch (msgType)
             {
-                case NearShareControlMsgType.StartChannelRequest:
+                case NearShareControlMsgType.StartTransfer:
                     {
                         var dataKind = (DataKind)payload.Get<uint>("DataKind");
                         if (dataKind == DataKind.File)
@@ -66,7 +66,16 @@ public sealed class NearShareApp : CdpAppBase
                             };
                             PlatformHandler.OnFileTransfer(_fileTransferToken);
 
-                            await _fileTransferToken.WaitForAcceptance();
+                            try
+                            {
+                                await _fileTransferToken.WaitForAcceptance();
+                            }
+                            catch (TaskCanceledException)
+                            {
+                                SendCancel(header, prepend);
+                                CloseChannel();
+                                throw;
+                            }
 
                             ulong requestedPosition = 0;
                             for (; requestedPosition + PartitionSize < bytesToSend; requestedPosition += PartitionSize)
@@ -125,7 +134,7 @@ public sealed class NearShareApp : CdpAppBase
         if (!expectMessage)
         {
             // Finished
-            response.Add("ControlMessage", (uint)NearShareControlMsgType.StartChannelResponse);
+            response.Add("ControlMessage", (uint)NearShareControlMsgType.CompleteTransfer);
         }
 
         header.Flags = 0;
@@ -136,10 +145,7 @@ public sealed class NearShareApp : CdpAppBase
         });
 
         if (!expectMessage)
-        {
-            Channel.Dispose(closeSession: true, closeSocket: true);
-            CdpAppRegistration.TryUnregisterApp(Id);
-        }
+            CloseChannel();
     }
 
     void RequestBlob(CommonHeader header, byte[] prepend, ulong requestedPosition, uint size = PartitionSize)
@@ -156,5 +162,24 @@ public sealed class NearShareApp : CdpAppBase
             payloadWriter.Write(prepend);
             request.Write(payloadWriter);
         });
+    }
+
+    void SendCancel(CommonHeader header, byte[] prepend)
+    {
+        ValueSet request = new();
+        request.Add("ControlMessage", (uint)NearShareControlMsgType.CancelTransfer);
+
+        header.Flags = 0;
+        Channel.SendMessage(header, (payloadWriter) =>
+        {
+            payloadWriter.Write(prepend);
+            request.Write(payloadWriter);
+        });
+    }
+
+    void CloseChannel()
+    {
+        Channel.Dispose(closeSession: true, closeSocket: true);
+        CdpAppRegistration.TryUnregisterApp(Id);
     }
 }

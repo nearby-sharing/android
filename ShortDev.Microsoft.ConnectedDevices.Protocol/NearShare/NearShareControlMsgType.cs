@@ -2,11 +2,11 @@
 
 internal enum NearShareControlMsgType
 {
-    StartChannelRequest = 1,
-    StartChannelResponse = 2,
+    StartTransfer = 1,
+    CompleteTransfer = 2,
     FetchDataRequest = 3,
     FetchDataResponse = 4,
-    Cancel = 5,
+    CancelTransfer = 5,
     HandShakeRequest = 6,
     HandShakeResult = 7
 }
