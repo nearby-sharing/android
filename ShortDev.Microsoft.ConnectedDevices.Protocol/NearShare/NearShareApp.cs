@@ -36,11 +36,10 @@ public sealed class NearShareApp : CdpAppBase
 
         header.AdditionalHeaders.RemoveAll((x) => x.Type == AdditionalHeaderType.CorrelationVector);
 
-        if (header.HasFlag(MessageFlags.ShouldAck))
-            Channel.SendAck(header);
+        // if (header.HasFlag(MessageFlags.ShouldAck))
+        //      Channel.SendAck(header);
 
         ValueSet response = new();
-
         if (payload.ContainsKey("ControlMessage"))
         {
             var msgType = (NearShareControlMsgType)payload.Get<uint>("ControlMessage");
@@ -69,21 +68,10 @@ public sealed class NearShareApp : CdpAppBase
 
                             await _fileTransferToken.WaitForAcceptance();
 
-                            for (uint requestedPosition = 0; requestedPosition < bytesToSend; requestedPosition += PartitionSize)
-                            {
-                                ValueSet request = new();
-                                request.Add("BlobPosition", (ulong)requestedPosition);
-                                request.Add("BlobSize", PartitionSize);
-                                request.Add("ContentId", 0u);
-                                request.Add("ControlMessage", (uint)NearShareControlMsgType.FetchDataRequest);
-
-                                header.Flags = 0;
-                                Channel.SendMessage(header, (payloadWriter) =>
-                                {
-                                    payloadWriter.Write(prepend);
-                                    request.Write(payloadWriter);
-                                });
-                            }
+                            ulong requestedPosition = 0;
+                            for (; requestedPosition + PartitionSize < bytesToSend; requestedPosition += PartitionSize)
+                                RequestBlob(header, prepend, requestedPosition);
+                            RequestBlob(header, prepend, requestedPosition, (uint)(bytesToSend - requestedPosition));
 
                             return;
                         }
@@ -104,8 +92,6 @@ public sealed class NearShareApp : CdpAppBase
                     }
                 case NearShareControlMsgType.FetchDataResponse:
                     {
-                        expectMessage = true;
-
                         if (_fileTransferToken == null)
                             throw new InvalidOperationException();
 
@@ -114,7 +100,6 @@ public sealed class NearShareApp : CdpAppBase
                         var blobSize = (ulong)blob.Count;
 
                         var newPosition = position + blobSize;
-                        // ToDo: Why are we hitting this?!
                         if (position > bytesToSend || blobSize > PartitionSize)
                             throw new InvalidOperationException("Device tried to send too much data!");
 
@@ -123,14 +108,13 @@ public sealed class NearShareApp : CdpAppBase
                         {
                             var stream = _fileTransferToken.Stream;
                             stream.Position = (long)position;
-                            if (newPosition > bytesToSend)
-                                stream.Write(CollectionsMarshal.AsSpan(blob).Slice(0, (int)(bytesToSend - position)));
-                            else
-                                stream.Write(CollectionsMarshal.AsSpan(blob));
+                            stream.Write(CollectionsMarshal.AsSpan(blob));
                         }
 
                         transferedBytes += blobSize;
                         _fileTransferToken.ReceivedBytes = transferedBytes;
+
+                        expectMessage = !_fileTransferToken.IsTransferComplete;
                         break;
                     }
             }
@@ -156,5 +140,21 @@ public sealed class NearShareApp : CdpAppBase
             Channel.Dispose(closeSession: true, closeSocket: true);
             CdpAppRegistration.TryUnregisterApp(Id);
         }
+    }
+
+    void RequestBlob(CommonHeader header, byte[] prepend, ulong requestedPosition, uint size = PartitionSize)
+    {
+        ValueSet request = new();
+        request.Add("BlobPosition", requestedPosition);
+        request.Add("BlobSize", size);
+        request.Add("ContentId", 0u);
+        request.Add("ControlMessage", (uint)NearShareControlMsgType.FetchDataRequest);
+
+        header.Flags = 0;
+        Channel.SendMessage(header, (payloadWriter) =>
+        {
+            payloadWriter.Write(prepend);
+            request.Write(payloadWriter);
+        });
     }
 }
