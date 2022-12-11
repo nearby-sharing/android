@@ -27,8 +27,4 @@
 		<None Include="../utils/CdpDissector.lua" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="Connection\TransportUpgrade\" />
-	</ItemGroup>
-
 </Project>

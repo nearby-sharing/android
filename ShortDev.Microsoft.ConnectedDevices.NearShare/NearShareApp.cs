@@ -1,13 +1,10 @@
-﻿using ShortDev.Microsoft.ConnectedDevices.Protocol.Serialization;
+﻿using ShortDev.Microsoft.ConnectedDevices.Protocol;
+using ShortDev.Microsoft.ConnectedDevices.Protocol.Serialization;
 using ShortDev.Networking;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 
-namespace ShortDev.Microsoft.ConnectedDevices.Protocol.NearShare;
+namespace ShortDev.Microsoft.ConnectedDevices.NearShare;
 
 public sealed class NearShareApp : CdpAppBase
 {

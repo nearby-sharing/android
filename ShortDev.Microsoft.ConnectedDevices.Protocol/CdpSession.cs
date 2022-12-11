@@ -3,7 +3,6 @@ using ShortDev.Microsoft.ConnectedDevices.Protocol.Connection.Authentication;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Connection.DeviceInfo;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Control;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Encryption;
-using ShortDev.Microsoft.ConnectedDevices.Protocol.NearShare;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms;
 using System;
 using System.Collections.Generic;
@@ -72,7 +71,7 @@ public sealed class CdpSession : IDisposable
     }
     #endregion
 
-    public INearSharePlatformHandler? PlatformHandler { get; set; } = null;
+    public ICdpPlatformHandler? PlatformHandler { get; set; } = null;
 
     internal CdpCryptor? Cryptor = null;
     readonly CdpEncryptionInfo _localEncryption = CdpEncryptionInfo.Create(CdpEncryptionParams.Default);
@@ -146,6 +145,7 @@ public sealed class CdpSession : IDisposable
                         }
                     case ConnectionType.UpgradeRequest:
                         {
+                            payloadReader.PrintPayload();
                             header.Flags = 0;
                             Cryptor!.EncryptMessage(writer, header, (writer) =>
                             {

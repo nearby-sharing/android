@@ -1,4 +1,4 @@
-﻿namespace ShortDev.Microsoft.ConnectedDevices.Protocol.NearShare;
+﻿namespace ShortDev.Microsoft.ConnectedDevices.NearShare;
 
 internal enum NearShareControlMsgType
 {

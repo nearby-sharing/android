@@ -12,12 +12,6 @@
 		<EnablePreviewFeatures>true</EnablePreviewFeatures>
 		<UseAndroidCrypto>true</UseAndroidCrypto>
 	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-		<AndroidUseAapt2>True</AndroidUseAapt2>
-		<AndroidCreatePackagePerAbi>False</AndroidCreatePackagePerAbi>
-		<TrimMode>copyused</TrimMode>
-		<AndroidLinkTool>r8</AndroidLinkTool>
-	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 	  <EnableLLVM>True</EnableLLVM>
 	  <RunAOTCompilation>False</RunAOTCompilation>
@@ -52,10 +46,7 @@
 			<Project>{9cd32cf6-76dc-46de-afa6-47b008ad17a7}</Project>
 			<Name>ShortDev.Microsoft.ConnectedDevices.AndroidSdk</Name>
 		</ProjectReference>
-		<ProjectReference Include="..\ShortDev.Microsoft.ConnectedDevices.Protocol\ShortDev.Microsoft.ConnectedDevices.Protocol.csproj">
-			<Project>{6ebe41db-aefb-45c0-a5e1-8a4352cc4b8e}</Project>
-			<Name>ShortDev.Microsoft.ConnectedDevices.Protocol</Name>
-		</ProjectReference>
+		<ProjectReference Include="..\ShortDev.Microsoft.ConnectedDevices.NearShare\ShortDev.Microsoft.ConnectedDevices.NearShare.csproj" />
 		<ProjectReference Include="..\ShortDev.Networking\ShortDev.Networking.csproj">
 			<Project>{18fcc134-71cc-4be9-9271-3839a6ffe380}</Project>
 			<Name>ShortDev.Networking</Name>

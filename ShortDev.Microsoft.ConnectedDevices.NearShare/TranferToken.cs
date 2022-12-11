@@ -1,15 +1,6 @@
-﻿using System;
-using System.IO;
-using System.Threading.Tasks;
+﻿using ShortDev.Microsoft.ConnectedDevices.Protocol;
 
-namespace ShortDev.Microsoft.ConnectedDevices.Protocol.NearShare;
-
-public interface INearSharePlatformHandler
-{
-    void Log(int level, string message);
-    void OnReceivedUri(UriTranferToken transfer);
-    void OnFileTransfer(FileTransferToken transfer);
-}
+namespace ShortDev.Microsoft.ConnectedDevices.NearShare;
 
 public abstract class TranferToken
 {
