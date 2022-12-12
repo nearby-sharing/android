@@ -1,8 +1,10 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Protocol.Connection;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Connection.Authentication;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Connection.DeviceInfo;
+using ShortDev.Microsoft.ConnectedDevices.Protocol.Connection.TransportUpgrade;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Control;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Encryption;
+using ShortDev.Microsoft.ConnectedDevices.Protocol.Exceptions;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms;
 using System;
 using System.Collections.Generic;
@@ -41,14 +43,14 @@ public sealed class CdpSession : IDisposable
             lock (_registration)
             {
                 if (!_registration.ContainsKey(localSessionId))
-                    throw new Exception("Session not found");
+                    throw new CdpSessionException("Session not found");
 
                 var result = _registration[localSessionId];
                 if (result.RemoteSessionId != remoteSessionId)
-                    throw new Exception($"Wrong {nameof(RemoteSessionId)}");
+                    throw new CdpSessionException($"Wrong {nameof(RemoteSessionId)}");
 
                 if (result.Device.Address != device.Address)
-                    throw new Exception("Wrong device!");
+                    throw new CdpSessionException("Wrong device!");
 
                 result.ThrowIfDisposed();
 
@@ -126,7 +128,7 @@ public sealed class CdpSession : IDisposable
                         {
                             var authRequest = AuthenticationPayload.Parse(payloadReader);
                             if (!authRequest.VerifyThumbprint(_localEncryption.Nonce, _remoteEncryption!.Nonce))
-                                throw new Exception("Invalid thumbprint");
+                                throw new CdpSecurityException("Invalid thumbprint");
 
                             header.Flags = 0;
                             Cryptor!.EncryptMessage(writer, header, (writer) =>
@@ -145,20 +147,30 @@ public sealed class CdpSession : IDisposable
                         }
                     case ConnectionType.UpgradeRequest:
                         {
-                            payloadReader.PrintPayload();
+                            var msg = UpgradeRequest.Parse(payloadReader);
+
                             header.Flags = 0;
                             Cryptor!.EncryptMessage(writer, header, (writer) =>
                             {
                                 new ConnectionHeader()
                                 {
                                     ConnectionMode = ConnectionMode.Proximal,
-                                    MessageType = ConnectionType.UpgradeFailure // We currently only support BT
+                                    MessageType = ConnectionType.UpgradeResponse
                                 }.Write(writer);
-                                new HResultPayload()
+                                new UpgradeResponse()
                                 {
-                                    HResult = 1 // Failure: Anything != 0
+                                    HostEndpoints = new[]
+                                    {
+                                        new HostEndpointMetadata(EndpointType.Tcp, PlatformHandler!.GetLocalIP(), "5050")
+                                    }
                                 }.Write(writer);
+                                msg.Write(writer, writeId: false);
                             });
+                            break;
+                        }
+                    case ConnectionType.UpgradeFinalization:
+                        {
+                            payloadReader.PrintPayload();
                             break;
                         }
                     case ConnectionType.AuthDoneRequest:
@@ -194,7 +206,7 @@ public sealed class CdpSession : IDisposable
                             break;
                         }
                     default:
-                        throw UnexpectedMessage();
+                        throw UnexpectedMessage(connectionHeader.MessageType.ToString());
                 }
             }
             else if (header.Type == MessageType.Control)
@@ -231,7 +243,7 @@ public sealed class CdpSession : IDisposable
                             break;
                         }
                     default:
-                        throw UnexpectedMessage();
+                        throw UnexpectedMessage(controlHeader.MessageType.ToString());
                 }
             }
             else if (header.Type == MessageType.Session)
@@ -307,7 +319,7 @@ public sealed class CdpSession : IDisposable
     #endregion
 
     Exception UnexpectedMessage(string? info = null)
-        => new SecurityException($"Recieved unexpected message {info ?? "null"}");
+        => new CdpSecurityException($"Recieved unexpected message {info ?? "null"}");
 
     public bool IsDisposed { get; private set; } = false;
 

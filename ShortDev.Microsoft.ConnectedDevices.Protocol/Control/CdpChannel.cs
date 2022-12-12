@@ -3,7 +3,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace ShortDev.Microsoft.ConnectedDevices.Protocol;
+namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Control;
 
 /// <summary>
 /// Provides the interface between a <see cref="CdpAppBase"/> and a <see cref="CdpSession"/>. <br/>

@@ -1,6 +1,6 @@
 ﻿namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Connection.TransportUpgrade;
 
-public enum EndpointType
+public enum EndpointType : ushort
 {
     Unknown = 0,
     Udp = 1,

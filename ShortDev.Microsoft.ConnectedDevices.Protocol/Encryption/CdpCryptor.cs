@@ -1,9 +1,9 @@
 ﻿#define CheckHmac
 
+using ShortDev.Microsoft.ConnectedDevices.Protocol.Exceptions;
 using ShortDev.Networking;
 using System;
 using System.Buffers.Binary;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -74,14 +74,14 @@ public sealed class CdpCryptor
         if (header.HasFlag(MessageFlags.HasHMAC))
         {
             if (hmac == null || hmac.Length != Constants.HMacSize)
-                throw new InvalidDataException("Invalid hmac!");
+                throw new CdpSecurityException("Invalid hmac!");
 
             byte[] buffer = ((ICdpWriteable)header).ToArray().Concat(payload).ToArray();
             AlterMessageLengthUnsafe(buffer, -Constants.HMacSize);
 
             var expectedHMac = ComputeHmac(buffer);
             if (!hmac.SequenceEqual(expectedHMac))
-                throw new InvalidDataException("Invalid hmac!");
+                throw new CdpSecurityException("Invalid hmac!");
         }
 
         return decryptedPayload;
@@ -159,7 +159,7 @@ public sealed class CdpCryptor
         if (payloadLength != decryptedPayload.Length - sizeof(Int32))
         {
             payloadReader.Dispose();
-            throw new InvalidDataException($"Expected payload to be {payloadLength} bytes long");
+            throw new CdpSecurityException($"Expected payload to be {payloadLength} bytes long");
         }
 
         return payloadReader;

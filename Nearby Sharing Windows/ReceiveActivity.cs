@@ -1,6 +1,8 @@
 ﻿using Android.Bluetooth;
 using Android.Bluetooth.LE;
+using Android.Content;
 using Android.Content.PM;
+using Android.Net.Wifi;
 using Android.Runtime;
 using Android.Views;
 using AndroidX.AppCompat.App;
@@ -13,7 +15,9 @@ using ShortDev.Microsoft.ConnectedDevices.Protocol.Discovery;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Net;
 using System.Net.NetworkInformation;
+using System.Net.Sockets;
 
 namespace Nearby_Sharing_Windows;
 
@@ -152,6 +156,10 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
             btAddress, // "00:fa:21:3e:fb:19"
             _btAdapter.Name!
         ));
+
+        NetworkAdvertisement networkAdvertisement = new();
+        networkAdvertisement.OnDeviceConnected += OnDeviceConnected;
+        networkAdvertisement.StartAdvertisement(null);
     }
 
     string GetFilePath(string name)
@@ -302,6 +310,14 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
         {
             debugLogTextView.Text += "\n" + $"[{DateTime.Now.ToString("HH:mm:ss")}]: {message}";
         });
+    }
+
+    public string GetLocalIP()
+    {
+        WifiManager wifiManager = (WifiManager)GetSystemService(WifiService)!;
+        WifiInfo wifiInfo = wifiManager.ConnectionInfo!;
+        int ip = wifiInfo.IpAddress;
+        return new IPAddress(ip).ToString();
     }
 
     void UpdateUI()

@@ -10,7 +10,7 @@ public sealed class CdpEncryptionParams
     public CdpEncryptionParams FromCurveType(CurveType curveType)
     {
         if (curveType != CurveType.CT_NIST_P256_KDF_SHA512)
-            throw new ArgumentException(nameof(curveType));
+            throw new ArgumentException("Invalid curve type", nameof(curveType));
         return new();
     }
 

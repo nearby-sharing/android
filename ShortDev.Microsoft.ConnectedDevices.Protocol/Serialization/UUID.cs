@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Serialization;
 
@@ -21,7 +22,7 @@ public partial class UUID
     {
         Span<byte> buffer = stackalloc byte[16];
         if (!value.TryWriteBytes(buffer))
-            throw new Exception("Could not convert");
+            throw new InvalidDataException("Could not convert");
 
         fixed (byte* pBuffer = buffer)
         {

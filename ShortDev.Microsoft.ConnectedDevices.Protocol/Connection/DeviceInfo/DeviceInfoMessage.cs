@@ -1,4 +1,5 @@
-﻿using ShortDev.Networking;
+﻿using ShortDev.Microsoft.ConnectedDevices.Protocol.Exceptions;
+using ShortDev.Networking;
 using System.IO;
 using System.Text.Json;
 
@@ -12,7 +13,7 @@ public sealed class DeviceInfoMessage : ICdpPayload<DeviceInfoMessage>
     public static DeviceInfoMessage Parse(BinaryReader reader)
         => new()
         {
-            DeviceInfo = JsonSerializer.Deserialize<CdpDeviceInfo>(reader.ReadStringWithLength()) ?? throw new InvalidDataException()
+            DeviceInfo = JsonSerializer.Deserialize<CdpDeviceInfo>(reader.ReadStringWithLength()) ?? throw new CdpProtocolException("Invalid device info")
         };
 
     /// <summary>

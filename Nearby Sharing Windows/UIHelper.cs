@@ -79,6 +79,7 @@ internal static class UIHelper
         ActivityCompat.RequestPermissions(activity, new[] {
             ManifestPermission.AccessFineLocation,
             ManifestPermission.AccessCoarseLocation,
+            ManifestPermission.AccessWifiState,
             ManifestPermission.Bluetooth,
             ManifestPermission.BluetoothScan,
             ManifestPermission.BluetoothConnect,

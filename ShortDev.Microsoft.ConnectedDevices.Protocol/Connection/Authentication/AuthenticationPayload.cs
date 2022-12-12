@@ -1,4 +1,5 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Protocol.Encryption;
+using ShortDev.Microsoft.ConnectedDevices.Protocol.Exceptions;
 using ShortDev.Networking;
 using System;
 using System.IO;
@@ -59,7 +60,7 @@ public sealed class AuthenticationPayload : ICdpPayload<AuthenticationPayload>
     /// <exception cref="InvalidDataException"></exception>
     public bool VerifyThumbprint(CdpNonce hostNonce, CdpNonce clientNonce)
     {
-        var publicKey = Certificate.GetECDsaPublicKey() ?? throw new InvalidDataException("Invalid certificate!");
+        var publicKey = Certificate.GetECDsaPublicKey() ?? throw new CdpSecurityException("Invalid certificate!");
         return publicKey.VerifyData(MergeNoncesWithCertificate(Certificate, hostNonce, clientNonce), SignedThumbprint, thumbprintHashType);
     }
 
