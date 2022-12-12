@@ -15,39 +15,15 @@ public sealed class UpgradeRequest : ICdpPayload<UpgradeRequest>
     public required TransportEndpoint[] Endpoints { get; init; }
 
     public static UpgradeRequest Parse(BinaryReader reader)
-    {
-        Guid id = new(reader.ReadBytes(16));
-
-        var arrayLength = reader.ReadUInt16();
-        var endpoints = new TransportEndpoint[arrayLength];
-        for (int i = 0; i < arrayLength; i++)
+        => new()
         {
-            var type = (EndpointType)reader.ReadUInt16();
-            var length = reader.ReadInt32();
-            var data = reader.ReadBytes(length);
-            endpoints[i] = new(type, data);
-        }
-        return new()
-        {
-            UpgradeId = id,
-            Endpoints = endpoints
+            UpgradeId = new(reader.ReadBytes(16)),
+            Endpoints = TransportEndpoint.ParseArray(reader)
         };
-    }
 
-    void ICdpWriteable.Write(BinaryWriter writer)
-        => Write(writer, writeId: true);
-
-    public void Write(BinaryWriter writer, bool writeId = true)
+    public void Write(BinaryWriter writer)
     {
-        if (writeId)
-            writer.Write(UpgradeId.ToByteArray());
-
-        writer.Write((ushort)Endpoints.Length);
-        foreach (var endpoint in Endpoints)
-        {
-            writer.Write((ushort)endpoint.Type);
-            writer.Write((uint)endpoint.Data.Length);
-            writer.Write(endpoint.Data);
-        }
+        writer.Write(UpgradeId.ToByteArray());
+        TransportEndpoint.WriteArray(writer, Endpoints);
     }
 }

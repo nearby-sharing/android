@@ -1,5 +1,4 @@
-﻿using ShortDev.Microsoft.ConnectedDevices.Protocol.Connection.TransportUpgrade;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Connection.DeviceInfo;
 
@@ -26,7 +25,7 @@ public sealed class CdpDeviceInfo
 public sealed class Endpoint
 {
     [JsonPropertyName("endpointType")]
-    public EndpointType EndpointType { get; set; }
+    public CdpTransportType EndpointType { get; set; }
 
     [JsonPropertyName("host")]
     public string? Host { get; set; }

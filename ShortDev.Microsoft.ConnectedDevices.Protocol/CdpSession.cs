@@ -9,6 +9,8 @@ using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Security;
 using System.Threading.Tasks;
 
@@ -49,8 +51,9 @@ public sealed class CdpSession : IDisposable
                 if (result.RemoteSessionId != remoteSessionId)
                     throw new CdpSessionException($"Wrong {nameof(RemoteSessionId)}");
 
-                if (result.Device.Address != device.Address)
-                    throw new CdpSessionException("Wrong device!");
+                // ToDo: Security (Upgrade -> address change)
+                //if (result.Device.Address != device.Address)
+                //    throw new CdpSessionException("Wrong device!");
 
                 result.ThrowIfDisposed();
 
@@ -148,6 +151,7 @@ public sealed class CdpSession : IDisposable
                     case ConnectionType.UpgradeRequest:
                         {
                             var msg = UpgradeRequest.Parse(payloadReader);
+                            PlatformHandler?.Log(0, $"Upgrade request {msg.UpgradeId} to {string.Join(',', msg.Endpoints.Select((x) => x.Type.ToString()))}");
 
                             header.Flags = 0;
                             Cryptor!.EncryptMessage(writer, header, (writer) =>
@@ -161,16 +165,53 @@ public sealed class CdpSession : IDisposable
                                 {
                                     HostEndpoints = new[]
                                     {
-                                        new HostEndpointMetadata(EndpointType.Tcp, PlatformHandler!.GetLocalIP(), "5050")
+                                        new HostEndpointMetadata(CdpTransportType.Tcp, PlatformHandler!.GetLocalIP(), "5040")
+                                    },
+                                    Endpoints = new[]
+                                    {
+                                        TransportEndpoint.Tcp
                                     }
                                 }.Write(writer);
-                                msg.Write(writer, writeId: false);
                             });
                             break;
                         }
                     case ConnectionType.UpgradeFinalization:
                         {
-                            payloadReader.PrintPayload();
+                            var msg = TransportEndpoint.ParseArray(payloadReader);
+                            PlatformHandler?.Log(0, "Transport upgrade to TCP");
+
+                            header.Flags = 0;
+                            Cryptor!.EncryptMessage(writer, header, (writer) =>
+                            {
+                                new ConnectionHeader()
+                                {
+                                    ConnectionMode = ConnectionMode.Proximal,
+                                    MessageType = ConnectionType.UpgradeFinalizationResponse
+                                }.Write(writer);
+                            });
+                            break;
+                        }
+                    case ConnectionType.UpgradeFailure:
+                        {
+                            var msg = HResultPayload.Parse(payloadReader);
+                            PlatformHandler?.Log(0, $"Transport upgrade failed with HResult {msg.HResult}");
+                            break;
+                        }
+                    case ConnectionType.TransportRequest:
+                        {
+                            var msg = TransportRequest.Parse(payloadReader);
+                            PlatformHandler?.Log(0, $"Transport upgrade {msg.UpgradeId} succeded");
+
+                            header.Flags = 0;
+                            Cryptor!.EncryptMessage(writer, header, (writer) =>
+                            {
+                                new ConnectionHeader()
+                                {
+                                    ConnectionMode = ConnectionMode.Proximal,
+                                    MessageType = ConnectionType.TransportConfirmation
+                                }.Write(writer);
+                                msg.Write(writer);
+                            });
                             break;
                         }
                     case ConnectionType.AuthDoneRequest:

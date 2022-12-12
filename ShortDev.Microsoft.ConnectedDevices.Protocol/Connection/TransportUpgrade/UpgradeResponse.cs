@@ -13,6 +13,7 @@ public sealed class UpgradeResponse : ICdpPayload<UpgradeResponse>
     /// A length-prefixed list of endpoint structures (see following) that are provided by each transport on the host device.
     /// </summary>
     public required HostEndpointMetadata[] HostEndpoints { get; init; }
+    public required TransportEndpoint[] Endpoints { get; init; }
 
     public static UpgradeResponse Parse(BinaryReader reader)
     {
@@ -25,8 +26,12 @@ public sealed class UpgradeResponse : ICdpPayload<UpgradeResponse>
         foreach (var endpoint in HostEndpoints)
         {
             writer.WriteWithLength(endpoint.Host);
+            writer.Write((byte)0);
             writer.WriteWithLength(endpoint.Service);
+            writer.Write((byte)0);
             writer.Write((ushort)endpoint.Type);
         }
+
+        TransportEndpoint.WriteArray(writer, Endpoints);
     }
 }

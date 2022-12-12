@@ -21,6 +21,12 @@ public interface ICdpSerializable<T> : ICdpWriteable where T : ICdpSerializable<
     }
 }
 
+public interface ICdpArraySerializable<T> where T : ICdpArraySerializable<T>
+{
+    static abstract T[] ParseArray(BinaryReader reader);
+    static abstract void WriteArray(BinaryWriter reader, T[] array);
+}
+
 public interface ICdpWriteable
 {
     void Write(BinaryWriter writer);

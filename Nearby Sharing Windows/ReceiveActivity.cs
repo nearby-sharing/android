@@ -276,7 +276,7 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
 
     private void OnDeviceConnected(CdpSocket socket)
     {
-        Log(0, $"Device {socket.RemoteDevice!.Name} ({socket.RemoteDevice!.Address}) connected via rfcomm");
+        Log(0, $"Device {socket.RemoteDevice!.Name} ({socket.RemoteDevice!.Address}) connected via {socket.TransportType}");
         Task.Run(() =>
         {
             var reader = socket.Reader;
@@ -295,7 +295,9 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
                     catch (Exception ex)
                     {
                         Log(1, $"{ex.GetType().Name} in session {session?.LocalSessionId.ToString() ?? "null"} \n {ex.Message}");
-                        throw;
+                        // throw;
+                        // ToDo
+                        break;
                     }
                 } while (!socket.IsClosed);
             }
@@ -355,8 +357,9 @@ static class Extensions
     public static CdpSocket ToCdp(this BluetoothSocket @this)
         => new()
         {
-            InputStream = @this.InputStream,
-            OutputStream = @this.OutputStream,
+            TransportType = CdpTransportType.Rfcomm,
+            InputStream = @this.InputStream ?? throw new NullReferenceException(),
+            OutputStream = @this.OutputStream ?? throw new NullReferenceException(),
             RemoteDevice = @this.RemoteDevice!.ToCdp(),
             Close = @this.Close
         };

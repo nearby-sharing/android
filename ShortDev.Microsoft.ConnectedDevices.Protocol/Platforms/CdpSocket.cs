@@ -9,8 +9,9 @@ namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms;
 /// </summary>
 public sealed class CdpSocket : IDisposable
 {
-    public required Stream InputStream { get; set; }
-    public required Stream OutputStream { get; set; }
+    public required CdpTransportType TransportType { get; init; }
+    public required Stream InputStream { get; init; }
+    public required Stream OutputStream { get; init; }
 
     BinaryReader? _readerCache;
     public BinaryReader Reader
@@ -20,7 +21,7 @@ public sealed class CdpSocket : IDisposable
     public BinaryWriter Writer
         => _writerCache ??= new BigEndianBinaryWriter(OutputStream);
 
-    public required CdpDevice RemoteDevice { get; set; }
+    public required CdpDevice RemoteDevice { get; init; }
 
     public bool IsClosed { get; private set; }
     public Action? Close { private get; set; }

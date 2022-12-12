@@ -22,7 +22,7 @@ public sealed class NetworkAdvertisement : IAdvertiser
         return ips[0].ToString();
     }
 
-    TcpListener _listener = new(IPAddress.Any, 5050);
+    TcpListener _listener = new(IPAddress.Any, 5040);
 
     CancellationTokenSource? cancellationTokenSource;
     public async void StartAdvertisement(CdpDeviceAdvertiseOptions options)
@@ -37,6 +37,7 @@ public sealed class NetworkAdvertisement : IAdvertiser
             var stream = client.GetStream();
             OnDeviceConnected?.Invoke(new()
             {
+                TransportType = CdpTransportType.Tcp,
                 Close = client.Close,
                 InputStream = stream,
                 OutputStream = stream,
