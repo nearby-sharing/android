@@ -123,7 +123,10 @@ public sealed class NearShareApp : CdpAppBase
                         expectMessage = !_fileTransferToken.IsTransferComplete;
 
                         if (expectMessage)
+                        {
                             _blobCursor?.MoveNext();
+                            return;
+                        }
                         break;
                     }
             }

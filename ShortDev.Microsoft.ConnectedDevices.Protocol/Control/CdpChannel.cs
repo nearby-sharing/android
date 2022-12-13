@@ -58,15 +58,25 @@ public sealed class CdpChannel : IDisposable
         newHeader.Write(_writer);
     }
 
-    public void SendMessage(CommonHeader header, Action<BinaryWriter> bodyCallback)
+    public void SendMessage(CommonHeader oldHeader, Action<BinaryWriter> bodyCallback)
     {
         if (Session.Cryptor == null)
             throw new InvalidOperationException("Invalid session state!");
 
-        header.RequestID++;
-        header.SequenceNumber++;
-        Session.Cryptor.EncryptMessage(_writer, header, bodyCallback);
-        _writer.Flush();
+        lock (_writer)
+        {
+            CommonHeader header = new();
+            header.Type = MessageType.Session;
+
+            header.SessionId = Session.GetSessionId(isHost: true);
+            header.ChannelId = ChannelId;
+
+            header.SequenceNumber = ++oldHeader.SequenceNumber;
+            // ToDo: "AdditionalHeaders" ... "RequestID" ??
+
+            Session.Cryptor.EncryptMessage(_writer, header, bodyCallback);
+            _writer.Flush();
+        }
     }
 
     void IDisposable.Dispose()

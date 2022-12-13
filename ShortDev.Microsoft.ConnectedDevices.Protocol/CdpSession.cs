@@ -26,6 +26,14 @@ public sealed class CdpSession : IDisposable
     public required uint RemoteSessionId { get; init; }
     public required CdpDevice Device { get; init; }
 
+    internal ulong GetSessionId(bool isHost)
+    {
+        ulong result = (ulong)LocalSessionId << 32 | RemoteSessionId;
+        if (isHost)
+            result |= CommonHeader.SessionIdHostFlag;
+        return result;
+    }
+
     internal CdpSession() { }
 
     #region Registration
@@ -294,6 +302,7 @@ public sealed class CdpSession : IDisposable
 
                 if (msg.IsComplete)
                 {
+                    // NewSequenceNumber();
                     _ = Task.Run(async () =>
                     {
                         try
@@ -319,6 +328,17 @@ public sealed class CdpSession : IDisposable
 
         writer.Flush();
     }
+
+    #region "SequenceNumber"
+    uint _sequenceNumber = 0;
+    internal uint NewSequenceNumber()
+    {
+        throw new NotImplementedException();
+        // ToDo: Fix
+        lock (this)
+            return _sequenceNumber++;
+    }
+    #endregion
 
     #region Messages
     readonly Dictionary<uint, CdpMessage> _msgRegistry = new();
