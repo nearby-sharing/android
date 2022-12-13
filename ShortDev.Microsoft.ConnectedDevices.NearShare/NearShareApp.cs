@@ -1,6 +1,7 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Protocol;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Serialization;
 using ShortDev.Networking;
+using System.Collections;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
@@ -18,6 +19,8 @@ public sealed class NearShareApp : CdpAppBase
     ulong transferedBytes = 0;
     ulong bytesToSend = 0;
     FileTransferToken? _fileTransferToken;
+
+    IEnumerator? _blobCursor;
 
     public override async ValueTask HandleMessageAsync(CdpMessage msg)
     {
@@ -51,7 +54,7 @@ public sealed class NearShareApp : CdpAppBase
                             if (fileNames.Count != 1)
                                 throw new NotImplementedException("Only able to receive one file at a time");
 
-                            PlatformHandler.Log(0, $"Receiving file \"{fileNames[0]}\" from session {header.SessionId.ToString("X")}");
+                            PlatformHandler.Log(0, $"Receiving file \"{fileNames[0]}\" from session {header.SessionId.ToString("X")} via {Channel.Socket.TransportType}");
 
                             bytesToSend = payload.Get<ulong>("BytesToSend");
 
@@ -74,11 +77,8 @@ public sealed class NearShareApp : CdpAppBase
                                 throw;
                             }
 
-                            ulong requestedPosition = 0;
-                            for (; requestedPosition + PartitionSize < bytesToSend; requestedPosition += PartitionSize)
-                                RequestBlob(header, prepend, requestedPosition);
-                            RequestBlob(header, prepend, requestedPosition, (uint)(bytesToSend - requestedPosition));
-
+                            _blobCursor = CreateBlobCursor(header, prepend);
+                            _blobCursor.MoveNext();
                             return;
                         }
                         else if (dataKind == DataKind.Uri)
@@ -121,6 +121,9 @@ public sealed class NearShareApp : CdpAppBase
                         _fileTransferToken.ReceivedBytes = transferedBytes;
 
                         expectMessage = !_fileTransferToken.IsTransferComplete;
+
+                        if (expectMessage)
+                            _blobCursor?.MoveNext();
                         break;
                     }
             }
@@ -143,6 +146,17 @@ public sealed class NearShareApp : CdpAppBase
 
         if (!expectMessage)
             CloseChannel();
+    }
+
+    IEnumerator CreateBlobCursor(CommonHeader header, byte[] prepend)
+    {
+        ulong requestedPosition = 0;
+        for (; requestedPosition + PartitionSize < bytesToSend; requestedPosition += PartitionSize)
+        {
+            RequestBlob(header, prepend, requestedPosition);
+            yield return null;
+        }
+        RequestBlob(header, prepend, requestedPosition, (uint)(bytesToSend - requestedPosition));
     }
 
     void RequestBlob(CommonHeader header, byte[] prepend, ulong requestedPosition, uint size = PartitionSize)

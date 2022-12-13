@@ -66,6 +66,7 @@ public sealed class CdpChannel : IDisposable
         header.RequestID++;
         header.SequenceNumber++;
         Session.Cryptor.EncryptMessage(_writer, header, bodyCallback);
+        _writer.Flush();
     }
 
     void IDisposable.Dispose()
