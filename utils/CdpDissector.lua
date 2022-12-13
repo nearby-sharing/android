@@ -1,5 +1,5 @@
 -- declare protocol
-cdp = Proto("mscdp", "Connected Devices Platform")
+cdp = Proto("ms-cdp", "Connected Devices Platform")
 -- create fields
 msglen = ProtoField.uint16("cdp.header.msglen", "MessageLength")
 version = ProtoField.uint8("cdp.header.version", "Version")
@@ -18,6 +18,7 @@ headerValue = ProtoField.bytes("cdp.header.nextheader.value", "Value", base.SPAC
 cdp.fields = {msglen, version, type, flags, seqid, reqid, fragid, fragcount, sessionid, channelid, nextHeader, headerType, headerSize, headerValue}
 
 local data_data = Field.new("data.data")
+local tcp_port = Field.new("tcp.dstport")
 
 function TypeToString(type)
     if type == 0 then return "None" end
@@ -48,33 +49,40 @@ end
 function cdp.dissector(buffer, pinfo, tree)
     local bufLen = buffer:len()
     if bufLen == 0 then return end
-
-    local data = data_data().range()
-    local reader = { offset = 0, range = data }
-    if (data and Read(reader, 2):uint() == 0x3030) then
+        
+    if tcp_port().value == 5040 or tcp_port().value == 5050 then
         pinfo.cols.protocol = cdp.name
+    end
 
-        local subtree = tree:add(cdp, "Cdp Header")
-        subtree:add(msglen, Read(reader, 2))
-        subtree:add(version, Read(reader, 1))
-        subtree:add(type, TypeToString(Read(reader, 1):uint()))
-        subtree:add(flags, Read(reader, 2))
-        subtree:add(seqid, Read(reader, 4))
-        subtree:add(reqid, Read(reader, 8))
-        subtree:add(fragid, Read(reader, 2))
-        subtree:add(fragcount, Read(reader, 2))
-        subtree:add(sessionid, Read(reader, 8))
-        subtree:add(channelid, Read(reader, 8))
+    local rawData = data_data()
+    if rawData then
+        local data = rawData.range()
+        local reader = { offset = 0, range = data }
+        if (data and Read(reader, 2):uint() == 0x3030) then
+            pinfo.cols.protocol = cdp.name
 
-        while true do
-            local nextHeaderType = Read(reader, 1):uint()
-            local nextHeaderLength = Read(reader, 1):uint()
-            if nextHeaderType == 0 then break end
+            local subtree = tree:add(cdp, "Cdp Header")
+            subtree:add(msglen, Read(reader, 2))
+            subtree:add(version, Read(reader, 1))
+            subtree:add(type, TypeToString(Read(reader, 1):uint()))
+            subtree:add(flags, Read(reader, 2))
+            subtree:add(seqid, Read(reader, 4))
+            subtree:add(reqid, Read(reader, 8))
+            subtree:add(fragid, Read(reader, 2))
+            subtree:add(fragcount, Read(reader, 2))
+            subtree:add(sessionid, Read(reader, 8))
+            subtree:add(channelid, Read(reader, 8))
 
-            local nextHeaderTree = subtree:add(nextHeader)
-            nextHeaderTree:add(headerType, HeaderTypeToString(nextHeaderType))
-            nextHeaderTree:add(headerSize, nextHeaderLength)
-            nextHeaderTree:add(headerValue, Read(reader, nextHeaderLength))
+            while true do
+                local nextHeaderType = Read(reader, 1):uint()
+                local nextHeaderLength = Read(reader, 1):uint()
+                if nextHeaderType == 0 then break end
+
+                local nextHeaderTree = subtree:add(nextHeader)
+                nextHeaderTree:add(headerType, HeaderTypeToString(nextHeaderType))
+                nextHeaderTree:add(headerSize, nextHeaderLength)
+                nextHeaderTree:add(headerValue, Read(reader, nextHeaderLength))
+            end
         end
     end
 end
