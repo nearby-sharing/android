@@ -67,10 +67,16 @@ jobs:
     #   If the Autobuild fails above, remove it and uncomment the following three lines.
     #   modify them (or add more) to build your code if your project, please refer to the EXAMPLE below for guidance.
 
-    - run: |
-        echo "Build"
-        dotnet workload restore
-        dotnet build --interactive
+    - name: Setup .NET Core SDK 6.0.x
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '6.0.x'
+        
+    - name: Install Workloads
+      run: dotnet workload install android wasm-tools
+        
+    - name: Build
+      run: dotnet build --interactive
 
     # - run: |
     #   echo "Run, Build Application using script"
