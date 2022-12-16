@@ -1,6 +1,7 @@
 ﻿#define CheckHmac
 
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Exceptions;
+using ShortDev.Microsoft.ConnectedDevices.Protocol.Messages;
 using ShortDev.Networking;
 using System;
 using System.Buffers.Binary;

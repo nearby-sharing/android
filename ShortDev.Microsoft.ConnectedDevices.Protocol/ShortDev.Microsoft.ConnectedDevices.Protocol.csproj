@@ -21,10 +21,9 @@
 
 	<ItemGroup>
 		<None Include="../docs/Crypt.md" Link="Encryption\Crypt.md" />
-		<None Include="../docs/CdpDllFlow.md" />
-		<None Include="../docs/Logging.md" />
-		<None Include="../docs/NearShare.md" Link="Session\AppControl\NearShare.md" />
-		<None Include="../utils/CdpDissector.lua" />
+		<None Include="../docs/CdpDllFlow.md" Link="docs/CdpDllFlow.md" />
+		<None Include="../docs/Logging.md" Link="docs/Logging.md" />
+		<None Include="../utils/CdpDissector.lua" Link="utils/CdpDissector.lua" />
 	</ItemGroup>
 
 </Project>

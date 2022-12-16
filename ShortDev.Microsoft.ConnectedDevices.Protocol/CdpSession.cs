@@ -1,11 +1,12 @@
-﻿using ShortDev.Microsoft.ConnectedDevices.Protocol.Connection;
-using ShortDev.Microsoft.ConnectedDevices.Protocol.Connection.Authentication;
-using ShortDev.Microsoft.ConnectedDevices.Protocol.Connection.DeviceInfo;
-using ShortDev.Microsoft.ConnectedDevices.Protocol.Connection.TransportUpgrade;
-using ShortDev.Microsoft.ConnectedDevices.Protocol.Control;
+﻿using ShortDev.Microsoft.ConnectedDevices.Protocol.Messages.Connection;
+using ShortDev.Microsoft.ConnectedDevices.Protocol.Messages.Connection.Authentication;
+using ShortDev.Microsoft.ConnectedDevices.Protocol.Messages.Connection.DeviceInfo;
+using ShortDev.Microsoft.ConnectedDevices.Protocol.Messages.Connection.TransportUpgrade;
+using ShortDev.Microsoft.ConnectedDevices.Protocol.Messages.Control;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Encryption;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Exceptions;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms;
+using ShortDev.Microsoft.ConnectedDevices.Protocol.Transports;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,6 +14,8 @@ using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 using System.Security;
 using System.Threading.Tasks;
+using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms.Network;
+using ShortDev.Microsoft.ConnectedDevices.Protocol.Messages;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Protocol;
 
@@ -84,7 +87,7 @@ public sealed class CdpSession : IDisposable
     }
     #endregion
 
-    public ICdpPlatformHandler? PlatformHandler { get; set; } = null;
+    public INetworkHandler? PlatformHandler { get; set; } = null;
 
     internal CdpCryptor? Cryptor = null;
     readonly CdpEncryptionInfo _localEncryption = CdpEncryptionInfo.Create(CdpEncryptionParams.Default);

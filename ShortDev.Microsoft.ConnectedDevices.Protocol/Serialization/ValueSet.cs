@@ -1,6 +1,7 @@
 ﻿using Bond;
 using Bond.IO.Unsafe;
 using Bond.Protocols;
+using ShortDev.Microsoft.ConnectedDevices.Protocol.Messages;
 using System;
 using System.IO;
 

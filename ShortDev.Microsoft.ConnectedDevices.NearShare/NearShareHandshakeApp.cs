@@ -1,4 +1,5 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Protocol;
+using ShortDev.Microsoft.ConnectedDevices.Protocol.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Serialization;
 
 namespace ShortDev.Microsoft.ConnectedDevices.NearShare;

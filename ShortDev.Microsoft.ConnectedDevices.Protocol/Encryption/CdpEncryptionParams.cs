@@ -1,4 +1,4 @@
-﻿using ShortDev.Microsoft.ConnectedDevices.Protocol.Connection;
+﻿using ShortDev.Microsoft.ConnectedDevices.Protocol.Messages.Connection;
 using System;
 using System.Security.Cryptography;
 

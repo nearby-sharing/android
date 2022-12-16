@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
-using ShortDev.Microsoft.ConnectedDevices.Protocol.Control;
+using ShortDev.Microsoft.ConnectedDevices.Protocol.Messages;
+using ShortDev.Microsoft.ConnectedDevices.Protocol.Messages.Control;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Protocol;
 

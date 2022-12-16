@@ -1,13 +1,14 @@
 ﻿using Bond.IO.Unsafe;
 using Bond.Protocols;
 using ShortDev.Microsoft.ConnectedDevices.Protocol;
-using ShortDev.Microsoft.ConnectedDevices.Protocol.Connection;
-using ShortDev.Microsoft.ConnectedDevices.Protocol.Connection.Authentication;
-using ShortDev.Microsoft.ConnectedDevices.Protocol.Connection.DeviceInfo;
+using ShortDev.Microsoft.ConnectedDevices.Protocol.Messages.Connection;
+using ShortDev.Microsoft.ConnectedDevices.Protocol.Messages.Connection.Authentication;
+using ShortDev.Microsoft.ConnectedDevices.Protocol.Messages.Connection.DeviceInfo;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Encryption;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Serialization;
 using ShortDev.Networking;
 using Spectre.Console;
+using ShortDev.Microsoft.ConnectedDevices.Protocol.Messages;
 
 //var adapter = await BluetoothAdapter.GetDefaultAsync();
 //Debug.Print(adapter.BluetoothAddress.ToString("X"));

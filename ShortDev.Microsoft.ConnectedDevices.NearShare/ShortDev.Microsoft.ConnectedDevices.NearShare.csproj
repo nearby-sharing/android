@@ -10,6 +10,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\ShortDev.Microsoft.ConnectedDevices.Protocol\ShortDev.Microsoft.ConnectedDevices.Protocol.csproj" />
+		<None Include="../docs/NearShare.md" Link="docs/NearShare.md" />
 	</ItemGroup>
 
 </Project>

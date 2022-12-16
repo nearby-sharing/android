@@ -1,6 +1,5 @@
 ﻿using Android.Bluetooth;
 using Android.Bluetooth.LE;
-using Android.Content;
 using Android.Content.PM;
 using Android.Net.Wifi;
 using Android.Runtime;
@@ -11,21 +10,23 @@ using Google.Android.Material.ProgressIndicator;
 using ShortDev.Android.UI;
 using ShortDev.Microsoft.ConnectedDevices.NearShare;
 using ShortDev.Microsoft.ConnectedDevices.Protocol;
-using ShortDev.Microsoft.ConnectedDevices.Protocol.Discovery;
+using ShortDev.Microsoft.ConnectedDevices.Protocol.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms;
+using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms.Bluetooth;
+using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms.Network;
+using ShortDev.Microsoft.ConnectedDevices.Protocol.Transports;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.NetworkInformation;
-using System.Net.Sockets;
 
 namespace Nearby_Sharing_Windows;
 
 [Activity(Label = "@string/app_name", Theme = "@style/AppTheme", ConfigurationChanges = UIHelper.ConfigChangesFlags)]
-public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, INearSharePlatformHandler
+public sealed class ReceiveActivity : AppCompatActivity, IBluetoothHandler, INetworkHandler, INearSharePlatformHandler
 {
     BluetoothAdapter? _btAdapter;
-    BluetoothAdvertisement? _bluetoothAdvertisement;
+    BluetoothTransport? _bluetoothAdvertisement;
 
     [AllowNull] TextView debugLogTextView;
 
@@ -134,10 +135,14 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
         );
     }
 
+    CancellationTokenSource? _cancellationTokenSource;
     void InitializeCDP()
     {
         if (btAddress == null)
             throw new NullReferenceException(nameof(btAddress));
+
+        _cancellationTokenSource?.Dispose();
+        _cancellationTokenSource = new();
 
         var service = (BluetoothManager)GetSystemService(BluetoothService)!;
         _btAdapter = service.Adapter!;
@@ -150,16 +155,17 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
         CdpAppRegistration.TryRegisterApp<NearShareHandshakeApp>(() => new() { PlatformHandler = this });
 
         _bluetoothAdvertisement = new(this);
-        _bluetoothAdvertisement.OnDeviceConnected += OnDeviceConnected;
-        _bluetoothAdvertisement.StartAdvertisement(new CdpDeviceAdvertiseOptions(
+        _bluetoothAdvertisement.Advertise(new CdpAdvertiseOptions(
             DeviceType.Android,
             btAddress, // "00:fa:21:3e:fb:19"
             _btAdapter.Name!
-        ));
+        ), _cancellationTokenSource.Token);
+        _bluetoothAdvertisement.DeviceConnected += OnDeviceConnected;
+        _bluetoothAdvertisement.Listen(_cancellationTokenSource.Token);
 
-        NetworkAdvertisement networkAdvertisement = new();
-        networkAdvertisement.OnDeviceConnected += OnDeviceConnected;
-        networkAdvertisement.StartAdvertisement(null);
+        NetworkTransport networkAdvertisement = new();
+        networkAdvertisement.DeviceConnected += OnDeviceConnected;
+        networkAdvertisement.Listen(_cancellationTokenSource.Token);
     }
 
     string GetFilePath(string name)
@@ -180,7 +186,7 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
         Log(0, $"Saving file to \"{path}\"");
         return File.Create(path);
 
-        // OutputStream cannot seek!
+        // ToDo: OutputStream cannot seek!
         //ContentValues contentValues = new();
         //contentValues.Put(MediaStore.IMediaColumns.RelativePath, Path.Combine(Android.OS.Environment.DirectoryDownloads!, name));
         //var uri = ContentResolver!.Insert(MediaStore.Files.GetContentUri("external")!, contentValues)!;
@@ -203,21 +209,21 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
 
     public override void Finish()
     {
-        _bluetoothAdvertisement?.StopAdvertisement();
+        _cancellationTokenSource?.Cancel();
         base.Finish();
     }
 
     #region Communication
     #region Not implemented
-    public Task ScanBLeAsync(CdpScanOptions<CdpBluetoothDevice> scanOptions, CancellationToken cancellationToken = default)
+    public Task ScanBLeAsync(ScanOptions<ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms.Bluetooth.BluetoothDevice> scanOptions, CancellationToken cancellationToken = default)
         => throw new NotImplementedException();
 
-    public Task<CdpSocket> ConnectRfcommAsync(CdpBluetoothDevice device, CdpRfcommOptions options, CancellationToken cancellationToken = default)
+    public Task<CdpSocket> ConnectRfcommAsync(ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms.Bluetooth.BluetoothDevice device, RfcommOptions options, CancellationToken cancellationToken = default)
         => throw new NotImplementedException();
     #endregion
 
     #region Advertisement
-    public async Task AdvertiseBLeBeaconAsync(CdpAdvertiseOptions options, CancellationToken cancellationToken = default)
+    public async Task AdvertiseBLeBeaconAsync(AdvertiseOptions options, CancellationToken cancellationToken = default)
     {
         var settings = new AdvertiseSettings.Builder()
             .SetAdvertiseMode(AdvertiseMode.LowLatency)!
@@ -241,7 +247,7 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
     #endregion
 
     #region Rfcomm
-    public async Task ListenRfcommAsync(CdpRfcommOptions options, CancellationToken cancellationToken = default)
+    public async Task ListenRfcommAsync(RfcommOptions options, CancellationToken cancellationToken = default)
     {
         if (_btAdapter == null)
             throw new InvalidOperationException($"{nameof(_btAdapter)} is null");
@@ -264,7 +270,7 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
                         return;
 
                     if (socket != null)
-                        options!.OnSocketConnected!(socket.ToCdp());
+                        options!.SocketConnected!(socket.ToCdp());
                 }
             };
             await Task.WhenAny(new[] {
@@ -274,7 +280,7 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
         }
     }
 
-    private void OnDeviceConnected(CdpSocket socket)
+    private void OnDeviceConnected(ICdpTransport sender, CdpSocket socket)
     {
         Log(0, $"Device {socket.RemoteDevice!.Name} ({socket.RemoteDevice!.Address}) connected via {socket.TransportType}");
         Task.Run(() =>
@@ -345,7 +351,7 @@ public sealed class ReceiveActivity : AppCompatActivity, ICdpBluetoothHandler, I
 
 static class Extensions
 {
-    public static CdpBluetoothDevice ToCdp(this BluetoothDevice @this, byte[]? beaconData = null)
+    public static ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms.Bluetooth.BluetoothDevice ToCdp(this Android.Bluetooth.BluetoothDevice @this, byte[]? beaconData = null)
         => new()
         {
             Address = @this.Address,
