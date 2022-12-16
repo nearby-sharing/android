@@ -1,21 +1,19 @@
-﻿using ShortDev.Microsoft.ConnectedDevices.Protocol.Messages.Connection;
+﻿using ShortDev.Microsoft.ConnectedDevices.Protocol.Encryption;
+using ShortDev.Microsoft.ConnectedDevices.Protocol.Exceptions;
+using ShortDev.Microsoft.ConnectedDevices.Protocol.Messages;
+using ShortDev.Microsoft.ConnectedDevices.Protocol.Messages.Connection;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Messages.Connection.Authentication;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Messages.Connection.DeviceInfo;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Messages.Connection.TransportUpgrade;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Messages.Control;
-using ShortDev.Microsoft.ConnectedDevices.Protocol.Encryption;
-using ShortDev.Microsoft.ConnectedDevices.Protocol.Exceptions;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms;
+using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms.Network;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Transports;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection.Metadata.Ecma335;
-using System.Security;
 using System.Threading.Tasks;
-using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms.Network;
-using ShortDev.Microsoft.ConnectedDevices.Protocol.Messages;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Protocol;
 
@@ -89,7 +87,8 @@ public sealed class CdpSession : IDisposable
 
     public INetworkHandler? PlatformHandler { get; set; } = null;
 
-    internal CdpCryptor? Cryptor = null;
+    #region HandleMessages
+    internal CdpCryptor? Cryptor { get; private set; } = null;
     readonly CdpEncryptionInfo _localEncryption = CdpEncryptionInfo.Create(CdpEncryptionParams.Default);
     CdpEncryptionInfo? _remoteEncryption = null;
     public void HandleMessage(CdpSocket socket, CommonHeader header, BinaryReader reader)
@@ -102,225 +101,11 @@ public sealed class CdpSession : IDisposable
             header.CorrectClientSessionBit();
 
             if (header.Type == MessageType.Connect)
-            {
-                ConnectionHeader connectionHeader = ConnectionHeader.Parse(payloadReader);
-                PlatformHandler?.Log(0, $"Received {header.Type} message {connectionHeader.MessageType} from session {header.SessionId.ToString("X")}");
-                switch (connectionHeader.MessageType)
-                {
-                    case ConnectionType.ConnectRequest:
-                        {
-                            var connectionRequest = ConnectionRequest.Parse(payloadReader);
-                            _remoteEncryption = CdpEncryptionInfo.FromRemote(connectionRequest.PublicKeyX, connectionRequest.PublicKeyY, connectionRequest.Nonce, CdpEncryptionParams.Default);
-
-                            var secret = _localEncryption.GenerateSharedSecret(_remoteEncryption);
-                            Cryptor = new(secret);
-
-                            header.SessionId |= (ulong)LocalSessionId << 32;
-
-                            header.Write(writer);
-
-                            new ConnectionHeader()
-                            {
-                                ConnectionMode = ConnectionMode.Proximal,
-                                MessageType = ConnectionType.ConnectResponse
-                            }.Write(writer);
-
-                            var publicKey = _localEncryption.PublicKey;
-                            new ConnectionResponse()
-                            {
-                                Result = ConnectionResult.Pending,
-                                HmacSize = connectionRequest.HmacSize,
-                                MessageFragmentSize = connectionRequest.MessageFragmentSize,
-                                Nonce = _localEncryption.Nonce,
-                                PublicKeyX = publicKey.X!,
-                                PublicKeyY = publicKey.Y!
-                            }.Write(writer);
-                            break;
-                        }
-                    case ConnectionType.DeviceAuthRequest:
-                    case ConnectionType.UserDeviceAuthRequest:
-                        {
-                            var authRequest = AuthenticationPayload.Parse(payloadReader);
-                            if (!authRequest.VerifyThumbprint(_localEncryption.Nonce, _remoteEncryption!.Nonce))
-                                throw new CdpSecurityException("Invalid thumbprint");
-
-                            header.Flags = 0;
-                            Cryptor!.EncryptMessage(writer, header, (writer) =>
-                            {
-                                new ConnectionHeader()
-                                {
-                                    ConnectionMode = ConnectionMode.Proximal,
-                                    MessageType = connectionHeader.MessageType == ConnectionType.DeviceAuthRequest ? ConnectionType.DeviceAuthResponse : ConnectionType.UserDeviceAuthResponse
-                                }.Write(writer);
-                                AuthenticationPayload.Create(
-                                    _localEncryption.DeviceCertificate!, // ToDo: User cert
-                                    _localEncryption.Nonce, _remoteEncryption!.Nonce
-                                ).Write(writer);
-                            });
-                            break;
-                        }
-                    case ConnectionType.UpgradeRequest:
-                        {
-                            var msg = UpgradeRequest.Parse(payloadReader);
-                            PlatformHandler?.Log(0, $"Upgrade request {msg.UpgradeId} to {string.Join(',', msg.Endpoints.Select((x) => x.Type.ToString()))}");
-
-                            header.Flags = 0;
-                            Cryptor!.EncryptMessage(writer, header, (writer) =>
-                            {
-                                new ConnectionHeader()
-                                {
-                                    ConnectionMode = ConnectionMode.Proximal,
-                                    MessageType = ConnectionType.UpgradeResponse
-                                }.Write(writer);
-                                new UpgradeResponse()
-                                {
-                                    HostEndpoints = new[]
-                                    {
-                                        new HostEndpointMetadata(CdpTransportType.Tcp, PlatformHandler!.GetLocalIP(), "5040")
-                                    },
-                                    Endpoints = new[]
-                                    {
-                                        TransportEndpoint.Tcp
-                                    }
-                                }.Write(writer);
-                            });
-                            break;
-                        }
-                    case ConnectionType.UpgradeFinalization:
-                        {
-                            var msg = TransportEndpoint.ParseArray(payloadReader);
-                            PlatformHandler?.Log(0, "Transport upgrade to TCP");
-
-                            header.Flags = 0;
-                            Cryptor!.EncryptMessage(writer, header, (writer) =>
-                            {
-                                new ConnectionHeader()
-                                {
-                                    ConnectionMode = ConnectionMode.Proximal,
-                                    MessageType = ConnectionType.UpgradeFinalizationResponse
-                                }.Write(writer);
-                            });
-                            break;
-                        }
-                    case ConnectionType.UpgradeFailure:
-                        {
-                            var msg = HResultPayload.Parse(payloadReader);
-                            PlatformHandler?.Log(0, $"Transport upgrade failed with HResult {msg.HResult}");
-                            break;
-                        }
-                    case ConnectionType.TransportRequest:
-                        {
-                            var msg = TransportRequest.Parse(payloadReader);
-                            PlatformHandler?.Log(0, $"Transport upgrade {msg.UpgradeId} succeded");
-
-                            header.Flags = 0;
-                            Cryptor!.EncryptMessage(writer, header, (writer) =>
-                            {
-                                new ConnectionHeader()
-                                {
-                                    ConnectionMode = ConnectionMode.Proximal,
-                                    MessageType = ConnectionType.TransportConfirmation
-                                }.Write(writer);
-                                msg.Write(writer);
-                            });
-                            break;
-                        }
-                    case ConnectionType.AuthDoneRequest:
-                        {
-                            header.Flags = 0;
-                            Cryptor!.EncryptMessage(writer, header, (writer) =>
-                            {
-                                new ConnectionHeader()
-                                {
-                                    ConnectionMode = ConnectionMode.Proximal,
-                                    MessageType = ConnectionType.AuthDoneRespone // Ack
-                                }.Write(writer);
-                                new HResultPayload()
-                                {
-                                    HResult = 0 // No error
-                                }.Write(writer);
-                            });
-                            break;
-                        }
-                    case ConnectionType.DeviceInfoMessage:
-                        {
-                            var msg = DeviceInfoMessage.Parse(payloadReader);
-
-                            header.Flags = 0;
-                            Cryptor!.EncryptMessage(writer, header, (writer) =>
-                            {
-                                new ConnectionHeader()
-                                {
-                                    ConnectionMode = ConnectionMode.Proximal,
-                                    MessageType = ConnectionType.DeviceInfoResponseMessage // Ack
-                                }.Write(writer);
-                            });
-                            break;
-                        }
-                    default:
-                        throw UnexpectedMessage(connectionHeader.MessageType.ToString());
-                }
-            }
+                HandleConnect(header, payloadReader, writer);
             else if (header.Type == MessageType.Control)
-            {
-                var controlHeader = ControlHeader.Parse(payloadReader);
-                PlatformHandler?.Log(0, $"Received {header.Type} message {controlHeader.MessageType} from session {header.SessionId.ToString("X")}");
-                switch (controlHeader.MessageType)
-                {
-                    case ControlMessageType.StartChannelRequest:
-                        {
-                            var request = StartChannelRequest.Parse(payloadReader);
-
-                            header.AdditionalHeaders.Clear();
-                            header.SetReplyToId(header.RequestID);
-                            header.AdditionalHeaders.Add(new(
-                                (AdditionalHeaderType)129,
-                                new byte[] { 0x30, 0x0, 0x0, 0x1 }
-                            ));
-
-                            header.RequestID = 0;
-
-                            StartChannel(request, socket, out var channelId);
-
-                            header.Flags = 0;
-                            Cryptor!.EncryptMessage(writer, header, (writer) =>
-                            {
-                                new ControlHeader()
-                                {
-                                    MessageType = ControlMessageType.StartChannelResponse
-                                }.Write(writer);
-                                writer.Write((byte)0);
-                                writer.Write(channelId);
-                            });
-                            break;
-                        }
-                    default:
-                        throw UnexpectedMessage(controlHeader.MessageType.ToString());
-                }
-            }
+                HandleControl(header, payloadReader, writer, socket);
             else if (header.Type == MessageType.Session)
-            {
-                CdpMessage msg = GetOrCreateMessage(header);
-                msg.AddFragment(payloadReader.ReadPayload());
-
-                if (msg.IsComplete)
-                {
-                    // NewSequenceNumber();
-                    _ = Task.Run(async () =>
-                    {
-                        try
-                        {
-                            var channel = _channelRegistry[header.ChannelId];
-                            await channel.HandleMessageAsync(msg);
-                        }
-                        finally
-                        {
-                            _msgRegistry.Remove(msg.Id);
-                            msg.Dispose();
-                        }
-                    });
-                }
-            }
+                HandleSession(header, payloadReader, writer);
             else
             {
                 // We might receive a "ReliabilityResponse"
@@ -331,6 +116,253 @@ public sealed class CdpSession : IDisposable
 
         writer.Flush();
     }
+
+    #region Connect
+    void HandleConnect(CommonHeader header, BinaryReader reader, BinaryWriter writer)
+    {
+        ConnectionHeader connectionHeader = ConnectionHeader.Parse(reader);
+        PlatformHandler?.Log(0, $"Received {header.Type} message {connectionHeader.MessageType} from session {header.SessionId.ToString("X")}");
+        switch (connectionHeader.MessageType)
+        {
+            case ConnectionType.ConnectRequest:
+                HandleConnectRequest(header, reader, writer);
+                break;
+            case ConnectionType.DeviceAuthRequest:
+            case ConnectionType.UserDeviceAuthRequest:
+                HandleAuthRequest(header, reader, writer, connectionHeader.MessageType);
+                break;
+            case ConnectionType.UpgradeRequest:
+                HandleUpgradeRequest(header, reader, writer);
+                break;
+            case ConnectionType.UpgradeFinalization:
+                HandleUpgradeFinalization(header, reader, writer);
+                break;
+            case ConnectionType.UpgradeFailure:
+                HandleUpgradeFailure(header, reader, writer);
+                break;
+            case ConnectionType.TransportRequest:
+                HandleTransportRequest(header, reader, writer);
+                break;
+            case ConnectionType.AuthDoneRequest:
+                HandleAuthDoneRequest(header, reader, writer);
+                break;
+            case ConnectionType.DeviceInfoMessage:
+                HandleDeviceInfoMessage(header, reader, writer);
+                break;
+            default:
+                throw UnexpectedMessage(connectionHeader.MessageType.ToString());
+        }
+    }
+
+    void HandleConnectRequest(CommonHeader header, BinaryReader reader, BinaryWriter writer)
+    {
+        var connectionRequest = ConnectionRequest.Parse(reader);
+        _remoteEncryption = CdpEncryptionInfo.FromRemote(connectionRequest.PublicKeyX, connectionRequest.PublicKeyY, connectionRequest.Nonce, CdpEncryptionParams.Default);
+
+        var secret = _localEncryption.GenerateSharedSecret(_remoteEncryption);
+        Cryptor = new(secret);
+
+        header.SessionId |= (ulong)LocalSessionId << 32;
+
+        header.Write(writer);
+
+        new ConnectionHeader()
+        {
+            ConnectionMode = ConnectionMode.Proximal,
+            MessageType = ConnectionType.ConnectResponse
+        }.Write(writer);
+
+        var publicKey = _localEncryption.PublicKey;
+        new ConnectionResponse()
+        {
+            Result = ConnectionResult.Pending,
+            HmacSize = connectionRequest.HmacSize,
+            MessageFragmentSize = connectionRequest.MessageFragmentSize,
+            Nonce = _localEncryption.Nonce,
+            PublicKeyX = publicKey.X!,
+            PublicKeyY = publicKey.Y!
+        }.Write(writer);
+    }
+    void HandleAuthRequest(CommonHeader header, BinaryReader reader, BinaryWriter writer, ConnectionType connectionType)
+    {
+        var authRequest = AuthenticationPayload.Parse(reader);
+        if (!authRequest.VerifyThumbprint(_localEncryption.Nonce, _remoteEncryption!.Nonce))
+            throw new CdpSecurityException("Invalid thumbprint");
+
+        header.Flags = 0;
+        Cryptor!.EncryptMessage(writer, header, (writer) =>
+        {
+            new ConnectionHeader()
+            {
+                ConnectionMode = ConnectionMode.Proximal,
+                MessageType = connectionType == ConnectionType.DeviceAuthRequest ? ConnectionType.DeviceAuthResponse : ConnectionType.UserDeviceAuthResponse
+            }.Write(writer);
+            AuthenticationPayload.Create(
+                _localEncryption.DeviceCertificate!, // ToDo: User cert
+                _localEncryption.Nonce, _remoteEncryption!.Nonce
+            ).Write(writer);
+        });
+    }
+    void HandleUpgradeRequest(CommonHeader header, BinaryReader reader, BinaryWriter writer)
+    {
+        var msg = UpgradeRequest.Parse(reader);
+        PlatformHandler?.Log(0, $"Upgrade request {msg.UpgradeId} to {string.Join(',', msg.Endpoints.Select((x) => x.Type.ToString()))}");
+
+        header.Flags = 0;
+        Cryptor!.EncryptMessage(writer, header, (writer) =>
+        {
+            new ConnectionHeader()
+            {
+                ConnectionMode = ConnectionMode.Proximal,
+                MessageType = ConnectionType.UpgradeResponse
+            }.Write(writer);
+            new UpgradeResponse()
+            {
+                HostEndpoints = new[]
+                {
+                    new HostEndpointMetadata(CdpTransportType.Tcp, PlatformHandler!.GetLocalIP(), Constants.TcpPort.ToString())
+                },
+                Endpoints = new[]
+                {
+                    TransportEndpoint.Tcp
+                }
+            }.Write(writer);
+        });
+    }
+    void HandleUpgradeFinalization(CommonHeader header, BinaryReader reader, BinaryWriter writer)
+    {
+        var msg = TransportEndpoint.ParseArray(reader);
+        PlatformHandler?.Log(0, "Transport upgrade to TCP");
+
+        header.Flags = 0;
+        Cryptor!.EncryptMessage(writer, header, (writer) =>
+        {
+            new ConnectionHeader()
+            {
+                ConnectionMode = ConnectionMode.Proximal,
+                MessageType = ConnectionType.UpgradeFinalizationResponse
+            }.Write(writer);
+        });
+    }
+    void HandleUpgradeFailure(CommonHeader header, BinaryReader reader, BinaryWriter writer)
+    {
+        var msg = HResultPayload.Parse(reader);
+        PlatformHandler?.Log(0, $"Transport upgrade failed with HResult {msg.HResult}");
+    }
+    void HandleTransportRequest(CommonHeader header, BinaryReader reader, BinaryWriter writer)
+    {
+        var msg = TransportRequest.Parse(reader);
+        PlatformHandler?.Log(0, $"Transport upgrade {msg.UpgradeId} succeded");
+
+        header.Flags = 0;
+        Cryptor!.EncryptMessage(writer, header, (writer) =>
+        {
+            new ConnectionHeader()
+            {
+                ConnectionMode = ConnectionMode.Proximal,
+                MessageType = ConnectionType.TransportConfirmation
+            }.Write(writer);
+            msg.Write(writer);
+        });
+    }
+    void HandleAuthDoneRequest(CommonHeader header, BinaryReader reader, BinaryWriter writer)
+    {
+        header.Flags = 0;
+        Cryptor!.EncryptMessage(writer, header, (writer) =>
+        {
+            new ConnectionHeader()
+            {
+                ConnectionMode = ConnectionMode.Proximal,
+                MessageType = ConnectionType.AuthDoneRespone // Ack
+            }.Write(writer);
+            new HResultPayload()
+            {
+                HResult = 0 // No error
+            }.Write(writer);
+        });
+    }
+    void HandleDeviceInfoMessage(CommonHeader header, BinaryReader reader, BinaryWriter writer)
+    {
+        var msg = DeviceInfoMessage.Parse(reader);
+
+        header.Flags = 0;
+        Cryptor!.EncryptMessage(writer, header, (writer) =>
+        {
+            new ConnectionHeader()
+            {
+                ConnectionMode = ConnectionMode.Proximal,
+                MessageType = ConnectionType.DeviceInfoResponseMessage // Ack
+            }.Write(writer);
+        });
+    }
+    #endregion
+
+    #region Control
+    void HandleControl(CommonHeader header, BinaryReader reader, BinaryWriter writer, CdpSocket socket)
+    {
+        var controlHeader = ControlHeader.Parse(reader);
+        PlatformHandler?.Log(0, $"Received {header.Type} message {controlHeader.MessageType} from session {header.SessionId.ToString("X")}");
+        switch (controlHeader.MessageType)
+        {
+            case ControlMessageType.StartChannelRequest:
+                HandleStartChannelRequest(header, reader, writer, socket);
+                break;
+            default:
+                throw UnexpectedMessage(controlHeader.MessageType.ToString());
+        }
+    }
+
+    void HandleStartChannelRequest(CommonHeader header, BinaryReader reader, BinaryWriter writer, CdpSocket socket)
+    {
+        var request = StartChannelRequest.Parse(reader);
+
+        header.AdditionalHeaders.Clear();
+        header.SetReplyToId(header.RequestID);
+        header.AdditionalHeaders.Add(new(
+            (AdditionalHeaderType)129,
+            new byte[] { 0x30, 0x0, 0x0, 0x1 }
+        ));
+        header.RequestID = 0;
+
+        StartChannel(request, socket, out var channelId);
+
+        header.Flags = 0;
+        Cryptor!.EncryptMessage(writer, header, (writer) =>
+        {
+            new ControlHeader()
+            {
+                MessageType = ControlMessageType.StartChannelResponse
+            }.Write(writer);
+            writer.Write((byte)0);
+            writer.Write(channelId);
+        });
+    }
+    #endregion
+
+    void HandleSession(CommonHeader header, BinaryReader reader, BinaryWriter writer)
+    {
+        CdpMessage msg = GetOrCreateMessage(header);
+        msg.AddFragment(reader.ReadPayload());
+
+        if (msg.IsComplete)
+        {
+            // NewSequenceNumber();
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    var channel = _channelRegistry[header.ChannelId];
+                    await channel.HandleMessageAsync(msg);
+                }
+                finally
+                {
+                    _msgRegistry.Remove(msg.Id);
+                    msg.Dispose();
+                }
+            });
+        }
+    }
+    #endregion
 
     #region "SequenceNumber"
     uint _sequenceNumber = 0;
