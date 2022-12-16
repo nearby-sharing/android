@@ -68,9 +68,13 @@ jobs:
     #   modify them (or add more) to build your code if your project, please refer to the EXAMPLE below for guidance.
 
     - run: |
-        echo "Restore dotnet workloads"
+        echo "Build"
+        cd ShortDev.Microsoft.ConnectedDevices.Protocol
+        echo "Restore workloads"
         dotnet workload restore
-        echo "Build solution"
+        echo "Restore"
+        dotnet restore
+        echo "Build"
         dotnet build --interactive
 
     # - run: |
