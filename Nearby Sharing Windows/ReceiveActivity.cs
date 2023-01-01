@@ -19,6 +19,8 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.NetworkInformation;
+using BLeScanResult = Android.Bluetooth.LE.ScanResult;
+using CdpBluetoothDevice = ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms.Bluetooth.BluetoothDevice;
 
 namespace Nearby_Sharing_Windows;
 
@@ -155,7 +157,7 @@ public sealed class ReceiveActivity : AppCompatActivity, IBluetoothHandler, INet
         CdpAppRegistration.TryRegisterApp<NearShareHandshakeApp>(() => new() { PlatformHandler = this });
 
         _bluetoothAdvertisement = new(this);
-        _bluetoothAdvertisement.Advertise(new CdpAdvertiseOptions(
+        _bluetoothAdvertisement.Advertise(new CdpAdvertisement(
             DeviceType.Android,
             btAddress, // "00:fa:21:3e:fb:19"
             _btAdapter.Name!
@@ -215,11 +217,48 @@ public sealed class ReceiveActivity : AppCompatActivity, IBluetoothHandler, INet
 
     #region Communication
     #region Not implemented
-    public Task ScanBLeAsync(ScanOptions<ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms.Bluetooth.BluetoothDevice> scanOptions, CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+    public async Task ScanBLeAsync(ScanOptions<CdpBluetoothDevice> scanOptions, CancellationToken cancellationToken = default)
+    {
+        using var scanner = _btAdapter?.BluetoothLeScanner ?? throw new InvalidOperationException($"\"{nameof(_btAdapter)}\" is not initialized");
 
-    public Task<CdpSocket> ConnectRfcommAsync(ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms.Bluetooth.BluetoothDevice device, RfcommOptions options, CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+        BluetoothLeScannerCallback scanningCallback = new();
+        scanningCallback.OnFoundDevice += (result) => scanOptions.OnDeviceDiscovered?.Invoke(result.Device!.ToCdp());
+        scanner.StartScan(scanningCallback);
+
+        await cancellationToken.AwaitCancellation();
+
+        scanner.StopScan(scanningCallback);
+    }
+
+    sealed class BluetoothLeScannerCallback : ScanCallback
+    {
+        public event Action<BLeScanResult>? OnFoundDevice;
+
+        public override void OnScanResult([GeneratedEnum] ScanCallbackType callbackType, BLeScanResult? result)
+        {
+            if (result != null)
+                OnFoundDevice?.Invoke(result);
+        }
+
+        public override void OnBatchScanResults(IList<BLeScanResult>? results)
+        {
+            if (results != null)
+                foreach (var result in results)
+                    if (result != null)
+                        OnFoundDevice?.Invoke(result);
+        }
+    }
+
+    public async Task<CdpSocket> ConnectRfcommAsync(CdpBluetoothDevice device, RfcommOptions options, CancellationToken cancellationToken = default)
+    {
+        if (_btAdapter == null)
+            throw new InvalidOperationException($"{nameof(_btAdapter)} is not initialized!");
+
+        var btDevice = _btAdapter.GetRemoteDevice(device.Address) ?? throw new ArgumentException($"Could not find bt device with address \"{device.Address}\"");
+        var btSocket = btDevice.CreateRfcommSocketToServiceRecord(Java.Util.UUID.FromString(options.ServiceId)) ?? throw new ArgumentException("Could not create service socket");
+        await btSocket.ConnectAsync();
+        return btSocket.ToCdp();
+    }
     #endregion
 
     #region Advertisement
@@ -351,7 +390,7 @@ public sealed class ReceiveActivity : AppCompatActivity, IBluetoothHandler, INet
 
 static class Extensions
 {
-    public static ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms.Bluetooth.BluetoothDevice ToCdp(this Android.Bluetooth.BluetoothDevice @this, byte[]? beaconData = null)
+    public static CdpBluetoothDevice ToCdp(this Android.Bluetooth.BluetoothDevice @this, byte[]? beaconData = null)
         => new()
         {
             Address = @this.Address,

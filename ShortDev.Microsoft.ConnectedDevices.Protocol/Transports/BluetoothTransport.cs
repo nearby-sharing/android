@@ -32,7 +32,7 @@ public sealed class BluetoothTransport : ICdpTransport, ICdpDiscoverableTranspor
         throw new NotImplementedException();
     }
 
-    public void Advertise(CdpAdvertiseOptions options, CancellationToken cancellationToken)
+    public void Advertise(CdpAdvertisement options, CancellationToken cancellationToken)
     {
         _ = Handler.AdvertiseBLeBeaconAsync(
             new AdvertiseOptions()
@@ -42,6 +42,19 @@ public sealed class BluetoothTransport : ICdpTransport, ICdpDiscoverableTranspor
             },
             cancellationToken
         );
+    }
+
+    public event DeviceDiscoveredEventHandler? DeviceDiscovered;
+    public void Discover(CancellationToken cancellationToken)
+    {
+        _ = Handler.ScanBLeAsync(new()
+        {
+            OnDeviceDiscovered = (device) =>
+            {
+                if (CdpAdvertisement.TryParse(device, out var data))
+                    DeviceDiscovered?.Invoke(this, device, data);
+            }
+        }, cancellationToken);
     }
 
     public void Dispose() { }

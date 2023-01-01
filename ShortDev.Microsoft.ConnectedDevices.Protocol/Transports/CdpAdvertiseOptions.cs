@@ -1,14 +1,15 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms.Bluetooth;
 using ShortDev.Networking;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net.NetworkInformation;
 using System.Text;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Transports;
 
-public sealed record CdpAdvertiseOptions(DeviceType DeviceType, PhysicalAddress MacAddress, string DeviceName)
+public sealed record CdpAdvertisement(DeviceType DeviceType, PhysicalAddress MacAddress, string DeviceName)
 {
-    public static bool TryParse(BluetoothDevice device, out CdpAdvertiseOptions? data)
+    public static bool TryParse(BluetoothDevice device, [MaybeNullWhen(false)] out CdpAdvertisement data)
     {
         data = null;
 
