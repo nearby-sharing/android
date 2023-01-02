@@ -4,11 +4,6 @@
 # You may wish to alter this file to override the set of languages analyzed,
 # or to provide custom queries or build logic.
 #
-# ******** NOTE ********
-# We have attempted to detect the languages in your repository. Please check
-# the `language` matrix defined below to confirm you have the correct set of
-# supported CodeQL languages.
-#
 name: "CodeQL"
 
 on:
@@ -24,7 +19,7 @@ on:
 jobs:
   analyze:
     name: Analyze
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     permissions:
       actions: read
       contents: read
@@ -67,16 +62,24 @@ jobs:
     #   If the Autobuild fails above, remove it and uncomment the following three lines.
     #   modify them (or add more) to build your code if your project, please refer to the EXAMPLE below for guidance.
 
-    - name: Setup .NET Core SDK 6.0.x
+    - name: Setup JDK
+      uses: actions/setup-java@v2
+      with:
+        distribution: 'microsoft'
+        java-version: '11'
+
+    - name: Setup .NET Core SDK
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: '6.0.x'
+        include-prerelease: true
         
     - name: Install Workloads
-      run: dotnet workload install android wasm-tools
+      run: |
+        dotnet workload install android --ignore-failed-sources
         
     - name: Build
-      run: dotnet build --interactive
+      run: dotnet build -c Release -f net6.0-android --interactive
 
     # - run: |
     #   echo "Run, Build Application using script"
