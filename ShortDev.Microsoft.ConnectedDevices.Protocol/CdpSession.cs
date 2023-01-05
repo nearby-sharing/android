@@ -27,7 +27,7 @@ public sealed class CdpSession : IDisposable
 {
     public required uint LocalSessionId { get; init; }
     public required uint RemoteSessionId { get; init; }
-    public required CdpDevice Device { get; init; }
+    public CdpDevice Device { get; }
 
     internal ulong GetSessionId(bool isHost)
     {
@@ -37,7 +37,13 @@ public sealed class CdpSession : IDisposable
         return result;
     }
 
-    internal CdpSession() { }
+    readonly UpgradeHandler _upgradeHandler;
+    private CdpSession(CdpDevice device)
+    {
+        Device = device;
+
+        _upgradeHandler = new(this, device);
+    }
 
     #region Registration
     static readonly AutoKeyRegistry<CdpSession> _sessionRegistry = new();
@@ -56,7 +62,8 @@ public sealed class CdpSession : IDisposable
             if (result.RemoteSessionId != remoteSessionId)
                 throw new CdpSessionException($"Wrong {nameof(RemoteSessionId)}");
 
-            // ToDo: Security (Upgrade -> address change)
+            // Do not check for device here!
+            // See UpgradeHandler class
             //if (result.Device.Address != device.Address)
             //    throw new CdpSessionException("Wrong device!");
 
@@ -67,9 +74,8 @@ public sealed class CdpSession : IDisposable
         else
         {
             // Create
-            return _sessionRegistry.Create(localSessionId => new()
+            return _sessionRegistry.Create(localSessionId => new(device)
             {
-                Device = device,
                 LocalSessionId = (uint)localSessionId,
                 RemoteSessionId = remoteSessionId
             }, out _);
@@ -94,12 +100,18 @@ public sealed class CdpSession : IDisposable
         {
             header.CorrectClientSessionBit();
 
+            // Only validate socket if it's not a connection msg
+            // All upgrade messages (belong to connect) need to be seen
+            // See HandleConnect(...)
+            if (header.Type != MessageType.Connect && !_upgradeHandler.IsSocketAllowed(socket))
+                throw UnexpectedMessage(socket.RemoteDevice.Address);
+
             if (header.Type == MessageType.Connect)
             {
                 if (_connectionEstablished)
                     throw UnexpectedMessage(header.Type.ToString());
 
-                HandleConnect(header, payloadReader, writer);
+                HandleConnect(socket, header, payloadReader, writer);
             }
             else if (header.Type == MessageType.Control)
             {
@@ -125,10 +137,17 @@ public sealed class CdpSession : IDisposable
     }
 
     #region Connect
-    void HandleConnect(CommonHeader header, BinaryReader reader, BinaryWriter writer)
+    void HandleConnect(CdpSocket socket, CommonHeader header, BinaryReader reader, BinaryWriter writer)
     {
         ConnectionHeader connectionHeader = ConnectionHeader.Parse(reader);
         PlatformHandler?.Log(0, $"Received {header.Type} message {connectionHeader.MessageType} from session {header.SessionId.ToString("X")}");
+
+        if (_upgradeHandler.HandleConnect(socket, header, connectionHeader, reader, writer))
+            return;
+
+        if (!_upgradeHandler.IsSocketAllowed(socket))
+            throw UnexpectedMessage(socket.RemoteDevice.Address);
+
         switch (connectionHeader.MessageType)
         {
             case ConnectionType.ConnectRequest:
@@ -140,18 +159,6 @@ public sealed class CdpSession : IDisposable
             case ConnectionType.DeviceAuthRequest:
             case ConnectionType.UserDeviceAuthRequest:
                 HandleAuthRequest(header, reader, writer, connectionHeader.MessageType);
-                break;
-            case ConnectionType.UpgradeRequest:
-                HandleUpgradeRequest(header, reader, writer);
-                break;
-            case ConnectionType.UpgradeFinalization:
-                HandleUpgradeFinalization(header, reader, writer);
-                break;
-            case ConnectionType.UpgradeFailure:
-                HandleUpgradeFailure(header, reader, writer);
-                break;
-            case ConnectionType.TransportRequest:
-                HandleTransportRequest(header, reader, writer);
                 break;
             case ConnectionType.AuthDoneRequest:
                 HandleAuthDoneRequest(header, reader, writer);
@@ -211,68 +218,6 @@ public sealed class CdpSession : IDisposable
                 _localEncryption.DeviceCertificate!, // ToDo: User cert
                 _localEncryption.Nonce, _remoteEncryption!.Nonce
             ).Write(writer);
-        });
-    }
-    void HandleUpgradeRequest(CommonHeader header, BinaryReader reader, BinaryWriter writer)
-    {
-        var msg = UpgradeRequest.Parse(reader);
-        PlatformHandler?.Log(0, $"Upgrade request {msg.UpgradeId} to {string.Join(',', msg.Endpoints.Select((x) => x.Type.ToString()))}");
-
-        header.Flags = 0;
-        Cryptor!.EncryptMessage(writer, header, (writer) =>
-        {
-            new ConnectionHeader()
-            {
-                ConnectionMode = ConnectionMode.Proximal,
-                MessageType = ConnectionType.UpgradeResponse
-            }.Write(writer);
-            new UpgradeResponse()
-            {
-                HostEndpoints = new[]
-                {
-                    new HostEndpointMetadata(CdpTransportType.Tcp, PlatformHandler!.GetLocalIP(), Constants.TcpPort.ToString())
-                },
-                Endpoints = new[]
-                {
-                    TransportEndpoint.Tcp
-                }
-            }.Write(writer);
-        });
-    }
-    void HandleUpgradeFinalization(CommonHeader header, BinaryReader reader, BinaryWriter writer)
-    {
-        var msg = TransportEndpoint.ParseArray(reader);
-        PlatformHandler?.Log(0, $"Transport upgrade to {string.Join(',', msg.Select((x) => x.Type.ToString()))}");
-
-        header.Flags = 0;
-        Cryptor!.EncryptMessage(writer, header, (writer) =>
-        {
-            new ConnectionHeader()
-            {
-                ConnectionMode = ConnectionMode.Proximal,
-                MessageType = ConnectionType.UpgradeFinalizationResponse
-            }.Write(writer);
-        });
-    }
-    void HandleUpgradeFailure(CommonHeader header, BinaryReader reader, BinaryWriter writer)
-    {
-        var msg = HResultPayload.Parse(reader);
-        PlatformHandler?.Log(0, $"Transport upgrade failed with HResult {msg.HResult}");
-    }
-    void HandleTransportRequest(CommonHeader header, BinaryReader reader, BinaryWriter writer)
-    {
-        var msg = TransportRequest.Parse(reader);
-        PlatformHandler?.Log(0, $"Transport upgrade {msg.UpgradeId} succeeded");
-
-        header.Flags = 0;
-        Cryptor!.EncryptMessage(writer, header, (writer) =>
-        {
-            new ConnectionHeader()
-            {
-                ConnectionMode = ConnectionMode.Proximal,
-                MessageType = ConnectionType.TransportConfirmation
-            }.Write(writer);
-            msg.Write(writer);
         });
     }
     void HandleAuthDoneRequest(CommonHeader header, BinaryReader reader, BinaryWriter writer)
@@ -408,7 +353,7 @@ public sealed class CdpSession : IDisposable
     #endregion
 
     Exception UnexpectedMessage(string? info = null)
-        => new CdpSecurityException($"Recieved unexpected message {info ?? "null"}");
+        => new CdpSecurityException($"Received unexpected message {info ?? "null"}");
 
     public bool IsDisposed { get; private set; } = false;
 

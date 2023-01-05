@@ -321,7 +321,7 @@ public sealed class ReceiveActivity : AppCompatActivity, IBluetoothHandler, INet
 
     private void OnDeviceConnected(ICdpTransport sender, CdpSocket socket)
     {
-        Log(0, $"Device {socket.RemoteDevice!.Name} ({socket.RemoteDevice!.Address}) connected via {socket.TransportType}");
+        Log(0, $"Device {socket.RemoteDevice.Name} ({socket.RemoteDevice.Address}) connected via {socket.TransportType}");
         Task.Run(() =>
         {
             var reader = socket.Reader;

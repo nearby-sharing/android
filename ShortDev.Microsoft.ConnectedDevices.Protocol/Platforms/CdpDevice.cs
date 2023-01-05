@@ -2,7 +2,7 @@
 
 public class CdpDevice
 {
-    public string? Name { get; init; }
-    public string? Address { get; init; }
+    public required string Name { get; init; }
+    public required string Address { get; init; }
     public string? Alias { get; init; }
 }
