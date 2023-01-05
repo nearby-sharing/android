@@ -29,24 +29,28 @@ public sealed class NetworkTransport : ICdpTransport
     {
         _listener.Start();
 
-        while (!cancellationToken.IsCancellationRequested)
+        try
         {
-            var client = await _listener.AcceptTcpClientAsync(cancellationToken);
-            var stream = client.GetStream();
-            DeviceConnected?.Invoke(this, new()
+            while (!cancellationToken.IsCancellationRequested)
             {
-                TransportType = CdpTransportType.Tcp,
-                Close = client.Close,
-                InputStream = stream,
-                OutputStream = stream,
-                RemoteDevice = new()
+                var client = await _listener.AcceptTcpClientAsync(cancellationToken);
+                var stream = client.GetStream();
+                DeviceConnected?.Invoke(this, new()
                 {
-                    Name = string.Empty,
-                    Alias = string.Empty,
-                    Address = ((IPEndPoint?)client.Client.RemoteEndPoint)?.Address.ToString() ?? throw new InvalidDataException("No ip address")
-                }
-            });
+                    TransportType = CdpTransportType.Tcp,
+                    Close = client.Close,
+                    InputStream = stream,
+                    OutputStream = stream,
+                    RemoteDevice = new()
+                    {
+                        Name = string.Empty,
+                        Alias = string.Empty,
+                        Address = ((IPEndPoint?)client.Client.RemoteEndPoint)?.Address.ToString() ?? throw new InvalidDataException("No ip address")
+                    }
+                });
+            }
         }
+        catch (OperationCanceledException) { }
     }
 
     public CdpSocket Connect(CdpDevice device)
