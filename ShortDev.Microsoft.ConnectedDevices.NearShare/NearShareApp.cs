@@ -4,6 +4,7 @@ using ShortDev.Microsoft.ConnectedDevices.Protocol.Serialization;
 using ShortDev.Networking;
 using System.Collections;
 using System.Diagnostics;
+using System.Net.Sockets;
 using System.Runtime.InteropServices;
 
 namespace ShortDev.Microsoft.ConnectedDevices.NearShare;

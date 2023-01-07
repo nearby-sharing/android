@@ -129,7 +129,7 @@ public sealed class CdpSession : IDisposable
             {
                 // We might receive a "ReliabilityResponse"
                 // ignore
-                PlatformHandler?.Log(0, $"Received {header.Type} message from session {header.SessionId.ToString("X")}");
+                PlatformHandler?.Log(0, $"Received {header.Type} message from session {header.SessionId.ToString("X")} via {socket.TransportType}");
             }
         }
 
@@ -140,7 +140,7 @@ public sealed class CdpSession : IDisposable
     void HandleConnect(CdpSocket socket, CommonHeader header, BinaryReader reader, BinaryWriter writer)
     {
         ConnectionHeader connectionHeader = ConnectionHeader.Parse(reader);
-        PlatformHandler?.Log(0, $"Received {header.Type} message {connectionHeader.MessageType} from session {header.SessionId.ToString("X")}");
+        PlatformHandler?.Log(0, $"Received {header.Type} message {connectionHeader.MessageType} from session {header.SessionId.ToString("X")} via {socket.TransportType}");
 
         if (_upgradeHandler.HandleConnect(socket, header, connectionHeader, reader, writer))
             return;
@@ -256,7 +256,7 @@ public sealed class CdpSession : IDisposable
     void HandleControl(CommonHeader header, BinaryReader reader, BinaryWriter writer, CdpSocket socket)
     {
         var controlHeader = ControlHeader.Parse(reader);
-        PlatformHandler?.Log(0, $"Received {header.Type} message {controlHeader.MessageType} from session {header.SessionId.ToString("X")}");
+        PlatformHandler?.Log(0, $"Received {header.Type} message {controlHeader.MessageType} from session {header.SessionId.ToString("X")} via {socket.TransportType}");
         switch (controlHeader.MessageType)
         {
             case ControlMessageType.StartChannelRequest:
