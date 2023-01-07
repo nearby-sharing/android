@@ -60,12 +60,16 @@ internal sealed class UpgradeHandler
     {
         var msg = TransportRequest.Parse(reader);
 
-        bool allowed = _upgradeIds.Contains(msg.UpgradeId);
-        if (allowed)
+        // Sometimes the device sends multiple transport requests
+        // If we know it already then let it pass
+        bool allowed = IsSocketAllowed(socket);
+        if (!allowed && _upgradeIds.Contains(msg.UpgradeId))
         {
             // No we have confirmed that this address belongs to the same device (different transport)
             _allowedAddresses.Add(socket.RemoteDevice.Address);
             _upgradeIds.Remove(msg.UpgradeId);
+
+            allowed = true;
         }
 
         _session.PlatformHandler?.Log(0, $"Transport upgrade {msg.UpgradeId} {(allowed ? "succeeded" : "failed")}");
