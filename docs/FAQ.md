@@ -16,6 +16,9 @@ From there you can select this app.
 In theory, any type of transport can be used but currently only **Bluetooth** (Rfcomm) and **Wifi** (local network) are supported.   
 I'll might make other types available in the future.
 
+### My device is `not supported`
+Ensure that you've set your "near share" settings in windows to send and receive to / from `all devices`.
+
 ### My transfer is slow
 In general bluetooth is slower than wifi, so try to **always choose wifi** if you can.
 
