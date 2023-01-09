@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<LangVersion>preview</LangVersion>
+		<EnablePreviewFeatures>True</EnablePreviewFeatures>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\ShortDev.Microsoft.ConnectedDevices.Protocol\ShortDev.Microsoft.ConnectedDevices.Protocol.csproj" />
+		<None Include="../docs/NearShare.md" Link="docs/NearShare.md" />
+	</ItemGroup>
+
+</Project>

@@ -4,26 +4,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    android:layout_height="match_parent">
 
-    <com.google.android.material.appbar.AppBarLayout
+    <include
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fitsSystemWindows="true">
-
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:titleCentered="true"
-            app:titleTextColor="#fff"
-            app:subtitleCentered="true"
-            app:subtitleTextColor="#efefef"
-            style="@style/AppTheme.AppBarOverlay" />
-
-    </com.google.android.material.appbar.AppBarLayout>
+        layout="@layout/layout_appbar" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -131,10 +117,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
-                    android:enabled="false"
                     android:text="Receive"
-                    android:visibility="gone"
-                    app:icon="@drawable/file_download_48"
+                    app:icon="@drawable/ic_fluent_mail_inbox_24_regular"
                     style="@style/AppTheme.NearbyShareButton" />
             </LinearLayout>
         </LinearLayout>
@@ -143,23 +127,13 @@
 
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/floating_action_button"
+        android:id="@+id/floating_receive_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|right"
         android:layout_margin="16dp"
-        android:src="@drawable/outline_share_24"
+        android:src="@drawable/ic_fluent_mail_inbox_24_regular"
         app:tint="?attr/colorOnPrimary"
         app:backgroundTint="?attr/colorPrimary"/>
-
-    <!-- <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/open_nearby_share_android_fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|left"
-        android:layout_margin="16dp"
-        android:src="@drawable/nearby_share_48"
-        app:tint="?attr/colorOnPrimary"
-        app:backgroundTint="?attr/colorPrimary"/> -->
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

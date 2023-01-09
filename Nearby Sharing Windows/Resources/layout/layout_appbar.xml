@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<com.google.android.material.appbar.AppBarLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:liftOnScroll="true">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:title="Nearby Sharing"
+        app:titleCentered="true"
+        app:titleTextColor="#fff"
+        app:subtitle="Send data to Windows 10 / 11"
+        app:subtitleCentered="true"
+        app:subtitleTextColor="#efefef"
+        app:menu="@menu/menu_main" />
+
+</com.google.android.material.appbar.AppBarLayout>

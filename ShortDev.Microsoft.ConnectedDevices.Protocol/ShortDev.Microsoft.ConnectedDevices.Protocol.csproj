@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<LangVersion>preview</LangVersion>
+		<EnablePreviewFeatures>True</EnablePreviewFeatures>
+		<Nullable>enable</Nullable>
+		<Version>0.1.0</Version>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="PolySharp" Version="1.7.1" />
+		<PackageReference Include="System.Memory" Version="4.5.5" />
+		<PackageReference Include="Bond.CSharp" Version="10.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\ShortDev.Networking\ShortDev.Networking.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="../docs/Crypt.md" Link="Encryption\Crypt.md" />
+		<None Include="../docs/CdpDllFlow.md" Link="docs/CdpDllFlow.md" />
+		<None Include="../docs/Logging.md" Link="docs/Logging.md" />
+		<None Include="../utils/CdpDissector.lua" Link="utils/CdpDissector.lua" />
+	</ItemGroup>
+
+</Project>
