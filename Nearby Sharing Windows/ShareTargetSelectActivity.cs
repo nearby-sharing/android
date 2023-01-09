@@ -216,8 +216,11 @@ public sealed class ShareTargetSelectActivity : AppCompatActivity, View.IOnApply
         StatusTextView.Text = "Waiting for acceptance...";
 
         RemoteSystemConnectionRequest connectionRequest = new RemoteSystemConnectionRequest(remoteSystem);
-        if (NearShareSender.IsNearShareSupported(connectionRequest))
+        try
         {
+            if (!NearShareSender.IsNearShareSupported(connectionRequest))
+                throw new Exception("Not supported\nCheck if \"all devices\" are allowed");
+
             try
             {
                 AsyncOperation? uriTransferOperation = null;
@@ -304,17 +307,15 @@ public sealed class ShareTargetSelectActivity : AppCompatActivity, View.IOnApply
                 else
                     Snackbar.Make(Window!.DecorView, $"Status: {result.Name()}", Snackbar.LengthLong).Show();
             }
-            catch (Exception ex)
+            finally
             {
-                Snackbar.Make(Window!.DecorView, $"Error: {ex.Message}", Snackbar.LengthLong).Show();
+                FinishAsync();
             }
-
-            await Task.Delay(1500);
-
-            this.Finish();
         }
-        else
-            Snackbar.Make(Window!.DecorView, "Not supported", Snackbar.LengthLong).Show();
+        catch (Exception ex)
+        {
+            Snackbar.Make(Window!.DecorView, $"Error: {ex.Message}", Snackbar.LengthLong).Show();
+        }
     }
 
     void OnRequestAccepted()
@@ -330,6 +331,12 @@ public sealed class ShareTargetSelectActivity : AppCompatActivity, View.IOnApply
     }
 
     #region Finish
+    async void FinishAsync(int delayMs = 1500)
+    {
+        await Task.Delay(delayMs);
+        Finish();
+    }
+
     public override void OnBackPressed()
         => Finish();
     public override void Finish()
