@@ -48,104 +48,15 @@
                 android:layout_height="wrap_content"
                 android:animateLayoutChanges="true">
 
-                <!-- #region send -->
-                <RelativeLayout
-                    android:orientation="vertical"
+               <include
+                    layout="@layout/activity_share__send"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/sendingDataLayout"
-                    android:animateLayoutChanges="true">
+                    android:layout_height="match_parent" />
 
-                    <ImageView
-                        android:id="@+id/waitForAcceptanceView"
-                        android:layout_width="80dp"
-                        android:layout_height="80dp"
-                        android:layout_centerInParent="true"
-                        android:src="@drawable/ic_fluent_send_clock_24_regular"/>
-
-                    <LinearLayout
-                        android:orientation="vertical"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerInParent="true"
-                        android:id="@+id/progressUILayout"
-                        android:visibility="gone">
-                        <RelativeLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content">
-                            <com.google.android.material.progressindicator.CircularProgressIndicator
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="5dp"
-                                android:layout_marginBottom="5dp"
-                                android:id="@+id/sendProgressIndicator"
-                                android:progress="0"
-                                app:indicatorSize="70dp"
-                                app:trackCornerRadius="10dp"
-                                android:layout_centerInParent="true" />
-                            <androidx.cardview.widget.CardView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_centerInParent="true"
-                                app:cardCornerRadius="50dp"
-                                app:cardElevation="0dp"
-                                android:background="@android:color/transparent"
-                                android:animateLayoutChanges="true">
-                                <ImageView
-                                    android:layout_width="50dp"
-                                    android:layout_height="50dp"
-                                    android:scaleType="centerCrop"
-                                    android:src="@drawable/user"/>
-                                <ImageView
-                                    android:layout_width="50dp"
-                                    android:layout_height="50dp"
-                                    android:scaleType="centerCrop"
-                                    android:id="@+id/doneIndicatorImageView"
-                                    android:visibility="gone"
-                                    android:src="@drawable/done"/>
-                            </androidx.cardview.widget.CardView>
-                        </RelativeLayout>
-                        <TextView
-                            android:id="@+id/currentDeviceTextView"
-                            android:layout_marginTop="5dp"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:textAppearance="?attr/textAppearanceSubtitle2"
-                            android:text="Device"/>
-                    </LinearLayout>
-
-                    <Button
-                        android:id="@id/cancel_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Cancel"
-                        android:layout_alignParentBottom="true"
-                        android:enabled="false"
-                        style="?attr/materialButtonOutlinedStyle" />
-                </RelativeLayout>
-                <!-- #endregion -->
-
-                <!-- #region device select -->
-                <RelativeLayout
+                <include
+                    layout="@layout/activity_share__device_select"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:id="@+id/selectDeviceLayout"
-                    android:animateLayoutChanges="true">
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:id="@+id/deviceSelector"
-                        android:background="#fff"
-                        android:scrollbars="vertical" />
-                    <ImageView
-                        android:id="@+id/emptyDeviceListView"
-                        android:layout_width="80dp"
-                        android:layout_height="80dp"
-                        android:layout_centerInParent="true"
-                        android:src="@drawable/ic_fluent_search_24_regular" />
-                </RelativeLayout>
-                <!-- #endregion -->
+                    android:layout_height="match_parent" />
             </FrameLayout>
         </LinearLayout>
 
