@@ -22,7 +22,7 @@ public class NearShareHandshakeApp : CdpAppBase, ICdpAppId
         header.AdditionalHeaders.RemoveAll((x) => x.Type == AdditionalHeaderType.CorrelationVector);
 
         string id = payload.Get<Guid>("OperationId").ToString();
-        CdpAppRegistration.TryRegisterApp(
+        CdpAppRegistration.RegisterApp(
             id,
             NearShareApp.Name,
             () => new NearShareApp()

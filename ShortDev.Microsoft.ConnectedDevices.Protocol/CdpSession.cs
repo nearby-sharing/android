@@ -5,16 +5,12 @@ using ShortDev.Microsoft.ConnectedDevices.Protocol.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Messages.Connection;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Messages.Connection.Authentication;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Messages.Connection.DeviceInfo;
-using ShortDev.Microsoft.ConnectedDevices.Protocol.Messages.Connection.TransportUpgrade;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Messages.Control;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms;
-using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms.Network;
-using ShortDev.Microsoft.ConnectedDevices.Protocol.Transports;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Protocol;
@@ -27,15 +23,10 @@ public sealed class CdpSession : IDisposable
 {
     public required uint LocalSessionId { get; init; }
     public required uint RemoteSessionId { get; init; }
+    public required ConnectedDevicesPlatform Platform { get; init; }
+
     public CdpDevice Device { get; }
 
-    internal ulong GetSessionId(bool isHost)
-    {
-        ulong result = (ulong)LocalSessionId << 32 | RemoteSessionId;
-        if (isHost)
-            result |= CommonHeader.SessionIdHostFlag;
-        return result;
-    }
 
     readonly UpgradeHandler _upgradeHandler;
     private CdpSession(CdpDevice device)
@@ -45,9 +36,17 @@ public sealed class CdpSession : IDisposable
         _upgradeHandler = new(this, device);
     }
 
+    internal ulong GetSessionId(bool isHost)
+    {
+        ulong result = (ulong)LocalSessionId << 32 | RemoteSessionId;
+        if (isHost)
+            result |= CommonHeader.SessionIdHostFlag;
+        return result;
+    }
+
     #region Registration
     static readonly AutoKeyRegistry<CdpSession> _sessionRegistry = new();
-    public static CdpSession GetOrCreate(CdpDevice device, CommonHeader header)
+    internal static CdpSession GetOrCreate(ConnectedDevicesPlatform platform, CdpDevice device, CommonHeader header)
     {
         ArgumentNullException.ThrowIfNull(device);
         ArgumentNullException.ThrowIfNull(header);
@@ -76,14 +75,13 @@ public sealed class CdpSession : IDisposable
             // Create
             return _sessionRegistry.Create(localSessionId => new(device)
             {
+                Platform = platform,
                 LocalSessionId = (uint)localSessionId,
                 RemoteSessionId = remoteSessionId
             }, out _);
         }
     }
     #endregion
-
-    public INetworkHandler? PlatformHandler { get; set; } = null;
 
     #region HandleMessages
     internal CdpCryptor? Cryptor { get; private set; } = null;
@@ -129,7 +127,7 @@ public sealed class CdpSession : IDisposable
             {
                 // We might receive a "ReliabilityResponse"
                 // ignore
-                PlatformHandler?.Log(0, $"Received {header.Type} message from session {header.SessionId.ToString("X")} via {socket.TransportType}");
+                Platform.Handler.Log(0, $"Received {header.Type} message from session {header.SessionId.ToString("X")} via {socket.TransportType}");
             }
         }
 
@@ -140,7 +138,7 @@ public sealed class CdpSession : IDisposable
     void HandleConnect(CdpSocket socket, CommonHeader header, BinaryReader reader, BinaryWriter writer)
     {
         ConnectionHeader connectionHeader = ConnectionHeader.Parse(reader);
-        PlatformHandler?.Log(0, $"Received {header.Type} message {connectionHeader.MessageType} from session {header.SessionId.ToString("X")} via {socket.TransportType}");
+        Platform.Handler.Log(0, $"Received {header.Type} message {connectionHeader.MessageType} from session {header.SessionId.ToString("X")} via {socket.TransportType}");
 
         if (_upgradeHandler.HandleConnect(socket, header, connectionHeader, reader, writer))
             return;
@@ -256,7 +254,7 @@ public sealed class CdpSession : IDisposable
     void HandleControl(CommonHeader header, BinaryReader reader, BinaryWriter writer, CdpSocket socket)
     {
         var controlHeader = ControlHeader.Parse(reader);
-        PlatformHandler?.Log(0, $"Received {header.Type} message {controlHeader.MessageType} from session {header.SessionId.ToString("X")} via {socket.TransportType}");
+        Platform.Handler.Log(0, $"Received {header.Type} message {controlHeader.MessageType} from session {header.SessionId.ToString("X")} via {socket.TransportType}");
         switch (controlHeader.MessageType)
         {
             case ControlMessageType.StartChannelRequest:

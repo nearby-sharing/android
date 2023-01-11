@@ -4,8 +4,6 @@ using ShortDev.Microsoft.ConnectedDevices.Protocol.Messages.Connection.Transport
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Transports;
 using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -55,7 +53,7 @@ internal sealed class UpgradeHandler
         return false;
     }
 
-    ConcurrentList<Guid> _upgradeIds = new();
+    readonly ConcurrentList<Guid> _upgradeIds = new();
     void HandleTransportRequest(CdpSocket socket, CommonHeader header, BinaryReader reader, BinaryWriter writer)
     {
         var msg = TransportRequest.Parse(reader);
@@ -72,7 +70,7 @@ internal sealed class UpgradeHandler
             allowed = true;
         }
 
-        _session.PlatformHandler?.Log(0, $"Transport upgrade {msg.UpgradeId} {(allowed ? "succeeded" : "failed")}");
+        _session.Platform.Handler.Log(0, $"Transport upgrade {msg.UpgradeId} {(allowed ? "succeeded" : "failed")}");
 
         header.Flags = 0;
         _session.Cryptor!.EncryptMessage(writer, header, (writer) =>
@@ -89,7 +87,25 @@ internal sealed class UpgradeHandler
     void HandleUpgradeRequest(CommonHeader header, BinaryReader reader, BinaryWriter writer)
     {
         var msg = UpgradeRequest.Parse(reader);
-        _session.PlatformHandler?.Log(0, $"Upgrade request {msg.UpgradeId} to {string.Join(',', msg.Endpoints.Select((x) => x.Type.ToString()))}");
+        _session.Platform.Handler.Log(0, $"Upgrade request {msg.UpgradeId} to {string.Join(',', msg.Endpoints.Select((x) => x.Type.ToString()))}");
+
+        var networkTransport = _session.Platform.TryGetTransport<NetworkTransport>();
+        if (networkTransport == null)
+        {
+            _session.Cryptor!.EncryptMessage(writer, header, (writer) =>
+            {
+                new ConnectionHeader()
+                {
+                    ConnectionMode = ConnectionMode.Proximal,
+                    MessageType = ConnectionType.UpgradeFailure
+                }.Write(writer);
+                new HResultPayload()
+                {
+                    HResult = -1
+                }.Write(writer);
+            });
+            return;
+        }
 
         _upgradeIds.Add(msg.UpgradeId);
 
@@ -105,7 +121,7 @@ internal sealed class UpgradeHandler
             {
                 HostEndpoints = new[]
                 {
-                    new HostEndpointMetadata(CdpTransportType.Tcp, _session.PlatformHandler!.GetLocalIP(), Constants.TcpPort.ToString())
+                    new HostEndpointMetadata(CdpTransportType.Tcp, networkTransport.Handler.GetLocalIp(), Constants.TcpPort.ToString())
                 },
                 Endpoints = new[]
                 {
@@ -114,10 +130,11 @@ internal sealed class UpgradeHandler
             }.Write(writer);
         });
     }
+
     void HandleUpgradeFinalization(CommonHeader header, BinaryReader reader, BinaryWriter writer)
     {
         var msg = TransportEndpoint.ParseArray(reader);
-        _session.PlatformHandler?.Log(0, $"Transport upgrade to {string.Join(',', msg.Select((x) => x.Type.ToString()))}");
+        _session.Platform.Handler.Log(0, $"Transport upgrade to {string.Join(',', msg.Select((x) => x.Type.ToString()))}");
 
         header.Flags = 0;
         _session.Cryptor!.EncryptMessage(writer, header, (writer) =>
@@ -129,9 +146,10 @@ internal sealed class UpgradeHandler
             }.Write(writer);
         });
     }
+
     void HandleUpgradeFailure(CommonHeader header, BinaryReader reader, BinaryWriter writer)
     {
         var msg = HResultPayload.Parse(reader);
-        _session.PlatformHandler?.Log(0, $"Transport upgrade failed with HResult {msg.HResult}");
+        _session.Platform.Handler.Log(0, $"Transport upgrade failed with HResult {msg.HResult}");
     }
 }

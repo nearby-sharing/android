@@ -57,5 +57,8 @@ public sealed class BluetoothTransport : ICdpTransport, ICdpDiscoverableTranspor
         }, cancellationToken);
     }
 
-    public void Dispose() { }
+    public void Dispose()
+    {
+        DeviceConnected = null;
+    }
 }

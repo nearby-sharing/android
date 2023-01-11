@@ -10,7 +10,6 @@ using Google.Android.Material.ProgressIndicator;
 using ShortDev.Android.UI;
 using ShortDev.Microsoft.ConnectedDevices.NearShare;
 using ShortDev.Microsoft.ConnectedDevices.Protocol;
-using ShortDev.Microsoft.ConnectedDevices.Protocol.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms.Bluetooth;
 using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms.Network;
@@ -28,7 +27,6 @@ namespace Nearby_Sharing_Windows;
 public sealed class ReceiveActivity : AppCompatActivity, IBluetoothHandler, INetworkHandler, INearSharePlatformHandler
 {
     BluetoothAdapter? _btAdapter;
-    BluetoothTransport? _bluetoothAdvertisement;
 
     [AllowNull] TextView debugLogTextView;
 
@@ -138,6 +136,7 @@ public sealed class ReceiveActivity : AppCompatActivity, IBluetoothHandler, INet
     }
 
     CancellationTokenSource? _cancellationTokenSource;
+    ConnectedDevicesPlatform? _cdp;
     void InitializeCDP()
     {
         if (btAddress == null)
@@ -153,21 +152,24 @@ public sealed class ReceiveActivity : AppCompatActivity, IBluetoothHandler, INet
             $"Address: {btAddress.ToStringFormatted()}";
         debugLogTextView = FindViewById<TextView>(Resource.Id.debugLogTextView)!;
 
-        CdpAppRegistration.TryUnregisterApp<NearShareHandshakeApp>();
-        CdpAppRegistration.TryRegisterApp<NearShareHandshakeApp>(() => new() { PlatformHandler = this });
+        CdpAppRegistration.RegisterApp<NearShareHandshakeApp>(() => new()
+        {
+            PlatformHandler = this
+        });
 
-        _bluetoothAdvertisement = new(this);
-        _bluetoothAdvertisement.Advertise(new CdpAdvertisement(
+        Debug.Assert(_cdp == null);
+
+        _cdp = new(this);
+
+        _cdp.AddTransport<BluetoothTransport>(new(this));
+        _cdp.AddTransport<NetworkTransport>(new(this));
+
+        _cdp.Listen(_cancellationTokenSource.Token);
+        _cdp.Advertise(new CdpAdvertisement(
             DeviceType.Android,
             btAddress, // "00:fa:21:3e:fb:19"
             _btAdapter.Name!
         ), _cancellationTokenSource.Token);
-        _bluetoothAdvertisement.DeviceConnected += OnDeviceConnected;
-        _bluetoothAdvertisement.Listen(_cancellationTokenSource.Token);
-
-        NetworkTransport networkAdvertisement = new();
-        networkAdvertisement.DeviceConnected += OnDeviceConnected;
-        networkAdvertisement.Listen(_cancellationTokenSource.Token);
     }
 
     string GetFilePath(string name)
@@ -212,11 +214,12 @@ public sealed class ReceiveActivity : AppCompatActivity, IBluetoothHandler, INet
     public override void Finish()
     {
         _cancellationTokenSource?.Cancel();
+        _cdp?.Dispose();
         base.Finish();
     }
 
     #region Communication
-    #region Not implemented
+    #region BLe Scan
     public async Task ScanBLeAsync(ScanOptions<CdpBluetoothDevice> scanOptions, CancellationToken cancellationToken = default)
     {
         using var scanner = _btAdapter?.BluetoothLeScanner ?? throw new InvalidOperationException($"\"{nameof(_btAdapter)}\" is not initialized");
@@ -261,7 +264,7 @@ public sealed class ReceiveActivity : AppCompatActivity, IBluetoothHandler, INet
     }
     #endregion
 
-    #region Advertisement
+    #region BLe Advertisement
     public async Task AdvertiseBLeBeaconAsync(AdvertiseOptions options, CancellationToken cancellationToken = default)
     {
         var settings = new AdvertiseSettings.Builder()
@@ -318,36 +321,6 @@ public sealed class ReceiveActivity : AppCompatActivity, IBluetoothHandler, INet
             });
         }
     }
-
-    private void OnDeviceConnected(ICdpTransport sender, CdpSocket socket)
-    {
-        Log(0, $"Device {socket.RemoteDevice.Name} ({socket.RemoteDevice.Address}) connected via {socket.TransportType}");
-        Task.Run(() =>
-        {
-            var reader = socket.Reader;
-            using (socket)
-            {
-                do
-                {
-                    CdpSession? session = null;
-                    try
-                    {
-                        var header = CommonHeader.Parse(reader);
-                        session = CdpSession.GetOrCreate(socket.RemoteDevice ?? throw new InvalidDataException(), header);
-                        session.PlatformHandler = this;
-                        session.HandleMessage(socket, header, reader);
-                    }
-                    catch (Exception ex)
-                    {
-                        Log(1, $"{ex.GetType().Name} in session {session?.LocalSessionId.ToString() ?? "null"} \n {ex.Message}");
-                        // throw;
-                        // ToDo
-                        break;
-                    }
-                } while (!socket.IsClosed);
-            }
-        });
-    }
     #endregion
     #endregion
 
@@ -359,7 +332,7 @@ public sealed class ReceiveActivity : AppCompatActivity, IBluetoothHandler, INet
         });
     }
 
-    public string GetLocalIP()
+    public string GetLocalIp()
     {
         WifiManager wifiManager = (WifiManager)GetSystemService(WifiService)!;
         WifiInfo wifiInfo = wifiManager.ConnectionInfo!;

@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using ShortDev.Microsoft.ConnectedDevices.Protocol.Messages;
+using ShortDev.Microsoft.ConnectedDevices.Protocol.Messages.Control;
+using System;
+using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
-using ShortDev.Microsoft.ConnectedDevices.Protocol.Messages;
-using ShortDev.Microsoft.ConnectedDevices.Protocol.Messages.Control;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Protocol;
 
@@ -18,23 +18,19 @@ public static class CdpAppRegistration
     /// </summary>
     public delegate T CdpAppFactory<out T>() where T : CdpAppBase;
 
-    readonly record struct AppId(string Id, string Name, CdpAppFactory<CdpAppBase> Factory);
+    record AppId(string Id, string Name, CdpAppFactory<CdpAppBase> Factory);
 
-    static readonly Dictionary<string, AppId> _registration = new();
+    static readonly ConcurrentDictionary<string, AppId> _registration = new();
 
-    public static bool TryRegisterApp<TApp>() where TApp : CdpAppBase, ICdpAppId, new()
-        => TryRegisterApp(TApp.Id, TApp.Name, () => new TApp());
+    public static void RegisterApp<TApp>(CdpAppFactory<TApp> factory) where TApp : CdpAppBase, ICdpAppId
+        => RegisterApp(TApp.Id, TApp.Name, factory);
 
-    public static bool TryRegisterApp<TApp>(CdpAppFactory<TApp> factory) where TApp : CdpAppBase, ICdpAppId
-        => TryRegisterApp(TApp.Id, TApp.Name, factory);
-
-    public static bool TryRegisterApp(string id, string name, CdpAppFactory<CdpAppBase> factory)
+    public static void RegisterApp(string id, string name, CdpAppFactory<CdpAppBase> factory)
     {
         id = id.ToLower();
-        lock (_registration)
-        {
-            return _registration.TryAdd(id, new(id, name, factory));
-        }
+
+        AppId appId = new(id, name, factory);
+        _registration.AddOrUpdate(id, appId, (_, _) => appId);
     }
 
     public static bool TryUnregisterApp<TApp>() where TApp : ICdpAppId
@@ -43,17 +39,13 @@ public static class CdpAppRegistration
     public static bool TryUnregisterApp(string id)
     {
         id = id.ToLower();
-        lock (_registration)
-        {
-            return _registration.Remove(id);
-        }
+        return _registration.TryRemove(id, out _);
     }
 
     internal static CdpAppBase InstantiateApp(string id, string name)
     {
         id = id.ToLower();
-        lock (_registration)
-            return _registration[id].Factory();
+        return _registration[id].Factory();
     }
 }
 

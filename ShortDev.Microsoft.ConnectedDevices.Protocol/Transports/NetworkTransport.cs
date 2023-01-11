@@ -1,7 +1,7 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms;
+using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms.Network;
 using System;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -10,16 +10,10 @@ namespace ShortDev.Microsoft.ConnectedDevices.Protocol.Transports;
 
 public sealed class NetworkTransport : ICdpTransport
 {
-    public static string GetLocalIP()
+    public INetworkHandler Handler { get; }
+    public NetworkTransport(INetworkHandler handler)
     {
-        var data = Dns.GetHostEntry(string.Empty).AddressList;
-        var ips = Dns.GetHostEntry(string.Empty).AddressList
-            .Where((x) => x.AddressFamily == AddressFamily.InterNetwork)
-            .ToArray();
-        if (ips.Length != 1)
-            throw new InvalidDataException("Could not resolve ip");
-
-        return ips[0].ToString();
+        Handler = handler;
     }
 
     TcpListener _listener = new(IPAddress.Any, Constants.TcpPort);
@@ -60,6 +54,7 @@ public sealed class NetworkTransport : ICdpTransport
 
     public void Dispose()
     {
+        DeviceConnected = null;
         _listener.Stop();
     }
 }
