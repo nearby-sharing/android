@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShortDev.Microsoft.Connecte
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShortDev.Android", "ShortDev.Android\ShortDev.Android.csproj", "{195C941F-5EEF-45A9-A65C-16186E4BB131}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShortDev.Microsoft.ConnectedDevices.Protocol", "ShortDev.Microsoft.ConnectedDevices.Protocol\ShortDev.Microsoft.ConnectedDevices.Protocol.csproj", "{6EBE41DB-AEFB-45C0-A5E1-8A4352CC4B8E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShortDev.Microsoft.ConnectedDevices", "ShortDev.Microsoft.ConnectedDevices\ShortDev.Microsoft.ConnectedDevices.csproj", "{6EBE41DB-AEFB-45C0-A5E1-8A4352CC4B8E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test", "Test\Test.csproj", "{CB6EAF2F-0357-4C96-8A88-190E6CF3FC2A}"
 EndProject
@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShortDev.Networking", "Shor
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShortDev.Android.FluentIcons", "ShortDev.Android.FluentIcons\ShortDev.Android.FluentIcons.csproj", "{71BECC85-C1AD-49FE-9F5E-689D843ADA88}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShortDev.Microsoft.ConnectedDevices.NearShare", "ShortDev.Microsoft.ConnectedDevices.NearShare\ShortDev.Microsoft.ConnectedDevices.NearShare.csproj", "{D0DE1114-C062-4305-8FB5-2356CE3DA753}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShortDev.Microsoft.ConnectedDevices.NearShare", "ShortDev.Microsoft.ConnectedDevices.NearShare\ShortDev.Microsoft.ConnectedDevices.NearShare.csproj", "{D0DE1114-C062-4305-8FB5-2356CE3DA753}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

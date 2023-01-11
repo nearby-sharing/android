@@ -9,17 +9,17 @@ using AndroidX.RecyclerView.Widget;
 using Google.Android.Material.ProgressIndicator;
 using ShortDev.Android.UI;
 using ShortDev.Microsoft.ConnectedDevices.NearShare;
-using ShortDev.Microsoft.ConnectedDevices.Protocol;
-using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms;
-using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms.Bluetooth;
-using ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms.Network;
-using ShortDev.Microsoft.ConnectedDevices.Protocol.Transports;
+using ShortDev.Microsoft.ConnectedDevices;
+using ShortDev.Microsoft.ConnectedDevices.Platforms;
+using ShortDev.Microsoft.ConnectedDevices.Platforms.Bluetooth;
+using ShortDev.Microsoft.ConnectedDevices.Platforms.Network;
+using ShortDev.Microsoft.ConnectedDevices.Transports;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.NetworkInformation;
 using BLeScanResult = Android.Bluetooth.LE.ScanResult;
-using CdpBluetoothDevice = ShortDev.Microsoft.ConnectedDevices.Protocol.Platforms.Bluetooth.BluetoothDevice;
+using CdpBluetoothDevice = ShortDev.Microsoft.ConnectedDevices.Platforms.Bluetooth.BluetoothDevice;
 
 namespace Nearby_Sharing_Windows;
 

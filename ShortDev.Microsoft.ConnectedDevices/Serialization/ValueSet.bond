@@ -1,0 +1,38 @@
+﻿
+namespace ShortDev.Microsoft.ConnectedDevices.Serialization
+
+enum PropertyType {
+  PropertyType_Empty = 0,
+  PropertyType_UInt32 = 5,
+  // PropertyType_Int64 = 6,
+  PropertyType_UInt64 = 7,
+  PropertyType_String = 39,
+  PropertyType_GuidArray = 15,
+  PropertyType_UInt8Array = 20,
+  PropertyType_UInt32Array = 24,
+  PropertyType_UInt64Array = 26,
+  PropertyType_StringArray = 40  
+}
+
+struct UUID {
+	0: uint32 Data1;
+	1: uint16 Data2;
+	2: uint16 Data3;
+	3: uint64 Data4;
+}
+
+struct PropertyValue {
+	0: required PropertyType Type = PropertyType_Empty;
+	104: uint32 UInt32Value;
+	106: uint64 UInt64Value;
+	114: vector<UUID> GuidArrayValue;
+	119: string StringValue;
+	200: vector<uint8> UInt8ArrayValue;
+	204: vector<uint32> UInt32ArrayValue;
+	206: vector<uint64> UInt64ArrayValue;
+	219: vector<string> StringArrayValue;
+}
+
+struct ValueSet {
+	1: map<wstring, PropertyValue> Entries;
+}

@@ -3,7 +3,7 @@ using Android.Content;
 using Android.Views;
 using AndroidX.AppCompat.App;
 using Google.Android.Material.TextField;
-using ShortDev.Microsoft.ConnectedDevices.Protocol;
+using ShortDev.Microsoft.ConnectedDevices;
 using System.Net.NetworkInformation;
 
 namespace Nearby_Sharing_Windows;
