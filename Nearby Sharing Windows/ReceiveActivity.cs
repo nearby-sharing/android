@@ -366,9 +366,9 @@ static class Extensions
     public static CdpBluetoothDevice ToCdp(this Android.Bluetooth.BluetoothDevice @this, byte[]? beaconData = null)
         => new()
         {
-            Address = @this.Address,
+            Address = @this.Address ?? throw new NullReferenceException(),
             Alias = OperatingSystem.IsAndroidVersionAtLeast(30) ? @this.Alias : null,
-            Name = @this.Name,
+            Name = @this.Name ?? throw new NullReferenceException(),
             BeaconData = beaconData
         };
 
