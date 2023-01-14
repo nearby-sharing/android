@@ -79,7 +79,7 @@ jobs:
         dotnet workload install android --ignore-failed-sources
         
     - name: Build
-      run: dotnet build -c Release -f net6.0-android --interactive
+      run: dotnet build -c Release --interactive
 
     # - run: |
     #   echo "Run, Build Application using script"
