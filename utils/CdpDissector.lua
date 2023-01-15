@@ -50,7 +50,7 @@ function cdp.dissector(buffer, pinfo, tree)
     local bufLen = buffer:len()
     if bufLen == 0 then return end
         
-    if tcp_port().value == 5040 or tcp_port().value == 5050 then
+    if not tcp_port == nil and (tcp_port().value == 5040 or tcp_port().value == 5050) then
         pinfo.cols.protocol = cdp.name
     end
 
