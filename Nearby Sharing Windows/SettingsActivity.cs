@@ -1,10 +1,12 @@
-﻿using Android.Views;
+﻿using Android.Service.QuickSettings;
+using Android.Views;
 using AndroidX.AppCompat.App;
 using AndroidX.Preference;
 
 namespace Nearby_Sharing_Windows;
 
-[Activity(Label = "@string/app_name", Theme = "@style/AppTheme", ConfigurationChanges = UIHelper.ConfigChangesFlags)]
+[IntentFilter(new[] { TileService.ActionQsTilePreferences })]
+[Activity(Label = "@string/app_name", Exported = true, Theme = "@style/AppTheme", ConfigurationChanges = UIHelper.ConfigChangesFlags)]
 public sealed class SettingsActivity : AppCompatActivity
 {
     protected override void OnCreate(Bundle? savedInstanceState)

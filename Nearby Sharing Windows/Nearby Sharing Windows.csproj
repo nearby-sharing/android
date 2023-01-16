@@ -23,6 +23,7 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<None Remove="Assets\MacAddressInfo.html" />
+		<None Remove="Resources\drawable\quick_settings_tile_icon.xml" />
 		<None Remove="Resources\layout\activity_receive.xml" />
 		<None Remove="Resources\layout\activity_settings.xml" />
 		<None Remove="Resources\layout\activity_share__device_select.xml" />
