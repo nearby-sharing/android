@@ -1,4 +1,5 @@
-﻿using Android.Service.QuickSettings;
+﻿using Android.Graphics;
+using Android.Service.QuickSettings;
 using Android.Views;
 using AndroidX.AppCompat.App;
 using AndroidX.Preference;
@@ -15,13 +16,26 @@ public sealed class SettingsActivity : AppCompatActivity
         SetContentView(Resource.Layout.activity_settings);
         UIHelper.SetupToolBar(this, "Settings");
 
+        SupportActionBar!.SetDisplayShowHomeEnabled(true);
+        SupportActionBar!.SetDisplayHomeAsUpEnabled(true);
+
+        var backDrawable = GetDrawable(Resource.Drawable.ic_fluent_arrow_left_24_selector)!;
+        backDrawable.SetTint(Color.White.ToArgb());
+        SupportActionBar!.SetHomeAsUpIndicator(backDrawable);
+
         SupportFragmentManager
             .BeginTransaction()
             .Replace(Resource.Id.settings_container, new SettingsFragment())
             .Commit();
     }
 
-    class SettingsFragment : PreferenceFragmentCompat
+    public override bool OnSupportNavigateUp()
+    {
+        OnBackPressed();
+        return true;
+    }
+
+    sealed class SettingsFragment : PreferenceFragmentCompat
     {
         public override void OnCreatePreferences(Bundle? savedInstanceState, string? rootKey)
         {
