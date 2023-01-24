@@ -26,7 +26,7 @@ public sealed class ReceiveSetupActivity : AppCompatActivity
         {
             btAddress = GetBtAddressInternal(service.Adapter!);
         }
-        catch (Exception ex)
+        catch
         {
             // ToDo: Display error in UI
             btAddress = preferences.GetString(Preference_MacAddress, null);

@@ -4,7 +4,6 @@ using ShortDev.Microsoft.ConnectedDevices.Exceptions;
 using ShortDev.Microsoft.ConnectedDevices.Messages;
 using ShortDev.Networking;
 using System;
-using System.Buffers.Binary;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -41,18 +40,6 @@ public sealed class CdpCryptor
     byte[] ComputeHmac(byte[] buffer)
         => new HMACSHA256(_secret[^32..^0]).ComputeHash(buffer);
 
-    static unsafe void AlterMessageLengthUnsafe(byte[] buffer, short delta)
-    {
-        fixed (byte* pBuffer = buffer)
-        {
-            Span<byte> msgLengthSpan = new(pBuffer + CommonHeader.MessageLengthOffset, 2);
-            BinaryPrimitives.WriteInt16BigEndian(
-                msgLengthSpan,
-                (short)(BinaryPrimitives.ReadInt16BigEndian(msgLengthSpan) + delta)
-            );
-        }
-    }
-
     public unsafe byte[] DecryptMessage(CommonHeader header, byte[] payload, byte[]? hmac = null)
     {
         byte[] decryptedPayload;
@@ -78,7 +65,7 @@ public sealed class CdpCryptor
                 throw new CdpSecurityException("Invalid hmac!");
 
             byte[] buffer = ((ICdpWriteable)header).ToArray().Concat(payload).ToArray();
-            AlterMessageLengthUnsafe(buffer, -Constants.HMacSize);
+            CommonHeader.AlterMessageLengthUnsafe(buffer, -Constants.HMacSize);
 
             var expectedHMac = ComputeHmac(buffer);
             if (!hmac.SequenceEqual(expectedHMac))
@@ -120,7 +107,7 @@ public sealed class CdpCryptor
                 var encryptedPayload = aes.EncryptCbc(buffer, iv, paddingMode);
 
                 header.Flags |= MessageFlags.SessionEncrypted | MessageFlags.HasHMAC;
-                header.SetMessageLength(encryptedPayload.Length);
+                header.SetPayloadLength(encryptedPayload.Length);
                 header.Write(msgWriter);
 
                 msgWriter.Write(encryptedPayload);
@@ -129,7 +116,7 @@ public sealed class CdpCryptor
 
             byte[] msgBuffer = msgStream.ToArray();
             byte[] hmac = ComputeHmac(msgBuffer);
-            AlterMessageLengthUnsafe(msgBuffer, +Constants.HMacSize);
+            CommonHeader.AlterMessageLengthUnsafe(msgBuffer, +Constants.HMacSize);
 
             writer.Write(msgBuffer);
             writer.Write(hmac);

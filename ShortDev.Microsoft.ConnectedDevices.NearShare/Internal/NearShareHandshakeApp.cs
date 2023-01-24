@@ -1,8 +1,7 @@
-﻿using ShortDev.Microsoft.ConnectedDevices;
-using ShortDev.Microsoft.ConnectedDevices.Messages;
+﻿using ShortDev.Microsoft.ConnectedDevices.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Serialization;
 
-namespace ShortDev.Microsoft.ConnectedDevices.NearShare;
+namespace ShortDev.Microsoft.ConnectedDevices.NearShare.Internal;
 
 public class NearShareHandshakeApp : CdpAppBase, ICdpAppId
 {

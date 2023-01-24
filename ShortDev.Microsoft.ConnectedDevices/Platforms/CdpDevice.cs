@@ -1,8 +1,6 @@
 ﻿namespace ShortDev.Microsoft.ConnectedDevices.Platforms;
 
-public class CdpDevice
+public record CdpDevice(string Name, string Address)
 {
-    public required string Name { get; init; }
-    public required string Address { get; init; }
-    public string? Alias { get; init; }
+    public string? MacAddress { get; init; }
 }

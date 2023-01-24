@@ -173,9 +173,21 @@ public sealed class CommonHeader : ICdpHeader<CommonHeader>
 
     #region Message Length
     public const int MessageLengthOffset = 2;
-    public void SetMessageLength(int payloadSize)
+    public void SetPayloadLength(int payloadSize)
     {
         MessageLength = (ushort)(payloadSize + ((ICdpSerializable<CommonHeader>)this).CalcSize());
+    }
+
+    public static unsafe void AlterMessageLengthUnsafe(byte[] buffer, short delta)
+    {
+        fixed (byte* pBuffer = buffer)
+        {
+            Span<byte> msgLengthSpan = new(pBuffer + CommonHeader.MessageLengthOffset, 2);
+            BinaryPrimitives.WriteInt16BigEndian(
+                msgLengthSpan,
+                (short)(BinaryPrimitives.ReadInt16BigEndian(msgLengthSpan) + delta)
+            );
+        }
     }
     #endregion
 

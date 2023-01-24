@@ -1,18 +1,16 @@
-﻿using ShortDev.Microsoft.ConnectedDevices;
+﻿namespace ShortDev.Microsoft.ConnectedDevices.NearShare;
 
-namespace ShortDev.Microsoft.ConnectedDevices.NearShare;
-
-public abstract class TranferToken
+public abstract class TransferToken
 {
     public required string DeviceName { get; init; }
 }
 
-public sealed class UriTranferToken : TranferToken
+public sealed class UriTransferToken : TransferToken
 {
     public required string Uri { get; init; }
 }
 
-public sealed class FileTransferToken : TranferToken
+public sealed class FileTransferToken : TransferToken
 {
     public required string FileName { get; init; }
 

@@ -5,6 +5,7 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Transports;
 
@@ -35,22 +36,18 @@ public sealed class NetworkTransport : ICdpTransport
                     Close = client.Close,
                     InputStream = stream,
                     OutputStream = stream,
-                    RemoteDevice = new()
-                    {
-                        Name = string.Empty,
-                        Alias = string.Empty,
-                        Address = ((IPEndPoint?)client.Client.RemoteEndPoint)?.Address.ToString() ?? throw new InvalidDataException("No ip address")
-                    }
+                    RemoteDevice = new(
+                        string.Empty,
+                        ((IPEndPoint?)client.Client.RemoteEndPoint)?.Address.ToString() ?? throw new InvalidDataException("No ip address")
+                    )
                 });
             }
         }
         catch (OperationCanceledException) { }
     }
 
-    public CdpSocket Connect(CdpDevice device)
-    {
-        throw new NotImplementedException();
-    }
+    public Task<CdpSocket> ConnectAsync(CdpDevice device)
+        => throw new NotImplementedException();
 
     public void Dispose()
     {

@@ -68,7 +68,7 @@ public sealed class CdpChannel : IDisposable
             CommonHeader header = new();
             header.Type = MessageType.Session;
 
-            header.SessionId = Session.GetSessionId(isHost: true);
+            header.SessionId = Session.GetSessionId();
             header.ChannelId = ChannelId;
 
             header.SequenceNumber = ++oldHeader.SequenceNumber;

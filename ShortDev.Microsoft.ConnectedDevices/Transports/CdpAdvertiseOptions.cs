@@ -1,4 +1,5 @@
-﻿using ShortDev.Microsoft.ConnectedDevices.Platforms.Bluetooth;
+﻿using ShortDev.Microsoft.ConnectedDevices.Platforms;
+using ShortDev.Microsoft.ConnectedDevices.Platforms.Bluetooth;
 using ShortDev.Networking;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -9,14 +10,14 @@ namespace ShortDev.Microsoft.ConnectedDevices.Transports;
 
 public sealed record CdpAdvertisement(DeviceType DeviceType, PhysicalAddress MacAddress, string DeviceName)
 {
-    public static bool TryParse(BluetoothDevice device, [MaybeNullWhen(false)] out CdpAdvertisement data)
+    public static bool TryParse(byte[] beaconData, [MaybeNullWhen(false)] out CdpAdvertisement data)
     {
         data = null;
 
-        if (device.BeaconData == null)
+        if (beaconData == null)
             return false;
 
-        using (MemoryStream stream = new(device.BeaconData))
+        using (MemoryStream stream = new(beaconData))
         using (BigEndianBinaryReader reader = new(stream))
         {
             var scenarioType = reader.ReadByte();

@@ -1,14 +1,14 @@
-﻿using ShortDev.Microsoft.ConnectedDevices;
-using ShortDev.Microsoft.ConnectedDevices.Messages;
+﻿using ShortDev.Microsoft.ConnectedDevices.Messages;
+using ShortDev.Microsoft.ConnectedDevices.NearShare.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Serialization;
 using ShortDev.Networking;
 using System.Collections;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace ShortDev.Microsoft.ConnectedDevices.NearShare;
+namespace ShortDev.Microsoft.ConnectedDevices.NearShare.Internal;
 
-public sealed class NearShareApp : CdpAppBase
+internal sealed class NearShareApp : CdpAppBase
 {
     public static string Name { get; } = "NearSharePlatform";
 

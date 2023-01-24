@@ -58,7 +58,7 @@ public sealed class MainActivity : AppCompatActivity
 
         if (requestCode == FilePickCode && resultCode == Result.Ok && data.Data != null)
         {
-            Intent intent = new Intent(this, typeof(ShareTargetSelectActivity));
+            Intent intent = new Intent(this, typeof(SendActivity));
             intent.SetAction(Intent.ActionSend);
             intent.PutExtra(Intent.ExtraStream, data.Data);
             StartActivity(intent);
