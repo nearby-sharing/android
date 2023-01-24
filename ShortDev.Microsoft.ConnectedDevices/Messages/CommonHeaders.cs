@@ -178,16 +178,22 @@ public sealed class CommonHeader : ICdpHeader<CommonHeader>
         MessageLength = (ushort)(payloadSize + ((ICdpSerializable<CommonHeader>)this).CalcSize());
     }
 
-    public static unsafe void AlterMessageLengthUnsafe(byte[] buffer, short delta)
+    public static void ModifyMessageLength(Span<byte> msgBuffer, short delta)
     {
-        fixed (byte* pBuffer = buffer)
-        {
-            Span<byte> msgLengthSpan = new(pBuffer + CommonHeader.MessageLengthOffset, 2);
-            BinaryPrimitives.WriteInt16BigEndian(
-                msgLengthSpan,
-                (short)(BinaryPrimitives.ReadInt16BigEndian(msgLengthSpan) + delta)
-            );
-        }
+        var msgLengthSpan = msgBuffer.Slice(MessageLengthOffset, 2);
+        ReplaceMessageLength(
+            msgBuffer,
+            (short)(BinaryPrimitives.ReadInt16BigEndian(msgLengthSpan) + delta)
+        );
+    }
+
+    public static void ReplaceMessageLength(Span<byte> msgBuffer, short msgLength)
+    {
+        var msgLengthSpan = msgBuffer.Slice(MessageLengthOffset, 2);
+        BinaryPrimitives.WriteInt16BigEndian(
+            msgLengthSpan,
+            msgLength
+        );
     }
     #endregion
 

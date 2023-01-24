@@ -65,7 +65,7 @@ public sealed class CdpCryptor
                 throw new CdpSecurityException("Invalid hmac!");
 
             byte[] buffer = ((ICdpWriteable)header).ToArray().Concat(payload).ToArray();
-            CommonHeader.AlterMessageLengthUnsafe(buffer, -Constants.HMacSize);
+            CommonHeader.ModifyMessageLength(buffer, -Constants.HMacSize);
 
             var expectedHMac = ComputeHmac(buffer);
             if (!hmac.SequenceEqual(expectedHMac))
@@ -116,7 +116,7 @@ public sealed class CdpCryptor
 
             byte[] msgBuffer = msgStream.ToArray();
             byte[] hmac = ComputeHmac(msgBuffer);
-            CommonHeader.AlterMessageLengthUnsafe(msgBuffer, +Constants.HMacSize);
+            CommonHeader.ModifyMessageLength(msgBuffer, +Constants.HMacSize);
 
             writer.Write(msgBuffer);
             writer.Write(hmac);
