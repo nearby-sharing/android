@@ -3,9 +3,7 @@
 namespace ShortDev.Microsoft.ConnectedDevices.Messages;
 
 /// <summary>
-/// General payload to represent a HRESULT (<see cref="int"/>). <br/>
-/// <br/>
-/// (e.g. <see cref="Connection.ConnectionType.AuthDoneRespone"/>)
+/// General payload to represent a HRESULT (<see cref="int"/>).
 /// </summary>
 public sealed class HResultPayload : ICdpPayload<HResultPayload>
 {

@@ -11,7 +11,6 @@ using ShortDev.Networking;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Formats.Asn1;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -248,15 +247,22 @@ public sealed class CdpSession : IDisposable
             return;
         }
 
+        if (connectionHeader.MessageType == ConnectionType.ConnectResponse)
+        {
+            if (Cryptor != null)
+                throw UnexpectedMessage("Encryption");
+
+            ThrowIfWrongMode(shouldBeHost: false);
+            HandleConnectResponse(header, reader, writer);
+
+            return;
+        }
+
         if (Cryptor == null)
             throw UnexpectedMessage("Encryption");
 
         switch (connectionHeader.MessageType)
         {
-            case ConnectionType.ConnectResponse:
-                ThrowIfWrongMode(shouldBeHost: false);
-                HandleConnectResponse(header, reader, writer);
-                break;
             case ConnectionType.DeviceAuthRequest:
             case ConnectionType.UserDeviceAuthRequest:
                 ThrowIfWrongMode(shouldBeHost: true);
@@ -265,7 +271,7 @@ public sealed class CdpSession : IDisposable
             case ConnectionType.DeviceAuthResponse:
             case ConnectionType.UserDeviceAuthResponse:
                 ThrowIfWrongMode(shouldBeHost: false);
-                HandleAuthResponse(header, reader, writer);
+                HandleAuthResponse(header, reader, writer, connectionHeader.MessageType);
                 break;
             case ConnectionType.AuthDoneRequest:
                 ThrowIfWrongMode(shouldBeHost: true);
@@ -320,29 +326,24 @@ public sealed class CdpSession : IDisposable
         var secret = _localEncryption.GenerateSharedSecret(_remoteEncryption);
         Cryptor = new(secret);
 
-        var sendAuthRequest = (ConnectionType type) =>
+        header.Flags = 0;
+        SendMessage(writer, header, (writer) =>
         {
-            header.Flags = 0;
-            SendMessage(writer, header, (writer) =>
+            new ConnectionHeader()
             {
-                new ConnectionHeader()
-                {
-                    ConnectionMode = ConnectionMode.Proximal,
-                    MessageType = type
-                }.Write(writer);
-                AuthenticationPayload.Create(
-                    _localEncryption.DeviceCertificate!, // ToDo: User cert
-                    _localEncryption.Nonce, _remoteEncryption!.Nonce
-                ).Write(writer);
-            });
-        };
-        sendAuthRequest(ConnectionType.DeviceAuthRequest);
-        sendAuthRequest(ConnectionType.UserDeviceAuthRequest);
+                ConnectionMode = ConnectionMode.Proximal,
+                MessageType = ConnectionType.DeviceAuthRequest
+            }.Write(writer);
+            AuthenticationPayload.Create(
+                _localEncryption.DeviceCertificate!, // ToDo: User cert
+                hostNonce: _remoteEncryption!.Nonce, clientNonce: _localEncryption.Nonce
+            ).Write(writer);
+        });
     }
     void HandleAuthRequest(CommonHeader header, BinaryReader reader, BinaryWriter writer, ConnectionType connectionType)
     {
         var authRequest = AuthenticationPayload.Parse(reader);
-        if (!authRequest.VerifyThumbprint(_localEncryption.Nonce, _remoteEncryption!.Nonce))
+        if (!authRequest.VerifyThumbprint(hostNonce: _localEncryption.Nonce, clientNonce: _remoteEncryption!.Nonce))
             throw new CdpSecurityException("Invalid thumbprint");
 
         header.Flags = 0;
@@ -355,15 +356,34 @@ public sealed class CdpSession : IDisposable
             }.Write(writer);
             AuthenticationPayload.Create(
                 _localEncryption.DeviceCertificate!, // ToDo: User cert
-                _localEncryption.Nonce, _remoteEncryption!.Nonce
+                hostNonce: _localEncryption.Nonce, clientNonce: _remoteEncryption!.Nonce
             ).Write(writer);
         });
     }
-    void HandleAuthResponse(CommonHeader header, BinaryReader reader, BinaryWriter writer)
+    void HandleAuthResponse(CommonHeader header, BinaryReader reader, BinaryWriter writer, ConnectionType connectionType)
     {
         var authRequest = AuthenticationPayload.Parse(reader);
-        if (!authRequest.VerifyThumbprint(_localEncryption.Nonce, _remoteEncryption!.Nonce))
+        if (!authRequest.VerifyThumbprint(hostNonce: _remoteEncryption!.Nonce, clientNonce: _localEncryption.Nonce))
             throw new CdpSecurityException("Invalid thumbprint");
+
+        if (connectionType == ConnectionType.DeviceAuthResponse)
+        {
+            header.Flags = 0;
+            SendMessage(writer, header, (writer) =>
+            {
+                new ConnectionHeader()
+                {
+                    ConnectionMode = ConnectionMode.Proximal,
+                    MessageType = ConnectionType.UserDeviceAuthRequest
+                }.Write(writer);
+                AuthenticationPayload.Create(
+                    _localEncryption.DeviceCertificate!, // ToDo: User cert
+                    hostNonce: _remoteEncryption!.Nonce, clientNonce: _localEncryption.Nonce
+                ).Write(writer);
+            });
+
+            return;
+        }
 
         header.Flags = 0;
         SendMessage(writer, header, (writer) =>
@@ -372,10 +392,6 @@ public sealed class CdpSession : IDisposable
             {
                 ConnectionMode = ConnectionMode.Proximal,
                 MessageType = ConnectionType.AuthDoneRequest
-            }.Write(writer);
-            new HResultPayload()
-            {
-                HResult = 0 // No error
             }.Write(writer);
         });
     }
@@ -389,15 +405,16 @@ public sealed class CdpSession : IDisposable
                 ConnectionMode = ConnectionMode.Proximal,
                 MessageType = ConnectionType.AuthDoneRespone // Ack
             }.Write(writer);
-            new HResultPayload()
+            new ResultPayload()
             {
-                HResult = 0 // No error
+                Result = CdpResult.Success
             }.Write(writer);
         });
     }
     void HandleAuthDoneResponse(CommonHeader header, BinaryReader reader, BinaryWriter writer)
     {
-        _ = HResultPayload.Parse(reader);
+        var msg = ResultPayload.Parse(reader);
+        msg.ThrowOnError();
     }
     void HandleDeviceInfoMessage(CommonHeader header, BinaryReader reader, BinaryWriter writer)
     {
