@@ -47,6 +47,22 @@ public sealed class CdpSession : IDisposable
         return (ulong)RemoteSessionId << 32 | LocalSessionId;
     }
 
+    internal static void ParseSessionId(ulong sessionId, out uint localSessionId, out uint remoteSessionId, out bool isMsgFromHost)
+    {
+        isMsgFromHost = (sessionId & CommonHeader.SessionIdHostFlag) != 0;
+
+        if (isMsgFromHost)
+        {
+            remoteSessionId = sessionId.HighValue();
+            localSessionId = sessionId.LowValue() & ~(uint)CommonHeader.SessionIdHostFlag;
+        }
+        else
+        {
+            localSessionId = sessionId.HighValue();
+            remoteSessionId = sessionId.LowValue();
+        }
+    }
+
     #region Registration
     static readonly AutoKeyRegistry<CdpSession> _sessionRegistry = new();
     internal static CdpSession GetOrCreate(ConnectedDevicesPlatform platform, CdpDevice device, CommonHeader header)
@@ -55,12 +71,15 @@ public sealed class CdpSession : IDisposable
         ArgumentNullException.ThrowIfNull(header);
 
         var sessionId = header.SessionId;
-        var localSessionId = sessionId.HighValue();
-        var remoteSessionId = sessionId.LowValue() & ~(uint)CommonHeader.SessionIdHostFlag;
+        ParseSessionId(sessionId, out var localSessionId, out var remoteSessionId, out _);
         if (localSessionId != 0)
         {
             // Existing session
             var result = _sessionRegistry.Get(localSessionId);
+
+            if (result.RemoteSessionId == 0)
+                result.RemoteSessionId = remoteSessionId;
+
             if (result.RemoteSessionId != remoteSessionId)
                 throw new CdpSessionException($"Wrong {nameof(RemoteSessionId)}");
 
