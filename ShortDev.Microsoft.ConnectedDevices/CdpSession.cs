@@ -133,7 +133,7 @@ public sealed class CdpSession : IDisposable
             new ConnectionHeader()
             {
                 ConnectionMode = ConnectionMode.Proximal,
-                MessageType = ConnectionType.ConnectResponse
+                MessageType = ConnectionType.ConnectRequest
             }.Write(writer);
 
             var publicKey = _localEncryption.PublicKey;
