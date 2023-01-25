@@ -31,7 +31,7 @@ public static class Extensions
         => @this.WriteWithLength(value, DefaultEncoding);
 
     public static void WriteWithLength(this BinaryWriter @this, string value, Encoding encoding)
-        => @this.WriteWithLength(encoding.GetBytes(value));
+        => @this.WriteWithLength(encoding.GetBytes(value + "\0"));
 
     public static void WriteWithLength(this BinaryWriter @this, byte[] value)
     {
