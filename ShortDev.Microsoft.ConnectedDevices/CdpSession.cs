@@ -471,8 +471,11 @@ public sealed class CdpSession : IDisposable
             {
                 MessageType = ControlMessageType.StartChannelResponse
             }.Write(writer);
-            writer.Write((byte)0);
-            writer.Write(channelId);
+            new StartChannelResponse()
+            {
+                Result = ChannelResult.Success,
+                ChannelId = channelId
+            }.Write(writer);
         });
     }
     #endregion

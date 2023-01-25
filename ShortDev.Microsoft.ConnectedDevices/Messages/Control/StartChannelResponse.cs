@@ -1,22 +1,22 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages.Control;
 
 public sealed class StartChannelResponse : ICdpPayload<StartChannelResponse>
 {
     public static StartChannelResponse Parse(BinaryReader reader)
-    {
-        throw new NotImplementedException();
-    }
+       => new()
+       {
+           Result = (ChannelResult)reader.ReadByte(),
+           ChannelId = reader.ReadUInt64()
+       };
 
-    public required long ReponseId { get; init; }
-    public required int Unknown { get; init; }
+    public required ChannelResult Result { get; init; }
+    public required ulong ChannelId { get; init; }
 
     public void Write(BinaryWriter writer)
     {
-        writer.Write(ReponseId);
-        writer.Write(Unknown);
-        writer.Write((uint)0);
+        writer.Write((byte)Result);
+        writer.Write(ChannelId);
     }
 }
