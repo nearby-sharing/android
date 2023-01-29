@@ -2,6 +2,6 @@
 
 public enum DiscoveryType : byte
 {
-    ResenceRequest,
-    ResenceResponse,
+    RresenceRequest,
+    RresenceResponse,
 }

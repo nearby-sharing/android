@@ -12,11 +12,11 @@ public class PresenceResponse : ICdpPayload<PresenceResponse>
 
     public required string DeviceName { get; init; }
 
-    public required int DeviceIdSalt { get; init; }
+    public int DeviceIdSalt { get; init; }
 
-    public required int DeviceIdHash { get; init; }
+    public int DeviceIdHash { get; init; }
 
-    public required int PrincipalUserNameHash { get; init; }
+    public int PrincipalUserNameHash { get; init; }
 
     public static PresenceResponse Parse(EndianReader reader)
         => new()

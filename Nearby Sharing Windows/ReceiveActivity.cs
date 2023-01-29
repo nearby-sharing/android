@@ -176,6 +176,8 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
         AndroidNetworkHandler networkHandler = new(this, this);
         _cdp.AddTransport<NetworkTransport>(new(networkHandler));
 
+        _cdp.AddTransport<UdpTransport>(new());
+
         _cdp.Listen(_cancellationTokenSource.Token);
         _cdp.Advertise(new CdpAdvertisement(
             DeviceType.Android,
