@@ -1,6 +1,4 @@
-﻿using ShortDev.Microsoft.ConnectedDevices.Platforms;
-using ShortDev.Microsoft.ConnectedDevices.Platforms.Bluetooth;
-using ShortDev.Networking;
+﻿using ShortDev.Networking;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net.NetworkInformation;
@@ -10,6 +8,12 @@ namespace ShortDev.Microsoft.ConnectedDevices.Transports;
 
 public sealed record CdpAdvertisement(DeviceType DeviceType, PhysicalAddress MacAddress, string DeviceName)
 {
+    enum BeaconFlags : byte
+    {
+        MyDevice,
+        Public
+    }
+
     public static bool TryParse(byte[] beaconData, [MaybeNullWhen(false)] out CdpAdvertisement data)
     {
         data = null;
@@ -24,10 +28,19 @@ public sealed record CdpAdvertisement(DeviceType DeviceType, PhysicalAddress Mac
             if (scenarioType != 1)
                 return false;
 
-            var versionAndDeviceType = reader.ReadByte();
-            var deviceType = (DeviceType)versionAndDeviceType;
+            var deviceType = (DeviceType)reader.ReadByte();
 
             var versionAndFlags = reader.ReadByte();
+            if (versionAndFlags >> 5 != 1)
+                return false; // wrong version
+
+            var flags = (BeaconFlags)(versionAndFlags & 0x1f);
+            if ((int)flags >= 2)
+                return false; // wrong flags
+
+            if (flags != BeaconFlags.Public)
+                return false;
+
             /* Reserved */
             reader.ReadByte();
 
