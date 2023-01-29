@@ -98,7 +98,7 @@ public sealed class ConnectedDevicesPlatform : IDisposable
     {
         foreach (var (_, transport) in _transports)
         {
-            if(transport is ICdpDiscoverableTransport discoverableTransport)
+            if (transport is ICdpDiscoverableTransport discoverableTransport)
             {
                 discoverableTransport.Discover(cancellationToken);
                 discoverableTransport.DeviceDiscovered += DeviceDiscovered;
@@ -113,7 +113,11 @@ public sealed class ConnectedDevicesPlatform : IDisposable
         var transport = TryGetTransport<BluetoothTransport>() ?? throw new InvalidOperationException("Bluetooth transport is needed!");
         var socket = await transport.ConnectAsync(device);
         ReceiveLoop(socket);
-        return CdpSession.CreateAndConnectClient(this, socket);
+        var session = CdpSession.CreateAndConnectClient(this, socket);
+
+        await session.WaitForAuthDone();
+
+        return session;
     }
     #endregion
 

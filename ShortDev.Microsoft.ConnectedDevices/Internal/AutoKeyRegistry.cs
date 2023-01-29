@@ -19,6 +19,17 @@ internal sealed class AutoKeyRegistry<TValue> : IEnumerable<TValue>
             return _registry[key];
     }
 
+    public void Add(ulong key, TValue value)
+    {
+        lock (this)
+        {
+            if (_registry.ContainsKey(key))
+                throw new ArgumentException("Key already exists");
+
+            _registry.Add(key, value);
+        }
+    }
+
     public TValue Create(Func<ulong, TValue> factory, out ulong key)
     {
         lock (this)

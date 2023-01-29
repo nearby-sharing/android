@@ -1,6 +1,5 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Control;
-using System;
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
@@ -53,17 +52,18 @@ public static class CdpAppRegistration
 /// A cdp app is responsible for the application layer communication over an established <see cref="CdpChannel"/>. <br/>
 /// Every channel has a unique app.
 /// </summary>
-public abstract class CdpAppBase : IDisposable
+public abstract class CdpAppBase : IChannelMessageHandler
 {
+    /// <summary>
+    /// Gets the corresponding channel. <br/>
+    /// The value is set immediately after instantiation. <br/>
+    /// <br/>
+    /// <inheritdoc cref="CdpChannel"/>
+    /// </summary>
     [AllowNull]
     public CdpChannel Channel { get; internal set; }
 
     public abstract ValueTask HandleMessageAsync(CdpMessage msg);
-
-    /// <summary>
-    /// Releases resources potentially used by the app itself.
-    /// </summary>
-    public virtual void Dispose() { }
 }
 
 /// <summary>

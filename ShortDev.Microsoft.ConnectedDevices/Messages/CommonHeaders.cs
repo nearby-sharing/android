@@ -2,6 +2,7 @@
 using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages;
 
@@ -208,5 +209,14 @@ public sealed class CommonHeader : ICdpHeader<CommonHeader>
             AdditionalHeaderType.ReplyToId,
             value
         ));
+    }
+
+    public ulong? TryGetReplyToId()
+    {
+        var header = AdditionalHeaders.FirstOrDefault(x => x.Type == AdditionalHeaderType.ReplyToId);
+        if (header == null)
+            return null;
+
+        return BinaryPrimitives.ReadUInt64LittleEndian(header.Value);
     }
 }

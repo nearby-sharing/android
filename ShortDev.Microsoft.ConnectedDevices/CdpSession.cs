@@ -7,12 +7,14 @@ using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.Authentication;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.DeviceInfo;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Control;
 using ShortDev.Microsoft.ConnectedDevices.Platforms;
+using ShortDev.Microsoft.ConnectedDevices.Transports;
 using ShortDev.Networking;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using static System.Collections.Specialized.BitVector32;
 
 namespace ShortDev.Microsoft.ConnectedDevices;
 
@@ -149,10 +151,11 @@ public sealed class CdpSession : IDisposable
     }
     #endregion
 
-    public void SendMessage(CdpSocket socket, CommonHeader header, Action<BinaryWriter> bodyCallback)
-        => SendMessage(socket.Writer, header, bodyCallback);
+    public void SendMessage(CdpSocket socket, CommonHeader header, Action<BinaryWriter> bodyCallback, bool supplyRequestId = false)
+        => SendMessage(socket.Writer, header, bodyCallback, supplyRequestId);
 
-    void SendMessage(BinaryWriter writer, CommonHeader header, Action<BinaryWriter> bodyCallback)
+    ulong _requestId = 1;
+    void SendMessage(BinaryWriter writer, CommonHeader header, Action<BinaryWriter> bodyCallback, bool supplyRequestId = false)
     {
         if (Cryptor != null)
         {
@@ -168,9 +171,15 @@ public sealed class CdpSession : IDisposable
             payload = payloadStream.ToArray();
         }
 
+        if (supplyRequestId)
+            lock (this)
+                header.RequestID = _requestId++;
+
         header.SetPayloadLength(payload.Length);
         header.Write(writer);
         writer.Write(payload);
+
+        writer.Flush();
     }
 
     #region HandleMessages
@@ -220,8 +229,6 @@ public sealed class CdpSession : IDisposable
                 Platform.Handler.Log(0, $"Received {header.Type} message from session {header.SessionId.ToString("X")} via {socket.TransportType}");
             }
         }
-
-        writer.Flush();
     }
 
     #region Connect
@@ -411,10 +418,27 @@ public sealed class CdpSession : IDisposable
             }.Write(writer);
         });
     }
+
+    #region OnAuthDone
+    event Action? OnAuthDoneInternal;
+    public Task WaitForAuthDone()
+    {
+        TaskCompletionSource promise = new();
+        void callback()
+        {
+            promise.SetResult();
+            OnAuthDoneInternal -= callback;
+        }
+        OnAuthDoneInternal += callback;
+        return promise.Task;
+    }
+    #endregion
+
     void HandleAuthDoneResponse(CommonHeader header, BinaryReader reader, BinaryWriter writer)
     {
         var msg = ResultPayload.Parse(reader);
         msg.ThrowOnError();
+        OnAuthDoneInternal?.Invoke();
     }
     void HandleDeviceInfoMessage(CommonHeader header, BinaryReader reader, BinaryWriter writer)
     {
@@ -445,6 +469,9 @@ public sealed class CdpSession : IDisposable
             case ControlMessageType.StartChannelRequest:
                 HandleStartChannelRequest(header, reader, writer, socket);
                 break;
+            case ControlMessageType.StartChannelResponse:
+                HandleStartChannelResponse(header, reader, writer, socket);
+                break;
             default:
                 throw UnexpectedMessage(controlHeader.MessageType.ToString());
         }
@@ -462,7 +489,7 @@ public sealed class CdpSession : IDisposable
         ));
         header.RequestID = 0;
 
-        StartChannel(request, socket, out var channelId);
+        InitializeHostChannel(request, socket, out var channelId);
 
         header.Flags = 0;
         SendMessage(writer, header, (writer) =>
@@ -477,6 +504,27 @@ public sealed class CdpSession : IDisposable
                 ChannelId = channelId
             }.Write(writer);
         });
+    }
+
+    event Action<CommonHeader, StartChannelResponse>? OnStartChannelResponseInternal;
+    Task<StartChannelResponse> WaitForChannelResponse(ulong requestId)
+    {
+        TaskCompletionSource<StartChannelResponse> promise = new();
+        void callback(CommonHeader header, StartChannelResponse response)
+        {
+            if (header.TryGetReplyToId() == requestId)
+                promise.SetResult(response);
+
+            OnStartChannelResponseInternal -= callback;
+        }
+        OnStartChannelResponseInternal += callback;
+        return promise.Task;
+    }
+
+    void HandleStartChannelResponse(CommonHeader header, BinaryReader reader, BinaryWriter writer, CdpSocket socket)
+    {
+        var msg = StartChannelResponse.Parse(reader);
+        OnStartChannelResponseInternal?.Invoke(header, msg);
     }
     #endregion
 
@@ -528,13 +576,52 @@ public sealed class CdpSession : IDisposable
     #region Channels
     readonly AutoKeyRegistry<CdpChannel> _channelRegistry = new();
 
-    void StartChannel(StartChannelRequest request, CdpSocket socket, out ulong channelId)
+    void InitializeHostChannel(StartChannelRequest request, CdpSocket socket, out ulong channelId)
     {
+        if (!IsHost)
+            throw new InvalidOperationException("Session is not a host");
+
         _channelRegistry.Create(channelId =>
         {
             var app = CdpAppRegistration.InstantiateApp(request.Id, request.Name);
-            return new(this, channelId, app, socket);
+            CdpChannel channel = new(this, channelId, app, socket);
+            app.Channel = channel;
+            return channel;
         }, out channelId);
+    }
+
+    async Task<CdpSocket> OpenNewSocketAsync()
+    {
+        var transport = Platform.TryGetTransport<BluetoothTransport>() ?? throw new InvalidOperationException("Bluetooth transport is needed!");
+        return await transport.ConnectAsync(Device);
+    }
+
+    public async Task<CdpChannel> StartClientChannelAsync(string appId, string appName, IChannelMessageHandler handler)
+    {
+        if (!IsHost)
+            throw new InvalidOperationException("Session is not a client");
+
+        var socket = await OpenNewSocketAsync();
+
+        CommonHeader header = new()
+        {
+            Type = MessageType.Control
+        };
+        SendMessage(
+            socket, header,
+            writer =>
+            {
+                new StartChannelRequest()
+                {
+                    Id = appId,
+                    Name = appName
+                }.Write(writer);
+            },
+            supplyRequestId: true
+        );
+
+        var response = await WaitForChannelResponse(header.RequestID);
+        return new CdpChannel(this, response.ChannelId, handler, socket);
     }
 
     internal void UnregisterChannel(CdpChannel channel)
