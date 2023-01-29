@@ -1,6 +1,9 @@
 # FAQ
 ## Share to windows
 
+> **Note**
+> Follow the new [setup guide](https://nearshare.shortdev.de/docs/setup)!
+
 ### What can I share?
 You can share **files** and **urls** to any Windows 10 / 11 devices.
 
