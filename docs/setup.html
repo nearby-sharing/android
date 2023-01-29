@@ -51,6 +51,7 @@
             }
 
             nextTab.click();
+            nextTab.scrollIntoView();
             nextRadio(document.querySelector(`#${nextTab.id}Panel`), true);
         }
 
@@ -79,10 +80,25 @@
             font-family: var(--body-font);
         }
 
+        c {
+            display: inline-block;
+            padding: 5px;
+            background: #EFF1F3;
+            padding: .2em .4em;
+            margin: 0;
+            font-size: 85%;
+            white-space: break-spaces;
+            border-radius: 6px;
+        }
+
         h1 {
             margin: 0px;
             margin-top: 32px;
             margin-bottom: 12px;
+        }
+
+        p {
+            font-size: var(--type-ramp-base-font-size);
         }
 
         .main {
@@ -93,15 +109,16 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%,-50%);
-            --margin-x: 50px;
+            --margin-x: 10px;
             --margin-y: var(--margin-x);
-            --card-width: clamp(0px, calc(100% - var(--margin-x) * 2), 1000px);
-            --card-height: clamp(0px, calc(100% - var(--margin-y) * 2), 500px);
+            --card-width: clamp(0px, calc(100% - var(--margin-x) * 2), 1500px);
+            --card-height: clamp(0px, calc(100% - var(--margin-y) * 2), 800px);
         }
 
             .main > .content {
                 flex-grow: 1;
                 padding: 22px;
+                overflow-y: auto;
             }
 
             .main > .bottom {
@@ -115,8 +132,22 @@
     </style>
 
     <style>
-        .ol-steps {
-            list-style-image: radial-gradient(transparent 40%, #0068BD 40%, #0068BD 70%, transparent 70%);
+        .checked .item_details {
+            display: block;
+        }
+
+        .item_details {
+            display: none;
+        }
+
+        img.item_details {
+            max-width: 100%;
+            max-height: 200px;
+            background: #F3F3F3;
+            margin: 5px;
+            padding: 5px;
+            border-radius: 8px;
+            border: 1px solid #E5E5E5;
         }
     </style>
 </head>
@@ -126,59 +157,66 @@
         <div class="content">
             <fluent-tabs id="tabs" activeid="Start">
                 <fluent-tab id="Start">Start</fluent-tab>
-                <fluent-tab id="EnableBluetooth">Enable <q>Bluetooth</q></fluent-tab>
-                <fluent-tab id="EnableNearShare">Enable <q>Nearby Sharing</q></fluent-tab>
-                <fluent-tab id="SetNetworkPrivate">Set network to <q>private</q></fluent-tab>
+                <fluent-tab id="EnableBluetooth">Enable <c>Bluetooth</c></fluent-tab>
+                <fluent-tab id="EnableNearShare">Enable <c>Nearby Sharing</c></fluent-tab>
+                <fluent-tab id="SetNetworkPrivate">Set network to <c>Private</c></fluent-tab>
                 <fluent-tab id="Ready">Ready</fluent-tab>
 
                 <fluent-tab-panel id="StartPanel">
-                    <h1>Setup <q>Nearby Sharing</q> for Window</h1>
+                    <h1>Setup <c>Nearby Sharing</c> for Window</h1>
+                    <p>
+                        Click through the setup using the <c>Next</c> button in the bottom right corner.
+                    </p>
                     <div style="display: flex; justify-content: center; align-items: center;">
                         <img src="https://nearshare.shortdev.de/docs/icon.svg" style="max-height: 150px;" />
                     </div>
                 </fluent-tab-panel>
                 <fluent-tab-panel id="EnableBluetoothPanel">
-                    <h1>Enable <q>Bluetooth</q></h1>
+                    <h1>Enable <c>Bluetooth</c></h1>
                     <p>
                         <fluent-radio-group orientation="vertical">
                             <fluent-radio>
                                 <fluent-button onclick="openSettings('ms-settings:bluetooth');">Open settings</fluent-button>
                             </fluent-radio>
                             <fluent-radio>
-                                Enable <q>Bluetooth</q>
+                                Enable <c>Bluetooth</c>
                             </fluent-radio>
                         </fluent-radio-group>
                     </p>
                 </fluent-tab-panel>
                 <fluent-tab-panel id="EnableNearSharePanel">
-                    <h1>Enable <q>Nearby Sharing</q></h1>
+                    <h1>Enable <c>Nearby Sharing</c></h1>
                     <p>
                         <fluent-radio-group orientation="vertical">
                             <fluent-radio>
                                 <fluent-button onclick="openSettings('ms-settings:crossdevice');">Open settings</fluent-button>
                             </fluent-radio>
                             <fluent-radio>
-                                Enable <q>Nearby sharing</q>
+                                Enable <c>Nearby sharing</c>
+                                <img class="item_details" src="assets/setup/img/enable_nearbysharing.png" />
                             </fluent-radio>
                             <fluent-radio>
-                                Set <q>I can share or receive content from</q> to <br />
-                                <q>Everyone nearby</q>
+                                Set <c>I can share or receive content from</c> to <br />
+                                <c>Everyone nearby</c>
+                                <img class="item_details" src="assets/setup/img/enable_nearbysharing.png" />
                             </fluent-radio>
                         </fluent-radio-group>
                     </p>
                 </fluent-tab-panel>
                 <fluent-tab-panel id="SetNetworkPrivatePanel">
-                    <h1>Set network to <q>private</q></h1>
+                    <h1>Set network to <c>Private</c></h1>
                     <p>
                         <fluent-radio-group orientation="vertical">
                             <fluent-radio>
                                 <fluent-button onclick="openSettings('ms-settings:network');">Open settings</fluent-button>
                             </fluent-radio>
                             <fluent-radio>
-                                Open <q>Properties</q> for you current network
+                                Open <c>Properties</c> for you current network
+                                <img class="item_details" src="assets/setup/img/network_private.png" />
                             </fluent-radio>
                             <fluent-radio>
-                                Select <q>Private</q>
+                                Select <c>Private</c>
+                                <img class="item_details" src="assets/setup/img/network_private.png" />
                             </fluent-radio>
                         </fluent-radio-group>
                     </p>
