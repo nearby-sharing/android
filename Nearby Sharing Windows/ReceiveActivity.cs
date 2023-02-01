@@ -144,8 +144,10 @@ public sealed class ReceiveActivity : AppCompatActivity, INetworkHandler, INearS
         var service = (BluetoothManager)GetSystemService(BluetoothService)!;
         _btAdapter = service.Adapter!;
 
-        FindViewById<TextView>(Resource.Id.deviceInfoTextView)!.Text = $"Visible as {_btAdapter.Name!}.\n" +
-            $"Address: {btAddress.ToStringFormatted()}";
+        FindViewById<TextView>(Resource.Id.deviceInfoTextView)!.Text = 
+            $"Visible as \"{_btAdapter.Name!}\"\n" +
+            $"BT-Address: {btAddress.ToStringFormatted()}\n" +
+            $"IP-Address: {GetLocalIp()}";
         debugLogTextView = FindViewById<TextView>(Resource.Id.debugLogTextView)!;
 
         Debug.Assert(_cdp == null);
