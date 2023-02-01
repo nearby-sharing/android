@@ -30,7 +30,6 @@ internal sealed class NearShareApp : CdpAppBase
         CommonHeader header = msg.Header;
         BinaryReader payloadReader = msg.Read();
 
-        var prepend = payloadReader.ReadBytes(0x0000000C);
         var buffer = payloadReader.ReadPayload();
         Debug.Print(BinaryConvert.ToString(buffer));
         var payload = ValueSet.Parse(buffer);
@@ -73,12 +72,12 @@ internal sealed class NearShareApp : CdpAppBase
                             }
                             catch (TaskCanceledException)
                             {
-                                SendCancel(header, prepend);
+                                SendCancel(header);
                                 CloseChannel();
                                 throw;
                             }
 
-                            _blobCursor = CreateBlobCursor(header, prepend);
+                            _blobCursor = CreateBlobCursor(header);
                             _blobCursor.MoveNext();
                             return;
                         }
@@ -142,28 +141,24 @@ internal sealed class NearShareApp : CdpAppBase
         }
 
         header.Flags = 0;
-        Channel.SendMessage(header, (payloadWriter) =>
-        {
-            payloadWriter.Write(prepend);
-            response.Write(payloadWriter);
-        });
+        Channel.SendMessage(header, response.Write);
 
         if (!expectMessage)
             CloseChannel();
     }
 
-    IEnumerator CreateBlobCursor(CommonHeader header, byte[] prepend)
+    IEnumerator CreateBlobCursor(CommonHeader header)
     {
         ulong requestedPosition = 0;
         for (; requestedPosition + PartitionSize < bytesToSend; requestedPosition += PartitionSize)
         {
-            RequestBlob(header, prepend, requestedPosition);
+            RequestBlob(header, requestedPosition);
             yield return null;
         }
-        RequestBlob(header, prepend, requestedPosition, (uint)(bytesToSend - requestedPosition));
+        RequestBlob(header, requestedPosition, (uint)(bytesToSend - requestedPosition));
     }
 
-    void RequestBlob(CommonHeader header, byte[] prepend, ulong requestedPosition, uint size = PartitionSize)
+    void RequestBlob(CommonHeader header, ulong requestedPosition, uint size = PartitionSize)
     {
         ValueSet request = new();
         request.Add("BlobPosition", requestedPosition);
@@ -172,24 +167,16 @@ internal sealed class NearShareApp : CdpAppBase
         request.Add("ControlMessage", (uint)NearShareControlMsgType.FetchDataRequest);
 
         header.Flags = 0;
-        Channel.SendMessage(header, (payloadWriter) =>
-        {
-            payloadWriter.Write(prepend);
-            request.Write(payloadWriter);
-        });
+        Channel.SendMessage(header, request.Write);
     }
 
-    void SendCancel(CommonHeader header, byte[] prepend)
+    void SendCancel(CommonHeader header)
     {
         ValueSet request = new();
         request.Add("ControlMessage", (uint)NearShareControlMsgType.CancelTransfer);
 
         header.Flags = 0;
-        Channel.SendMessage(header, (payloadWriter) =>
-        {
-            payloadWriter.Write(prepend);
-            request.Write(payloadWriter);
-        });
+        Channel.SendMessage(header, request.Write);
     }
 
     void CloseChannel()

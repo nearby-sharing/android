@@ -1,10 +1,12 @@
 ﻿using Bond.IO.Unsafe;
 using Bond.Protocols;
 using ShortDev.Microsoft.ConnectedDevices;
+using ShortDev.Microsoft.ConnectedDevices.Encryption;
+using ShortDev.Microsoft.ConnectedDevices.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.Authentication;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.DeviceInfo;
-using ShortDev.Microsoft.ConnectedDevices.Encryption;
+using ShortDev.Microsoft.ConnectedDevices.Messages.Session;
 using ShortDev.Microsoft.ConnectedDevices.Serialization;
 using ShortDev.Networking;
 using Spectre.Console;
@@ -13,23 +15,7 @@ using ShortDev.Microsoft.ConnectedDevices.Messages;
 //var adapter = await BluetoothAdapter.GetDefaultAsync();
 //Debug.Print(adapter.BluetoothAddress.ToString("X"));
 
-while (false)
-{
-    MemoryStream stream = new(BinaryConvert.ToBytes(AnsiConsole.Ask<string>("Bytes")));
-    CompactBinaryReader<InputStream> reader = new(new(stream));
-    reader.ReadFieldBegin(out var a, out var b);
-    var typeId = reader.ReadInt32();
-    reader.ReadFieldBegin(out var fieldType, out var fieldId);
-    bool array = fieldType == Bond.BondDataType.BT_LIST;
-    int length = 0;
-    if (array)
-        reader.ReadContainerBegin(out length, out fieldType);
-    Console.WriteLine($"{fieldType} = {typeId}; {fieldId}: {(array ? $"array Count = {length}" : "")}");
-
-    Console.ReadLine();
-}
-
-var secret = BinaryConvert.ToBytes("3036f355c9b027833f5ab36fdc0bf313bb6382394a01a40667c6e5f974ad180ab99d444f8b30cff7665c0a7c4ebd870488fdb8f44c9dd5800a060b67484c2116");
+var secret = BinaryConvert.ToBytes("37fc508508ba8d6d7ba7ddc79ad29fecdf855879e2a48b6811f310e80dcab98a81500925c1c8019c05b418d3bc22a870fc52d3735b43babc85c57a1fe12d4fb4");
 CdpCryptor cryptor = new(secret);
 
 while (true)
@@ -80,8 +66,7 @@ void HandleMessage(CommonHeader header, BinaryReader reader)
     }
     else if (header.Type == MessageType.Session)
     {
-        // reader.PrintPayload();
-        var prepend = reader.ReadBytes(0x0000000C);
+        var fragmentHeader = SessionFragmentHeader.Parse(reader);
         var valueSet = ValueSet.Parse(reader.BaseStream);
     }
     else

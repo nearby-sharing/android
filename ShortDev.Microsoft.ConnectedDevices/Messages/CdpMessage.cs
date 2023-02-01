@@ -1,4 +1,5 @@
-﻿using ShortDev.Networking;
+﻿using ShortDev.Microsoft.ConnectedDevices.Messages.Session;
+using ShortDev.Networking;
 using System;
 using System.IO;
 
@@ -49,12 +50,15 @@ public sealed class CdpMessage : IDisposable
     }
     #endregion
 
+    public SessionFragmentHeader? FragmentHeader { get; private set; }
+
     public BinaryReader Read()
     {
         if (!IsComplete)
             throw new InvalidOperationException("Wait for completion");
 
         _stream.Position = 0;
+        FragmentHeader = SessionFragmentHeader.Parse(_reader);
         return _reader;
     }
 

@@ -2,7 +2,6 @@
 using Bond.IO.Unsafe;
 using Bond.Protocols;
 using ShortDev.Microsoft.ConnectedDevices.Messages;
-using System;
 using System.IO;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Serialization;
@@ -11,8 +10,8 @@ public partial class ValueSet : ICdpPayload<ValueSet>
 {
     public static ValueSet Parse(byte[] data)
     {
-        using (MemoryStream stream = new(data))
-            return Parse(stream);
+        using MemoryStream stream = new(data);
+        return Parse(stream);
     }
 
     public static ValueSet Parse(BinaryReader reader)

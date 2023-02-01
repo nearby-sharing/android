@@ -16,7 +16,6 @@ public class NearShareHandshakeApp : CdpAppBase, ICdpAppId
         CommonHeader header = msg.Header;
         BinaryReader payloadReader = msg.Read();
 
-        var prepend = payloadReader.ReadBytes(0x0000000C);
         var payload = ValueSet.Parse(payloadReader.ReadPayload());
         header.AdditionalHeaders.RemoveAll((x) => x.Type == AdditionalHeaderType.CorrelationVector);
 
@@ -36,11 +35,7 @@ public class NearShareHandshakeApp : CdpAppBase, ICdpAppId
         response.Add("VersionHandShakeResult", 1u);
 
         header.Flags = 0;
-        Channel.SendMessage(header, (payloadWriter) =>
-        {
-            payloadWriter.Write(prepend);
-            response.Write(payloadWriter);
-        });
+        Channel.SendMessage(header, response.Write);
 
         Channel.Dispose();
 
