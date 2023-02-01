@@ -226,7 +226,7 @@ public sealed class CdpSession : IDisposable
             {
                 // We might receive a "ReliabilityResponse"
                 // ignore
-                Platform.Handler.Log(0, $"Received {header.Type} message from session {header.SessionId.ToString("X")} via {socket.TransportType}");
+                // Platform.Handler.Log(0, $"Received {header.Type} message from session {header.SessionId.ToString("X")} via {socket.TransportType}");
             }
         }
     }
