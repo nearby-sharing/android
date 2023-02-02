@@ -6,6 +6,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -33,6 +34,9 @@ public sealed class ConnectedDevicesPlatform : IDisposable
 
     public T? TryGetTransport<T>() where T : ICdpTransport
         => (T?)_transports.GetValueOrDefault(typeof(T));
+
+    public ICdpTransport? TryGetTransport(CdpTransportType transportType)
+        => _transports.Values.SingleOrDefault(transport => transport.TransportType == transportType);
     #endregion
 
     #region Host

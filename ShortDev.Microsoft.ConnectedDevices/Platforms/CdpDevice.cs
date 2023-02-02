@@ -1,6 +1,7 @@
-﻿namespace ShortDev.Microsoft.ConnectedDevices.Platforms;
+﻿using ShortDev.Microsoft.ConnectedDevices.Transports;
 
-public record CdpDevice(string Name, string Address)
+namespace ShortDev.Microsoft.ConnectedDevices.Platforms;
+
+public record CdpDevice(string Name, CdpTransportType TransportType, string Address)
 {
-    public string? MacAddress { get; init; }
 }

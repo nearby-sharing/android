@@ -11,6 +11,8 @@ namespace ShortDev.Microsoft.ConnectedDevices.Transports;
 
 public sealed class NetworkTransport : ICdpTransport
 {
+    public CdpTransportType TransportType { get; } = CdpTransportType.Tcp;
+
     public INetworkHandler Handler { get; }
     public NetworkTransport(INetworkHandler handler)
     {
@@ -38,6 +40,7 @@ public sealed class NetworkTransport : ICdpTransport
                     OutputStream = stream,
                     RemoteDevice = new(
                         string.Empty,
+                        TransportType,
                         ((IPEndPoint?)client.Client.RemoteEndPoint)?.Address.ToString() ?? throw new InvalidDataException("No ip address")
                     )
                 });

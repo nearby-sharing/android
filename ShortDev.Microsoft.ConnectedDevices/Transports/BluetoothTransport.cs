@@ -7,6 +7,8 @@ namespace ShortDev.Microsoft.ConnectedDevices.Transports;
 
 public sealed class BluetoothTransport : ICdpTransport, ICdpDiscoverableTransport
 {
+    public CdpTransportType TransportType { get; } = CdpTransportType.Rfcomm;
+
     public IBluetoothHandler Handler { get; }
     public BluetoothTransport(IBluetoothHandler handler)
     {
@@ -54,7 +56,11 @@ public sealed class BluetoothTransport : ICdpTransport, ICdpDiscoverableTranspor
         {
             OnDeviceDiscovered = (advertisement) =>
             {
-                CdpDevice device = new(advertisement.DeviceName, advertisement.MacAddress.ToStringFormatted());
+                CdpDevice device = new(
+                    advertisement.DeviceName,
+                    TransportType,
+                    advertisement.MacAddress.ToStringFormatted()
+                );
                 DeviceDiscovered?.Invoke(this, device, advertisement);
             }
         }, cancellationToken);

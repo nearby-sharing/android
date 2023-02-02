@@ -592,7 +592,7 @@ public sealed class CdpSession : IDisposable
 
     async Task<CdpSocket> OpenNewSocketAsync()
     {
-        var transport = Platform.TryGetTransport<BluetoothTransport>() ?? throw new InvalidOperationException("Bluetooth transport is needed!");
+        var transport = Platform.TryGetTransport(Device.TransportType) ?? throw new InvalidOperationException($"No single transport not found for type {Device.TransportType}");
         return await transport.ConnectAsync(Device);
     }
 
