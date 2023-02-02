@@ -1,4 +1,5 @@
-﻿using ShortDev.Microsoft.ConnectedDevices.Platforms;
+﻿using ShortDev.Microsoft.ConnectedDevices.Messages.Session;
+using ShortDev.Microsoft.ConnectedDevices.Platforms;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -50,6 +51,18 @@ public sealed class CdpChannel : IDisposable
 
     public void SendMessage(CommonHeader oldHeader, Action<BinaryWriter> bodyCallback)
     {
+        lock (this)
+        {
+            // ToDo: Better way!!
+            SendMessage(
+                 ++oldHeader.SequenceNumber,
+                 bodyCallback
+            );
+        }
+    }
+
+    public void SendMessage(uint sequenceNumber, Action<BinaryWriter> bodyCallback)
+    {
         if (Session.Cryptor == null)
             throw new InvalidOperationException("Invalid session state!");
 
@@ -61,10 +74,17 @@ public sealed class CdpChannel : IDisposable
             header.SessionId = Session.GetSessionId();
             header.ChannelId = ChannelId;
 
-            header.SequenceNumber = ++oldHeader.SequenceNumber;
+            header.SequenceNumber = sequenceNumber;
             // ToDo: "AdditionalHeaders" ... "RequestID" ??
 
-            Session.SendMessage(Socket, header, bodyCallback);
+            Session.SendMessage(Socket, header, writer =>
+            {
+                new SessionFragmentHeader()
+                {
+                    MessageId = 0
+                }.Write(writer);
+                bodyCallback(writer);
+            });
         }
     }
 
