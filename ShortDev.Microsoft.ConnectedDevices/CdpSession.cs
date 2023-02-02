@@ -7,14 +7,12 @@ using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.Authentication;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.DeviceInfo;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Control;
 using ShortDev.Microsoft.ConnectedDevices.Platforms;
-using ShortDev.Microsoft.ConnectedDevices.Transports;
 using ShortDev.Networking;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using static System.Collections.Specialized.BitVector32;
 
 namespace ShortDev.Microsoft.ConnectedDevices;
 
@@ -157,6 +155,8 @@ public sealed class CdpSession : IDisposable
     ulong _requestId = 1;
     void SendMessage(BinaryWriter writer, CommonHeader header, Action<BinaryWriter> bodyCallback, bool supplyRequestId = false)
     {
+        header.SessionId = GetSessionId();
+
         if (Cryptor != null)
         {
             Cryptor.EncryptMessage(writer, header, bodyCallback);
@@ -287,6 +287,8 @@ public sealed class CdpSession : IDisposable
             case ConnectionType.AuthDoneRespone:
                 ThrowIfWrongMode(shouldBeHost: false);
                 HandleAuthDoneResponse(header, reader, writer);
+
+                socket.Dispose();
                 break;
             case ConnectionType.DeviceInfoMessage:
                 HandleDeviceInfoMessage(header, reader, writer);
@@ -598,7 +600,7 @@ public sealed class CdpSession : IDisposable
 
     public async Task<CdpChannel> StartClientChannelAsync(string appId, string appName, IChannelMessageHandler handler)
     {
-        if (!IsHost)
+        if (IsHost)
             throw new InvalidOperationException("Session is not a client");
 
         var socket = await OpenNewSocketAsync();
@@ -611,6 +613,10 @@ public sealed class CdpSession : IDisposable
             socket, header,
             writer =>
             {
+                new ControlHeader()
+                {
+                    MessageType = ControlMessageType.StartChannelRequest
+                }.Write(writer);
                 new StartChannelRequest()
                 {
                     Id = appId,
