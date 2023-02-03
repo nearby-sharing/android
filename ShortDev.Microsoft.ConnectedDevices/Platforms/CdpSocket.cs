@@ -20,7 +20,7 @@ public sealed class CdpSocket : IDisposable
 
     BinaryWriter? _writerCache;
     public BinaryWriter Writer
-        => _writerCache ??= new BigEndianBinaryWriter(OutputStream);
+        => _writerCache ??= new BinaryWriter(OutputStream);
 
     public required CdpDevice RemoteDevice { get; init; }
 

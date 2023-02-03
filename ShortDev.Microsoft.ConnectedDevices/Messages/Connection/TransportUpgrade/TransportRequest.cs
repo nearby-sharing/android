@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ShortDev.Networking;
+using System;
 using System.IO;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages.Connection.TransportUpgrade;
@@ -16,7 +17,7 @@ public sealed class TransportRequest : ICdpPayload<TransportRequest>
             UpgradeId = new(reader.ReadBytes(16))
         };
 
-    public void Write(BinaryWriter writer)
+    public void Write(EndianWriter writer)
     {
         writer.Write(UpgradeId.ToByteArray());
     }

@@ -41,17 +41,14 @@ public sealed record CdpAdvertisement(DeviceType DeviceType, PhysicalAddress Mac
 
     public byte[] GenerateBLeBeacon()
     {
-        using (MemoryStream stream = new())
-        using (BinaryWriter writer = new(stream))
-        {
-            writer.Write((byte)0x1);
-            writer.Write((byte)DeviceType);
-            writer.Write((byte)0x21);
-            writer.Write((byte)0x0a);
-            writer.Write(BinaryConvert.Reverse(MacAddress.GetAddressBytes()));
-            writer.Write(Encoding.UTF8.GetBytes(DeviceName));
+        EndianWriter writer = new(Endianness.LittleEndian);
+        writer.Write((byte)0x1);
+        writer.Write((byte)DeviceType);
+        writer.Write((byte)0x21);
+        writer.Write((byte)0x0a);
+        writer.Write(BinaryConvert.Reverse(MacAddress.GetAddressBytes()));
+        writer.Write(DeviceName);
 
-            return stream.ToArray();
-        }
+        return writer.Buffer.ToArray();
     }
 }

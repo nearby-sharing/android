@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ShortDev.Networking;
+using System;
 using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.IO;
@@ -73,7 +74,7 @@ public sealed class CommonHeader : ICdpHeader<CommonHeader>
         return true;
     }
 
-    public void Write(BinaryWriter writer)
+    public void Write(EndianWriter writer)
     {
         writer.Write(Constants.Signature);
         writer.Write(MessageLength);
@@ -176,6 +177,24 @@ public sealed class CommonHeader : ICdpHeader<CommonHeader>
     public void SetMessageLength(int payloadSize)
     {
         MessageLength = (ushort)(payloadSize + ((ICdpSerializable<CommonHeader>)this).CalcSize());
+    }
+
+    public static void ModifyMessageLength(Span<byte> msgBuffer, short delta)
+    {
+        var msgLengthSpan = msgBuffer.Slice(MessageLengthOffset, 2);
+        ReplaceMessageLength(
+            msgBuffer,
+            (short)(BinaryPrimitives.ReadInt16BigEndian(msgLengthSpan) + delta)
+        );
+    }
+
+    public static void ReplaceMessageLength(Span<byte> msgBuffer, short msgLength)
+    {
+        var msgLengthSpan = msgBuffer.Slice(MessageLengthOffset, 2);
+        BinaryPrimitives.WriteInt16BigEndian(
+            msgLengthSpan,
+            msgLength
+        );
     }
     #endregion
 

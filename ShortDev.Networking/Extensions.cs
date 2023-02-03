@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace ShortDev.Networking;
@@ -26,17 +28,6 @@ public static class Extensions
     }
     #endregion
 
-    #region BinaryWriter
-    public static void WriteWithLength(this BinaryWriter @this, string value)
-        => @this.WriteWithLength(value, DefaultEncoding);
-
-    public static void WriteWithLength(this BinaryWriter @this, string value, Encoding encoding)
-        => @this.WriteWithLength(encoding.GetBytes(value));
-
-    public static void WriteWithLength(this BinaryWriter @this, byte[] value)
-    {
-        @this.Write((ushort)value.Length);
-        @this.Write(value);
-    }
-    #endregion
+    public static Span<T> AsSpan<T>(this ReadOnlySpan<T> buffer)
+        => MemoryMarshal.CreateSpan(ref MemoryMarshal.GetReference(buffer), buffer.Length);
 }

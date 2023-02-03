@@ -3,7 +3,7 @@ using System.Buffers;
 
 namespace ShortDev.Networking;
 
-public sealed class EndianBuffer
+public readonly ref struct EndianBuffer
 {
     readonly ArrayBufferWriter<byte> _writer;
 
@@ -28,6 +28,15 @@ public sealed class EndianBuffer
 
     public ReadOnlySpan<byte> AsSpan()
         => _writer.WrittenSpan;
+
+    public Span<byte> AsWriteableSpan()
+        => _writer.WrittenSpan.AsSpan();
+
+    public ReadOnlyMemory<byte> AsMemory()
+        => _writer.WrittenMemory;
+
+    public byte[] ToArray()
+        => _writer.WrittenMemory.ToArray();
 
     public void Clear()
         => _writer.Clear();

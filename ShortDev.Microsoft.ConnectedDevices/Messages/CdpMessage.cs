@@ -6,9 +6,9 @@ namespace ShortDev.Microsoft.ConnectedDevices.Messages;
 
 public sealed class CdpMessage : IDisposable
 {
-    MemoryStream _stream;
-    BigEndianBinaryReader _reader;
-    BigEndianBinaryWriter? _writer;
+    readonly MemoryStream _stream;
+    readonly BigEndianBinaryReader _reader;
+    readonly BinaryWriter? _writer;
 
     public CdpMessage(CommonHeader header)
     {

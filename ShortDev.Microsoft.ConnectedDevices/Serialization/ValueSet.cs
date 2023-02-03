@@ -2,7 +2,7 @@
 using Bond.IO.Unsafe;
 using Bond.Protocols;
 using ShortDev.Microsoft.ConnectedDevices.Messages;
-using System;
+using ShortDev.Networking;
 using System.IO;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Serialization;
@@ -11,8 +11,8 @@ public partial class ValueSet : ICdpPayload<ValueSet>
 {
     public static ValueSet Parse(byte[] data)
     {
-        using (MemoryStream stream = new(data))
-            return Parse(stream);
+        using MemoryStream stream = new(data);
+        return Parse(stream);
     }
 
     public static ValueSet Parse(BinaryReader reader)
@@ -24,12 +24,12 @@ public partial class ValueSet : ICdpPayload<ValueSet>
         return Deserialize<ValueSet>.From(reader);
     }
 
-    public void Write(BinaryWriter writer)
+    public void Write(EndianWriter writer)
     {
-        OutputStream stream = new(writer.BaseStream);
-        CompactBinaryWriter<OutputStream> bondWriter = new(stream);
+        OutputBuffer buffer = new();
+        CompactBinaryWriter<OutputBuffer> bondWriter = new(buffer);
         Serialize.To(bondWriter, this);
-        stream.Flush();
+        writer.Write(buffer.Data);
     }
 
     /// <summary>

@@ -1,17 +1,30 @@
 ﻿using System;
 using System.Buffers.Binary;
+using System.IO;
+using System.Text;
 
 namespace ShortDev.Networking;
 
-public sealed class EndianWriter
+public readonly ref struct EndianWriter
 {
-    public bool UseLittleEndian { get; init; } = false;
+    static readonly Encoding DefaultEncoding = Encoding.UTF8;
 
-    public EndianBuffer Buffer { get; }
-    public EndianWriter()
-        => Buffer = new();
-    public EndianWriter(EndianBuffer stream)
-        => Buffer = stream;
+    public readonly bool UseLittleEndian;
+    public readonly EndianBuffer Buffer;
+
+    public EndianWriter() : this(Endianness.BigEndian) { }
+
+    public EndianWriter(Endianness endianness)
+    {
+        UseLittleEndian = endianness == Endianness.LittleEndian;
+        Buffer = new();
+    }
+
+    public EndianWriter(Endianness endianness, int initialCapacity)
+    {
+        UseLittleEndian = endianness == Endianness.LittleEndian;
+        Buffer = new(initialCapacity);
+    }
 
     public void Clear()
         => Buffer.Clear();
@@ -98,11 +111,6 @@ public sealed class EndianWriter
         Write(buffer);
     }
 
-    //public  void Write(string value)
-    //{
-    //    throw new NotImplementedException();
-    //}
-
     public void Write(float value)
     {
         Span<byte> buffer = stackalloc byte[sizeof(float)];
@@ -127,8 +135,33 @@ public sealed class EndianWriter
         Write(buffer);
     }
 
-    //public void Write(decimal value)
-    //{
-    //    throw new NotImplementedException();
-    //}
+    public void Write(string value)
+        => Write(value, DefaultEncoding);
+
+    public void Write(string value, Encoding encoding)
+    {
+        // ToDo: Allocation free if possible (no stack overflow)
+        Write(encoding.GetBytes(value + "\0"));
+    }
+
+    public void WriteWithLength(string value)
+        => WriteWithLength(value, DefaultEncoding);
+
+    public void WriteWithLength(string value, Encoding encoding)
+    {
+        // ToDo: Allocation free if possible (no stack overflow)
+        WriteWithLength(encoding.GetBytes(value + "\0"));
+    }
+
+    public void WriteWithLength(ReadOnlySpan<byte> value)
+    {
+        Write((ushort)value.Length);
+        Write(value);
+    }
+
+    public void CopyTo(BinaryWriter writer)
+    {
+        writer.Write(Buffer.AsSpan());
+        writer.Flush();
+    }
 }

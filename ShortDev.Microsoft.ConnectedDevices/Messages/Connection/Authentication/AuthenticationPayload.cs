@@ -43,9 +43,9 @@ public sealed class AuthenticationPayload : ICdpPayload<AuthenticationPayload>
     /// <summary>
     /// A signed Device Cert Thumbprint.
     /// </summary>
-    public required byte[] SignedThumbprint { get; init; }    
+    public required byte[] SignedThumbprint { get; init; }
 
-    public void Write(BinaryWriter writer)
+    public void Write(EndianWriter writer)
     {
         writer.WriteWithLength(Certificate.Export(X509ContentType.Cert));
         writer.WriteWithLength(SignedThumbprint);
@@ -61,28 +61,28 @@ public sealed class AuthenticationPayload : ICdpPayload<AuthenticationPayload>
     public bool VerifyThumbprint(CdpNonce hostNonce, CdpNonce clientNonce)
     {
         var publicKey = Certificate.GetECDsaPublicKey() ?? throw new CdpSecurityException("Invalid certificate!");
-        return publicKey.VerifyData(MergeNoncesWithCertificate(Certificate, hostNonce, clientNonce), SignedThumbprint, thumbprintHashType);
+
+        var merged = MergeNoncesWithCertificate(Certificate, hostNonce, clientNonce).Span;
+        return publicKey.VerifyData(merged, SignedThumbprint, thumbprintHashType);
     }
 
     #region Thumbprint Api
     static readonly HashAlgorithmName thumbprintHashType = HashAlgorithmName.SHA256;
 
-    static byte[] MergeNoncesWithCertificate(X509Certificate2 cert, CdpNonce hostNonce, CdpNonce clientNonce)
+    static ReadOnlyMemory<byte> MergeNoncesWithCertificate(X509Certificate2 cert, CdpNonce hostNonce, CdpNonce clientNonce)
     {
         byte[] certData = cert.Export(X509ContentType.Cert);
-        using (MemoryStream stream = new())
-        using (BinaryWriter writer = new(stream)) // Use little-endian here!
-        {
-            writer.Write(hostNonce.Value);
-            writer.Write(clientNonce.Value);
-            writer.Write(certData);
-            return stream.ToArray();
-        }
+
+        EndianWriter writer = new(Endianness.LittleEndian); // Use little-endian here!
+        writer.Write(hostNonce.Value);
+        writer.Write(clientNonce.Value);
+        writer.Write(certData);
+        return writer.Buffer.AsMemory();
     }
 
     static byte[] CreateSignedThumbprint(X509Certificate2 cert, CdpNonce hostNonce, CdpNonce clientNonce)
     {
-        byte[] data = MergeNoncesWithCertificate(cert, hostNonce, clientNonce);
+        var data = MergeNoncesWithCertificate(cert, hostNonce, clientNonce).ToArray();
         var privateKey = cert.GetECDsaPrivateKey() ?? throw new ArgumentException("No ECDsa private key!", nameof(cert));
         return privateKey.SignData(data, thumbprintHashType);
     }

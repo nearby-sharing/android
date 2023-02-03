@@ -5,135 +5,125 @@ using ShortDev.Microsoft.ConnectedDevices.Messages;
 using ShortDev.Networking;
 using System;
 using System.Buffers.Binary;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Encryption;
 
-public sealed class CdpCryptor
+public sealed class CdpCryptor : IDisposable
 {
-    byte[] _secret { get; init; }
+    static readonly byte[] _ivData = new byte[16];
+
+    readonly Aes _ivAes;
+    readonly Aes _aes;
+    readonly HMACSHA256 _hmac;
     public CdpCryptor(byte[] sharedSecret)
-        => _secret = sharedSecret;
-
-    byte[] GenerateIV(CommonHeader header)
     {
-        using (var aes = Aes.Create())
-        {
-            aes.Key = _secret[16..32];
-            using (MemoryStream stream = new())
-            using (BigEndianBinaryWriter writer = new(stream)) // Big-endian format!
-            {
-                writer.Write(header.SessionId);
-                writer.Write(header.SequenceNumber);
-                writer.Write(header.FragmentIndex);
-                writer.Write(header.FragmentCount);
+        _aes = Aes.Create();
+        _aes.Key = sharedSecret[..16];
 
-                return aes.EncryptCbc(stream.ToArray(), new byte[16], PaddingMode.None);
-            }
-        }
+        _ivAes = Aes.Create();
+        _ivAes.Key = sharedSecret[16..32];
+
+        _hmac = new(sharedSecret[^32..^0]);
     }
 
-    byte[] AesKey
-        => _secret[0..16];
-
-    byte[] ComputeHmac(byte[] buffer)
-        => new HMACSHA256(_secret[^32..^0]).ComputeHash(buffer);
-
-    static unsafe void AlterMessageLengthUnsafe(byte[] buffer, short delta)
+    void GenerateIV(CommonHeader header, Span<byte> destination)
     {
-        fixed (byte* pBuffer = buffer)
-        {
-            Span<byte> msgLengthSpan = new(pBuffer + CommonHeader.MessageLengthOffset, 2);
-            BinaryPrimitives.WriteInt16BigEndian(
-                msgLengthSpan,
-                (short)(BinaryPrimitives.ReadInt16BigEndian(msgLengthSpan) + delta)
-            );
-        }
+        Debug.Assert(destination.Length == Constants.IVSize);
+
+        var aes = _ivAes;
+
+        EndianWriter writer = new(Endianness.BigEndian, Constants.IVSize);
+
+        writer.Write(header.SessionId);
+        writer.Write(header.SequenceNumber);
+        writer.Write(header.FragmentIndex);
+        writer.Write(header.FragmentCount);
+
+        int bytesWritten = aes.EncryptCbc(writer.Buffer.AsSpan(), _ivData, destination, PaddingMode.None);
+        Debug.Assert(bytesWritten == destination.Length);
     }
 
-    public unsafe byte[] DecryptMessage(CommonHeader header, byte[] payload, byte[]? hmac = null)
+    void ComputeHmac(ReadOnlySpan<byte> buffer, Span<byte> destination)
     {
-        byte[] decryptedPayload;
-        using (var aes = Aes.Create())
-        {
-            byte[] iv = GenerateIV(header);
-            aes.Key = AesKey;
+        Debug.Assert(destination.Length == Constants.HMacSize);
 
-            try
-            {
-                decryptedPayload = aes.DecryptCbc(payload, iv);
-            }
-            catch
-            {
-                // If payload size is an exact multiple of block length (16 bytes) no padding is applied
-                decryptedPayload = aes.DecryptCbc(payload, iv, PaddingMode.None);
-            }
-        }
+        var isSuccess = _hmac.TryComputeHash(buffer, destination, out var bytesWritten);
 
-        if (header.HasFlag(MessageFlags.HasHMAC))
-        {
-            if (hmac == null || hmac.Length != Constants.HMacSize)
-                throw new CdpSecurityException("Invalid hmac!");
+        Debug.Assert(isSuccess);
+        Debug.Assert(bytesWritten == destination.Length);
+    }
 
-            byte[] buffer = ((ICdpWriteable)header).ToArray().Concat(payload).ToArray();
-            AlterMessageLengthUnsafe(buffer, -Constants.HMacSize);
+    public byte[] DecryptMessage(CommonHeader header, ReadOnlySpan<byte> payload, ReadOnlySpan<byte> hmac)
+    {
+        Span<byte> iv = stackalloc byte[Constants.IVSize];
+        GenerateIV(header, iv);
 
-            var expectedHMac = ComputeHmac(buffer);
-            if (!hmac.SequenceEqual(expectedHMac))
-                throw new CdpSecurityException("Invalid hmac!");
-        }
+        // If payload size is an exact multiple of block length (16 bytes) no padding is applied
+        var paddingMode = payload.Length % 16 == 0 ? PaddingMode.None : PaddingMode.PKCS7;
+        var decryptedPayload = _aes.DecryptCbc(payload, iv);
+
+        VerifyHMac(header, payload, hmac);
 
         return decryptedPayload;
     }
 
-    public unsafe void EncryptMessage(BinaryWriter writer, CommonHeader header, Action<BinaryWriter> bodyCallback)
+    void VerifyHMac(CommonHeader header, ReadOnlySpan<byte> payload, ReadOnlySpan<byte> hmac)
     {
-        using (MemoryStream msgStream = new())
-        using (BigEndianBinaryWriter msgWriter = new(msgStream))
-        using (var aes = Aes.Create())
-        {
-            byte[] iv = GenerateIV(header);
-            aes.Key = AesKey;
+        if (!header.HasFlag(MessageFlags.HasHMAC))
+            return;
 
-            byte[] payloadBuffer;
-            using (MemoryStream bodyStream = new())
-            using (BigEndianBinaryWriter bodyWriter = new(bodyStream))
-            {
-                bodyCallback(bodyWriter);
-                bodyWriter.Flush();
+        if (hmac == null || hmac.Length != Constants.HMacSize)
+            throw new CdpSecurityException("Invalid hmac size!");
 
-                payloadBuffer = bodyStream.ToArray();
-            }
+        EndianWriter writer = new(Endianness.BigEndian);
+        header.Write(writer);
+        writer.Write(payload);
+        CommonHeader.ModifyMessageLength(writer.Buffer.AsWriteableSpan(), -Constants.HMacSize);
 
-            using (MemoryStream payloadStream = new())
-            using (BigEndianBinaryWriter payloadWriter = new(payloadStream))
-            {
-                payloadWriter.Write((uint)payloadBuffer.Length);
-                payloadWriter.Write(payloadBuffer);
-                payloadWriter.Flush();
+        Span<byte> expectedHMac = stackalloc byte[Constants.HMacSize];
+        ComputeHmac(writer.Buffer.AsSpan(), expectedHMac);
+        if (!hmac.SequenceEqual(expectedHMac))
+            throw new CdpSecurityException("Invalid hmac!");
+    }
 
-                var buffer = payloadStream.ToArray();
-                // If payload size is an exact multiple of block length (16 bytes) no padding is applied
-                PaddingMode paddingMode = buffer.Length % 16 == 0 ? PaddingMode.None : PaddingMode.PKCS7;
-                var encryptedPayload = aes.EncryptCbc(buffer, iv, paddingMode);
+    public void EncryptMessage(EndianWriter writer, CommonHeader header, BodyCallback bodyCallback)
+    {
+        EndianWriter msgWriter = new(Endianness.BigEndian);
 
-                header.Flags |= MessageFlags.SessionEncrypted | MessageFlags.HasHMAC;
-                header.SetMessageLength(encryptedPayload.Length);
-                header.Write(msgWriter);
+        Span<byte> iv = stackalloc byte[Constants.IVSize];
+        GenerateIV(header, iv);
 
-                msgWriter.Write(encryptedPayload);
-                msgWriter.Flush();
-            }
+        EndianWriter bodyWriter = new(Endianness.BigEndian);
+        bodyCallback(bodyWriter);
+        var payloadBuffer = bodyWriter.Buffer.AsSpan();
 
-            byte[] msgBuffer = msgStream.ToArray();
-            byte[] hmac = ComputeHmac(msgBuffer);
-            AlterMessageLengthUnsafe(msgBuffer, +Constants.HMacSize);
+        EndianWriter payloadWriter = new(Endianness.BigEndian);
+        payloadWriter.Write((uint)payloadBuffer.Length);
+        payloadWriter.Write(payloadBuffer);
 
-            writer.Write(msgBuffer);
-            writer.Write(hmac);
-        }
+        var buffer = payloadWriter.Buffer.AsSpan();
+        // If payload size is an exact multiple of block length (16 bytes) no padding is applied
+        PaddingMode paddingMode = buffer.Length % 16 == 0 ? PaddingMode.None : PaddingMode.PKCS7;
+        var encryptedPayload = _aes.EncryptCbc(buffer, iv, paddingMode);
+
+        header.Flags |= MessageFlags.SessionEncrypted | MessageFlags.HasHMAC;
+        header.SetMessageLength(encryptedPayload.Length);
+        header.Write(msgWriter);
+
+        msgWriter.Write(encryptedPayload);
+
+        var msgBuffer = msgWriter.Buffer.AsWriteableSpan();
+
+        Span<byte> hmac = stackalloc byte[Constants.HMacSize];
+        ComputeHmac(msgBuffer, hmac);
+        CommonHeader.ModifyMessageLength(msgBuffer, +Constants.HMacSize);
+
+        writer.Write(msgBuffer);
+        writer.Write(hmac);
     }
 
     public BinaryReader Read(BinaryReader reader, CommonHeader header)
@@ -164,5 +154,12 @@ public sealed class CdpCryptor
         }
 
         return payloadReader;
+    }
+
+    public void Dispose()
+    {
+        _ivAes.Dispose();
+        _aes.Dispose();
+        _hmac.Dispose();
     }
 }
