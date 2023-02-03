@@ -50,7 +50,7 @@ public sealed class ConnectionRequest : ICdpPayload<ConnectionRequest>
             PublicKeyY = reader.ReadBytesWithLength()
         };
 
-    public void Write(BinaryWriter writer)
+    public void Write(EndianWriter writer)
     {
         writer.Write((byte)CurveType);
         writer.Write((ushort)HmacSize);

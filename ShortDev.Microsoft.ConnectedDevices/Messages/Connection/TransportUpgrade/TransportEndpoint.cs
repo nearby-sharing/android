@@ -1,5 +1,6 @@
-﻿using System.IO;
-using ShortDev.Microsoft.ConnectedDevices.Transports;
+﻿using ShortDev.Microsoft.ConnectedDevices.Transports;
+using ShortDev.Networking;
+using System.IO;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages.Connection.TransportUpgrade;
 
@@ -24,14 +25,14 @@ public record class TransportEndpoint(CdpTransportType Type, byte[] Data) : ICdp
         return endpoints;
     }
 
-    public void Write(BinaryWriter writer)
+    public void Write(EndianWriter writer)
     {
         writer.Write((ushort)Type);
         writer.Write((uint)Data.Length);
         writer.Write(Data);
     }
 
-    public static void WriteArray(BinaryWriter writer, TransportEndpoint[] endpoints)
+    public static void WriteArray(EndianWriter writer, TransportEndpoint[] endpoints)
     {
         writer.Write((ushort)endpoints.Length);
         foreach (var endpoint in endpoints)

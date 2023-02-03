@@ -29,7 +29,7 @@ public class PresenceResponse : ICdpPayload<PresenceResponse>
             PrincipalUserNameHash = reader.ReadInt32()
         };
 
-    public void Write(BinaryWriter writer)
+    public void Write(EndianWriter writer)
     {
         writer.Write((short)ConnectionMode);
         writer.Write((short)DeviceType);

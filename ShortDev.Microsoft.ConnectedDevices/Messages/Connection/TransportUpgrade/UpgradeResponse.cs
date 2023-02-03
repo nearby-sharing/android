@@ -20,7 +20,7 @@ public sealed class UpgradeResponse : ICdpPayload<UpgradeResponse>
         throw new NotImplementedException();
     }
 
-    public void Write(BinaryWriter writer)
+    public void Write(EndianWriter writer)
     {
         writer.Write((ushort)HostEndpoints.Length);
         foreach (var endpoint in HostEndpoints)

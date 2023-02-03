@@ -55,7 +55,7 @@ public sealed class LaunchUriForTargetRequest : ICdpPayload<LaunchUriForTargetRe
     /// </summary>
     public byte[] InputData { get; init; } = new byte[0];
 
-    public void Write(BinaryWriter writer)
+    public void Write(EndianWriter writer)
     {
         writer.WriteWithLength(Uri);
         writer.Write((short)LaunchLocation);

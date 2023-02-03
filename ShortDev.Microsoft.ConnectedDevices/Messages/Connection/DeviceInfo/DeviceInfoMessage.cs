@@ -21,7 +21,7 @@ public sealed class DeviceInfoMessage : ICdpPayload<DeviceInfoMessage>
     /// </summary>
     public required CdpDeviceInfo DeviceInfo { get; init; }
 
-    public void Write(BinaryWriter writer)
+    public void Write(EndianWriter writer)
     {
         writer.WriteWithLength(JsonSerializer.Serialize(DeviceInfo));
     }

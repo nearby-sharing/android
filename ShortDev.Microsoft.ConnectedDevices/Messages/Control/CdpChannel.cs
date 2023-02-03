@@ -1,4 +1,5 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Platforms;
+using ShortDev.Networking;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -11,7 +12,6 @@ namespace ShortDev.Microsoft.ConnectedDevices.Messages.Control;
 /// </summary>
 public sealed class CdpChannel : IDisposable
 {
-    BinaryWriter _writer;
     internal CdpChannel(CdpSession session, ulong channelId, CdpAppBase app, CdpSocket socket)
     {
         Session = session;
@@ -19,7 +19,6 @@ public sealed class CdpChannel : IDisposable
         App = app;
         app.Channel = this;
         Socket = socket;
-        _writer = socket.Writer;
     }
 
     /// <summary>
@@ -51,31 +50,39 @@ public sealed class CdpChannel : IDisposable
 
     public void SendAck(CommonHeader header)
     {
-        CommonHeader newHeader = new();
-        newHeader.SequenceNumber = header.SequenceNumber + 1;
-        newHeader.Type = MessageType.Ack;
+        CommonHeader newHeader = new()
+        {
+            SequenceNumber = header.SequenceNumber + 1,
+            Type = MessageType.Ack
+        };
         newHeader.SetReplyToId(header.RequestID);
-        newHeader.Write(_writer);
+
+        EndianWriter writer = new(Endianness.BigEndian);
+        newHeader.Write(writer);
+        writer.CopyTo(Socket.Writer);
     }
 
-    public void SendMessage(CommonHeader oldHeader, Action<BinaryWriter> bodyCallback)
+    public void SendMessage(CommonHeader oldHeader, BodyCallback bodyCallback)
     {
         if (Session.Cryptor == null)
             throw new InvalidOperationException("Invalid session state!");
 
-        lock (_writer)
+        lock (this)
         {
-            CommonHeader header = new();
-            header.Type = MessageType.Session;
+            CommonHeader header = new()
+            {
+                Type = MessageType.Session,
 
-            header.SessionId = Session.GetSessionId(isHost: true);
-            header.ChannelId = ChannelId;
+                SessionId = Session.GetSessionId(isHost: true),
+                ChannelId = ChannelId,
 
-            header.SequenceNumber = ++oldHeader.SequenceNumber;
+                SequenceNumber = ++oldHeader.SequenceNumber
+            };
             // ToDo: "AdditionalHeaders" ... "RequestID" ??
 
-            Session.Cryptor.EncryptMessage(_writer, header, bodyCallback);
-            _writer.Flush();
+            EndianWriter writer = new(Endianness.BigEndian);
+            Session.Cryptor.EncryptMessage(writer, header, bodyCallback);
+            writer.CopyTo(Socket.Writer);
         }
     }
 

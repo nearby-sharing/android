@@ -54,7 +54,7 @@ public sealed class ConnectionResponse : ICdpPayload<ConnectionResponse>
         };
     }
 
-    public void Write(BinaryWriter writer)
+    public void Write(EndianWriter writer)
     {
         writer.Write((byte)Result);
         writer.Write((ushort)HmacSize);

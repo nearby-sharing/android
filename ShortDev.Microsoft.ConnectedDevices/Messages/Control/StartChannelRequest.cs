@@ -20,7 +20,7 @@ public sealed class StartChannelRequest : ICdpPayload<StartChannelRequest>
     public required short Unknown1 { get; init; }
     public required string Unknown2 { get; init; }
 
-    public void Write(BinaryWriter writer)
+    public void Write(EndianWriter writer)
     {
         throw new NotImplementedException();
     }
