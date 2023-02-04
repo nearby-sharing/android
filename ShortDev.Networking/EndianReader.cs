@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Buffers.Binary;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 
@@ -35,8 +36,8 @@ public readonly ref struct EndianReader
     {
         if (Stream != null)
         {
-            Span<byte> buffer = new byte[length];
-            Stream.Read(buffer);
+            var buffer = new byte[length];
+            ReadStreamInternal(buffer);
             return buffer;
         }
 
@@ -46,9 +47,31 @@ public readonly ref struct EndianReader
     public void ReadBytes(Span<byte> buffer)
     {
         if (Stream != null)
-            Stream.Read(buffer);
+            ReadStreamInternal(buffer);
         else
             Buffer.ReadBytes(buffer);
+    }
+
+    /// <summary>
+    /// <see href="https://github.com/dotnet/runtime/blob/56c84971041ae1debfa5ff360c547392d29f4cb3/src/libraries/System.Private.CoreLib/src/System/IO/BinaryReader.cs#L494-L506">BinaryReader.ReadBytes</see>
+    /// </summary>
+    void ReadStreamInternal(Span<byte> buffer)
+    {
+        Debug.Assert(Stream != null);
+
+        int count = buffer.Length;
+        int numRead = 0;
+        do
+        {
+            int n = Stream.Read(buffer[numRead..]);
+            if (n == 0)
+                throw new EndOfStreamException();
+
+            numRead += n;
+            count -= n;
+        } while (count > 0);
+        
+        Debug.Assert(numRead == buffer.Length);
     }
 
     public byte ReadByte()
