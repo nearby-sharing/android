@@ -5,7 +5,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Messages.Discovery;
 
 public sealed class DiscoveryHeader : ICdpHeader<DiscoveryHeader>
 {
-    public static DiscoveryHeader Parse(BinaryReader reader)
+    public static DiscoveryHeader Parse(EndianReader reader)
         => new()
         {
             Type = (DiscoveryType)reader.ReadByte()

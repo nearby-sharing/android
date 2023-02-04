@@ -11,7 +11,7 @@ public sealed class TransportRequest : ICdpPayload<TransportRequest>
 {
     public required Guid UpgradeId { get; init; }
 
-    public static TransportRequest Parse(BinaryReader reader)
+    public static TransportRequest Parse(EndianReader reader)
         => new()
         {
             UpgradeId = new(reader.ReadBytes(16))

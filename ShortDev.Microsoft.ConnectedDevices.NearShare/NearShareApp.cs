@@ -1,9 +1,6 @@
-﻿using ShortDev.Microsoft.ConnectedDevices;
-using ShortDev.Microsoft.ConnectedDevices.Messages;
+﻿using ShortDev.Microsoft.ConnectedDevices.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Serialization;
-using ShortDev.Networking;
 using System.Collections;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace ShortDev.Microsoft.ConnectedDevices.NearShare;
@@ -28,12 +25,8 @@ public sealed class NearShareApp : CdpAppBase
         bool expectMessage = true;
 
         CommonHeader header = msg.Header;
-        BinaryReader payloadReader = msg.Read();
 
-        var prepend = payloadReader.ReadBytes(0x0000000C);
-        var buffer = payloadReader.ReadPayload();
-        Debug.Print(BinaryConvert.ToString(buffer));
-        var payload = ValueSet.Parse(buffer);
+        var payload = ValueSet.Parse(msg.Read(out var prepend));
 
         header.AdditionalHeaders.RemoveAll((x) => x.Type == AdditionalHeaderType.CorrelationVector);
 
@@ -73,12 +66,12 @@ public sealed class NearShareApp : CdpAppBase
                             }
                             catch (TaskCanceledException)
                             {
-                                SendCancel(header, prepend);
+                                SendCancel(header, prepend.ToArray());
                                 CloseChannel();
                                 throw;
                             }
 
-                            _blobCursor = CreateBlobCursor(header, prepend);
+                            _blobCursor = CreateBlobCursor(header, prepend.ToArray());
                             _blobCursor.MoveNext();
                             return;
                         }

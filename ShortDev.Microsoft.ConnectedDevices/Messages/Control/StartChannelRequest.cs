@@ -6,13 +6,13 @@ namespace ShortDev.Microsoft.ConnectedDevices.Messages.Control;
 
 public sealed class StartChannelRequest : ICdpPayload<StartChannelRequest>
 {
-    public static StartChannelRequest Parse(BinaryReader reader)
+    public static StartChannelRequest Parse(EndianReader reader)
         => new()
         {
-            Id = reader.ReadStringWithLength(zeroByte: true),
-            Name = reader.ReadStringWithLength(zeroByte: true),
+            Id = reader.ReadStringWithLength(),
+            Name = reader.ReadStringWithLength(),
             Unknown1 = reader.ReadInt16(),
-            Unknown2 = reader.ReadStringWithLength(zeroByte: true)
+            Unknown2 = reader.ReadStringWithLength()
         };
 
     public required string Id { get; init; }

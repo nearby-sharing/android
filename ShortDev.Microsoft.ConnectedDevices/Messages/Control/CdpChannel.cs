@@ -59,7 +59,7 @@ public sealed class CdpChannel : IDisposable
 
         EndianWriter writer = new(Endianness.BigEndian);
         newHeader.Write(writer);
-        writer.CopyTo(Socket.Writer);
+        writer.CopyTo(Socket.OutputStream);
     }
 
     public void SendMessage(CommonHeader oldHeader, BodyCallback bodyCallback)
@@ -82,7 +82,7 @@ public sealed class CdpChannel : IDisposable
 
             EndianWriter writer = new(Endianness.BigEndian);
             Session.Cryptor.EncryptMessage(writer, header, bodyCallback);
-            writer.CopyTo(Socket.Writer);
+            writer.CopyTo(Socket.OutputStream);
         }
     }
 

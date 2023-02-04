@@ -1,6 +1,5 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Encryption;
 using ShortDev.Networking;
-using System.IO;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages.Connection;
 
@@ -40,7 +39,7 @@ public sealed class ConnectionResponse : ICdpPayload<ConnectionResponse>
     /// </summary>
     public required byte[] PublicKeyY { get; set; }
 
-    public static ConnectionResponse Parse(BinaryReader reader)
+    public static ConnectionResponse Parse(EndianReader reader)
     {
         var result = (ConnectionResult)reader.ReadByte();
         return new()
@@ -49,8 +48,8 @@ public sealed class ConnectionResponse : ICdpPayload<ConnectionResponse>
             HmacSize = reader.ReadUInt16(),
             Nonce = new(reader.ReadUInt16()),
             MessageFragmentSize = reader.ReadUInt32(),
-            PublicKeyX = reader.ReadBytesWithLength(),
-            PublicKeyY = reader.ReadBytesWithLength()
+            PublicKeyX = reader.ReadBytesWithLength().ToArray(),
+            PublicKeyY = reader.ReadBytesWithLength().ToArray()
         };
     }
 

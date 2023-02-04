@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ShortDev.Networking
 {
@@ -44,10 +46,12 @@ namespace ShortDev.Networking
         public static string ToString(byte[] data)
             => BitConverter.ToString(data).Replace("-", "");
 
-        public static byte[] Reverse(byte[] data)
+        public static byte[] ToReversed(ReadOnlySpan<byte> data)
         {
-            Array.Reverse(data);
-            return data;
+            var result = new byte[data.Length];
+            for (int i = 0; i < result.Length; i++)
+                result[i] = data[result.Length - i - 1];
+            return result;
         }
     }
 }

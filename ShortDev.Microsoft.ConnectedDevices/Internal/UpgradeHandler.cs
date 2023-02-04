@@ -25,7 +25,7 @@ internal sealed class UpgradeHandler
     public bool IsSocketAllowed(CdpSocket socket)
         => _allowedAddresses.Contains(socket.RemoteDevice.Address);
 
-    public bool HandleConnect(CdpSocket socket, CommonHeader header, ConnectionHeader connectionHeader, BinaryReader reader, EndianWriter writer)
+    public bool HandleConnect(CdpSocket socket, CommonHeader header, ConnectionHeader connectionHeader, EndianReader reader, EndianWriter writer)
     {
         // This part need to be always accessible!
         // This is used to validate
@@ -55,7 +55,7 @@ internal sealed class UpgradeHandler
     }
 
     readonly ConcurrentList<Guid> _upgradeIds = new();
-    void HandleTransportRequest(CdpSocket socket, CommonHeader header, BinaryReader reader, EndianWriter writer)
+    void HandleTransportRequest(CdpSocket socket, CommonHeader header, EndianReader reader, EndianWriter writer)
     {
         var msg = TransportRequest.Parse(reader);
 
@@ -85,7 +85,7 @@ internal sealed class UpgradeHandler
         });
     }
 
-    void HandleUpgradeRequest(CommonHeader header, BinaryReader reader, EndianWriter writer)
+    void HandleUpgradeRequest(CommonHeader header, EndianReader reader, EndianWriter writer)
     {
         var msg = UpgradeRequest.Parse(reader);
         _session.Platform.Handler.Log(0, $"Upgrade request {msg.UpgradeId} to {string.Join(',', msg.Endpoints.Select((x) => x.Type.ToString()))}");
@@ -132,7 +132,7 @@ internal sealed class UpgradeHandler
         });
     }
 
-    void HandleUpgradeFinalization(CommonHeader header, BinaryReader reader, EndianWriter writer)
+    void HandleUpgradeFinalization(CommonHeader header, EndianReader reader, EndianWriter writer)
     {
         var msg = TransportEndpoint.ParseArray(reader);
         _session.Platform.Handler.Log(0, $"Transport upgrade to {string.Join(',', msg.Select((x) => x.Type.ToString()))}");
@@ -148,7 +148,7 @@ internal sealed class UpgradeHandler
         });
     }
 
-    void HandleUpgradeFailure(CommonHeader header, BinaryReader reader, EndianWriter writer)
+    void HandleUpgradeFailure(CommonHeader header, EndianReader reader, EndianWriter writer)
     {
         var msg = HResultPayload.Parse(reader);
         _session.Platform.Handler.Log(0, $"Transport upgrade failed with HResult {msg.HResult}");
