@@ -259,6 +259,7 @@ static class Extensions
     public static CdpDevice ToCdp(this BluetoothDevice @this)
         => new(
             @this.Name ?? throw new InvalidDataException("Empty name"),
+            CdpTransportType.Rfcomm,
             @this.Address ?? throw new InvalidDataException("Empty address")
         );
 

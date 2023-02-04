@@ -3,6 +3,7 @@ using ShortDev.Microsoft.ConnectedDevices.Messages.Connection;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.TransportUpgrade;
 using ShortDev.Microsoft.ConnectedDevices.Platforms;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
+using ShortDev.Networking;
 using System;
 using System.IO;
 using System.Linq;
@@ -24,13 +25,13 @@ internal sealed class UpgradeHandler
     public bool IsSocketAllowed(CdpSocket socket)
         => _allowedAddresses.Contains(socket.RemoteDevice.Address);
 
-    public bool HandleConnect(CdpSocket socket, CommonHeader header, ConnectionHeader connectionHeader, BinaryReader reader, BinaryWriter writer)
+    public bool HandleConnect(CdpSocket socket, CommonHeader header, ConnectionHeader connectionHeader, EndianReader reader)
     {
         // This part need to be always accessible!
         // This is used to validate
         if (connectionHeader.MessageType == ConnectionType.TransportRequest)
         {
-            HandleTransportRequest(socket, header, reader, writer);
+            HandleTransportRequest(socket, header, reader);
             return true;
         }
 
@@ -41,20 +42,20 @@ internal sealed class UpgradeHandler
         switch (connectionHeader.MessageType)
         {
             case ConnectionType.UpgradeRequest:
-                HandleUpgradeRequest(header, reader, writer);
+                HandleUpgradeRequest(socket, header, reader);
                 return true;
             case ConnectionType.UpgradeFinalization:
-                HandleUpgradeFinalization(header, reader, writer);
+                HandleUpgradeFinalization(socket, header, reader);
                 return true;
             case ConnectionType.UpgradeFailure:
-                HandleUpgradeFailure(header, reader, writer);
+                HandleUpgradeFailure(socket, header, reader);
                 return true;
         }
         return false;
     }
 
     readonly ConcurrentList<Guid> _upgradeIds = new();
-    void HandleTransportRequest(CdpSocket socket, CommonHeader header, BinaryReader reader, BinaryWriter writer)
+    void HandleTransportRequest(CdpSocket socket, CommonHeader header, EndianReader reader)
     {
         var msg = TransportRequest.Parse(reader);
 
@@ -73,7 +74,7 @@ internal sealed class UpgradeHandler
         _session.Platform.Handler.Log(0, $"Transport upgrade {msg.UpgradeId} {(allowed ? "succeeded" : "failed")}");
 
         header.Flags = 0;
-        _session.Cryptor!.EncryptMessage(writer, header, (writer) =>
+        _session.SendMessage(socket, header, (writer) =>
         {
             new ConnectionHeader()
             {
@@ -84,7 +85,7 @@ internal sealed class UpgradeHandler
         });
     }
 
-    void HandleUpgradeRequest(CommonHeader header, BinaryReader reader, BinaryWriter writer)
+    void HandleUpgradeRequest(CdpSocket socket, CommonHeader header, EndianReader reader)
     {
         var msg = UpgradeRequest.Parse(reader);
         _session.Platform.Handler.Log(0, $"Upgrade request {msg.UpgradeId} to {string.Join(',', msg.Endpoints.Select((x) => x.Type.ToString()))}");
@@ -92,7 +93,7 @@ internal sealed class UpgradeHandler
         var networkTransport = _session.Platform.TryGetTransport<NetworkTransport>();
         if (networkTransport == null)
         {
-            _session.Cryptor!.EncryptMessage(writer, header, (writer) =>
+            _session.SendMessage(socket, header, (writer) =>
             {
                 new ConnectionHeader()
                 {
@@ -110,7 +111,7 @@ internal sealed class UpgradeHandler
         _upgradeIds.Add(msg.UpgradeId);
 
         header.Flags = 0;
-        _session.Cryptor!.EncryptMessage(writer, header, (writer) =>
+        _session.SendMessage(socket, header, (writer) =>
         {
             new ConnectionHeader()
             {
@@ -131,13 +132,13 @@ internal sealed class UpgradeHandler
         });
     }
 
-    void HandleUpgradeFinalization(CommonHeader header, BinaryReader reader, BinaryWriter writer)
+    void HandleUpgradeFinalization(CdpSocket socket, CommonHeader header, EndianReader reader)
     {
         var msg = TransportEndpoint.ParseArray(reader);
         _session.Platform.Handler.Log(0, $"Transport upgrade to {string.Join(',', msg.Select((x) => x.Type.ToString()))}");
 
         header.Flags = 0;
-        _session.Cryptor!.EncryptMessage(writer, header, (writer) =>
+        _session.SendMessage(socket, header, (writer) =>
         {
             new ConnectionHeader()
             {
@@ -147,7 +148,7 @@ internal sealed class UpgradeHandler
         });
     }
 
-    void HandleUpgradeFailure(CommonHeader header, BinaryReader reader, BinaryWriter writer)
+    void HandleUpgradeFailure(CdpSocket socket, CommonHeader header, EndianReader reader)
     {
         var msg = HResultPayload.Parse(reader);
         _session.Platform.Handler.Log(0, $"Transport upgrade failed with HResult {msg.HResult}");

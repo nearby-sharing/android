@@ -1,5 +1,6 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Messages.Session;
 using ShortDev.Microsoft.ConnectedDevices.Platforms;
+using ShortDev.Networking;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -49,7 +50,7 @@ public sealed class CdpChannel : IDisposable
     public async ValueTask HandleMessageAsync(CdpMessage msg)
         => await MessageHandler.HandleMessageAsync(msg);
 
-    public void SendMessage(CommonHeader oldHeader, Action<BinaryWriter> bodyCallback)
+    public void SendMessage(CommonHeader oldHeader, BodyCallback bodyCallback)
     {
         lock (this)
         {
@@ -61,10 +62,11 @@ public sealed class CdpChannel : IDisposable
         }
     }
 
-    public void SendMessage(uint sequenceNumber, Action<BinaryWriter> bodyCallback)
+    public void SendMessage(uint sequenceNumber, BodyCallback bodyCallback)
     {
-        if (Session.Cryptor == null)
-            throw new InvalidOperationException("Invalid session state!");
+        // ToDo
+        //if (Session.Cryptor == null)
+        //    throw new InvalidOperationException("Invalid session state!");
 
         lock (this)
         {

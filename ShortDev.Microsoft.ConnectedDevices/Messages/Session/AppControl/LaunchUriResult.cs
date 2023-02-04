@@ -1,11 +1,12 @@
-﻿using System;
+﻿using ShortDev.Networking;
+using System;
 using System.IO;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages.Session.AppControl;
 
 public sealed class LaunchUriResult : ICdpPayload<LaunchUriResult>
 {
-    public static LaunchUriResult Parse(BinaryReader reader)
+    public static LaunchUriResult Parse(EndianReader reader)
     {
         throw new NotImplementedException();
     }
@@ -21,7 +22,7 @@ public sealed class LaunchUriResult : ICdpPayload<LaunchUriResult>
     /// </summary>
     public required int ResponseID { get; init; }
 
-    public void Write(BinaryWriter writer)
+    public void Write(EndianWriter writer)
     {
 
     }

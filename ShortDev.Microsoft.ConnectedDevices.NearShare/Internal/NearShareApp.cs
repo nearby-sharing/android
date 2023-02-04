@@ -1,9 +1,7 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Messages;
 using ShortDev.Microsoft.ConnectedDevices.NearShare.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Serialization;
-using ShortDev.Networking;
 using System.Collections;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace ShortDev.Microsoft.ConnectedDevices.NearShare.Internal;
@@ -28,11 +26,8 @@ internal sealed class NearShareApp : CdpAppBase
         bool expectMessage = true;
 
         CommonHeader header = msg.Header;
-        BinaryReader payloadReader = msg.Read();
 
-        var buffer = payloadReader.ReadPayload();
-        Debug.Print(BinaryConvert.ToString(buffer));
-        var payload = ValueSet.Parse(buffer);
+        var payload = ValueSet.Parse(msg.Read());
 
         header.AdditionalHeaders.RemoveAll((x) => x.Type == AdditionalHeaderType.CorrelationVector);
 

@@ -15,12 +15,12 @@ public sealed class UpgradeResponse : ICdpPayload<UpgradeResponse>
     public required HostEndpointMetadata[] HostEndpoints { get; init; }
     public required TransportEndpoint[] Endpoints { get; init; }
 
-    public static UpgradeResponse Parse(BinaryReader reader)
+    public static UpgradeResponse Parse(EndianReader reader)
     {
         throw new NotImplementedException();
     }
 
-    public void Write(BinaryWriter writer)
+    public void Write(EndianWriter writer)
     {
         writer.Write((ushort)HostEndpoints.Length);
         foreach (var endpoint in HostEndpoints)

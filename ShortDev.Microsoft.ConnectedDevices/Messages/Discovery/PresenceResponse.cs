@@ -18,7 +18,7 @@ public class PresenceResponse : ICdpPayload<PresenceResponse>
 
     public required int PrincipalUserNameHash { get; init; }
 
-    public static PresenceResponse Parse(BinaryReader reader)
+    public static PresenceResponse Parse(EndianReader reader)
         => new()
         {
             ConnectionMode = (ConnectionMode)reader.ReadInt16(),
@@ -29,7 +29,7 @@ public class PresenceResponse : ICdpPayload<PresenceResponse>
             PrincipalUserNameHash = reader.ReadInt32()
         };
 
-    public void Write(BinaryWriter writer)
+    public void Write(EndianWriter writer)
     {
         writer.Write((short)ConnectionMode);
         writer.Write((short)DeviceType);

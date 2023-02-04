@@ -1,11 +1,12 @@
 ﻿using ShortDev.Networking;
+using System;
 using System.IO;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages.Session.AppControl;
 
 public sealed class LaunchUriForTargetRequest : ICdpPayload<LaunchUriForTargetRequest>
 {
-    public static LaunchUriForTargetRequest Parse(BinaryReader reader)
+    public static LaunchUriForTargetRequest Parse(EndianReader reader)
         => new()
         {
             Uri = reader.ReadStringWithLength(),
@@ -16,7 +17,7 @@ public sealed class LaunchUriForTargetRequest : ICdpPayload<LaunchUriForTargetRe
             AlternateId = reader.ReadStringWithLength(),
             TitleId = reader.ReadInt32(),
             FacadeName = reader.ReadStringWithLength(),
-            InputData = reader.ReadBytesWithLength()
+            InputData = reader.ReadBytesWithLength().ToArray()
         };
 
     /// <summary>
@@ -53,9 +54,9 @@ public sealed class LaunchUriForTargetRequest : ICdpPayload<LaunchUriForTargetRe
     /// BOND.NET serialized data that is passed as a value set to the app launched by the call. <br/>
     /// (Optional)
     /// </summary>
-    public byte[] InputData { get; init; } = new byte[0];
+    public byte[] InputData { get; init; } = Array.Empty<byte>();
 
-    public void Write(BinaryWriter writer)
+    public void Write(EndianWriter writer)
     {
         writer.WriteWithLength(Uri);
         writer.Write((short)LaunchLocation);

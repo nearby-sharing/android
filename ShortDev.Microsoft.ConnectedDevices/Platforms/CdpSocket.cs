@@ -14,14 +14,6 @@ public sealed class CdpSocket : IDisposable
     public required Stream InputStream { get; init; }
     public required Stream OutputStream { get; init; }
 
-    BinaryReader? _readerCache;
-    public BinaryReader Reader
-        => _readerCache ??= new BigEndianBinaryReader(InputStream);
-
-    BinaryWriter? _writerCache;
-    public BinaryWriter Writer
-        => _writerCache ??= new BigEndianBinaryWriter(OutputStream);
-
     public required CdpDevice RemoteDevice { get; init; }
 
     public bool IsClosed { get; private set; }
@@ -35,8 +27,6 @@ public sealed class CdpSocket : IDisposable
             return;
 
         Close();
-        _readerCache?.Dispose();
-        _writerCache?.Dispose();
 
         IsClosed = true;
     }

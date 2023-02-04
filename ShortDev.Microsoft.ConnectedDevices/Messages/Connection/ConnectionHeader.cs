@@ -1,4 +1,4 @@
-﻿using System.IO;
+﻿using ShortDev.Networking;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages.Connection;
 
@@ -17,7 +17,7 @@ public sealed class ConnectionHeader : ICdpHeader<ConnectionHeader>
     /// </summary>
     public required ConnectionMode ConnectionMode { get; set; }
 
-    public static ConnectionHeader Parse(BinaryReader reader)
+    public static ConnectionHeader Parse(EndianReader reader)
     {
         return new()
         {
@@ -26,7 +26,7 @@ public sealed class ConnectionHeader : ICdpHeader<ConnectionHeader>
         };
     }
 
-    public void Write(BinaryWriter writer)
+    public void Write(EndianWriter writer)
     {
         writer.Write((short)ConnectionMode);
         writer.Write((byte)MessageType);

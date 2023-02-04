@@ -5,7 +5,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Messages.Session.AppControl;
 
 public sealed class LaunchUriRequest : ICdpPayload<LaunchUriRequest>
 {
-    public static LaunchUriRequest Parse(BinaryReader reader)
+    public static LaunchUriRequest Parse(EndianReader reader)
         => new()
         {
             Uri = reader.ReadStringWithLength(),
@@ -30,7 +30,7 @@ public sealed class LaunchUriRequest : ICdpPayload<LaunchUriRequest>
     /// </summary>
     public string InputData { get; init; } = string.Empty;
 
-    public void Write(BinaryWriter writer)
+    public void Write(EndianWriter writer)
     {
         writer.WriteWithLength(Uri);
         writer.Write((short)LaunchLocation);

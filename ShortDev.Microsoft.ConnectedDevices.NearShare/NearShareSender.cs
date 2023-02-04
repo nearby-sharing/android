@@ -44,7 +44,7 @@ public sealed class NearShareSender
 
     class HandshakeHandler : IChannelMessageHandler
     {
-        TaskCompletionSource _promise = new();
+        readonly TaskCompletionSource _promise = new();
 
         public static void StartHandshake(CdpChannel channel, Guid operationId)
         {

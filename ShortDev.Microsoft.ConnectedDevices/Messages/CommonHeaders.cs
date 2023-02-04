@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ShortDev.Networking;
+using System;
 using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.IO;
@@ -11,14 +12,14 @@ namespace ShortDev.Microsoft.ConnectedDevices.Messages;
 /// </summary>
 public sealed class CommonHeader : ICdpHeader<CommonHeader>
 {
-    public static CommonHeader Parse(BinaryReader reader)
+    public static CommonHeader Parse(EndianReader reader)
     {
         if (!TryParse(reader, out var result, out var ex))
             throw ex ?? new NullReferenceException("No exception");
         return result ?? throw new NullReferenceException("No result");
     }
 
-    public static bool TryParse(BinaryReader reader, out CommonHeader? result, out Exception? ex)
+    public static bool TryParse(EndianReader reader, out CommonHeader? result, out Exception? ex)
     {
         result = new();
         var sig = reader.ReadUInt16();
@@ -56,7 +57,7 @@ public sealed class CommonHeader : ICdpHeader<CommonHeader>
             if (nextHeaderType != AdditionalHeaderType.None)
             {
                 var value = reader.ReadBytes(nextHeaderSize);
-                additionalHeaders.Add(new(nextHeaderType, value));
+                additionalHeaders.Add(new(nextHeaderType, value.ToArray()));
             }
             else
                 break;
@@ -74,7 +75,7 @@ public sealed class CommonHeader : ICdpHeader<CommonHeader>
         return true;
     }
 
-    public void Write(BinaryWriter writer)
+    public void Write(EndianWriter writer)
     {
         writer.Write(Constants.Signature);
         writer.Write(MessageLength);
@@ -92,7 +93,7 @@ public sealed class CommonHeader : ICdpHeader<CommonHeader>
         {
             writer.Write((byte)header.Type);
             writer.Write((byte)header.Value.Length);
-            writer.Write(header.Value);
+            writer.Write(header.Value.Span);
         }
         writer.Write((byte)AdditionalHeaderType.None);
         writer.Write((byte)0);
@@ -217,6 +218,6 @@ public sealed class CommonHeader : ICdpHeader<CommonHeader>
         if (header == null)
             return null;
 
-        return BinaryPrimitives.ReadUInt64LittleEndian(header.Value);
+        return BinaryPrimitives.ReadUInt64LittleEndian(header.Value.Span);
     }
 }

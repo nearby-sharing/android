@@ -19,7 +19,7 @@ public sealed class NetworkTransport : ICdpTransport
         Handler = handler;
     }
 
-    TcpListener _listener = new(IPAddress.Any, Constants.TcpPort);
+    readonly TcpListener _listener = new(IPAddress.Any, Constants.TcpPort);
 
     public event DeviceConnectedEventHandler? DeviceConnected;
     public async void Listen(CancellationToken cancellationToken)

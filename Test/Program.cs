@@ -20,18 +20,17 @@ while (true)
     Console.Clear();
     var buffer = BinaryConvert.ToBytes(AnsiConsole.Ask<string>("Message"));
 
-    using (MemoryStream stream = new(buffer))
-    using (BigEndianBinaryReader reader = new(stream))
-    {
-        if (!CommonHeader.TryParse(reader, out var header, out _) || header == null)
-            throw new InvalidDataException();
+    EndianReader reader = new(Endianness.BigEndian, buffer);
 
-        HandleMessage(header, cryptor.Read(reader, header));
-    }
+    if (!CommonHeader.TryParse(reader, out var header, out _) || header == null)
+        throw new InvalidDataException();
+
+    HandleMessage(header, cryptor.Read(reader, header));
+
     Console.ReadLine();
 }
 
-void HandleMessage(CommonHeader header, BinaryReader reader)
+void HandleMessage(CommonHeader header, EndianReader reader)
 {
     if (header.Type == MessageType.Connect)
     {
@@ -63,12 +62,13 @@ void HandleMessage(CommonHeader header, BinaryReader reader)
     }
     else if (header.Type == MessageType.Session)
     {
-        var fragmentHeader = SessionFragmentHeader.Parse(reader);
-        var valueSet = ValueSet.Parse(reader.BaseStream);
+        // reader.PrintPayload();
+        //var prepend = reader.ReadBytes(0x0000000C);
+        //var valueSet = ValueSet.Parse(reader.BaseStream);
     }
     else
     {
         Console.WriteLine();
-        Console.WriteLine(BinaryConvert.ToString(reader.ReadPayload()));
+        //Console.WriteLine(BinaryConvert.ToString(reader.ReadPayload()));
     }
 }

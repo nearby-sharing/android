@@ -14,9 +14,8 @@ public class NearShareHandshakeApp : CdpAppBase, ICdpAppId
     public override ValueTask HandleMessageAsync(CdpMessage msg)
     {
         CommonHeader header = msg.Header;
-        BinaryReader payloadReader = msg.Read();
 
-        var payload = ValueSet.Parse(payloadReader.ReadPayload());
+        var payload = ValueSet.Parse(msg.Read());
         header.AdditionalHeaders.RemoveAll((x) => x.Type == AdditionalHeaderType.CorrelationVector);
 
         string id = payload.Get<Guid>("OperationId").ToString();

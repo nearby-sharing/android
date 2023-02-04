@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using ShortDev.Networking;
+using System.IO;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages.Session;
 
@@ -12,7 +13,7 @@ public sealed class SessionFragmentHeader : ICdpHeader<SessionFragmentHeader>
     public int FragmentIndex { get; set; } = 0;
     public required int MessageId { get; set; }
 
-    public static SessionFragmentHeader Parse(BinaryReader reader)
+    public static SessionFragmentHeader Parse(EndianReader reader)
         => new()
         {
             FragmentCount = reader.ReadInt32(),
@@ -20,7 +21,7 @@ public sealed class SessionFragmentHeader : ICdpHeader<SessionFragmentHeader>
             MessageId = reader.ReadInt32(),
         };
 
-    public void Write(BinaryWriter writer)
+    public void Write(EndianWriter writer)
     {
         writer.Write(FragmentCount);
         writer.Write(FragmentIndex);

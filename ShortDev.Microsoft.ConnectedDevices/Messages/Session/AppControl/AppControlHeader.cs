@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using ShortDev.Networking;
+using System.IO;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages.Session.AppControl;
 
@@ -6,7 +7,7 @@ public sealed class AppControlHeader : ICdpHeader<AppControlHeader>
 {
     public required AppControlType MessageType { get; set; }
 
-    public static AppControlHeader Parse(BinaryReader reader)
+    public static AppControlHeader Parse(EndianReader reader)
     {
         return new()
         {
@@ -14,7 +15,7 @@ public sealed class AppControlHeader : ICdpHeader<AppControlHeader>
         };
     }
 
-    public void Write(BinaryWriter writer)
+    public void Write(EndianWriter writer)
     {
         writer.Write((byte)MessageType);
     }

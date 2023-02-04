@@ -1,6 +1,9 @@
 # FAQ
 ## Share to windows
 
+> **Note**
+> Follow the new [setup guide](https://nearshare.shortdev.de/docs/setup)!
+
 ### What can I share?
 You can share **files** and **urls** to any Windows 10 / 11 devices.
 
@@ -23,20 +26,19 @@ Ensure that you've set your "near share" settings in windows to send and receive
 In general bluetooth is slower than wifi, so try to **always choose wifi** if you can.
 
 ### My device is only shown with Bluetooth
-For the transfer to work via wifi you have to ensure both devices are on the same network.   
-You should also make sure that your router allows devices to communicate (might not be the case in a (public) hotspot)!
+For the transfer to work via wifi you have to ensure both devices are on the **same network**.   
+You should also make sure that your router allows devices to communicate (might not be the case in a (public) hotspot)!   
+Make sure your network is set to **`Private`** in your PCs settings!
 
 ### My devices is not shown at all
-This is a builtin feature of windows.   
+This is a **built-in** feature of windows.   
 Check if "Nearby Sharing" is enabled in the settings of your windows device (<a href="ms-settings:crossdevice">ms-settings:crossdevice</a>).    
 
 ## Receive from windows
 
 > **Note**   
 > I'm currently working on this feature   
-> Track the status in [Issue #8](https://github.com/ShortDevelopment/Nearby-Sharing-Windows/issues/8)
-
-Feedback: https://forms.office.com/r/j2Fp5biXKB
+> [Join the preview](https://nearshare.shortdev.de/docs/beta) to test this feature!
 
 ### My PC does not connect
-Please ensure that **no** device is connected!
+Please ensure that **no** devices are connected to your android device (See Bluetooth settings)!

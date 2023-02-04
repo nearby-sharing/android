@@ -6,38 +6,25 @@ namespace ShortDev.Microsoft.ConnectedDevices.Messages;
 
 public interface ICdpSerializable<T> : ICdpWriteable where T : ICdpSerializable<T>
 {
-    static abstract T Parse(BinaryReader reader);
-    public static bool TryParse(BinaryReader reader, out T? result, out Exception? error)
+    static abstract T Parse(EndianReader reader);
+    public static bool TryParse(EndianReader reader, out T? result, out Exception? error)
         => throw new NotImplementedException();
 
     public long CalcSize()
     {
-        using (MemoryStream stream = new())
-        using (BinaryWriter writer = new(stream))
-        {
-            Write(writer);
-            return stream.Length;
-        }
+        EndianWriter writer = new(Endianness.BigEndian);
+        Write(writer);
+        return writer.Buffer.Size;
     }
 }
 
 public interface ICdpArraySerializable<T> where T : ICdpArraySerializable<T>
 {
-    static abstract T[] ParseArray(BinaryReader reader);
-    static abstract void WriteArray(BinaryWriter reader, T[] array);
+    static abstract T[] ParseArray(EndianReader reader);
+    static abstract void WriteArray(EndianWriter writer, T[] array);
 }
 
 public interface ICdpWriteable
 {
-    void Write(BinaryWriter writer);
-
-    public byte[] ToArray()
-    {
-        using (MemoryStream stream = new())
-        using (BigEndianBinaryWriter writer = new(stream))
-        {
-            Write(writer);
-            return stream.ToArray();
-        }
-    }
+    void Write(EndianWriter writer);
 }

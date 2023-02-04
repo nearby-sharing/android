@@ -1,5 +1,5 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Exceptions;
-using System.IO;
+using ShortDev.Networking;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages;
 
@@ -10,7 +10,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Messages;
 /// </summary>
 public sealed class ResultPayload : ICdpPayload<ResultPayload>
 {
-    public static ResultPayload Parse(BinaryReader reader)
+    public static ResultPayload Parse(EndianReader reader)
         => new()
         {
             Result = (CdpResult)reader.ReadByte()
@@ -18,7 +18,7 @@ public sealed class ResultPayload : ICdpPayload<ResultPayload>
 
     public required CdpResult Result { get; init; }
 
-    public void Write(BinaryWriter writer)
+    public void Write(EndianWriter writer)
     {
         writer.Write((byte)Result);
     }

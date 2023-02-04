@@ -1,6 +1,5 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Encryption;
 using ShortDev.Networking;
-using System.IO;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages.Connection;
 
@@ -39,18 +38,18 @@ public sealed class ConnectionRequest : ICdpPayload<ConnectionRequest>
     /// </summary>
     public required byte[] PublicKeyY { get; set; }
 
-    public static ConnectionRequest Parse(BinaryReader reader)
+    public static ConnectionRequest Parse(EndianReader reader)
         => new()
         {
             CurveType = (CurveType)reader.ReadByte(),
             HmacSize = reader.ReadUInt16(),
             Nonce = new(reader.ReadUInt64()),
             MessageFragmentSize = reader.ReadUInt32(),
-            PublicKeyX = reader.ReadBytesWithLength(),
-            PublicKeyY = reader.ReadBytesWithLength()
+            PublicKeyX = reader.ReadBytesWithLength().ToArray(),
+            PublicKeyY = reader.ReadBytesWithLength().ToArray()
         };
 
-    public void Write(BinaryWriter writer)
+    public void Write(EndianWriter writer)
     {
         writer.Write((byte)CurveType);
         writer.Write((ushort)HmacSize);
