@@ -10,7 +10,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Messages.Connection.DeviceInfo;
 /// </summary>
 public sealed class DeviceInfoMessage : ICdpPayload<DeviceInfoMessage>
 {
-    public static DeviceInfoMessage Parse(BinaryReader reader)
+    public static DeviceInfoMessage Parse(EndianReader reader)
         => new()
         {
             DeviceInfo = JsonSerializer.Deserialize<CdpDeviceInfo>(reader.ReadStringWithLength()) ?? throw new CdpProtocolException("Invalid device info")

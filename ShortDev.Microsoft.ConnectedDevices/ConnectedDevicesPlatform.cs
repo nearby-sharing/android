@@ -1,6 +1,7 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Platforms;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
+using ShortDev.Networking;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -59,7 +60,7 @@ public sealed class ConnectedDevicesPlatform : IDisposable
         Handler.Log(0, $"Device {socket.RemoteDevice.Name} ({socket.RemoteDevice.Address}) connected via {socket.TransportType}");
         Task.Run(() =>
         {
-            var reader = socket.Reader;
+            EndianReader streamReader = new(Endianness.BigEndian, socket.InputStream);
             using (socket)
             {
                 do
@@ -67,9 +68,11 @@ public sealed class ConnectedDevicesPlatform : IDisposable
                     CdpSession? session = null;
                     try
                     {
-                        var header = CommonHeader.Parse(reader);
+                        var header = CommonHeader.Parse(streamReader);
                         session = CdpSession.GetOrCreate(this, socket.RemoteDevice ?? throw new InvalidDataException(), header);
-                        session.HandleMessage(socket, header, reader);
+
+                        var payload = streamReader.ReadBytes(header.PayloadSize);
+                        session.HandleMessage(socket, header, new EndianReader(Endianness.BigEndian, payload));
                     }
                     catch (Exception ex)
                     {

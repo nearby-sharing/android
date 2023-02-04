@@ -29,7 +29,7 @@ while (false)
     Console.ReadLine();
 }
 
-var secret = BinaryConvert.ToBytes("3036f355c9b027833f5ab36fdc0bf313bb6382394a01a40667c6e5f974ad180ab99d444f8b30cff7665c0a7c4ebd870488fdb8f44c9dd5800a060b67484c2116");
+var secret = BinaryConvert.ToBytes("37fc508508ba8d6d7ba7ddc79ad29fecdf855879e2a48b6811f310e80dcab98a81500925c1c8019c05b418d3bc22a870fc52d3735b43babc85c57a1fe12d4fb4");
 CdpCryptor cryptor = new(secret);
 
 while (true)
@@ -37,18 +37,17 @@ while (true)
     Console.Clear();
     var buffer = BinaryConvert.ToBytes(AnsiConsole.Ask<string>("Message"));
 
-    using (MemoryStream stream = new(buffer))
-    using (BigEndianBinaryReader reader = new(stream))
-    {
-        if (!CommonHeader.TryParse(reader, out var header, out _) || header == null)
-            throw new InvalidDataException();
+    EndianReader reader = new(Endianness.BigEndian, buffer);
 
-        HandleMessage(header, cryptor.Read(reader, header));
-    }
+    if (!CommonHeader.TryParse(reader, out var header, out _) || header == null)
+        throw new InvalidDataException();
+
+    HandleMessage(header, cryptor.Read(reader, header));
+
     Console.ReadLine();
 }
 
-void HandleMessage(CommonHeader header, BinaryReader reader)
+void HandleMessage(CommonHeader header, EndianReader reader)
 {
     if (header.Type == MessageType.Connect)
     {
@@ -81,12 +80,12 @@ void HandleMessage(CommonHeader header, BinaryReader reader)
     else if (header.Type == MessageType.Session)
     {
         // reader.PrintPayload();
-        var prepend = reader.ReadBytes(0x0000000C);
-        var valueSet = ValueSet.Parse(reader.BaseStream);
+        //var prepend = reader.ReadBytes(0x0000000C);
+        //var valueSet = ValueSet.Parse(reader.BaseStream);
     }
     else
     {
         Console.WriteLine();
-        Console.WriteLine(BinaryConvert.ToString(reader.ReadPayload()));
+        //Console.WriteLine(BinaryConvert.ToString(reader.ReadPayload()));
     }
 }

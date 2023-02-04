@@ -1,7 +1,6 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Platforms.Bluetooth;
 using ShortDev.Networking;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Net.NetworkInformation;
 using System.Text;
 
@@ -16,26 +15,25 @@ public sealed record CdpAdvertisement(DeviceType DeviceType, PhysicalAddress Mac
         if (device.BeaconData == null)
             return false;
 
-        using (MemoryStream stream = new(device.BeaconData))
-        using (BigEndianBinaryReader reader = new(stream))
-        {
-            var scenarioType = reader.ReadByte();
-            if (scenarioType != 1)
-                return false;
+        EndianReader reader = new(Endianness.BigEndian, device.BeaconData);
 
-            var versionAndDeviceType = reader.ReadByte();
-            var deviceType = (DeviceType)versionAndDeviceType;
+        var scenarioType = reader.ReadByte();
+        if (scenarioType != 1)
+            return false;
 
-            var versionAndFlags = reader.ReadByte();
-            /* Reserved */
-            reader.ReadByte();
+        var versionAndDeviceType = reader.ReadByte();
+        var deviceType = (DeviceType)versionAndDeviceType;
 
-            data = new(
-                deviceType,
-                new PhysicalAddress(BinaryConvert.Reverse(reader.ReadBytes(6))),
-                Encoding.UTF8.GetString(reader.ReadBytes((int)(stream.Length - stream.Position)))
-            );
-        }
+        var versionAndFlags = reader.ReadByte();
+        /* Reserved */
+        reader.ReadByte();
+
+        data = new(
+            deviceType,
+            new PhysicalAddress(BinaryConvert.ToReversed(reader.ReadBytes(6))),
+            Encoding.UTF8.GetString(reader.ReadToEnd())
+        );
+
         return true;
     }
 
@@ -46,7 +44,7 @@ public sealed record CdpAdvertisement(DeviceType DeviceType, PhysicalAddress Mac
         writer.Write((byte)DeviceType);
         writer.Write((byte)0x21);
         writer.Write((byte)0x0a);
-        writer.Write(BinaryConvert.Reverse(MacAddress.GetAddressBytes()));
+        writer.Write(BinaryConvert.ToReversed(MacAddress.GetAddressBytes()));
         writer.Write(DeviceName);
 
         return writer.Buffer.ToArray();

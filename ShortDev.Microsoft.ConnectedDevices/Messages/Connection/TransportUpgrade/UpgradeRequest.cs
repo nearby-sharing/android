@@ -15,7 +15,7 @@ public sealed class UpgradeRequest : ICdpPayload<UpgradeRequest>
     public required Guid UpgradeId { get; init; }
     public required TransportEndpoint[] Endpoints { get; init; }
 
-    public static UpgradeRequest Parse(BinaryReader reader)
+    public static UpgradeRequest Parse(EndianReader reader)
         => new()
         {
             UpgradeId = new(reader.ReadBytes(16)),

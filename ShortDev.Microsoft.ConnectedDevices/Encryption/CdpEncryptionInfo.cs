@@ -47,5 +47,5 @@ public sealed class CdpEncryptionInfo
     }
 
     public byte[] GenerateSharedSecret(CdpEncryptionInfo remoteEncryption)
-        => DiffieHellman.DeriveKeyFromHash(remoteEncryption.DiffieHellman.PublicKey, EncryptionParams.KeyDerivationHashAlgorithm, EncryptionParams.SecretPrepend, EncryptionParams.SecretAppend);
+        => DiffieHellman.DeriveKeyFromHash(remoteEncryption.DiffieHellman.PublicKey, EncryptionParams.KeyDerivationHashAlgorithm, CdpEncryptionParams.SecretPrepend, CdpEncryptionParams.SecretAppend);
 }

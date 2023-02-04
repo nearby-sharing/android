@@ -159,9 +159,9 @@ public readonly ref struct EndianWriter
         Write(value);
     }
 
-    public void CopyTo(BinaryWriter writer)
+    public void CopyTo(Stream stream)
     {
-        writer.Write(Buffer.AsSpan());
-        writer.Flush();
+        stream.Write(Buffer.AsSpan());
+        stream.Flush();
     }
 }

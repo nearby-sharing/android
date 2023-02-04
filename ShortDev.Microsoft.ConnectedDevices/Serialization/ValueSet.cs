@@ -3,25 +3,17 @@ using Bond.IO.Unsafe;
 using Bond.Protocols;
 using ShortDev.Microsoft.ConnectedDevices.Messages;
 using ShortDev.Networking;
-using System.IO;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Serialization;
 
 public partial class ValueSet : ICdpPayload<ValueSet>
 {
-    public static ValueSet Parse(byte[] data)
+    public static ValueSet Parse(EndianReader reader)
     {
-        using MemoryStream stream = new(data);
-        return Parse(stream);
-    }
-
-    public static ValueSet Parse(BinaryReader reader)
-        => Parse(reader.BaseStream);
-
-    public static ValueSet Parse(Stream stream)
-    {
-        CompactBinaryReader<InputStream> reader = new(new(stream));
-        return Deserialize<ValueSet>.From(reader);
+        // ToDo: We really should not re-allocated here!!
+        var data = reader.ReadToEnd().ToArray();
+        CompactBinaryReader<InputBuffer> bondReader = new(new(data));
+        return Deserialize<ValueSet>.From(bondReader);
     }
 
     public void Write(EndianWriter writer)

@@ -3,6 +3,7 @@ using ShortDev.Microsoft.ConnectedDevices.Exceptions;
 using ShortDev.Networking;
 using System;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 
@@ -15,11 +16,11 @@ public sealed class AuthenticationPayload : ICdpPayload<AuthenticationPayload>
 {
     private AuthenticationPayload() { }
 
-    public static AuthenticationPayload Parse(BinaryReader reader)
+    public static AuthenticationPayload Parse(EndianReader reader)
         => new()
         {
-            Certificate = new(reader.ReadBytesWithLength()),
-            SignedThumbprint = reader.ReadBytesWithLength()
+            Certificate = new(reader.ReadBytesWithLength().ToArray()),
+            SignedThumbprint = reader.ReadBytesWithLength().ToArray()
         };
 
     /// <summary>

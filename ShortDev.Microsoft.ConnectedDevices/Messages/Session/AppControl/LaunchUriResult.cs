@@ -6,7 +6,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Messages.Session.AppControl;
 
 public sealed class LaunchUriResult : ICdpPayload<LaunchUriResult>
 {
-    public static LaunchUriResult Parse(BinaryReader reader)
+    public static LaunchUriResult Parse(EndianReader reader)
     {
         throw new NotImplementedException();
     }

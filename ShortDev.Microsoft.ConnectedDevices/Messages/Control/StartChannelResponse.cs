@@ -6,7 +6,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Messages.Control;
 
 public sealed class StartChannelResponse : ICdpPayload<StartChannelResponse>
 {
-    public static StartChannelResponse Parse(BinaryReader reader)
+    public static StartChannelResponse Parse(EndianReader reader)
     {
         throw new NotImplementedException();
     }

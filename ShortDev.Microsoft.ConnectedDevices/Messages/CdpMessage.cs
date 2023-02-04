@@ -1,28 +1,22 @@
 ﻿using ShortDev.Networking;
 using System;
-using System.IO;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages;
 
 public sealed class CdpMessage : IDisposable
 {
-    readonly MemoryStream _stream;
-    readonly BigEndianBinaryReader _reader;
-    readonly BinaryWriter? _writer;
+    readonly EndianBuffer _buffer;
 
     public CdpMessage(CommonHeader header)
     {
         Header = header;
-        _stream = new(header.FragmentCount * Constants.DefaultMessageFragmentSize);
-        _reader = new(_stream);
-        _writer = new(_stream);
+        _buffer = new(header.FragmentCount * Constants.DefaultMessageFragmentSize);
     }
 
     public CdpMessage(CommonHeader header, byte[] payload)
     {
         Header = header;
-        _stream = new(payload);
-        _reader = new(_stream);
+        _buffer = new(payload);
         _receivedFragmentCount = header.FragmentCount;
     }
 
@@ -36,32 +30,35 @@ public sealed class CdpMessage : IDisposable
         => _receivedFragmentCount >= Header.FragmentCount;
 
     ushort _receivedFragmentCount = 0;
-    public void AddFragment(byte[] fragment)
+    public void AddFragment(ReadOnlySpan<byte> fragment)
     {
-        if (_writer == null)
-            throw new InvalidOperationException("No fragments expected");
-
         if (IsComplete)
             throw new InvalidOperationException("Already received all fragments");
 
-        _writer.Write(fragment);
+        _buffer.Write(fragment);
         _receivedFragmentCount++;
     }
     #endregion
 
-    public BinaryReader Read()
+    public EndianReader Read()
     {
         if (!IsComplete)
             throw new InvalidOperationException("Wait for completion");
 
-        _stream.Position = 0;
-        return _reader;
+        return new(Endianness.BigEndian, _buffer.AsSpan());
+    }
+
+    public EndianReader Read(out byte[] prepend)
+    {
+        if (!IsComplete)
+            throw new InvalidOperationException("Wait for completion");
+
+        var reader = Read();
+        prepend = reader.ReadBytes(0x0000000C).ToArray();
+        return reader;
     }
 
     public void Dispose()
     {
-        _stream.Dispose();
-        _reader.Dispose();
-        _writer?.Dispose();
     }
 }

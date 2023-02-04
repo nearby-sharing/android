@@ -3,7 +3,7 @@ using System.Buffers;
 
 namespace ShortDev.Networking;
 
-public readonly ref struct EndianBuffer
+public readonly struct EndianBuffer
 {
     readonly ArrayBufferWriter<byte> _writer;
 
@@ -12,6 +12,12 @@ public readonly ref struct EndianBuffer
 
     public EndianBuffer(int initialCapacity)
         => _writer = new(initialCapacity);
+
+    public EndianBuffer(byte[] data)
+    {
+        _writer = new(data.Length);
+        _writer.Write(data);
+    }
 
     public void Write(byte value)
     {

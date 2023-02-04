@@ -1,4 +1,6 @@
-﻿namespace ShortDev.Microsoft.ConnectedDevices.Messages;
+﻿using System;
+
+namespace ShortDev.Microsoft.ConnectedDevices.Messages;
 
 /// <summary>
 /// 
@@ -6,4 +8,4 @@
 /// </summary>
 /// <param name="Type"></param>
 /// <param name="Value"></param>
-public record AdditionalHeader(AdditionalHeaderType Type, byte[] Value);
+public record AdditionalHeader(AdditionalHeaderType Type, ReadOnlyMemory<byte> Value);

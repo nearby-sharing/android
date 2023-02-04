@@ -15,7 +15,7 @@ public sealed class UpgradeResponse : ICdpPayload<UpgradeResponse>
     public required HostEndpointMetadata[] HostEndpoints { get; init; }
     public required TransportEndpoint[] Endpoints { get; init; }
 
-    public static UpgradeResponse Parse(BinaryReader reader)
+    public static UpgradeResponse Parse(EndianReader reader)
     {
         throw new NotImplementedException();
     }

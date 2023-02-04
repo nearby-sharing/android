@@ -1,7 +1,4 @@
-﻿using ShortDev.Networking;
-using System;
-using System.Diagnostics;
-using System.IO;
+﻿using System;
 using System.Net.NetworkInformation;
 using System.Security.Cryptography;
 using System.Threading;
@@ -11,22 +8,6 @@ namespace ShortDev.Microsoft.ConnectedDevices;
 
 public static class Extensions
 {
-    public static T[] Reverse<T>(this T[] source)
-    {
-        source = (T[])source.Clone();
-        Array.Reverse(source);
-        return source;
-    }
-
-    public static byte[] ReadPayload(this BinaryReader @this)
-    {
-        var stream = @this.BaseStream;
-        return @this.ReadBytes((int)(stream.Length - stream.Position));
-    }
-
-    public static void PrintPayload(this BinaryReader @this)
-        => Debug.Print(BinaryConvert.ToString(@this.ReadPayload()));
-
     public static uint HighValue(this ulong value)
         => (uint)(value >> 32);
 
