@@ -150,33 +150,37 @@ public sealed class CdpSession : IDisposable
 
     public void SendMessage(CdpSocket socket, CommonHeader header, BodyCallback bodyCallback, bool supplyRequestId = false)
     {
+        if (header.Type == MessageType.Session && _cryptor == null)
+            throw new InvalidOperationException("Invalid session state!");
+
+        // header
+        {
+            header.SessionId = GetSessionId();
+
+            if (supplyRequestId)
+                header.RequestID = RequestId();
+
+            if (header.Type != MessageType.Connect)
+                header.SequenceNumber = SequenceNumber();
+        }
+
         EndianWriter writer = new(Endianness.BigEndian);
-        SendMessage(writer, header, bodyCallback, supplyRequestId);
-        writer.CopyTo(socket.OutputStream);
-    }
-
-    ulong _requestId = 1;
-    void SendMessage(EndianWriter writer, CommonHeader header, BodyCallback bodyCallback, bool supplyRequestId = false)
-    {
-        header.SessionId = GetSessionId();
-
         if (_cryptor != null)
         {
             _cryptor.EncryptMessage(writer, header, bodyCallback);
-            return;
+        }
+        else
+        {
+            EndianWriter payloadWriter = new(Endianness.BigEndian);
+            bodyCallback(payloadWriter);
+            var payload = payloadWriter.Buffer.AsSpan();
+
+            header.SetPayloadLength(payload.Length);
+            header.Write(writer);
+            writer.Write(payload);
         }
 
-        EndianWriter payloadWriter = new(Endianness.BigEndian);
-        bodyCallback(payloadWriter);
-        var payload = payloadWriter.Buffer.AsSpan();
-
-        if (supplyRequestId)
-            lock (this)
-                header.RequestID = _requestId++;
-
-        header.SetPayloadLength(payload.Length);
-        header.Write(writer);
-        writer.Write(payload);
+        socket.SendData(writer);
     }
 
     #region HandleMessages
@@ -205,13 +209,13 @@ public sealed class CdpSession : IDisposable
             if (_connectionEstablished)
                 throw UnexpectedMessage(header.Type.ToString());
 
-            HandleConnect(socket, header, payloadReader, writer);
+            HandleConnect(socket, header, payloadReader);
         }
         else if (header.Type == MessageType.Control)
         {
             _connectionEstablished = true;
 
-            HandleControl(header, payloadReader, writer, socket);
+            HandleControl(header, payloadReader, socket);
         }
         else if (header.Type == MessageType.Session)
         {
@@ -225,13 +229,11 @@ public sealed class CdpSession : IDisposable
             // ignore
             // Platform.Handler.Log(0, $"Received {header.Type} message from session {header.SessionId.ToString("X")} via {socket.TransportType}");
         }
-
-        writer.CopyTo(socket.OutputStream);
     }
 
 
     #region Connect
-    void HandleConnect(CdpSocket socket, CommonHeader header, EndianReader reader, EndianWriter writer)
+    void HandleConnect(CdpSocket socket, CommonHeader header, EndianReader reader)
     {
         ConnectionHeader connectionHeader = ConnectionHeader.Parse(reader);
         Platform.Handler.Log(0, $"Received {header.Type} message {connectionHeader.MessageType} from session {header.SessionId.ToString("X")} via {socket.TransportType}");
@@ -248,7 +250,7 @@ public sealed class CdpSession : IDisposable
                 throw UnexpectedMessage("Encryption");
 
             ThrowIfWrongMode(shouldBeHost: true);
-            HandleConnectRequest(header, reader, writer);
+            HandleConnectRequest(header, reader, socket);
 
             return;
         }
@@ -259,7 +261,7 @@ public sealed class CdpSession : IDisposable
                 throw UnexpectedMessage("Encryption");
 
             ThrowIfWrongMode(shouldBeHost: false);
-            HandleConnectResponse(header, reader, writer);
+            HandleConnectResponse(header, reader, socket);
 
             return;
         }
@@ -272,61 +274,61 @@ public sealed class CdpSession : IDisposable
             case ConnectionType.DeviceAuthRequest:
             case ConnectionType.UserDeviceAuthRequest:
                 ThrowIfWrongMode(shouldBeHost: true);
-                HandleAuthRequest(header, reader, writer, connectionHeader.MessageType);
+                HandleAuthRequest(header, reader, socket, connectionHeader.MessageType);
                 break;
             case ConnectionType.DeviceAuthResponse:
             case ConnectionType.UserDeviceAuthResponse:
                 ThrowIfWrongMode(shouldBeHost: false);
-                HandleAuthResponse(header, reader, writer, connectionHeader.MessageType);
+                HandleAuthResponse(header, reader, socket, connectionHeader.MessageType);
                 break;
             case ConnectionType.AuthDoneRequest:
                 ThrowIfWrongMode(shouldBeHost: true);
-                HandleAuthDoneRequest(header, reader, writer);
+                HandleAuthDoneRequest(header, socket);
                 break;
             case ConnectionType.AuthDoneRespone:
                 ThrowIfWrongMode(shouldBeHost: false);
-                HandleAuthDoneResponse(header, reader, writer);
+                HandleAuthDoneResponse(reader);
 
                 socket.Dispose();
                 break;
             case ConnectionType.DeviceInfoMessage:
-                HandleDeviceInfoMessage(header, reader, writer);
+                HandleDeviceInfoMessage(header, reader, socket);
                 break;
             default:
                 throw UnexpectedMessage(connectionHeader.MessageType.ToString());
         }
     }
 
-    void HandleConnectRequest(CommonHeader header, EndianReader reader, EndianWriter writer)
+    void HandleConnectRequest(CommonHeader header, EndianReader reader, CdpSocket socket)
     {
         var connectionRequest = ConnectionRequest.Parse(reader);
         _remoteEncryption = CdpEncryptionInfo.FromRemote(connectionRequest.PublicKeyX, connectionRequest.PublicKeyY, connectionRequest.Nonce, CdpEncryptionParams.Default);
 
+        SendMessage(socket, header, writer =>
+        {
+            new ConnectionHeader()
+            {
+                ConnectionMode = ConnectionMode.Proximal,
+                MessageType = ConnectionType.ConnectResponse
+            }.Write(writer);
+
+            var publicKey = _localEncryption.PublicKey;
+            new ConnectionResponse()
+            {
+                Result = ConnectionResult.Pending,
+                HmacSize = connectionRequest.HmacSize,
+                MessageFragmentSize = connectionRequest.MessageFragmentSize,
+                Nonce = _localEncryption.Nonce,
+                PublicKeyX = publicKey.X!,
+                PublicKeyY = publicKey.Y!
+            }.Write(writer);
+        });
+
+        // We have to set cryptor after we send the message because it would be encrypted otherwise
         var secret = _localEncryption.GenerateSharedSecret(_remoteEncryption);
         _cryptor = new(secret);
-
-        header.SessionId |= (ulong)LocalSessionId << 32;
-
-        header.Write(writer);
-
-        new ConnectionHeader()
-        {
-            ConnectionMode = ConnectionMode.Proximal,
-            MessageType = ConnectionType.ConnectResponse
-        }.Write(writer);
-
-        var publicKey = _localEncryption.PublicKey;
-        new ConnectionResponse()
-        {
-            Result = ConnectionResult.Pending,
-            HmacSize = connectionRequest.HmacSize,
-            MessageFragmentSize = connectionRequest.MessageFragmentSize,
-            Nonce = _localEncryption.Nonce,
-            PublicKeyX = publicKey.X!,
-            PublicKeyY = publicKey.Y!
-        }.Write(writer);
     }
-    void HandleConnectResponse(CommonHeader header, EndianReader reader, EndianWriter writer)
+    void HandleConnectResponse(CommonHeader header, EndianReader reader, CdpSocket socket)
     {
         var connectionResponse = ConnectionResponse.Parse(reader);
         _remoteEncryption = CdpEncryptionInfo.FromRemote(connectionResponse.PublicKeyX, connectionResponse.PublicKeyY, connectionResponse.Nonce, CdpEncryptionParams.Default);
@@ -335,7 +337,7 @@ public sealed class CdpSession : IDisposable
         _cryptor = new(secret);
 
         header.Flags = 0;
-        SendMessage(writer, header, (writer) =>
+        SendMessage(socket, header, (writer) =>
         {
             new ConnectionHeader()
             {
@@ -348,14 +350,14 @@ public sealed class CdpSession : IDisposable
             ).Write(writer);
         });
     }
-    void HandleAuthRequest(CommonHeader header, EndianReader reader, EndianWriter writer, ConnectionType connectionType)
+    void HandleAuthRequest(CommonHeader header, EndianReader reader, CdpSocket socket, ConnectionType connectionType)
     {
         var authRequest = AuthenticationPayload.Parse(reader);
         if (!authRequest.VerifyThumbprint(hostNonce: _localEncryption.Nonce, clientNonce: _remoteEncryption!.Nonce))
             throw new CdpSecurityException("Invalid thumbprint");
 
         header.Flags = 0;
-        SendMessage(writer, header, (writer) =>
+        SendMessage(socket, header, (writer) =>
         {
             new ConnectionHeader()
             {
@@ -368,7 +370,7 @@ public sealed class CdpSession : IDisposable
             ).Write(writer);
         });
     }
-    void HandleAuthResponse(CommonHeader header, EndianReader reader, EndianWriter writer, ConnectionType connectionType)
+    void HandleAuthResponse(CommonHeader header, EndianReader reader, CdpSocket socket, ConnectionType connectionType)
     {
         var authRequest = AuthenticationPayload.Parse(reader);
         if (!authRequest.VerifyThumbprint(hostNonce: _remoteEncryption!.Nonce, clientNonce: _localEncryption.Nonce))
@@ -377,7 +379,7 @@ public sealed class CdpSession : IDisposable
         if (connectionType == ConnectionType.DeviceAuthResponse)
         {
             header.Flags = 0;
-            SendMessage(writer, header, (writer) =>
+            SendMessage(socket, header, (writer) =>
             {
                 new ConnectionHeader()
                 {
@@ -394,7 +396,7 @@ public sealed class CdpSession : IDisposable
         }
 
         header.Flags = 0;
-        SendMessage(writer, header, (writer) =>
+        SendMessage(socket, header, (writer) =>
         {
             new ConnectionHeader()
             {
@@ -403,10 +405,10 @@ public sealed class CdpSession : IDisposable
             }.Write(writer);
         });
     }
-    void HandleAuthDoneRequest(CommonHeader header, EndianReader reader, EndianWriter writer)
+    void HandleAuthDoneRequest(CommonHeader header, CdpSocket socket)
     {
         header.Flags = 0;
-        SendMessage(writer, header, (writer) =>
+        SendMessage(socket, header, (writer) =>
         {
             new ConnectionHeader()
             {
@@ -435,18 +437,18 @@ public sealed class CdpSession : IDisposable
     }
     #endregion
 
-    void HandleAuthDoneResponse(CommonHeader header, EndianReader reader, EndianWriter writer)
+    void HandleAuthDoneResponse(EndianReader reader)
     {
         var msg = ResultPayload.Parse(reader);
         msg.ThrowOnError();
         OnAuthDoneInternal?.Invoke();
     }
-    void HandleDeviceInfoMessage(CommonHeader header, EndianReader reader, EndianWriter writer)
+    void HandleDeviceInfoMessage(CommonHeader header, EndianReader reader, CdpSocket socket)
     {
         var msg = DeviceInfoMessage.Parse(reader);
 
         header.Flags = 0;
-        SendMessage(writer, header, (writer) =>
+        SendMessage(socket, header, (writer) =>
         {
             new ConnectionHeader()
             {
@@ -458,7 +460,7 @@ public sealed class CdpSession : IDisposable
     #endregion
 
     #region Control
-    void HandleControl(CommonHeader header, EndianReader reader, EndianWriter writer, CdpSocket socket)
+    void HandleControl(CommonHeader header, EndianReader reader, CdpSocket socket)
     {
         if (_cryptor == null)
             throw UnexpectedMessage("Encryption");
@@ -468,17 +470,17 @@ public sealed class CdpSession : IDisposable
         switch (controlHeader.MessageType)
         {
             case ControlMessageType.StartChannelRequest:
-                HandleStartChannelRequest(header, reader, writer, socket);
+                HandleStartChannelRequest(header, reader, socket);
                 break;
             case ControlMessageType.StartChannelResponse:
-                HandleStartChannelResponse(header, reader, writer, socket);
+                HandleStartChannelResponse(header, reader, socket);
                 break;
             default:
                 throw UnexpectedMessage(controlHeader.MessageType.ToString());
         }
     }
 
-    void HandleStartChannelRequest(CommonHeader header, EndianReader reader, EndianWriter writer, CdpSocket socket)
+    void HandleStartChannelRequest(CommonHeader header, EndianReader reader, CdpSocket socket)
     {
         var request = StartChannelRequest.Parse(reader);
 
@@ -493,7 +495,7 @@ public sealed class CdpSession : IDisposable
         InitializeHostChannel(request, socket, out var channelId);
 
         header.Flags = 0;
-        SendMessage(writer, header, (writer) =>
+        SendMessage(socket, header, (writer) =>
         {
             new ControlHeader()
             {
@@ -522,7 +524,7 @@ public sealed class CdpSession : IDisposable
         return promise.Task;
     }
 
-    void HandleStartChannelResponse(CommonHeader header, EndianReader reader, EndianWriter writer, CdpSocket socket)
+    void HandleStartChannelResponse(CommonHeader header, EndianReader reader, CdpSocket socket)
     {
         var msg = StartChannelResponse.Parse(reader);
         OnStartChannelResponseInternal?.Invoke(header, msg);
@@ -558,13 +560,18 @@ public sealed class CdpSession : IDisposable
     #endregion
 
     #region SequenceNumber
-    uint _sequenceNumber = 0;
-    internal uint NewSequenceNumber()
+    uint _sequenceNumber = 1;
+    internal uint SequenceNumber()
     {
-        throw new NotImplementedException();
-        // ToDo: Fix
-        //lock (this)
-        //    return _sequenceNumber++;
+        lock (this)
+            return _sequenceNumber++;
+    }
+
+    ulong _requestId = 1;
+    internal ulong RequestId()
+    {
+        lock (this)
+            return _requestId++;
     }
     #endregion
 

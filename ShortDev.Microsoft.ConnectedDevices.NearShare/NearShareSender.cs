@@ -53,7 +53,7 @@ public sealed class NearShareSender
             msg.Add("MaxPlatformVersion", 1u);
             msg.Add("MinPlatformVersion", 1u);
             msg.Add("OperationId", operationId);
-            channel.SendMessage(0, msg.Write);
+            channel.SendMessage(msg.Write);
         }
 
         public ValueTask HandleMessageAsync(CdpMessage msg)

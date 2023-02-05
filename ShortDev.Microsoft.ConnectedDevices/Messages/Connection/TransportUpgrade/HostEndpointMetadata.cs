@@ -5,5 +5,5 @@ namespace ShortDev.Microsoft.ConnectedDevices.Messages.Connection.TransportUpgra
 public record class HostEndpointMetadata(CdpTransportType Type, string Host, string Service)
 {
     public static HostEndpointMetadata FromIP(string ip)
-        => new HostEndpointMetadata(CdpTransportType.Tcp, ip, Constants.TcpPort.ToString());
+        => new(CdpTransportType.Tcp, ip, Constants.TcpPort.ToString());
 }

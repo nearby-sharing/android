@@ -14,6 +14,12 @@ public sealed class CdpSocket : IDisposable
     public required Stream InputStream { get; init; }
     public required Stream OutputStream { get; init; }
 
+    public void SendData(EndianWriter writer)
+    {
+        lock (OutputStream)
+            writer.CopyTo(OutputStream);
+    }
+
     public required CdpDevice RemoteDevice { get; init; }
 
     public bool IsClosed { get; private set; }

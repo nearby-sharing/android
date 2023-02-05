@@ -1,11 +1,8 @@
-﻿using ShortDev.Microsoft.ConnectedDevices;
-using ShortDev.Microsoft.ConnectedDevices.Encryption;
+﻿using ShortDev.Microsoft.ConnectedDevices.Encryption;
 using ShortDev.Microsoft.ConnectedDevices.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.Authentication;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.DeviceInfo;
-using ShortDev.Microsoft.ConnectedDevices.Messages.Session;
-using ShortDev.Microsoft.ConnectedDevices.Serialization;
 using ShortDev.Networking;
 using Spectre.Console;
 

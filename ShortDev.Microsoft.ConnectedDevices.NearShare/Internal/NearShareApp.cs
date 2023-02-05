@@ -25,14 +25,7 @@ internal sealed class NearShareApp : CdpAppBase
     {
         bool expectMessage = true;
 
-        CommonHeader header = msg.Header;
-
         var payload = ValueSet.Parse(msg.Read());
-
-        header.AdditionalHeaders.RemoveAll((x) => x.Type == AdditionalHeaderType.CorrelationVector);
-
-        // if (header.HasFlag(MessageFlags.ShouldAck))
-        //      Channel.SendAck(header);
 
         ValueSet response = new();
         if (payload.ContainsKey("ControlMessage"))
@@ -49,7 +42,7 @@ internal sealed class NearShareApp : CdpAppBase
                             if (fileNames.Count != 1)
                                 throw new NotImplementedException("Only able to receive one file at a time");
 
-                            PlatformHandler.Log(0, $"Receiving file \"{fileNames[0]}\" from session {header.SessionId.ToString("X")} via {Channel.Socket.TransportType}");
+                            PlatformHandler.Log(0, $"Receiving file \"{fileNames[0]}\" from session {msg.Header.SessionId:X} via {Channel.Socket.TransportType}");
 
                             bytesToSend = payload.Get<ulong>("BytesToSend");
 
@@ -67,19 +60,19 @@ internal sealed class NearShareApp : CdpAppBase
                             }
                             catch (TaskCanceledException)
                             {
-                                SendCancel(header);
+                                SendCancel();
                                 CloseChannel();
                                 throw;
                             }
 
-                            _blobCursor = CreateBlobCursor(header);
+                            _blobCursor = CreateBlobCursor();
                             _blobCursor.MoveNext();
                             return;
                         }
                         else if (dataKind == DataKind.Uri)
                         {
                             var uri = payload.Get<string>("Uri");
-                            PlatformHandler.Log(0, $"Received uri \"{uri}\" from session {header.SessionId.ToString("X")}");
+                            PlatformHandler.Log(0, $"Received uri \"{uri}\" from session {msg.Header.SessionId:X}");
                             PlatformHandler.OnReceivedUri(new()
                             {
                                 DeviceName = Channel.Session.Device.Name ?? "UNKNOWN",
@@ -135,25 +128,24 @@ internal sealed class NearShareApp : CdpAppBase
             response.Add("ControlMessage", (uint)NearShareControlMsgType.CompleteTransfer);
         }
 
-        header.Flags = 0;
-        Channel.SendMessage(header, response.Write);
+        Channel.SendMessage(response.Write);
 
         if (!expectMessage)
             CloseChannel();
     }
 
-    IEnumerator CreateBlobCursor(CommonHeader header)
+    IEnumerator CreateBlobCursor()
     {
         ulong requestedPosition = 0;
         for (; requestedPosition + PartitionSize < bytesToSend; requestedPosition += PartitionSize)
         {
-            RequestBlob(header, requestedPosition);
+            RequestBlob(requestedPosition);
             yield return null;
         }
-        RequestBlob(header, requestedPosition, (uint)(bytesToSend - requestedPosition));
+        RequestBlob(requestedPosition, (uint)(bytesToSend - requestedPosition));
     }
 
-    void RequestBlob(CommonHeader header, ulong requestedPosition, uint size = PartitionSize)
+    void RequestBlob(ulong requestedPosition, uint size = PartitionSize)
     {
         ValueSet request = new();
         request.Add("BlobPosition", requestedPosition);
@@ -161,17 +153,15 @@ internal sealed class NearShareApp : CdpAppBase
         request.Add("ContentId", 0u);
         request.Add("ControlMessage", (uint)NearShareControlMsgType.FetchDataRequest);
 
-        header.Flags = 0;
-        Channel.SendMessage(header, request.Write);
+        Channel.SendMessage(request.Write);
     }
 
-    void SendCancel(CommonHeader header)
+    void SendCancel()
     {
         ValueSet request = new();
         request.Add("ControlMessage", (uint)NearShareControlMsgType.CancelTransfer);
 
-        header.Flags = 0;
-        Channel.SendMessage(header, request.Write);
+        Channel.SendMessage(request.Write);
     }
 
     void CloseChannel()

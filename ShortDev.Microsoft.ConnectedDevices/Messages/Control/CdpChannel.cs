@@ -1,8 +1,6 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Messages.Session;
 using ShortDev.Microsoft.ConnectedDevices.Platforms;
-using ShortDev.Networking;
 using System;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages.Control;
@@ -50,44 +48,22 @@ public sealed class CdpChannel : IDisposable
     public async ValueTask HandleMessageAsync(CdpMessage msg)
         => await MessageHandler.HandleMessageAsync(msg);
 
-    public void SendMessage(CommonHeader oldHeader, BodyCallback bodyCallback)
+    public void SendMessage(BodyCallback bodyCallback)
     {
-        lock (this)
+        CommonHeader header = new()
         {
-            // ToDo: Better way!!
-            SendMessage(
-                 ++oldHeader.SequenceNumber,
-                 bodyCallback
-            );
-        }
-    }
+            Type = MessageType.Session,
+            ChannelId = ChannelId
+        };
 
-    public void SendMessage(uint sequenceNumber, BodyCallback bodyCallback)
-    {
-        // ToDo
-        //if (Session.Cryptor == null)
-        //    throw new InvalidOperationException("Invalid session state!");
-
-        lock (this)
+        Session.SendMessage(Socket, header, writer =>
         {
-            CommonHeader header = new();
-            header.Type = MessageType.Session;
-
-            header.SessionId = Session.GetSessionId();
-            header.ChannelId = ChannelId;
-
-            header.SequenceNumber = sequenceNumber;
-            // ToDo: "AdditionalHeaders" ... "RequestID" ??
-
-            Session.SendMessage(Socket, header, writer =>
+            new SessionFragmentHeader()
             {
-                new SessionFragmentHeader()
-                {
-                    MessageId = 0
-                }.Write(writer);
-                bodyCallback(writer);
-            });
-        }
+                MessageId = 0
+            }.Write(writer);
+            bodyCallback(writer);
+        });
     }
 
     void IDisposable.Dispose()
