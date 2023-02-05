@@ -56,7 +56,7 @@ public sealed class NearShareSender
             channel.SendMessage(msg.Write);
         }
 
-        public ValueTask HandleMessageAsync(CdpMessage msg)
+        public void HandleMessage(CdpMessage msg)
         {
             throw new NotImplementedException();
         }
@@ -67,7 +67,7 @@ public sealed class NearShareSender
 
     class SenderStateMachine : IChannelMessageHandler
     {
-        public ValueTask HandleMessageAsync(CdpMessage msg)
+        public void HandleMessage(CdpMessage msg)
         {
             throw new NotImplementedException();
         }

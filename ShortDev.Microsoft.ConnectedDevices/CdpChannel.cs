@@ -3,7 +3,6 @@ using ShortDev.Microsoft.ConnectedDevices.Messages.Control;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Session;
 using ShortDev.Microsoft.ConnectedDevices.Platforms;
 using System;
-using System.Threading.Tasks;
 
 namespace ShortDev.Microsoft.ConnectedDevices;
 
@@ -47,8 +46,8 @@ public sealed class CdpChannel : IDisposable
     /// </summary>
     public ulong ChannelId { get; }
 
-    public async ValueTask HandleMessageAsync(CdpMessage msg)
-        => await MessageHandler.HandleMessageAsync(msg);
+    public void HandleMessageAsync(CdpMessage msg)
+        => MessageHandler.HandleMessage(msg);
 
     public void SendMessage(BodyCallback bodyCallback)
     {

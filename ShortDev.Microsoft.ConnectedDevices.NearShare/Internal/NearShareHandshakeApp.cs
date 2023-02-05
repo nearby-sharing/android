@@ -11,7 +11,7 @@ public class NearShareHandshakeApp : CdpAppBase, ICdpAppId
 
     public required INearSharePlatformHandler PlatformHandler { get; init; }
 
-    public override ValueTask HandleMessageAsync(CdpMessage msg)
+    public override void HandleMessage(CdpMessage msg)
     {
         var payload = ValueSet.Parse(msg.Read());
 
@@ -29,10 +29,8 @@ public class NearShareHandshakeApp : CdpAppBase, ICdpAppId
         ValueSet response = new();
         response.Add("SelectedPlatformVersion", 1u);
         response.Add("VersionHandShakeResult", 1u);
-        Channel.SendMessage(response.Write);
+        SendValueSet(response);
 
         Channel.Dispose();
-
-        return ValueTask.CompletedTask;
     }
 }

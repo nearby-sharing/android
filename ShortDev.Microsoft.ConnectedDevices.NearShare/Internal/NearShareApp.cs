@@ -1,4 +1,5 @@
-﻿using ShortDev.Microsoft.ConnectedDevices.Messages;
+﻿using ShortDev.Microsoft.ConnectedDevices.Exceptions;
+using ShortDev.Microsoft.ConnectedDevices.Messages;
 using ShortDev.Microsoft.ConnectedDevices.NearShare.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Serialization;
 using System.Collections;
@@ -15,123 +16,116 @@ internal sealed class NearShareApp : CdpAppBase
 
     const uint PartitionSize = 102400u; // 131072u
 
+    public override void HandleMessage(CdpMessage msg)
+    {
+        var payload = ValueSet.Parse(msg.Read());
+
+        if (!payload.ContainsKey("ControlMessage"))
+            throw new InvalidDataException();
+
+        var msgType = (NearShareControlMsgType)payload.Get<uint>("ControlMessage");
+        switch (msgType)
+        {
+            case NearShareControlMsgType.StartTransfer:
+                HandleStartTransfer(msg, payload);
+                return;
+            case NearShareControlMsgType.FetchDataResponse:
+                HandleFetchDataResponse(msg, payload);
+                return;
+        }
+        throw CdpSession.UnexpectedMessage(msgType.ToString());
+    }
+
     ulong transferedBytes = 0;
     ulong bytesToSend = 0;
     FileTransferToken? _fileTransferToken;
+    void HandleStartTransfer(CdpMessage msg, ValueSet payload)
+    {
+        var dataKind = (DataKind)payload.Get<uint>("DataKind");
+        switch (dataKind)
+        {
+            case DataKind.File:
+                {
+                    var fileNames = payload.Get<List<string>>("FileNames");
+                    if (fileNames.Count != 1)
+                        throw new NotImplementedException("Only able to receive one file at a time");
+
+                    PlatformHandler.Log(0, $"Receiving file \"{fileNames[0]}\" from session {msg.Header.SessionId:X} via {Channel.Socket.TransportType}");
+
+                    bytesToSend = payload.Get<ulong>("BytesToSend");
+
+                    _fileTransferToken = new()
+                    {
+                        DeviceName = Channel.Session.Device.Name ?? "UNKNOWN",
+                        FileName = fileNames[0],
+                        FileSize = bytesToSend
+                    };
+                    HandleFileTransferToken(_fileTransferToken);
+
+                    PlatformHandler.OnFileTransfer(_fileTransferToken);
+                    return;
+                }
+            case DataKind.Uri:
+                {
+                    var uri = payload.Get<string>("Uri");
+                    PlatformHandler.Log(0, $"Received uri \"{uri}\" from session {msg.Header.SessionId:X}");
+                    PlatformHandler.OnReceivedUri(new()
+                    {
+                        DeviceName = Channel.Session.Device.Name ?? "UNKNOWN",
+                        Uri = uri
+                    });
+
+                    OnCompleted();
+                    return;
+                }
+        }
+        throw new NotImplementedException($"DataKind {dataKind} not implemented");
+    }
 
     IEnumerator? _blobCursor;
-
-    public override async ValueTask HandleMessageAsync(CdpMessage msg)
+    async void HandleFileTransferToken(FileTransferToken token)
     {
-        bool expectMessage = true;
-
-        var payload = ValueSet.Parse(msg.Read());
-
-        ValueSet response = new();
-        if (payload.ContainsKey("ControlMessage"))
+        try
         {
-            var msgType = (NearShareControlMsgType)payload.Get<uint>("ControlMessage");
-            switch (msgType)
-            {
-                case NearShareControlMsgType.StartTransfer:
-                    {
-                        var dataKind = (DataKind)payload.Get<uint>("DataKind");
-                        if (dataKind == DataKind.File)
-                        {
-                            var fileNames = payload.Get<List<string>>("FileNames");
-                            if (fileNames.Count != 1)
-                                throw new NotImplementedException("Only able to receive one file at a time");
+            await token.TaskInternal;
 
-                            PlatformHandler.Log(0, $"Receiving file \"{fileNames[0]}\" from session {msg.Header.SessionId:X} via {Channel.Socket.TransportType}");
-
-                            bytesToSend = payload.Get<ulong>("BytesToSend");
-
-                            _fileTransferToken = new()
-                            {
-                                DeviceName = Channel.Session.Device.Name ?? "UNKNOWN",
-                                FileName = fileNames[0],
-                                FileSize = bytesToSend
-                            };
-                            PlatformHandler.OnFileTransfer(_fileTransferToken);
-
-                            try
-                            {
-                                await _fileTransferToken.WaitForAcceptance();
-                            }
-                            catch (TaskCanceledException)
-                            {
-                                SendCancel();
-                                CloseChannel();
-                                throw;
-                            }
-
-                            _blobCursor = CreateBlobCursor();
-                            _blobCursor.MoveNext();
-                            return;
-                        }
-                        else if (dataKind == DataKind.Uri)
-                        {
-                            var uri = payload.Get<string>("Uri");
-                            PlatformHandler.Log(0, $"Received uri \"{uri}\" from session {msg.Header.SessionId:X}");
-                            PlatformHandler.OnReceivedUri(new()
-                            {
-                                DeviceName = Channel.Session.Device.Name ?? "UNKNOWN",
-                                Uri = uri
-                            });
-                            expectMessage = false;
-                        }
-                        else
-                            throw new NotImplementedException($"DataKind {dataKind} not implemented");
-                        break;
-                    }
-                case NearShareControlMsgType.FetchDataResponse:
-                    {
-                        if (_fileTransferToken == null)
-                            throw new InvalidOperationException();
-
-                        var position = payload.Get<ulong>("BlobPosition");
-                        var blob = payload.Get<List<byte>>("DataBlob");
-                        var blobSize = (ulong)blob.Count;
-
-                        var newPosition = position + blobSize;
-                        if (position > bytesToSend || blobSize > PartitionSize)
-                            throw new InvalidOperationException("Device tried to send too much data!");
-
-                        // PlatformHandler.Log(0, $"BlobPosition: {position}; ({newPosition * 100 / bytesToSend}%)");
-                        lock (_fileTransferToken)
-                        {
-                            var stream = _fileTransferToken.Stream;
-                            stream.Position = (long)position;
-                            stream.Write(CollectionsMarshal.AsSpan(blob));
-                        }
-
-                        transferedBytes += blobSize;
-                        _fileTransferToken.ReceivedBytes = transferedBytes;
-
-                        expectMessage = !_fileTransferToken.IsTransferComplete;
-
-                        if (expectMessage)
-                        {
-                            _blobCursor?.MoveNext();
-                            return;
-                        }
-                        break;
-                    }
-            }
+            _blobCursor = CreateBlobCursor();
+            _blobCursor.MoveNext();
         }
+        catch (TaskCanceledException)
+        {
+            OnCancel();
+        }
+    }
+
+    void HandleFetchDataResponse(CdpMessage msg, ValueSet payload)
+    {
+        if (_fileTransferToken == null)
+            throw new CdpProtocolException("FileTransfer has not been initialized");
+
+        var position = payload.Get<ulong>("BlobPosition");
+        var blob = payload.Get<List<byte>>("DataBlob");
+        var blobSize = (ulong)blob.Count;
+
+        if (position > bytesToSend || blobSize > PartitionSize)
+            throw new CdpSecurityException("Device tried to send too much data!");
+
+        // PlatformHandler.Log(0, $"BlobPosition: {position}; ({newPosition * 100 / bytesToSend}%)");
+        lock (_fileTransferToken)
+        {
+            var stream = _fileTransferToken.Stream;
+            stream.Position = (long)position;
+            stream.Write(CollectionsMarshal.AsSpan(blob));
+        }
+
+        transferedBytes += blobSize;
+        _fileTransferToken.ReceivedBytes = transferedBytes;
+
+        var expectMessage = !_fileTransferToken.IsTransferComplete;
+        if (expectMessage)
+            _blobCursor?.MoveNext();
         else
-            expectMessage = false;
-
-        if (!expectMessage)
-        {
-            // Finished
-            response.Add("ControlMessage", (uint)NearShareControlMsgType.CompleteTransfer);
-        }
-
-        Channel.SendMessage(response.Write);
-
-        if (!expectMessage)
-            CloseChannel();
+            OnCompleted();
     }
 
     IEnumerator CreateBlobCursor()
@@ -148,25 +142,34 @@ internal sealed class NearShareApp : CdpAppBase
     void RequestBlob(ulong requestedPosition, uint size = PartitionSize)
     {
         ValueSet request = new();
+        request.Add("ControlMessage", (uint)NearShareControlMsgType.FetchDataRequest);
         request.Add("BlobPosition", requestedPosition);
         request.Add("BlobSize", size);
         request.Add("ContentId", 0u);
-        request.Add("ControlMessage", (uint)NearShareControlMsgType.FetchDataRequest);
-
-        Channel.SendMessage(request.Write);
+        SendValueSet(request);
     }
 
-    void SendCancel()
+    void OnCancel()
     {
         ValueSet request = new();
         request.Add("ControlMessage", (uint)NearShareControlMsgType.CancelTransfer);
+        SendValueSet(request);
 
-        Channel.SendMessage(request.Write);
+        CloseChannel();
     }
 
-    void CloseChannel()
+    void OnCompleted()
     {
-        Channel.Dispose(closeSession: true, closeSocket: true);
+        ValueSet request = new();
+        request.Add("ControlMessage", (uint)NearShareControlMsgType.CompleteTransfer);
+        SendValueSet(request);
+
+        CloseChannel();
+    }
+
+    protected override void CloseChannel()
+    {
+        base.CloseChannel();
         CdpAppRegistration.TryUnregisterApp(Id);
     }
 }

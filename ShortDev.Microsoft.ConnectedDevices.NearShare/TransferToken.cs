@@ -38,8 +38,8 @@ public sealed class FileTransferToken : TransferToken
 
 
     #region Acceptance
-    TaskCompletionSource<FileStream> _promise = new();
-    internal Task WaitForAcceptance()
+    readonly TaskCompletionSource<FileStream> _promise = new();
+    internal Task TaskInternal
         => _promise.Task;
 
     internal FileStream Stream

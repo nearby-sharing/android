@@ -1,8 +1,8 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Control;
+using ShortDev.Microsoft.ConnectedDevices.Serialization;
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
 
 namespace ShortDev.Microsoft.ConnectedDevices;
 
@@ -46,32 +46,4 @@ public static class CdpAppRegistration
         id = id.ToLower();
         return _registration[id].Factory();
     }
-}
-
-/// <summary>
-/// A cdp app is responsible for the application layer communication over an established <see cref="CdpChannel"/>. <br/>
-/// Every channel has a unique app.
-/// </summary>
-public abstract class CdpAppBase : IChannelMessageHandler
-{
-    /// <summary>
-    /// Gets the corresponding channel. <br/>
-    /// The value is set immediately after instantiation. <br/>
-    /// <br/>
-    /// <inheritdoc cref="CdpChannel"/>
-    /// </summary>
-    [AllowNull]
-    public CdpChannel Channel { get; internal set; }
-
-    public abstract ValueTask HandleMessageAsync(CdpMessage msg);
-}
-
-/// <summary>
-/// Describes a static cdp app with well known id. <br/>
-/// Implementing apps can be instantiated without prior handshake.
-/// </summary>
-public interface ICdpAppId
-{
-    static abstract string Id { get; }
-    static abstract string Name { get; }
 }

@@ -11,5 +11,5 @@ public interface IChannelMessageHandler
     /// Handle the received message.
     /// </summary>
     /// <param name="msg">Received message</param>
-    ValueTask HandleMessageAsync(CdpMessage msg);
+    void HandleMessage(CdpMessage msg);
 }

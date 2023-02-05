@@ -541,20 +541,16 @@ public sealed class CdpSession : IDisposable
 
         if (msg.IsComplete)
         {
-            // NewSequenceNumber();
-            _ = Task.Run(async () =>
+            try
             {
-                try
-                {
-                    var channel = _channelRegistry.Get(header.ChannelId);
-                    await channel.HandleMessageAsync(msg);
-                }
-                finally
-                {
-                    _msgRegistry.Remove(msg.Id, out _);
-                    msg.Dispose();
-                }
-            });
+                _channelRegistry.Get(header.ChannelId)
+                    .HandleMessageAsync(msg);
+            }
+            finally
+            {
+                _msgRegistry.Remove(msg.Id, out _);
+                msg.Dispose();
+            }
         }
     }
     #endregion
@@ -640,7 +636,7 @@ public sealed class CdpSession : IDisposable
         => _channelRegistry.Remove(channel.ChannelId);
     #endregion
 
-    Exception UnexpectedMessage(string? info = null)
+    public static Exception UnexpectedMessage(string? info = null)
         => new CdpSecurityException($"Received unexpected message {info ?? "null"}");
 
     void ThrowIfWrongMode(bool shouldBeHost)
