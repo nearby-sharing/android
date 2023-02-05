@@ -1,9 +1,11 @@
-﻿using ShortDev.Microsoft.ConnectedDevices.Messages.Session;
+﻿using ShortDev.Microsoft.ConnectedDevices.Messages;
+using ShortDev.Microsoft.ConnectedDevices.Messages.Control;
+using ShortDev.Microsoft.ConnectedDevices.Messages.Session;
 using ShortDev.Microsoft.ConnectedDevices.Platforms;
 using System;
 using System.Threading.Tasks;
 
-namespace ShortDev.Microsoft.ConnectedDevices.Messages.Control;
+namespace ShortDev.Microsoft.ConnectedDevices;
 
 /// <summary>
 /// Provides the interface between a <see cref="IChannelMessageHandler"/> and a <see cref="CdpSession"/>. <br/>

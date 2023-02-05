@@ -11,8 +11,8 @@ public sealed class UpgradeResponse : ICdpPayload<UpgradeResponse>
     /// <summary>
     /// A length-prefixed list of endpoint structures (see following) that are provided by each transport on the host device.
     /// </summary>
-    public required HostEndpointMetadata[] HostEndpoints { get; init; }
-    public required TransportEndpoint[] Endpoints { get; init; }
+    public required HostEndpoint[] HostEndpoints { get; init; }
+    public required EndpointMetadata[] Endpoints { get; init; }
 
     public static UpgradeResponse Parse(EndianReader reader)
     {
@@ -31,6 +31,6 @@ public sealed class UpgradeResponse : ICdpPayload<UpgradeResponse>
             writer.Write((ushort)endpoint.Type);
         }
 
-        TransportEndpoint.WriteArray(writer, Endpoints);
+        EndpointMetadata.WriteArray(writer, Endpoints);
     }
 }

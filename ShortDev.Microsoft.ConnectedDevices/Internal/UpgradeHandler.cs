@@ -130,11 +130,11 @@ internal sealed class UpgradeHandler
             {
                 HostEndpoints = new[]
                 {
-                    HostEndpointMetadata.FromIP(networkTransport.Handler.GetLocalIp())
+                    HostEndpoint.FromIP(networkTransport.Handler.GetLocalIp())
                 },
                 Endpoints = new[]
                 {
-                    TransportEndpoint.Tcp
+                    EndpointMetadata.Tcp
                 }
             }.Write(writer);
         });
@@ -142,7 +142,7 @@ internal sealed class UpgradeHandler
 
     void HandleUpgradeFinalization(CdpSocket socket, EndianReader reader)
     {
-        var msg = TransportEndpoint.ParseArray(reader);
+        var msg = EndpointMetadata.ParseArray(reader);
         _session.Platform.Handler.Log(0, $"Transport upgrade to {string.Join(',', msg.Select((x) => x.Type.ToString()))}");
 
         CommonHeader header = new()

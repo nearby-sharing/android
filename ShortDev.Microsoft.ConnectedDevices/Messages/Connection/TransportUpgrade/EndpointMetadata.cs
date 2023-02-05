@@ -4,11 +4,11 @@ using System;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages.Connection.TransportUpgrade;
 
-public record class TransportEndpoint(CdpTransportType Type, byte[] Data) : ICdpPayload<TransportEndpoint>, ICdpArraySerializable<TransportEndpoint>
+public record class EndpointMetadata(CdpTransportType Type, byte[] Data) : ICdpPayload<EndpointMetadata>, ICdpArraySerializable<EndpointMetadata>
 {
-    public static TransportEndpoint Tcp { get; } = new(CdpTransportType.Tcp, Array.Empty<byte>());
+    public static EndpointMetadata Tcp { get; } = new(CdpTransportType.Tcp, Array.Empty<byte>());
 
-    public static TransportEndpoint Parse(EndianReader reader)
+    public static EndpointMetadata Parse(EndianReader reader)
     {
         var type = (CdpTransportType)reader.ReadUInt16();
         var length = reader.ReadInt32();
@@ -16,10 +16,10 @@ public record class TransportEndpoint(CdpTransportType Type, byte[] Data) : ICdp
         return new(type, data.ToArray());
     }
 
-    public static TransportEndpoint[] ParseArray(EndianReader reader)
+    public static EndpointMetadata[] ParseArray(EndianReader reader)
     {
         var arrayLength = reader.ReadUInt16();
-        var endpoints = new TransportEndpoint[arrayLength];
+        var endpoints = new EndpointMetadata[arrayLength];
         for (int i = 0; i < arrayLength; i++)
             endpoints[i] = Parse(reader);
         return endpoints;
@@ -32,7 +32,7 @@ public record class TransportEndpoint(CdpTransportType Type, byte[] Data) : ICdp
         writer.Write(Data);
     }
 
-    public static void WriteArray(EndianWriter writer, TransportEndpoint[] endpoints)
+    public static void WriteArray(EndianWriter writer, EndpointMetadata[] endpoints)
     {
         writer.Write((ushort)endpoints.Length);
         foreach (var endpoint in endpoints)
