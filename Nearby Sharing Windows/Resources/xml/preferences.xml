@@ -4,26 +4,26 @@
 	xmlns:app="http://schemas.android.com/apk/res-auto">
 	<PreferenceCategory
 		android:key="general"
-        android:title="General">
+        android:title="@string/category_general">
 		<Preference
             app:key="request_permissions"
-            app:title="Request Permissions"
-            app:summary="Grant necessary permissions to app" />
+            app:title="@string/request_permissions_title"
+            app:summary="@string/request_permissions_summary" />
 		<Preference
             app:key="open_sponsor"
-            app:title="Sponsor"
-            app:summary="Sponsor the app creator" />
+            app:title="@string/open_sponsor_title"
+            app:summary="@string/open_sponsor_summary" />
 		<Preference
             app:key="open_faq"
-            app:title="Help"
-            app:summary="Open the FAQ" />		
+            app:title="@string/open_faq_title"
+            app:summary="@string/open_faq_summary" />		
 	</PreferenceCategory>
 	<PreferenceCategory
 		android:key="device_info"
-        android:title="Device Information">
+        android:title="@string/category_device_info">
 		<Preference
             app:key="goto_mac_address"
-            app:title="Specify Mac Address"
-            app:summary="Specify the mac address of this device" />
+            app:title="@string/goto_mac_address_title"
+            app:summary="@string/goto_mac_address_summary" />
 	</PreferenceCategory>
 </PreferenceScreen>

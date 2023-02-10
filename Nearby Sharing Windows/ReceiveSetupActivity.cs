@@ -16,7 +16,7 @@ public sealed class ReceiveSetupActivity : AppCompatActivity
         base.OnCreate(savedInstanceState);
 
         SetContentView(Resource.Layout.activity_mac_address);
-        UIHelper.SetupToolBar(this, "Setup / Information");
+        UIHelper.SetupToolBar(this, GetString(Resource.String.app_titlebar_title_receive_setup));
 
         var preferences = GetPreferences(this);
 
@@ -32,7 +32,7 @@ public sealed class ReceiveSetupActivity : AppCompatActivity
             btAddress = preferences.GetString(Preference_MacAddress, null);
         }
 
-        FindViewById<TextView>(Resource.Id.infoTextView)!.TextFormatted = UIHelper.LoadHtmlAsset(this, "MacAddressInfo.html");
+        FindViewById<TextView>(Resource.Id.infoTextView)!.TextFormatted = UIHelper.LoadHtmlAsset(this, "MacAddressInfo");
         FindViewById<Button>(Resource.Id.launchSettingsButton)!.Click += (s, e) => StartActivity(new Intent(Android.Provider.Settings.ActionDeviceInfoSettings));
 
         var inputLayout = FindViewById<TextInputLayout>(Resource.Id.btMacAddressTextInputLayout)!;

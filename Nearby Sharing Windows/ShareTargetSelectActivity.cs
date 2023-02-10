@@ -20,8 +20,8 @@ using ManifestPermission = Android.Manifest.Permission;
 
 namespace Nearby_Sharing_Windows;
 
-[IntentFilter(new[] { Intent.ActionSend, Intent.ActionSendMultiple }, Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable }, DataMimeType = "*/*", Label = "Share file")]
-[IntentFilter(new[] { Intent.ActionSend }, Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable }, DataMimeType = "text/plain", Label = "Share url")]
+[IntentFilter(new[] { Intent.ActionSend, Intent.ActionSendMultiple }, Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable }, DataMimeType = "*/*", Label = "@string/share_file")]
+[IntentFilter(new[] { Intent.ActionSend }, Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable }, DataMimeType = "text/plain", Label = "@string/share_url")]
 [Activity(Label = "@string/app_name", Exported = true, Theme = "@style/AppTheme.TranslucentOverlay", ConfigurationChanges = UIHelper.ConfigChangesFlags)]
 public sealed class ShareTargetSelectActivity : AppCompatActivity, View.IOnApplyWindowInsetsListener
 {
@@ -127,7 +127,7 @@ public sealed class ShareTargetSelectActivity : AppCompatActivity, View.IOnApply
     public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
     {
         if (grantResults.Contains(Android.Content.PM.Permission.Denied))
-            Snackbar.Make(Window!.DecorView, "Error: Missing permission!", Snackbar.LengthLong).Show();
+            Snackbar.Make(Window!.DecorView, GetString(Resource.String.send_missing_permissions), Snackbar.LengthLong).Show();
         else
             RunOnUiThread(() => StartWatcher());
     }
@@ -211,7 +211,7 @@ public sealed class ShareTargetSelectActivity : AppCompatActivity, View.IOnApply
     AsyncOperationWithProgress? fileTransferOperation = null;
     private async void SendData(RemoteSystem remoteSystem)
     {
-        StatusTextView.Text = "Waiting for acceptance...";
+        StatusTextView.Text = GetString(Resource.String.wait_for_acceptance);
 
         RemoteSystemConnectionRequest connectionRequest = new RemoteSystemConnectionRequest(remoteSystem);
         try
@@ -276,7 +276,11 @@ public sealed class ShareTargetSelectActivity : AppCompatActivity, View.IOnApply
 
                             if (args.TotalFilesToSend != 0 && args.TotalBytesToSend != 0)
                             {
-                                StatusTextView.Text = $"Sending ... {args.FilesSent}/{args.TotalFilesToSend} files ... {Math.Round((decimal)args.BytesSent / args.TotalBytesToSend * 100)}%";
+                                StatusTextView.Text = this.Localize(
+                                    Resource.String.sending_template,
+                                    args.FilesSent, args.TotalFilesToSend,
+                                    Math.Round((decimal)args.BytesSent / args.TotalBytesToSend * 100)
+                                );
                                 OnRequestAccepted();
                             }
 #if !DEBUG
@@ -303,7 +307,7 @@ public sealed class ShareTargetSelectActivity : AppCompatActivity, View.IOnApply
                     FindViewById(Resource.Id.doneIndicatorImageView)!.Visibility = ViewStates.Visible;
                 }
                 else
-                    Snackbar.Make(Window!.DecorView, $"Status: {result.Name()}", Snackbar.LengthLong).Show();
+                    Snackbar.Make(Window!.DecorView, this.Localize(Resource.String.generic_status_template, result.Name()), Snackbar.LengthLong).Show();
             }
             finally
             {
@@ -312,7 +316,7 @@ public sealed class ShareTargetSelectActivity : AppCompatActivity, View.IOnApply
         }
         catch (Exception ex)
         {
-            Snackbar.Make(Window!.DecorView, $"Error: {ex.Message}", Snackbar.LengthLong).Show();
+            Snackbar.Make(Window!.DecorView, this.Localize(Resource.String.generic_error_template, ex.Message), Snackbar.LengthLong).Show();
         }
     }
 
