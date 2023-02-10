@@ -1,0 +1,17 @@
+name: "Credits"
+on:
+  pull_request
+
+jobs:
+  CheckCredits:
+    runs-on: ubuntu-latest
+    if: ${{ github.actor != 'dependabot[bot]' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Check CREDITS.md
+        run: cat CREDITS.md | grep -w $USER
+        env:
+          USER: ${{ github.actor }}
