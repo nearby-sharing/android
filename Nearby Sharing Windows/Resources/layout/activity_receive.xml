@@ -26,14 +26,14 @@
                 style="@style/TextAppearance.AppCompat.Headline"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Receive" />
+                android:text="@string/generic_receive" />
 
             <TextView
                 android:id="@+id/deviceInfoTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingTop="10dp"
-                android:text="Visible as ..."
+                android:text="@string/visible_as_template"
                 android:paddingBottom="10dp" />
 
             <TextView
@@ -42,7 +42,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="3dp"
-                android:text="Notifications" />
+                android:text="@string/generic_notifications" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/notificationsRecyclerView"
@@ -57,7 +57,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="3dp"
-                android:text="Debug Log" />
+                android:text="@string/debug_log" />
 
             <TextView
                 android:id="@+id/debugLogTextView"

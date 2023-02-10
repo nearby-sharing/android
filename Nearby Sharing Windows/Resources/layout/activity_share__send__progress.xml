@@ -48,5 +48,5 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:textAppearance="?attr/textAppearanceSubtitle2"
-        android:text="Device Name"/>
+        android:text="@string/device_name"/>
 </LinearLayout>

@@ -27,7 +27,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="#232323"
-                android:text="Scanning ..."
+                android:text="@string/scanning"
                 android:layout_marginLeft="10dp"
                 android:gravity="center"
                 android:id="@+id/statusTextView" />

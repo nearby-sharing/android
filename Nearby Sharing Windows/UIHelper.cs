@@ -1,5 +1,6 @@
 ﻿using Android.Content;
 using Android.Content.PM;
+using Android.Drm;
 using Android.Text;
 using Android.Views;
 using AndroidX.AppCompat.App;
@@ -92,10 +93,18 @@ internal static class UIHelper
 
     public static ISpanned LoadHtmlAsset(Activity activity, string assetPath)
     {
-        using (var stream = activity.Assets!.Open(assetPath))
-        using (StreamReader reader = new(stream))
-        {
-            return Html.FromHtml(reader.ReadToEnd())!;
-        }
+        string langCode = activity.GetString(Resource.String.assets_prefix);
+        string fileName = $"{assetPath}.html";
+        if (!activity.Assets!.List($"{langCode}/").Contains(fileName))
+            langCode = "en";
+
+        using var stream = activity.Assets!.Open($"{langCode}/{fileName}");
+        using StreamReader reader = new(stream);
+#pragma warning disable CS0618 // Type or member is obsolete
+        return Html.FromHtml(reader.ReadToEnd())!;
+#pragma warning restore CS0618 // Type or member is obsolete
     }
+
+    public static string Localize(this Activity activity, int resId, params object[] args)
+        => string.Format(activity.GetString(resId), args);
 }

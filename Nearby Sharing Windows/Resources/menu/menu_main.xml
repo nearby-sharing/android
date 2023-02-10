@@ -4,16 +4,16 @@
 	<item
         android:id="@+id/action_help"
 		android:icon="@drawable/ic_fluent_chat_help_24_regular"
-        android:title="Help"
+        android:title="@string/open_faq_title"
 		android:showAsAction="ifRoom" />
 	<item
         android:id="@+id/action_sponsor"
 		android:icon="@drawable/ic_fluent_handshake_24_selector"
-        android:title="Sponsor"
+        android:title="@string/open_sponsor_title"
 		android:showAsAction="ifRoom" />
 	<item
         android:id="@+id/action_settings"
         android:icon="@drawable/ic_fluent_settings_24_selector"
-        android:title="Settings"
+        android:title="@string/generic_settings"
 		android:showAsAction="ifRoom" />
 </menu>

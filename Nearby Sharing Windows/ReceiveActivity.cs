@@ -50,7 +50,7 @@ public sealed class ReceiveActivity : AppCompatActivity, IBluetoothHandler, INet
         SetContentView(Resource.Layout.activity_receive);
 
         UIHelper.RequestReceivePermissions(this);
-        UIHelper.SetupToolBar(this, "Receive data from Windows 10 / 11");
+        UIHelper.SetupToolBar(this, GetString(Resource.String.app_titlebar_title_receive));
 
         notificationsRecyclerView = FindViewById<RecyclerView>(Resource.Id.notificationsRecyclerView)!;
         notificationsRecyclerView.SetLayoutManager(new LinearLayoutManager(this));
@@ -148,8 +148,10 @@ public sealed class ReceiveActivity : AppCompatActivity, IBluetoothHandler, INet
         var service = (BluetoothManager)GetSystemService(BluetoothService)!;
         _btAdapter = service.Adapter!;
 
-        FindViewById<TextView>(Resource.Id.deviceInfoTextView)!.Text = $"Visible as {_btAdapter.Name!}.\n" +
-            $"Address: {btAddress.ToStringFormatted()}";
+        FindViewById<TextView>(Resource.Id.deviceInfoTextView)!.Text = this.Localize(
+            Resource.String.visible_as_template,
+            $"{_btAdapter.Name!}.\n" +
+            $"Address: {btAddress.ToStringFormatted()}");
         debugLogTextView = FindViewById<TextView>(Resource.Id.debugLogTextView)!;
 
         CdpAppRegistration.RegisterApp<NearShareHandshakeApp>(() => new()
@@ -202,7 +204,7 @@ public sealed class ReceiveActivity : AppCompatActivity, IBluetoothHandler, INet
         if (!grantResults.All((x) => x != Permission.Granted))
             InitializeCDP();
         else
-            Toast.MakeText(this, "Can't receive without permissions!", ToastLength.Long)!.Show();
+            Toast.MakeText(this, this.Localize(Resource.String.receive_missing_permissions), ToastLength.Long)!.Show();
     }
 
     public override bool OnCreateOptionsMenu(IMenu? menu)
