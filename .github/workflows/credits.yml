@@ -11,8 +11,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - run: |
-          echo Check CREDITS.md
-          cat CREDITS.md | grep -w $USER
+      - name: Check CREDITS.md
+        run: cat CREDITS.md | grep -w $USER
         env:
           USER: ${{ github.actor }}
