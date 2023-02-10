@@ -22,8 +22,8 @@ public abstract class CdpAppBase : IChannelMessageHandler
 
     public abstract void HandleMessage(CdpMessage msg);
 
-    protected void SendValueSet(ValueSet request)
-        => Channel.SendMessage(request.Write);
+    protected void SendValueSet(ValueSet request, uint msgId)
+        => Channel.SendBinaryMessage(request.Write, msgId);
 
     protected virtual void CloseChannel()
     {

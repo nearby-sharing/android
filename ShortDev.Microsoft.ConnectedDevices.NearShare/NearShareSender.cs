@@ -53,7 +53,7 @@ public sealed class NearShareSender
             msg.Add("MaxPlatformVersion", 1u);
             msg.Add("MinPlatformVersion", 1u);
             msg.Add("OperationId", operationId);
-            channel.SendMessage(msg.Write);
+            channel.SendBinaryMessage(msg.Write, msgId: 0);
         }
 
         public void HandleMessage(CdpMessage msg)

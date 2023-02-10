@@ -1,5 +1,4 @@
 ﻿using ShortDev.Networking;
-using System.IO;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages.Session;
 
@@ -7,18 +6,18 @@ namespace ShortDev.Microsoft.ConnectedDevices.Messages.Session;
 /// cdp.dll!cdp::BinaryFragmenter::GetMessageFragments <br/>
 /// <see cref="AdditionalHeaderType.UserMessageRequestId"/>
 /// </summary>
-public sealed class SessionFragmentHeader : ICdpHeader<SessionFragmentHeader>
+public sealed class BinaryMsgHeader : ICdpHeader<BinaryMsgHeader>
 {
-    public int FragmentCount { get; set; } = 1;
-    public int FragmentIndex { get; set; } = 0;
-    public required int MessageId { get; set; }
+    public uint FragmentCount { get; set; } = 1;
+    public uint FragmentIndex { get; set; } = 0;
+    public required uint MessageId { get; set; }
 
-    public static SessionFragmentHeader Parse(EndianReader reader)
+    public static BinaryMsgHeader Parse(EndianReader reader)
         => new()
         {
-            FragmentCount = reader.ReadInt32(),
-            FragmentIndex = reader.ReadInt32(),
-            MessageId = reader.ReadInt32(),
+            FragmentCount = reader.ReadUInt32(),
+            FragmentIndex = reader.ReadUInt32(),
+            MessageId = reader.ReadUInt32(),
         };
 
     public void Write(EndianWriter writer)

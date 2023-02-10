@@ -13,7 +13,7 @@ public class NearShareHandshakeApp : CdpAppBase, ICdpAppId
 
     public override void HandleMessage(CdpMessage msg)
     {
-        var payload = ValueSet.Parse(msg.Read());
+        var payload = ValueSet.Parse(msg.ReadBinary(out _));
 
         string id = payload.Get<Guid>("OperationId").ToString();
         CdpAppRegistration.RegisterApp(
@@ -29,7 +29,7 @@ public class NearShareHandshakeApp : CdpAppBase, ICdpAppId
         ValueSet response = new();
         response.Add("SelectedPlatformVersion", 1u);
         response.Add("VersionHandShakeResult", 1u);
-        SendValueSet(response);
+        SendValueSet(response, msgId: 0);
 
         Channel.Dispose();
     }

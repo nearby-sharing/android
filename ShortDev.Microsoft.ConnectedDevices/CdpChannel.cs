@@ -49,6 +49,16 @@ public sealed class CdpChannel : IDisposable
     public void HandleMessageAsync(CdpMessage msg)
         => MessageHandler.HandleMessage(msg);
 
+    public void SendBinaryMessage(BodyCallback bodyCallback, uint msgId)
+        => SendMessage(writer =>
+        {
+            new BinaryMsgHeader()
+            {
+                MessageId = msgId
+            }.Write(writer);
+            bodyCallback(writer);
+        });
+
     public void SendMessage(BodyCallback bodyCallback)
     {
         CommonHeader header = new()
@@ -57,14 +67,7 @@ public sealed class CdpChannel : IDisposable
             ChannelId = ChannelId
         };
 
-        Session.SendMessage(Socket, header, writer =>
-        {
-            new SessionFragmentHeader()
-            {
-                MessageId = 0
-            }.Write(writer);
-            bodyCallback(writer);
-        });
+        Session.SendMessage(Socket, header, bodyCallback);
     }
 
     void IDisposable.Dispose()

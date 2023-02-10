@@ -16,9 +16,11 @@ internal sealed class NearShareApp : CdpAppBase
 
     const uint PartitionSize = 102400u; // 131072u
 
+    uint _messageId = 0;
     public override void HandleMessage(CdpMessage msg)
     {
-        var payload = ValueSet.Parse(msg.Read());
+        var payload = ValueSet.Parse(msg.ReadBinary(out var binaryHeader));
+        _messageId = binaryHeader.MessageId;
 
         if (!payload.ContainsKey("ControlMessage"))
             throw new InvalidDataException();
@@ -146,14 +148,14 @@ internal sealed class NearShareApp : CdpAppBase
         request.Add("BlobPosition", requestedPosition);
         request.Add("BlobSize", size);
         request.Add("ContentId", 0u);
-        SendValueSet(request);
+        SendValueSet(request, _messageId);
     }
 
     void OnCancel()
     {
         ValueSet request = new();
         request.Add("ControlMessage", (uint)NearShareControlMsgType.CancelTransfer);
-        SendValueSet(request);
+        SendValueSet(request, _messageId);
 
         CloseChannel();
     }
@@ -162,7 +164,7 @@ internal sealed class NearShareApp : CdpAppBase
     {
         ValueSet request = new();
         request.Add("ControlMessage", (uint)NearShareControlMsgType.CompleteTransfer);
-        SendValueSet(request);
+        SendValueSet(request, _messageId);
 
         CloseChannel();
     }

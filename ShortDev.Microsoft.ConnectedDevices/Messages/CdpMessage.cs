@@ -41,16 +41,26 @@ public sealed class CdpMessage : IDisposable
     }
     #endregion
 
-    public SessionFragmentHeader? FragmentHeader { get; private set; }
-
     public EndianReader Read()
+    {
+        ThrowIfNotCompleted();
+
+        return new(Endianness.BigEndian, _buffer.AsSpan());
+    }
+
+    public EndianReader ReadBinary(out BinaryMsgHeader header)
+    {
+        ThrowIfNotCompleted();
+
+        var reader = Read();
+        header = BinaryMsgHeader.Parse(reader);
+        return reader;
+    }
+
+    void ThrowIfNotCompleted()
     {
         if (!IsComplete)
             throw new InvalidOperationException("Wait for completion");
-
-        EndianReader reader = new(Endianness.BigEndian, _buffer.AsSpan());
-        FragmentHeader = SessionFragmentHeader.Parse(reader);
-        return reader;
     }
 
     public void Dispose()

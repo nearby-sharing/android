@@ -3,6 +3,8 @@ using ShortDev.Microsoft.ConnectedDevices.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.Authentication;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.DeviceInfo;
+using ShortDev.Microsoft.ConnectedDevices.Messages.Session;
+using ShortDev.Microsoft.ConnectedDevices.Serialization;
 using ShortDev.Networking;
 using Spectre.Console;
 
@@ -59,9 +61,8 @@ void HandleMessage(CommonHeader header, EndianReader reader)
     }
     else if (header.Type == MessageType.Session)
     {
-        // reader.PrintPayload();
-        //var prepend = reader.ReadBytes(0x0000000C);
-        //var valueSet = ValueSet.Parse(reader.BaseStream);
+        BinaryMsgHeader binaryHeader = BinaryMsgHeader.Parse(reader);
+        var valueSet = ValueSet.Parse(reader);
     }
     else
     {
