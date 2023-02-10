@@ -26,6 +26,7 @@ Contributions are welcome.
  - Better documentation (e.g. FAQ)
  - Report bugs / feature requests
  - UI / UX improvements
+ - Translating
  - ...
 
 Just open a PR / Issue.   
