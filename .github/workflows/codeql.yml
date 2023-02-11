@@ -1,9 +1,11 @@
-name: "CodeQL"
+name: "CodeQL C#"
 
 on:
   push:
     branches: [ "master" ]
+    paths: ["**.cs"]
   pull_request:
+    paths: ["**.cs"]
   workflow_dispatch:
 
 jobs:
