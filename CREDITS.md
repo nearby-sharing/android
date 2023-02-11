@@ -4,3 +4,4 @@
  
 ## Translations
  - Guille (@Sappstal) (Spanish)
+ - Zakhar Markelov (@markelovz) (Russian)
