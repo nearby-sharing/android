@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="app_name">Windows就近共享</string>
+	<string name="app_titlebar_title_default">传输数据到您的 Windows 10 / 11 电脑</string>
+	<string name="app_titlebar_title_receive">从您的 Windows 10 / 11 电脑接收数据</string>
+	<string name="app_titlebar_title_receive_setup">设置与信息</string>
+	
+	<string name="assets_prefix">cn</string>
+
+	<!-- #region generic -->
+	<string name="generic_back">返回</string>
+	<string name="generic_next">下一项</string>
+	<string name="generic_cancel">取消</string>
+
+	<string name="generic_send">发送</string>
+	<string name="generic_receive">接收</string>
+	
+	<string name="generic_status_template">状态: {0}</string>
+	<string name="generic_error_template">错误: {0}</string>
+
+	<string name="generic_important">重要</string>
+	<string name="generic_notifications">通知</string>
+	<string name="generic_settings">设置</string>
+	<string name="device_name">设备名称</string>
+	<!-- #endregion -->
+
+	<!-- #region activity_mac_address.xml -->
+	<string name="launch_settings">打开设置</string>
+	<string name="bt_mac_address">蓝牙Mac地址</string>
+	<!-- #endregion -->
+
+	<!-- #region activity_receive.xml -->
+	<string name="visible_as_template">可被视为 {0}</string>
+	<string name="debug_log">调试日志</string>
+	<!-- #endregion -->
+
+	<!-- #region activity_share.xml -->
+	<string name="scanning">扫描中...</string>
+	<!-- #endregion -->
+
+	<!-- #region preferences.xml -->
+	<string name="category_general">常规</string>
+
+	<string name="request_permissions_title">请求权限</string>
+	<string name="request_permissions_summary">同意必要权限以使用本应用</string>
+
+	<string name="open_sponsor_title">赞助</string>
+	<string name="open_sponsor_summary">赞助此应用的开发者</string>
+
+	<string name="open_faq_title">帮助</string>
+	<string name="open_faq_summary">打开常见问题手册</string>
+
+
+	<string name="category_device_info">设备信息</string>
+
+	<string name="goto_mac_address_title">指定Mac地址</string>
+	<string name="goto_mac_address_summary">指定此设备的Mac地址</string>
+	<!-- #endregion -->
+
+	<!-- #region ReceiveActivity.cs -->
+	<string name="receive_missing_permissions">您必须同意此应用的权限以接收文件!</string>
+	<!-- #endregion -->
+
+	<!-- #region ReceiveActivity.cs -->
+	<string name="share_file">分享文件</string>
+	<string name="share_url">分享网址</string>
+
+	<string name="send_missing_permissions">缺失必要的权限!</string>
+	<string name="wait_for_acceptance">等待接受中...</string>
+	<string name="sending_template">正在发送 ... {0}/{1} 个文件 ... {2}%</string>
+	<!-- #endregion -->
+</resources>
