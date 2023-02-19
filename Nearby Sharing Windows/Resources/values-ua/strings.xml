@@ -20,7 +20,7 @@
 	<string name="generic_important">Важливо</string>
 	<string name="generic_notifications">Повідомлення</string>
 	<string name="generic_settings">Налаштування</string>
-	<string name="device_name">Ім'я пристрою</string>
+	<string name="device_name">Ім\'я пристрою</string>
 	<!-- #endregion -->
 
 	<!-- #region activity_mac_address.xml -->
