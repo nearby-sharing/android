@@ -4,7 +4,7 @@
 	<string name="app_titlebar_title_receive">Отримання файлів із Windows 10 / 11</string>
 	<string name="app_titlebar_title_receive_setup">Налаштування / Інформація</string>
 	
-	<string name="assets_prefix">ua</string>
+	<string name="assets_prefix">uk</string>
 
 	<!-- #region generic -->
 	<string name="generic_back">Назад</string>
