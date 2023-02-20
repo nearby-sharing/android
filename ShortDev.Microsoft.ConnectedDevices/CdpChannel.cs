@@ -3,6 +3,7 @@ using ShortDev.Microsoft.ConnectedDevices.Messages.Control;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Session;
 using ShortDev.Microsoft.ConnectedDevices.Platforms;
 using System;
+using System.Collections.Generic;
 
 namespace ShortDev.Microsoft.ConnectedDevices;
 
@@ -49,17 +50,7 @@ public sealed class CdpChannel : IDisposable
     public void HandleMessageAsync(CdpMessage msg)
         => MessageHandler.HandleMessage(msg);
 
-    public void SendBinaryMessage(BodyCallback bodyCallback, uint msgId)
-        => SendMessage(writer =>
-        {
-            new BinaryMsgHeader()
-            {
-                MessageId = msgId
-            }.Write(writer);
-            bodyCallback(writer);
-        });
-
-    public void SendMessage(BodyCallback bodyCallback)
+    public void SendBinaryMessage(BodyCallback bodyCallback, uint msgId, List<AdditionalHeader>? headers = null)
     {
         CommonHeader header = new()
         {
@@ -67,7 +58,17 @@ public sealed class CdpChannel : IDisposable
             ChannelId = ChannelId
         };
 
-        Session.SendMessage(Socket, header, bodyCallback);
+        if (headers != null)
+            header.AdditionalHeaders = headers;
+
+        Session.SendMessage(Socket, header, writer =>
+        {
+            new BinaryMsgHeader()
+            {
+                MessageId = msgId
+            }.Write(writer);
+            bodyCallback(writer);
+        });
     }
 
     void IDisposable.Dispose()
