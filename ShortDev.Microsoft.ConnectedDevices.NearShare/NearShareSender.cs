@@ -53,7 +53,10 @@ public sealed class NearShareSender
             msg.Add("MaxPlatformVersion", 1u);
             msg.Add("MinPlatformVersion", 1u);
             msg.Add("OperationId", operationId);
-            channel.SendBinaryMessage(msg.Write, msgId: 0);
+            channel.SendBinaryMessage(msg.Write, msgId: 0, new()
+            {
+                AdditionalHeader.CreateCorrelationHeader() // "CDPSvc" crashes if not supplied (AccessViolation in ShareHost.dll!ExtendCorrelationVector)
+            });
         }
 
         public void HandleMessage(CdpMessage msg)
