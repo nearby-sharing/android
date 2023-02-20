@@ -115,14 +115,21 @@ public sealed class ConnectedDevicesPlatform : IDisposable
 
     public async Task<CdpSession> ConnectAsync(CdpDevice device)
     {
-        var transport = TryGetTransport<BluetoothTransport>() ?? throw new InvalidOperationException("Bluetooth transport is needed!");
-        var socket = await transport.ConnectAsync(device);
-        ReceiveLoop(socket);
-        var session = CdpSession.CreateAndConnectClient(this, socket);
+        // var transport = TryGetTransport<BluetoothTransport>() ?? throw new InvalidOperationException("Bluetooth transport is needed!");
+        var socket = await CreateSocketAsync(device);
 
+        var session = CdpSession.CreateAndConnectClient(this, socket);
         await session.WaitForAuthDone();
 
         return session;
+    }
+
+    internal async Task<CdpSocket> CreateSocketAsync(CdpDevice device)
+    {
+        var transport = TryGetTransport(device.TransportType) ?? throw new InvalidOperationException($"No single transport found for type {device.TransportType}");
+        var socket = await transport.ConnectAsync(device);
+        ReceiveLoop(socket);
+        return socket;
     }
     #endregion
 

@@ -287,7 +287,7 @@ public sealed class CdpSession : IDisposable
                 break;
             case ConnectionType.AuthDoneRespone:
                 ThrowIfWrongMode(shouldBeHost: false);
-                HandleAuthDoneResponse(reader);
+                HandleAuthDoneResponse(socket, reader);
 
                 socket.Dispose();
                 break;
@@ -437,11 +437,12 @@ public sealed class CdpSession : IDisposable
     }
     #endregion
 
-    void HandleAuthDoneResponse(EndianReader reader)
+    void HandleAuthDoneResponse(CdpSocket socket, EndianReader reader)
     {
         var msg = ResultPayload.Parse(reader);
         msg.ThrowOnError();
         OnAuthDoneInternal?.Invoke();
+        socket.Dispose();
     }
     void HandleDeviceInfoMessage(CommonHeader header, EndianReader reader, CdpSocket socket)
     {
@@ -594,18 +595,12 @@ public sealed class CdpSession : IDisposable
         }, out channelId);
     }
 
-    async Task<CdpSocket> OpenNewSocketAsync()
-    {
-        var transport = Platform.TryGetTransport(Device.TransportType) ?? throw new InvalidOperationException($"No single transport not found for type {Device.TransportType}");
-        return await transport.ConnectAsync(Device);
-    }
-
     public async Task<CdpChannel> StartClientChannelAsync(string appId, string appName, IChannelMessageHandler handler)
     {
         if (IsHost)
             throw new InvalidOperationException("Session is not a client");
 
-        var socket = await OpenNewSocketAsync();
+        var socket = await Platform.CreateSocketAsync(Device);
 
         CommonHeader header = new()
         {
@@ -629,7 +624,10 @@ public sealed class CdpSession : IDisposable
         );
 
         var response = await WaitForChannelResponse(header.RequestID);
-        return new CdpChannel(this, response.ChannelId, handler, socket);
+
+        CdpChannel channel = new(this, response.ChannelId, handler, socket);
+        _channelRegistry.Add(channel.ChannelId, channel);
+        return channel;
     }
 
     internal void UnregisterChannel(CdpChannel channel)
