@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Serialization;
 
+[DebuggerDisplay("Type = {Type}, Value = {Get()}")]
 public partial class PropertyValue
 {
     internal object Get()
@@ -50,11 +52,19 @@ public partial class PropertyValue
 
     public void Set<T>(T value)
     {
+        if (value is Guid guidValue)
+            SetInternal(new[] { guidValue });
+        else
+            SetInternal(value);
+    }
+
+    void SetInternal<T>(T value)
+    {
         switch (value)
         {
             case IEnumerable<byte> uint8ArrayValue:
                 Type = PropertyType.PropertyType_UInt8Array;
-                // this.UInt8ArrayValue = uint8ArrayValue.ToList();
+                this.UInt8ArrayValue = uint8ArrayValue.ToList();
                 break;
             case uint uint32Value:
                 Type = PropertyType.PropertyType_UInt32;
@@ -88,7 +98,4 @@ public partial class PropertyValue
                 throw new NotImplementedException();
         }
     }
-
-    public override string ToString()
-        => $"{{ Type = {Type}, Value = {Get()} }}";
 }
