@@ -3,9 +3,9 @@ name: "CodeQL C#"
 on:
   push:
     branches: [ "master" ]
-    paths: ["**.cs"]
+    paths: ["**.cs", "**.xml"]
   pull_request:
-    paths: ["**.cs"]
+    paths: ["**.cs", "**.xml"]
   workflow_dispatch:
 
 jobs:
@@ -49,7 +49,7 @@ jobs:
         dotnet workload install android --ignore-failed-sources
         
     - name: Build
-      run: dotnet build "Nearby Sharing Windows" -c Release --interactive /p:EnforceCodeStyleInBuild=true /p:AnalysisLevel=latest-all
+      run: dotnet build "Nearby Sharing Windows" -c Debug --interactive /p:EnforceCodeStyleInBuild=true /p:AnalysisLevel=latest-all
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
