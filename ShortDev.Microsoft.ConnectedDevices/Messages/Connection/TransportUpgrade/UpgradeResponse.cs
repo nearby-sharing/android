@@ -25,9 +25,7 @@ public sealed class UpgradeResponse : ICdpPayload<UpgradeResponse>
         foreach (var endpoint in HostEndpoints)
         {
             writer.WriteWithLength(endpoint.Host);
-            writer.Write((byte)0);
             writer.WriteWithLength(endpoint.Service);
-            writer.Write((byte)0);
             writer.Write((ushort)endpoint.Type);
         }
 

@@ -141,7 +141,8 @@ public readonly ref struct EndianWriter
     public void Write(string value, Encoding encoding)
     {
         // ToDo: Allocation free if possible (no stack overflow)
-        Write(encoding.GetBytes(value + "\0"));
+        Write(encoding.GetBytes(value));
+        Write((byte)0);
     }
 
     public void WriteWithLength(string value)
@@ -150,7 +151,8 @@ public readonly ref struct EndianWriter
     public void WriteWithLength(string value, Encoding encoding)
     {
         // ToDo: Allocation free if possible (no stack overflow)
-        WriteWithLength(encoding.GetBytes(value + "\0"));
+        WriteWithLength(encoding.GetBytes(value));
+        Write((byte)0);
     }
 
     public void WriteWithLength(ReadOnlySpan<byte> value)
