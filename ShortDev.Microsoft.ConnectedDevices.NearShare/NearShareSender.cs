@@ -1,10 +1,11 @@
-﻿using ShortDev.Microsoft.ConnectedDevices.Messages;
+﻿using Microsoft.CorrelationVector;
+using ShortDev.Microsoft.ConnectedDevices.Exceptions;
+using ShortDev.Microsoft.ConnectedDevices.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Control;
 using ShortDev.Microsoft.ConnectedDevices.NearShare.Internal;
 using ShortDev.Microsoft.ConnectedDevices.NearShare.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Platforms;
 using ShortDev.Microsoft.ConnectedDevices.Serialization;
-using System.Runtime.CompilerServices;
 
 namespace ShortDev.Microsoft.ConnectedDevices.NearShare;
 
@@ -23,17 +24,14 @@ public sealed class NearShareSender
         Guid operationId = Guid.NewGuid();
 
         HandshakeHandler handshake = new();
-        using (var handShakeChannel = await session.StartClientChannelAsync(NearShareHandshakeApp.Id, NearShareHandshakeApp.Name, handshake))
-        {
-            HandshakeHandler.StartHandshake(handShakeChannel, operationId);
-            await handshake;
-        }
+        using var handShakeChannel = await session.StartClientChannelAsync(NearShareHandshakeApp.Id, NearShareHandshakeApp.Name, handshake);
+        var handshakeResultMsg = await handshake.Execute(handShakeChannel, operationId);
+
+        var cv = handshakeResultMsg.Header.TryGetCorrelationVector() ?? throw new InvalidDataException("No Correlation Vector");
 
         SenderStateMachine senderStateMachine = new();
-        using (var channel = await session.StartClientChannelAsync(NearShareHandshakeApp.Id, NearShareHandshakeApp.Name, senderStateMachine))
-        {
-
-        }
+        using var channel = await session.StartClientChannelAsync(operationId.ToString("D").ToUpper(), NearShareApp.Name, senderStateMachine, handShakeChannel.Socket);
+        SenderStateMachine.SendUri(channel, uri, cv);
     }
 
     public Task SendFileAsync(CdpDevice device, CdpFileProvider file, IProgress<NearShareProgress> progress, CancellationToken cancellationToken = default)
@@ -42,11 +40,11 @@ public sealed class NearShareSender
     public Task SendFilesAsync(CdpDevice device, CdpFileProvider[] files, IProgress<NearShareProgress> progress, CancellationToken cancellationToken = default)
         => throw new NotImplementedException();
 
-    class HandshakeHandler : IChannelMessageHandler
+    sealed class HandshakeHandler : IChannelMessageHandler
     {
-        readonly TaskCompletionSource _promise = new();
+        readonly TaskCompletionSource<CdpMessage> _promise = new();
 
-        public static void StartHandshake(CdpChannel channel, Guid operationId)
+        public Task<CdpMessage> Execute(CdpChannel channel, Guid operationId)
         {
             ValueSet msg = new();
             msg.Add("ControlMessage", (uint)NearShareControlMsgType.HandShakeRequest);
@@ -57,22 +55,41 @@ public sealed class NearShareSender
             {
                 AdditionalHeader.CreateCorrelationHeader() // "CDPSvc" crashes if not supplied (AccessViolation in ShareHost.dll!ExtendCorrelationVector)
             });
+
+            return _promise.Task;
         }
 
         public void HandleMessage(CdpMessage msg)
         {
-            throw new NotImplementedException();
-        }
+            var payload = ValueSet.Parse(msg.ReadBinary(out _));
+            var handshakeResult = payload.Get<uint>("VersionHandShakeResult");
 
-        public TaskAwaiter GetAwaiter()
-            => _promise.Task.GetAwaiter();
+            if (handshakeResult != 1)
+                _promise.SetException(new CdpProtocolException("Handshake failed"));
+
+            _promise.SetResult(msg);
+        }
     }
 
-    class SenderStateMachine : IChannelMessageHandler
+    sealed class SenderStateMachine : IChannelMessageHandler
     {
+        public static void SendUri(CdpChannel channel, Uri uri, CorrelationVector cv)
+        {
+            ValueSet valueSet = new();
+            valueSet.Add("ControlMessage", (uint)NearShareControlMsgType.StartTransfer);
+            valueSet.Add("DataKind", (uint)DataKind.Uri);
+            valueSet.Add("BytesToSend", 0);
+            valueSet.Add("FileCount", 0);
+            valueSet.Add("Uri", uri.ToString());
+            channel.SendBinaryMessage(valueSet.Write, 10, new()
+            {
+                AdditionalHeader.FromCorrelationVector(cv.Increment())
+            });
+        }
+
         public void HandleMessage(CdpMessage msg)
         {
-            throw new NotImplementedException();
+            var payload = ValueSet.Parse(msg.ReadBinary(out _));
         }
     }
 }

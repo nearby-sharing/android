@@ -16,6 +16,8 @@ public partial class PropertyValue
                 throw new NullReferenceException();
             case PropertyType.PropertyType_UInt8Array:
                 return UInt8ArrayValue;
+            case PropertyType.PropertyType_Int32:
+                return Int32Value;
             case PropertyType.PropertyType_UInt32:
                 return UInt32Value;
             case PropertyType.PropertyType_UInt32Array:
@@ -65,6 +67,10 @@ public partial class PropertyValue
             case IEnumerable<byte> uint8ArrayValue:
                 Type = PropertyType.PropertyType_UInt8Array;
                 this.UInt8ArrayValue = uint8ArrayValue.ToList();
+                break;
+            case int int32Value:
+                Type = PropertyType.PropertyType_Int32;
+                this.Int32Value = int32Value;
                 break;
             case uint uint32Value:
                 Type = PropertyType.PropertyType_UInt32;

@@ -601,6 +601,13 @@ public sealed class CdpSession : IDisposable
             throw new InvalidOperationException("Session is not a client");
 
         var socket = await Platform.CreateSocketAsync(Device);
+        return await StartClientChannelAsync(appId, appName, handler, socket);
+    }
+
+    public async Task<CdpChannel> StartClientChannelAsync(string appId, string appName, IChannelMessageHandler handler, CdpSocket socket)
+    {
+        if (IsHost)
+            throw new InvalidOperationException("Session is not a client");
 
         CommonHeader header = new()
         {
@@ -624,6 +631,7 @@ public sealed class CdpSession : IDisposable
         );
 
         var response = await WaitForChannelResponse(header.RequestID);
+        response.ThrowOnError();
 
         CdpChannel channel = new(this, response.ChannelId, handler, socket);
         _channelRegistry.Add(channel.ChannelId, channel);

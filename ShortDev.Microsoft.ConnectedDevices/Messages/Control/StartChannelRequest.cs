@@ -1,6 +1,4 @@
 ﻿using ShortDev.Networking;
-using System;
-using System.IO;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages.Control;
 

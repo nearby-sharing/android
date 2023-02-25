@@ -13,11 +13,16 @@ namespace ShortDev.Microsoft.ConnectedDevices.Messages;
 public record AdditionalHeader(AdditionalHeaderType Type, ReadOnlyMemory<byte> Value)
 {
     public static AdditionalHeader CreateCorrelationHeader()
+        => FromCorrelationVector(new CorrelationVector());
+
+    public static AdditionalHeader FromCorrelationVector(CorrelationVector cv)
+        => FromCorrelationVector(cv.ToString());
+
+    public static AdditionalHeader FromCorrelationVector(string cv)
     {
-        CorrelationVector cv = new();
         return new(
             AdditionalHeaderType.CorrelationVector,
-            Encoding.ASCII.GetBytes(cv.ToString())
+            Encoding.ASCII.GetBytes(cv)
         );
     }
 }

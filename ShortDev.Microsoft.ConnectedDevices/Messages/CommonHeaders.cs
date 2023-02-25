@@ -1,9 +1,11 @@
-﻿using ShortDev.Networking;
+﻿using Microsoft.CorrelationVector;
+using ShortDev.Networking;
 using System;
 using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages;
 
@@ -219,5 +221,15 @@ public sealed class CommonHeader : ICdpHeader<CommonHeader>
             return null;
 
         return BinaryPrimitives.ReadUInt64LittleEndian(header.Value.Span);
+    }
+
+    public CorrelationVector? TryGetCorrelationVector()
+    {
+        var header = AdditionalHeaders.FirstOrDefault(x => x.Type == AdditionalHeaderType.CorrelationVector);
+        if (header == null)
+            return null;
+
+        var raw = Encoding.ASCII.GetString(header.Value.Span);
+        return CorrelationVector.Parse(raw);
     }
 }

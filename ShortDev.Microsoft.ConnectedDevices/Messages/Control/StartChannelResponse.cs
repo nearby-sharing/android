@@ -1,6 +1,5 @@
-﻿using ShortDev.Networking;
-using System;
-using System.IO;
+﻿using ShortDev.Microsoft.ConnectedDevices.Exceptions;
+using ShortDev.Networking;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages.Control;
 
@@ -15,6 +14,12 @@ public sealed class StartChannelResponse : ICdpPayload<StartChannelResponse>
 
     public required ChannelResult Result { get; init; }
     public required ulong ChannelId { get; init; }
+
+    public void ThrowOnError()
+    {
+        if (Result != ChannelResult.Success)
+            throw new CdpProtocolException($"Could not create channel. {Result}");
+    }
 
     public void Write(EndianWriter writer)
     {
