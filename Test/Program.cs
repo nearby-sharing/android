@@ -3,13 +3,25 @@ using ShortDev.Microsoft.ConnectedDevices.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.Authentication;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.DeviceInfo;
+using ShortDev.Microsoft.ConnectedDevices.Messages.Control;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Session;
 using ShortDev.Microsoft.ConnectedDevices.Serialization;
 using ShortDev.Networking;
 using Spectre.Console;
+using System.IO.Pipes;
 
 //var adapter = await BluetoothAdapter.GetDefaultAsync();
 //Debug.Print(adapter.BluetoothAddress.ToString("X"));
+
+{
+    NamedPipeServerStream pipeServer = new("\\\\.\\pipe\\CDPInOut", PipeDirection.InOut);
+    Console.WriteLine("Waiting...");
+    pipeServer.WaitForConnection();
+    Console.WriteLine("Connected!!");
+    using StreamReader reader = new(pipeServer);
+    while (true)
+        Console.Write(reader.ReadToEnd());
+}
 
 var secret = BinaryConvert.ToBytes("37fc508508ba8d6d7ba7ddc79ad29fecdf855879e2a48b6811f310e80dcab98a81500925c1c8019c05b418d3bc22a870fc52d3735b43babc85c57a1fe12d4fb4");
 CdpCryptor cryptor = new(secret);
@@ -63,6 +75,26 @@ void HandleMessage(CommonHeader header, EndianReader reader)
     {
         BinaryMsgHeader binaryHeader = BinaryMsgHeader.Parse(reader);
         var valueSet = ValueSet.Parse(reader);
+    }
+    else if (header.Type == MessageType.Control)
+    {
+        ControlHeader controlHeader = ControlHeader.Parse(reader);
+        switch (controlHeader.MessageType)
+        {
+            case ControlMessageType.StartChannelRequest:
+                StartChannelRequest startChannelRequest = StartChannelRequest.Parse(reader);
+                break;
+            case ControlMessageType.StartChannelResponse:
+                break;
+            case ControlMessageType.EnumerateAppsReponse:
+                break;
+            case ControlMessageType.EnumerateAppTargetNamesRequest:
+                break;
+            case ControlMessageType.EnumerateAppTargetNamesResponse:
+                break;
+            default:
+                break;
+        }
     }
     else
     {
