@@ -41,13 +41,13 @@
 	<!-- #region preferences.xml -->
 	<string name="category_general">General</string>
 
-	<string name="request_permissions_title">Solicitar Permisos</string>
-	<string name="request_permissions_summary">Otorga los permisos necesarios a la aplicación</string>
+	<string name="request_permissions_title">Solicitar permisos necesarios</string>
+	<string name="request_permissions_summary">Concede los permisos necesarios a la aplicación</string>
 
 	<string name="open_sponsor_title">Patrocinar</string>
 	<string name="open_sponsor_summary">Patrocina al creador de la aplicación</string>
 
-	<string name="open_faq_title">Help</string>
+	<string name="open_faq_title">Ayuda</string>
 	<string name="open_faq_summary">Abre las Preguntas Frecuentes</string>
 
 
@@ -58,15 +58,15 @@
 	<!-- #endregion -->
 
 	<!-- #region ReceiveActivity.cs -->
-	<string name="receive_missing_permissions">¡No se puede recibir sin permisos!</string>
+	<string name="receive_missing_permissions">¡No se puede recibir sin los permisos necesarios!</string>
 	<!-- #endregion -->
 
 	<!-- #region ReceiveActivity.cs -->
 	<string name="share_file">Compartir archivo</string>
 	<string name="share_url">Compartir URL</string>
 
-	<string name="send_missing_permissions">¡Faltan permisos!</string>
-	<string name="wait_for_acceptance">Esperando aceptación...</string>
+	<string name="send_missing_permissions">¡Faltan algunos permisos necesarios!</string>
+	<string name="wait_for_acceptance">Esperando respuesta...</string>
 	<string name="sending_template">Enviando ... {0}/{1} archivos ... {2}%</string>
 	<!-- #endregion -->
 </resources>
