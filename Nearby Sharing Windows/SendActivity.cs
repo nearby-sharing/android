@@ -8,6 +8,7 @@ using AndroidX.Core.App;
 using AndroidX.RecyclerView.Widget;
 using Google.Android.Material.ProgressIndicator;
 using Google.Android.Material.Snackbar;
+using Nearby_Sharing_Windows.Bluetooth;
 using ShortDev.Android.UI;
 using ShortDev.Microsoft.ConnectedDevices;
 using ShortDev.Microsoft.ConnectedDevices.NearShare;
@@ -120,14 +121,20 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
             RunOnUiThread(() => InitializePlatform());
     }
 
+    BluetoothLeService? _leService;
+
     #region Initialization
     CancellationTokenSource _discoverCancellationTokenSource = new();
     [AllowNull] ConnectedDevicesPlatform Platform { get; set; }
-    void InitializePlatform()
+    async void InitializePlatform()
     {
         var service = (BluetoothManager)GetSystemService(BluetoothService)!;
         var adapter = service.Adapter!;
-        AndroidBluetoothHandler bluetoothHandler = new(this, adapter);
+
+        _leService = await BluetoothLeServiceConnection.ConnectToServiceAsync(this);
+        _leService.TryInitialize();
+
+        AndroidBluetoothHandler bluetoothHandler = new(this, adapter, _leService);
 
         Platform = new(this);
         Platform.AddTransport<BluetoothTransport>(new(bluetoothHandler));

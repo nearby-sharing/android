@@ -29,13 +29,22 @@ public sealed class BluetoothTransport : ICdpTransport, ICdpDiscoverableTranspor
         );
     }
 
+    public bool PreferRfcomm { get; set; } = false;
     public async Task<CdpSocket> ConnectAsync(CdpDevice device)
-        => await Handler.ConnectRfcommAsync(device, new RfcommOptions()
+    {
+        if (Handler.SupportsRfcomm && PreferRfcomm)
+            return await Handler.ConnectRfcommAsync(device, new RfcommOptions()
+            {
+                ServiceId = Constants.RfcommServiceId,
+                ServiceName = Constants.RfcommServiceName,
+                SocketConnected = (socket) => DeviceConnected?.Invoke(this, socket)
+            });
+
+        return await Handler.ConnectGattAsync(device, new()
         {
-            ServiceId = Constants.RfcommServiceId,
-            ServiceName = Constants.RfcommServiceName,
             SocketConnected = (socket) => DeviceConnected?.Invoke(this, socket)
         });
+    }
 
     public void Advertise(CdpAdvertisement options, CancellationToken cancellationToken)
     {
@@ -43,7 +52,8 @@ public sealed class BluetoothTransport : ICdpTransport, ICdpDiscoverableTranspor
             new AdvertiseOptions()
             {
                 ManufacturerId = Constants.BLeBeaconManufacturerId,
-                BeaconData = options.GenerateBLeBeacon()
+                BeaconData = options.GenerateBLeBeacon(),
+                GattServiceId = $"BAD956B2-900A-45AD-B42F-{options.MacAddress}"
             },
             cancellationToken
         );

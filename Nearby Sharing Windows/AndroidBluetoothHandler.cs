@@ -1,11 +1,13 @@
 ﻿using Android.Bluetooth;
 using Android.Bluetooth.LE;
+using Android.OS;
 using Android.Runtime;
-using ShortDev.Microsoft.ConnectedDevices.Platforms;
+using Nearby_Sharing_Windows.Bluetooth;
 using ShortDev.Microsoft.ConnectedDevices;
+using ShortDev.Microsoft.ConnectedDevices.Platforms;
 using ShortDev.Microsoft.ConnectedDevices.Platforms.Bluetooth;
-using BLeScanResult = Android.Bluetooth.LE.ScanResult;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
+using BLeScanResult = Android.Bluetooth.LE.ScanResult;
 
 namespace Nearby_Sharing_Windows;
 
@@ -13,10 +15,12 @@ public sealed class AndroidBluetoothHandler : IBluetoothHandler
 {
     public BluetoothAdapter Adapter { get; }
     public ICdpPlatformHandler PlatformHandler { get; }
-    public AndroidBluetoothHandler(ICdpPlatformHandler handler, BluetoothAdapter adapter)
+    readonly BluetoothLeService? _leService;
+    public AndroidBluetoothHandler(ICdpPlatformHandler handler, BluetoothAdapter adapter, BluetoothLeService? leService = null)
     {
         PlatformHandler = handler;
         Adapter = adapter;
+        _leService = leService;
     }
 
     #region BLe Scan
@@ -25,14 +29,24 @@ public sealed class AndroidBluetoothHandler : IBluetoothHandler
         using var scanner = Adapter?.BluetoothLeScanner ?? throw new InvalidOperationException($"\"{nameof(Adapter)}\" is not initialized");
 
         BluetoothLeScannerCallback scanningCallback = new();
-        scanningCallback.OnFoundDevice += (result) =>
+        scanningCallback.OnFoundDevice += async (result) =>
         {
             try
             {
                 var address = result.Device?.Address ?? throw new InvalidDataException("No address");
                 var beaconData = result.ScanRecord?.GetManufacturerSpecificData(Constants.BLeBeaconManufacturerId);
                 if (beaconData != null && CdpAdvertisement.TryParse(beaconData, out var data))
+                {
+                    if (data.DeviceName.Contains("Lukas"))
+                    {
+                        scanner.StopScan(scanningCallback);
+
+                        await Task.Delay(500);
+
+                        _leService?.Connect(address);
+                    }
                     scanOptions.OnDeviceDiscovered?.Invoke(data);
+                }
             }
             catch (InvalidDataException) { }
         };
@@ -61,17 +75,6 @@ public sealed class AndroidBluetoothHandler : IBluetoothHandler
                         OnFoundDevice?.Invoke(result);
         }
     }
-
-    public async Task<CdpSocket> ConnectRfcommAsync(CdpDevice device, RfcommOptions options, CancellationToken cancellationToken = default)
-    {
-        if (Adapter == null)
-            throw new InvalidOperationException($"{nameof(Adapter)} is not initialized!");
-
-        var btDevice = Adapter.GetRemoteDevice(device.Address) ?? throw new ArgumentException($"Could not find bt device with address \"{device.Address}\"");
-        var btSocket = btDevice.CreateRfcommSocketToServiceRecord(Java.Util.UUID.FromString(options.ServiceId)) ?? throw new ArgumentException("Could not create service socket");
-        await btSocket.ConnectAsync();
-        return btSocket.ToCdp();
-    }
     #endregion
 
     #region BLe Advertisement
@@ -85,6 +88,7 @@ public sealed class AndroidBluetoothHandler : IBluetoothHandler
 
         var data = new AdvertiseData.Builder()
             .AddManufacturerData(options.ManufacturerId, options.BeaconData!)!
+            .AddServiceUuid(ParcelUuid.FromString(options.GattServiceId))!
             .Build();
 
         BLeAdvertiseCallback callback = new();
@@ -99,6 +103,19 @@ public sealed class AndroidBluetoothHandler : IBluetoothHandler
     #endregion
 
     #region Rfcomm
+    bool IBluetoothHandler.SupportsRfcomm { get; } = true;
+
+    public async Task<CdpSocket> ConnectRfcommAsync(CdpDevice device, RfcommOptions options, CancellationToken cancellationToken = default)
+    {
+        if (Adapter == null)
+            throw new InvalidOperationException($"{nameof(Adapter)} is not initialized!");
+
+        var btDevice = Adapter.GetRemoteDevice(device.Address) ?? throw new ArgumentException($"Could not find bt device with address \"{device.Address}\"");
+        var btSocket = btDevice.CreateRfcommSocketToServiceRecord(Java.Util.UUID.FromString(options.ServiceId)) ?? throw new ArgumentException("Could not create service socket");
+        await btSocket.ConnectAsync();
+        return btSocket.ToCdp();
+    }
+
     public async Task ListenRfcommAsync(RfcommOptions options, CancellationToken cancellationToken = default)
     {
         if (Adapter == null)
@@ -129,6 +146,51 @@ public sealed class AndroidBluetoothHandler : IBluetoothHandler
                 Task.Run(() => processor(securelistener), cancellationToken),
                 Task.Run(() => processor(insecureListener), cancellationToken)
             });
+        }
+    }
+    #endregion
+
+    #region Gatt
+    bool IBluetoothHandler.SupportsGatt { get; } = true;
+
+    public async Task<CdpSocket> ConnectGattAsync(CdpDevice device, GattOptions options, CancellationToken cancellationToken = default)
+    {
+        var btDevice = Adapter.GetRemoteDevice(device.Address) ?? throw new ArgumentException("Invalid address", nameof(device));
+        var gatt = btDevice.ConnectGatt(Application.Context, false, new GattCallback()) ?? throw new InvalidOperationException("Could not connect via GATT");
+        gatt.DiscoverServices();
+
+        await cancellationToken.AwaitCancellation();
+
+        return null;
+    }
+
+    public void GattTest(Activity context, string address)
+    {
+        var btDevice = Adapter.GetRemoteDevice(address) ?? throw new ArgumentException("Invalid address", nameof(address));
+        var gatt = btDevice.ConnectGatt(context, true, new GattCallback()) ?? throw new InvalidOperationException("Could not connect via GATT");
+    }
+
+    sealed class GattCallback : BluetoothGattCallback
+    {
+        public override void OnServicesDiscovered(BluetoothGatt? gatt, [GeneratedEnum] GattStatus status)
+        {
+            var services = gatt.Services.ToArray();
+        }
+
+        public override void OnConnectionStateChange(BluetoothGatt? gatt, [GeneratedEnum] GattStatus status, [GeneratedEnum] ProfileState newState)
+        {
+            gatt?.DiscoverServices();
+        }
+
+        public override void OnServiceChanged(BluetoothGatt gatt)
+        {
+            var services = gatt.Services.ToArray();
+            base.OnServiceChanged(gatt);
+        }
+
+        public override void OnCharacteristicChanged(BluetoothGatt? gatt, BluetoothGattCharacteristic? characteristic)
+        {
+            base.OnCharacteristicChanged(gatt, characteristic);
         }
     }
     #endregion

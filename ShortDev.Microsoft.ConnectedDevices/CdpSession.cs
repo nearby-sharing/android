@@ -11,6 +11,8 @@ using ShortDev.Networking;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace ShortDev.Microsoft.ConnectedDevices;
@@ -447,6 +449,7 @@ public sealed class CdpSession : IDisposable
     void HandleDeviceInfoMessage(CommonHeader header, EndianReader reader, CdpSocket socket)
     {
         var msg = DeviceInfoMessage.Parse(reader);
+        Debug.Print(JsonSerializer.Serialize(msg));
 
         header.Flags = 0;
         SendMessage(socket, header, (writer) =>
