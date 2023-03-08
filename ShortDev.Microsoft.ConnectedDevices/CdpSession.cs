@@ -11,6 +11,7 @@ using ShortDev.Networking;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ShortDev.Microsoft.ConnectedDevices;
@@ -557,19 +558,13 @@ public sealed class CdpSession : IDisposable
     #endregion
 
     #region SequenceNumber
-    uint _sequenceNumber = 1;
+    uint _sequenceNumber = 0;
     internal uint SequenceNumber()
-    {
-        lock (this)
-            return _sequenceNumber++;
-    }
+        => Interlocked.Increment(ref _sequenceNumber);
 
-    ulong _requestId = 1;
+    ulong _requestId = 0;
     internal ulong RequestId()
-    {
-        lock (this)
-            return _requestId++;
-    }
+        => Interlocked.Increment(ref _requestId);
     #endregion
 
     #region Messages
