@@ -15,6 +15,7 @@ using Java.Util.Concurrent;
 using ShortDev.Android.UI;
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
+using System.Net;
 using AndroidUri = Android.Net.Uri;
 using ManifestPermission = Android.Manifest.Permission;
 
@@ -234,9 +235,14 @@ public sealed class ShareTargetSelectActivity : AppCompatActivity, View.IOnApply
                     }
                     else
                     {
+                        var uri = Intent.GetStringExtra(Intent.ExtraText);
+                        if (!Uri.IsWellFormedUriString(uri, UriKind.Absolute))
+                        {
+                            uri = $"https://nearshare.shortdev.de/docs/txt_view?transfer_txt={WebUtility.UrlEncode(uri)}";
+                        }
                         uriTransferOperation = NearShareSender.SendUriAsync(
                             connectionRequest,
-                            Intent.GetStringExtra(Intent.ExtraText)
+                            uri
                         );
                     }
                 }
