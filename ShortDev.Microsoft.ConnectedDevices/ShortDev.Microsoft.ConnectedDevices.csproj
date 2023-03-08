@@ -27,7 +27,6 @@
 		<None Include="../docs/cdp.dll/Crypt.md" Link="Encryption\Crypt.md" />
 		<None Include="../docs/cdp.dll/CdpDllFlow.md" Link="docs/CdpDllFlow.md" />
 		<None Include="../docs/cdp.dll/Logging.md" Link="docs/Logging.md" />
-		<None Include="../utils/CdpDissector.lua" Link="utils/CdpDissector.lua" />
 	</ItemGroup>
 
 </Project>
