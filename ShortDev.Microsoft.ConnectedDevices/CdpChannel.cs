@@ -1,5 +1,4 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Messages;
-using ShortDev.Microsoft.ConnectedDevices.Messages.Control;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Session;
 using ShortDev.Microsoft.ConnectedDevices.Platforms;
 using System;
@@ -8,12 +7,11 @@ using System.Collections.Generic;
 namespace ShortDev.Microsoft.ConnectedDevices;
 
 /// <summary>
-/// Provides the interface between a <see cref="IChannelMessageHandler"/> and a <see cref="CdpSession"/>. <br/>
-/// Every handler / app has a unique <see cref="CdpSocket"/> managed from within this channel.
+/// Provides the interface between a <see cref="CdpAppBase"/> and a <see cref="CdpSession"/>.
 /// </summary>
 public sealed class CdpChannel : IDisposable
 {
-    internal CdpChannel(CdpSession session, ulong channelId, IChannelMessageHandler handler, CdpSocket socket)
+    internal CdpChannel(CdpSession session, ulong channelId, CdpAppBase handler, CdpSocket socket)
     {
         Session = session;
         ChannelId = channelId;
@@ -36,10 +34,11 @@ public sealed class CdpChannel : IDisposable
     public CdpSocket Socket { get; }
 
     /// <summary>
-    /// Get's the corresponding <see cref="IChannelMessageHandler"/>. <br/>
-    /// (See <see cref="CdpAppBase"/>)
+    /// Get's the corresponding <see cref="CdpAppBase"/>. <br/>
+    /// <br/>
+    /// <inheritdoc cref="CdpAppBase"/>
     /// </summary>
-    public IChannelMessageHandler MessageHandler { get; }
+    public CdpAppBase MessageHandler { get; }
 
     /// <summary>
     /// Get's the unique id for the channel. <br/>

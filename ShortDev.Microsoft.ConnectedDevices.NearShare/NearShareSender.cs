@@ -1,7 +1,6 @@
 ﻿using Microsoft.CorrelationVector;
 using ShortDev.Microsoft.ConnectedDevices.Exceptions;
 using ShortDev.Microsoft.ConnectedDevices.Messages;
-using ShortDev.Microsoft.ConnectedDevices.Messages.Control;
 using ShortDev.Microsoft.ConnectedDevices.NearShare.Internal;
 using ShortDev.Microsoft.ConnectedDevices.NearShare.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Platforms;
@@ -25,13 +24,13 @@ public sealed class NearShareSender
 
         HandshakeHandler handshake = new();
         using var handShakeChannel = await session.StartClientChannelAsync(NearShareHandshakeApp.Id, NearShareHandshakeApp.Name, handshake);
-        var handshakeResultMsg = await handshake.Execute(handShakeChannel, operationId);
+        var handshakeResultMsg = await handshake.Execute(operationId);
 
         var cv = handshakeResultMsg.Header.TryGetCorrelationVector() ?? throw new InvalidDataException("No Correlation Vector");
 
         SenderStateMachine senderStateMachine = new();
         using var channel = await session.StartClientChannelAsync(operationId.ToString("D").ToUpper(), NearShareApp.Name, senderStateMachine, handShakeChannel.Socket);
-        SenderStateMachine.SendUri(channel, uri, cv);
+        await senderStateMachine.SendUriAsync(uri, cv);
     }
 
     public Task SendFileAsync(CdpDevice device, CdpFileProvider file, IProgress<NearShareProgress> progress, CancellationToken cancellationToken = default)
@@ -40,18 +39,18 @@ public sealed class NearShareSender
     public Task SendFilesAsync(CdpDevice device, CdpFileProvider[] files, IProgress<NearShareProgress> progress, CancellationToken cancellationToken = default)
         => throw new NotImplementedException();
 
-    sealed class HandshakeHandler : IChannelMessageHandler
+    sealed class HandshakeHandler : CdpAppBase
     {
         readonly TaskCompletionSource<CdpMessage> _promise = new();
 
-        public Task<CdpMessage> Execute(CdpChannel channel, Guid operationId)
+        public Task<CdpMessage> Execute(Guid operationId)
         {
             ValueSet msg = new();
             msg.Add("ControlMessage", (uint)NearShareControlMsgType.HandShakeRequest);
             msg.Add("MaxPlatformVersion", 1u);
             msg.Add("MinPlatformVersion", 1u);
             msg.Add("OperationId", operationId);
-            channel.SendBinaryMessage(msg.Write, msgId: 0, new()
+            Channel.SendBinaryMessage(msg.Write, msgId: 0, new()
             {
                 AdditionalHeader.CreateCorrelationHeader() // "CDPSvc" crashes if not supplied (AccessViolation in ShareHost.dll!ExtendCorrelationVector)
             });
@@ -59,7 +58,7 @@ public sealed class NearShareSender
             return _promise.Task;
         }
 
-        public void HandleMessage(CdpMessage msg)
+        public override void HandleMessage(CdpMessage msg)
         {
             var payload = ValueSet.Parse(msg.ReadBinary(out _));
             var handshakeResult = payload.Get<uint>("VersionHandShakeResult");
@@ -71,9 +70,10 @@ public sealed class NearShareSender
         }
     }
 
-    sealed class SenderStateMachine : IChannelMessageHandler
+    sealed class SenderStateMachine : CdpAppBase
     {
-        public static void SendUri(CdpChannel channel, Uri uri, CorrelationVector cv)
+        readonly TaskCompletionSource _promise = new();
+        public async Task SendUriAsync(Uri uri, CorrelationVector cv)
         {
             ValueSet valueSet = new();
             valueSet.Add("ControlMessage", (uint)NearShareControlMsgType.StartTransfer);
@@ -81,15 +81,30 @@ public sealed class NearShareSender
             valueSet.Add("BytesToSend", 0);
             valueSet.Add("FileCount", 0);
             valueSet.Add("Uri", uri.ToString());
-            channel.SendBinaryMessage(valueSet.Write, 10, new()
+            Channel.SendBinaryMessage(valueSet.Write, 10, new()
             {
                 AdditionalHeader.FromCorrelationVector(cv.Increment())
             });
+
+            await _promise.Task;
         }
 
-        public void HandleMessage(CdpMessage msg)
+        public override void HandleMessage(CdpMessage msg)
         {
             var payload = ValueSet.Parse(msg.ReadBinary(out _));
+
+            var controlMsg = (NearShareControlMsgType)payload.Get<uint>("ControlMessage");
+            switch (controlMsg)
+            {
+                case NearShareControlMsgType.CompleteTransfer:
+                    _promise.SetResult();
+                    break;
+                case NearShareControlMsgType.CancelTransfer:
+                    _promise.SetCanceled();
+                    break;
+                default:
+                    throw new CdpProtocolException($"Unexpected {controlMsg}");
+            }
         }
     }
 }

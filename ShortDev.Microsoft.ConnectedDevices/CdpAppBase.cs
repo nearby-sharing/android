@@ -9,7 +9,7 @@ namespace ShortDev.Microsoft.ConnectedDevices;
 /// A cdp app is responsible for the application layer communication over an established <see cref="CdpChannel"/>. <br/>
 /// Every channel has a unique app.
 /// </summary>
-public abstract class CdpAppBase : IChannelMessageHandler
+public abstract class CdpAppBase
 {
     /// <summary>
     /// Gets the corresponding channel. <br/>
@@ -20,6 +20,10 @@ public abstract class CdpAppBase : IChannelMessageHandler
     [AllowNull]
     public CdpChannel Channel { get; internal set; }
 
+    /// <summary>
+    /// Handle the received message.
+    /// </summary>
+    /// <param name="msg">Received message</param>
     public abstract void HandleMessage(CdpMessage msg);
 
     protected void SendValueSet(ValueSet request, uint msgId)

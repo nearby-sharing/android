@@ -590,7 +590,7 @@ public sealed class CdpSession : IDisposable
         }, out channelId);
     }
 
-    public async Task<CdpChannel> StartClientChannelAsync(string appId, string appName, IChannelMessageHandler handler)
+    public async Task<CdpChannel> StartClientChannelAsync(string appId, string appName, CdpAppBase handler)
     {
         if (IsHost)
             throw new InvalidOperationException("Session is not a client");
@@ -599,7 +599,7 @@ public sealed class CdpSession : IDisposable
         return await StartClientChannelAsync(appId, appName, handler, socket);
     }
 
-    public async Task<CdpChannel> StartClientChannelAsync(string appId, string appName, IChannelMessageHandler handler, CdpSocket socket)
+    public async Task<CdpChannel> StartClientChannelAsync(string appId, string appName, CdpAppBase handler, CdpSocket socket)
     {
         if (IsHost)
             throw new InvalidOperationException("Session is not a client");
@@ -629,6 +629,7 @@ public sealed class CdpSession : IDisposable
         response.ThrowOnError();
 
         CdpChannel channel = new(this, response.ChannelId, handler, socket);
+        handler.Channel = channel;
         _channelRegistry.Add(channel.ChannelId, channel);
         return channel;
     }
