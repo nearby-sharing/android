@@ -166,26 +166,50 @@ public sealed class CdpSession : IDisposable
 
             // "CDPSvc" crashes if not supplied (AccessViolation in ShareHost.dll!ExtendCorrelationVector)
             if (header.Type == MessageType.Session)
-            header.AdditionalHeaders.Add(AdditionalHeader.CreateCorrelationHeader());
+                header.AdditionalHeaders.Add(AdditionalHeader.CreateCorrelationHeader());
         }
 
-        EndianWriter writer = new(Endianness.BigEndian);
-        if (_cryptor != null)
+        EndianWriter payloadWriter = new(Endianness.BigEndian);
+        bodyCallback(payloadWriter);
+        var payload = payloadWriter.Buffer.AsSpan();
+
+        if (payload.Length <= Constants.DefaultMessageFragmentSize)
         {
-            _cryptor.EncryptMessage(writer, header, bodyCallback);
+            SendFragment(header, payload);
+            return;
         }
-        else
+
+        header.FragmentCount = (ushort)(payload.Length / Constants.DefaultMessageFragmentSize);
+
+        var leftover = payload.Length % Constants.DefaultMessageFragmentSize;
+        if (leftover != 0)
+            header.FragmentCount++;
+
+        for (ushort fragmentIndex = 0; fragmentIndex < header.FragmentCount; fragmentIndex++)
         {
-            EndianWriter payloadWriter = new(Endianness.BigEndian);
-            bodyCallback(payloadWriter);
-            var payload = payloadWriter.Buffer.AsSpan();
+            header.FragmentIndex = fragmentIndex;
 
-            header.SetPayloadLength(payload.Length);
-            header.Write(writer);
-            writer.Write(payload);
+            int start = fragmentIndex * Constants.DefaultMessageFragmentSize;
+            int length = Math.Min(payload.Length - start, Constants.DefaultMessageFragmentSize);
+            SendFragment(header, payload.Slice(start, length));
         }
 
-        socket.SendData(writer);
+        void SendFragment(CommonHeader header, ReadOnlySpan<byte> fragmentPayload)
+        {
+            EndianWriter writer = new(Endianness.BigEndian);
+            if (_cryptor != null)
+            {
+                _cryptor.EncryptMessage(writer, header, fragmentPayload);
+            }
+            else
+            {
+                header.SetPayloadLength(fragmentPayload.Length);
+                header.Write(writer);
+                writer.Write(fragmentPayload);
+            }
+
+            socket.SendData(writer);
+        }
     }
 
     #region HandleMessages
