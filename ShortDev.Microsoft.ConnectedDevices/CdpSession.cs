@@ -163,6 +163,10 @@ public sealed class CdpSession : IDisposable
 
             if (header.Type != MessageType.Connect)
                 header.SequenceNumber = SequenceNumber();
+
+            // "CDPSvc" crashes if not supplied (AccessViolation in ShareHost.dll!ExtendCorrelationVector)
+            if (header.Type == MessageType.Session)
+            header.AdditionalHeaders.Add(AdditionalHeader.CreateCorrelationHeader());
         }
 
         EndianWriter writer = new(Endianness.BigEndian);
