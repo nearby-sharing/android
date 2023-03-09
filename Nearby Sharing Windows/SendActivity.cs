@@ -1,6 +1,7 @@
 ﻿using Android.Bluetooth;
 using Android.Content;
 using Android.OS;
+using Android.Provider;
 using Android.Runtime;
 using Android.Views;
 using AndroidX.AppCompat.App;
@@ -13,7 +14,6 @@ using ShortDev.Microsoft.ConnectedDevices;
 using ShortDev.Microsoft.ConnectedDevices.NearShare;
 using ShortDev.Microsoft.ConnectedDevices.Platforms;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
-using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using AndroidUri = Android.Net.Uri;
 using ManifestPermission = Android.Manifest.Permission;
@@ -158,10 +158,26 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
     }
     #endregion
 
-    CdpFileProvider CreateNearShareFileFromContentUri(AndroidUri contentUri)
-        => throw new NotImplementedException();
+    async Task<CdpFileProvider> CreateNearShareFileFromContentUriAsync(AndroidUri contentUri)
+    {
+        var fileName = QueryContentName(ContentResolver!, contentUri);
 
-    CancellationTokenSource _fileSendCancellationTokenSource = new();
+        using var contentStream = ContentResolver!.OpenInputStream(contentUri) ?? throw new InvalidOperationException("Could not open input stream");
+        var buffer = new byte[contentStream.Length];
+        await contentStream.ReadAsync(buffer);
+
+        return CdpFileProvider.FromBuffer(fileName, buffer);
+    }
+
+    static string QueryContentName(ContentResolver resolver, AndroidUri contentUri)
+    {
+        using var returnCursor = resolver.Query(contentUri, null, null, null, null) ?? throw new InvalidOperationException("Could not open content cursor");
+        int nameIndex = returnCursor.GetColumnIndex(IOpenableColumns.DisplayName);
+        returnCursor.MoveToFirst();
+        return returnCursor.GetString(nameIndex) ?? throw new InvalidOperationException("Could not query content name");
+    }
+
+    readonly CancellationTokenSource _fileSendCancellationTokenSource = new();
     private async void SendData(CdpDevice remoteSystem)
     {
         _discoverCancellationTokenSource.Cancel();
@@ -181,7 +197,7 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
                         AndroidUri file = (Intent.GetParcelableExtra(Intent.ExtraStream) as AndroidUri)!;
                         fileTransferOperation = NearShareSender.SendFileAsync(
                             remoteSystem,
-                            CreateNearShareFileFromContentUri(file),
+                            await CreateNearShareFileFromContentUriAsync(file),
                             fileSendProgress,
                             _fileSendCancellationTokenSource.Token
                         );
@@ -196,10 +212,10 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
                 }
                 else if (Intent?.Action == Intent.ActionSendMultiple)
                 {
-                    IList files = Intent.GetParcelableArrayListExtra(Intent.ExtraStream)!;
+                    var files = Intent.GetParcelableArrayListExtra(Intent.ExtraStream)?.Cast<AndroidUri>() ?? throw new InvalidDataException("Could not get extra files from intent");
                     fileTransferOperation = NearShareSender.SendFilesAsync(
                         remoteSystem,
-                        files.Cast<AndroidUri>().Select(CreateNearShareFileFromContentUri).ToArray(),
+                        await Task.WhenAll(files.Select(CreateNearShareFileFromContentUriAsync)),
                         fileSendProgress,
                         _fileSendCancellationTokenSource.Token
                     );
@@ -270,7 +286,11 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
 
     private void CancelButton_Click(object? sender, EventArgs e)
     {
-        _fileSendCancellationTokenSource.Cancel();
+        try
+        {
+            _fileSendCancellationTokenSource.Cancel();
+        }
+        catch { }
     }
 
     #region Finish
