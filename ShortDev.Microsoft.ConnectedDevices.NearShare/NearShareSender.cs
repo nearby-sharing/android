@@ -1,5 +1,6 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Exceptions;
 using ShortDev.Microsoft.ConnectedDevices.Messages;
+using ShortDev.Microsoft.ConnectedDevices.Messages.Session;
 using ShortDev.Microsoft.ConnectedDevices.NearShare.Internal;
 using ShortDev.Microsoft.ConnectedDevices.NearShare.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Platforms;
@@ -150,14 +151,14 @@ public sealed class NearShareSender
 
         public override void HandleMessage(CdpMessage msg)
         {
-            var payload = ValueSet.Parse(msg.ReadBinary(out _));
+            var payload = ValueSet.Parse(msg.ReadBinary(out var header));
             try
             {
                 var controlMsg = (NearShareControlMsgType)payload.Get<uint>("ControlMessage");
                 switch (controlMsg)
                 {
                     case NearShareControlMsgType.FetchDataRequest:
-                        HandleDataRequest(payload);
+                        HandleDataRequest(header, payload);
                         break;
                     case NearShareControlMsgType.CompleteTransfer:
                         _promise.TrySetResult();
@@ -175,9 +176,21 @@ public sealed class NearShareSender
             }
         }
 
-        void HandleDataRequest(ValueSet payload)
+        void HandleDataRequest(BinaryMsgHeader header, ValueSet payload)
         {
+            var contentId = payload.Get<uint>("ContentId");
+            var start = payload.Get<ulong>("BlobPosition");
+            var length = payload.Get<uint>("BlobSize");
 
+            var fileProvider = _files[contentId];
+            var blob = fileProvider.ReadBlob(start, length);
+
+            ValueSet response = new();
+            response.Add("ControlMessage", (uint)NearShareControlMsgType.FetchDataResponse);
+            response.Add("ContentId", contentId);
+            response.Add("BlobPosition", start);
+            response.Add("DataBlob", blob.ToArray().ToList()); // ToDo: Remove allocation
+            SendValueSet(response, header.MessageId);
         }
     }
 }

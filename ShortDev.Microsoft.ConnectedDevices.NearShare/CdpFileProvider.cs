@@ -17,6 +17,6 @@ public sealed class CdpFileProvider
     public ulong FileSize
         => (ulong)_buffer.Length;
 
-    public ReadOnlySpan<byte> ReadChunk(int offset, int size)
-        => _buffer.Slice(offset, size).Span;
+    public ReadOnlySpan<byte> ReadBlob(ulong start, uint length)
+        => _buffer.Slice((int)start, (int)length).Span;
 }
