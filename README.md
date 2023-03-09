@@ -16,7 +16,7 @@
  - Spanish
  - Russian
  - Ukrainian
- - Chinese (Mandarin)
+ - Chinese (Simplified)
  - [Add a new one](https://github.com/ShortDevelopment/Nearby-Sharing-Windows/wiki/Contributing#add-translation)
 
 ## Building
