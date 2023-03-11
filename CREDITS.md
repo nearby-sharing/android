@@ -7,3 +7,4 @@
  - Zakhar Markelov (@markelovz) (Russian)
  - Sergiy (@sergd88) (Ukrainian)
  - Simon (@QWERT-commits) (Chinese)
+ - 舰队的偶像-岛风酱! (@frg2089) (Chinese (Simplified))
