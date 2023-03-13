@@ -5,7 +5,7 @@
 	<string name="app_titlebar_title_receive">从您的 Windows 10 / 11 电脑接收数据</string>
 	<string name="app_titlebar_title_receive_setup">设置与信息</string>
 	
-	<string name="assets_prefix">cmn</string>
+	<string name="assets_prefix">zh</string>
 
 	<!-- #region generic -->
 	<string name="generic_back">返回</string>
