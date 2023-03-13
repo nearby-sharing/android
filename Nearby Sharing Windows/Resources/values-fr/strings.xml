@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="app_name">Partage de proximité (Windows)</string>
+	<string name="app_titlebar_title_default">Envoyer des données vers Windows 10 / 11</string>
+	<string name="app_titlebar_title_receive">Recevoir des données depuis Windows 10 / 11</string>
+	<string name="app_titlebar_title_receive_setup">Configuration / Information</string>
+	
+	<string name="assets_prefix">fr</string>
+
+	<!-- #region generic -->
+	<string name="generic_back">Retour</string>
+	<string name="generic_next">Suivant</string>
+	<string name="generic_cancel">Annuler</string>
+
+	<string name="generic_send">Envoyer</string>
+	<string name="generic_receive">Recevoir</string>
+	
+	<string name="generic_status_template">Status: {0}</string>
+	<string name="generic_error_template">Erreur: {0}</string>
+
+	<string name="generic_important">Important</string>
+	<string name="generic_notifications">Notifications</string>
+	<string name="generic_settings">Paramètres</string>
+	<string name="device_name">Nom de l’appareil</string>
+	<!-- #endregion -->
+
+	<!-- #region activity_mac_address.xml -->
+	<string name="launch_settings">Ouvrir les paramètres</string>
+	<string name="bt_mac_address">Adresse Mac du Bluetooth</string>
+	<!-- #endregion -->
+
+	<!-- #region activity_receive.xml -->
+	<string name="visible_as_template">Visible en tant que {0}</string>
+	<string name="debug_log">Journal de débogage</string>
+	<!-- #endregion -->
+
+	<!-- #region activity_share.xml -->
+	<string name="scanning">Recherche...</string>
+	<!-- #endregion -->
+
+	<!-- #region preferences.xml -->
+	<string name="category_general">Général</string>
+
+	<string name="request_permissions_title">Permissions de l’application</string>
+	<string name="request_permissions_summary">Accorder les autorisations requises à l’application</string>
+
+	<string name="open_sponsor_title">Supporter</string>
+	<string name="open_sponsor_summary">Supporter le créateur de l’application</string>
+
+	<string name="open_faq_title">Aide</string>
+	<string name="open_faq_summary">Ouvrir la FAQ</string>
+
+
+	<string name="category_device_info">Informations de l’appareil</string>
+
+	<string name="goto_mac_address_title">Définir l’adresse Mac</string>
+	<string name="goto_mac_address_summary">Définissez l’adresse Mac de l’appareil</string>
+	<!-- #endregion -->
+
+	<!-- #region ReceiveActivity.cs -->
+	<string name="receive_missing_permissions">Impossible de recevoir sans les permissions requises !</string>
+	<!-- #endregion -->
+
+	<!-- #region ReceiveActivity.cs -->
+	<string name="share_file">Partager un fichier</string>
+	<string name="share_url">Partager un lien</string>
+
+	<string name="send_missing_permissions">Des permissions requises sont manquantes !</string>
+	<string name="wait_for_acceptance">En attente d’acceptation...</string>
+	<string name="sending_template">Envoi en cours... {0}/{1} fichiers... {2}%</string>
+	<!-- #endregion -->
+</resources>
