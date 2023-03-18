@@ -15,16 +15,6 @@ public sealed record CdpAdvertisement(DeviceType DeviceType, PhysicalAddress Mac
         Public
     }
 
-    [Flags]
-    enum SessionPolicy
-    {
-        RemoteSessionsHosted = 1,
-        RemoteSessionsNotHosted = 2,
-        NearShareAuthPolicySameUser = 4,
-        NearShareAuthPolicyPermissive = 8,
-        NearShareAuthPolicyFamily = 0x10
-    }
-
     public static bool TryParse(byte[] beaconData, [MaybeNullWhen(false)] out CdpAdvertisement data)
     {
         data = null;
@@ -35,7 +25,7 @@ public sealed record CdpAdvertisement(DeviceType DeviceType, PhysicalAddress Mac
         EndianReader reader = new(Endianness.BigEndian, beaconData);
 
         var scenarioType = reader.ReadByte();
-        if (scenarioType != 1)
+        if (scenarioType != Constants.BLeBeaconScenarioType)
             return false;
 
         var deviceType = (DeviceType)reader.ReadByte();
@@ -48,10 +38,10 @@ public sealed record CdpAdvertisement(DeviceType DeviceType, PhysicalAddress Mac
         if ((int)flags >= 2)
             return false; // wrong flags
 
+        var deviceStatus = (ExtendedDeviceStatus)reader.ReadByte();
+
         if (flags != BeaconFlags.Public)
             return false;
-
-        var policy = (SessionPolicy)reader.ReadByte();
 
         data = new(
             deviceType,
@@ -65,12 +55,22 @@ public sealed record CdpAdvertisement(DeviceType DeviceType, PhysicalAddress Mac
     public byte[] GenerateBLeBeacon()
     {
         EndianWriter writer = new(Endianness.LittleEndian);
-        writer.Write((byte)0x1);
+        writer.Write(Constants.BLeBeaconScenarioType);
         writer.Write((byte)DeviceType);
-        writer.Write((byte)0x21);
-        writer.Write((byte)0x0a);
+
+        byte versionAndFlags = (byte)BeaconFlags.Public;
+        versionAndFlags |= Constants.BLeBeaconVersion << 5;
+        writer.Write(versionAndFlags);
+
+        var deviceStatus = ExtendedDeviceStatus.RemoteSessionsNotHosted | ExtendedDeviceStatus.NearShareAuthPolicyPermissive;
+        writer.Write((byte)deviceStatus);
+
         writer.Write(BinaryConvert.ToReversed(MacAddress.GetAddressBytes()));
-        writer.Write(DeviceName);
+
+        // ToDo: Don't crop characters wider that 2 bytes!
+        ReadOnlySpan<byte> deviceNameBuffer = Encoding.UTF8.GetBytes(DeviceName);
+        var deviceNameLength = Math.Min(deviceNameBuffer.Length, Constants.BLeBeaconDeviceNameMaxByteLength);
+        writer.Write(deviceNameBuffer[..deviceNameLength]);
 
         return writer.Buffer.ToArray();
     }
