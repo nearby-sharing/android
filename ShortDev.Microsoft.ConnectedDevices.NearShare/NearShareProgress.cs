@@ -2,8 +2,8 @@
 
 public sealed class NearShareProgress
 {
-    public required long BytesSent { get; init; }
-    public required int FilesSent { get; init; }
-    public required long TotalBytesToSend { get; init; }
-    public required int TotalFilesToSend { get; init; }
+    public required ulong BytesSent { get; init; }
+    public required uint FilesSent { get; init; }
+    public required ulong TotalBytesToSend { get; init; }
+    public required uint TotalFilesToSend { get; init; }
 }

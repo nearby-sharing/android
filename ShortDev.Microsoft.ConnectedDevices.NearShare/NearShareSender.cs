@@ -151,6 +151,9 @@ public sealed class NearShareSender
 
         public override void HandleMessage(CdpMessage msg)
         {
+            if (_fileCancellationToken.IsCancellationRequested)
+                return;
+
             var payload = ValueSet.Parse(msg.ReadBinary(out var header));
             try
             {
@@ -176,6 +179,7 @@ public sealed class NearShareSender
             }
         }
 
+        ulong _bytesSent = 0;
         void HandleDataRequest(BinaryMsgHeader header, ValueSet payload)
         {
             var contentId = payload.Get<uint>("ContentId");
@@ -184,6 +188,14 @@ public sealed class NearShareSender
 
             var fileProvider = _files[contentId];
             var blob = fileProvider.ReadBlob(start, length);
+
+            _fileProgress.Report(new()
+            {
+                BytesSent = Interlocked.Add(ref _bytesSent, length),
+                FilesSent = contentId + 1, // ToDo: How to calculate?
+                TotalBytesToSend = _bytesToSend,
+                TotalFilesToSend = (uint)_files.Length
+            });
 
             ValueSet response = new();
             response.Add("ControlMessage", (uint)NearShareControlMsgType.FetchDataResponse);
