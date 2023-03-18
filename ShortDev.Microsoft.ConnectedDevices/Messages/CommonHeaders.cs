@@ -214,22 +214,15 @@ public sealed class CommonHeader : ICdpHeader<CommonHeader>
         ));
     }
 
+    public AdditionalHeader? TryGetHeader(AdditionalHeaderType type)
+        => AdditionalHeaders.FirstOrDefault(x => x.Type == type);
+
     public ulong? TryGetReplyToId()
     {
-        var header = AdditionalHeaders.FirstOrDefault(x => x.Type == AdditionalHeaderType.ReplyToId);
+        var header = TryGetHeader(AdditionalHeaderType.ReplyToId);
         if (header == null)
             return null;
 
         return BinaryPrimitives.ReadUInt64LittleEndian(header.Value.Span);
-    }
-
-    public CorrelationVector? TryGetCorrelationVector()
-    {
-        var header = AdditionalHeaders.FirstOrDefault(x => x.Type == AdditionalHeaderType.CorrelationVector);
-        if (header == null)
-            return null;
-
-        var raw = Encoding.ASCII.GetString(header.Value.Span);
-        return CorrelationVector.Parse(raw);
     }
 }

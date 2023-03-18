@@ -1,4 +1,5 @@
-﻿using ShortDev.Microsoft.ConnectedDevices.Platforms;
+﻿using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.TransportUpgrade;
+using ShortDev.Microsoft.ConnectedDevices.Platforms;
 using ShortDev.Microsoft.ConnectedDevices.Platforms.Bluetooth;
 using System.Threading;
 using System.Threading.Tasks;
@@ -58,8 +59,7 @@ public sealed class BluetoothTransport : ICdpTransport, ICdpDiscoverableTranspor
             {
                 CdpDevice device = new(
                     advertisement.DeviceName,
-                    TransportType,
-                    advertisement.MacAddress.ToStringFormatted()
+                    EndpointInfo.FromRfcommDevice(advertisement.MacAddress)
                 );
                 DeviceDiscovered?.Invoke(this, device, advertisement);
             }
@@ -70,4 +70,7 @@ public sealed class BluetoothTransport : ICdpTransport, ICdpDiscoverableTranspor
     {
         DeviceConnected = null;
     }
+
+    public EndpointInfo GetEndpoint()
+        => new(TransportType, Handler.MacAddress.ToStringFormatted(), Constants.RfcommServiceId);
 }

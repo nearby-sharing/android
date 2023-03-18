@@ -1,4 +1,5 @@
-﻿using ShortDev.Microsoft.ConnectedDevices.Platforms;
+﻿using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.TransportUpgrade;
+using ShortDev.Microsoft.ConnectedDevices.Platforms;
 using ShortDev.Microsoft.ConnectedDevices.Platforms.Network;
 using System;
 using System.IO;
@@ -39,9 +40,12 @@ public sealed class NetworkTransport : ICdpTransport
                     InputStream = stream,
                     OutputStream = stream,
                     RemoteDevice = new(
-                        string.Empty,
-                        TransportType,
-                        ((IPEndPoint?)client.Client.RemoteEndPoint)?.Address.ToString() ?? throw new InvalidDataException("No ip address")
+                        null,
+                        new EndpointInfo(
+                            TransportType,
+                            ((IPEndPoint?)client.Client.RemoteEndPoint)?.Address.ToString() ?? throw new InvalidDataException("No ip address"),
+                            Constants.TcpPort.ToString()
+                        )
                     )
                 });
             }
@@ -49,12 +53,26 @@ public sealed class NetworkTransport : ICdpTransport
         catch (OperationCanceledException) { }
     }
 
-    public Task<CdpSocket> ConnectAsync(CdpDevice device)
-        => throw new NotImplementedException();
+    public async Task<CdpSocket> ConnectAsync(CdpDevice device)
+    {
+        TcpClient client = new();
+        await client.ConnectAsync(device.Endpoint.ToIPEndPoint());
+        return new()
+        {
+            TransportType = TransportType,
+            RemoteDevice = device,
+            InputStream = client.GetStream(),
+            OutputStream = client.GetStream(),
+            Close = client.Close,
+        };
+    }
 
     public void Dispose()
     {
         DeviceConnected = null;
         _listener.Stop();
     }
+
+    public EndpointInfo GetEndpoint()
+        => new(TransportType, Handler.GetLocalIp(), Constants.TcpPort.ToString());
 }

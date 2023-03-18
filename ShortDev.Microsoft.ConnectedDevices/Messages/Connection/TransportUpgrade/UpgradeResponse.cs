@@ -1,5 +1,5 @@
-﻿using ShortDev.Networking;
-using System;
+﻿using ShortDev.Microsoft.ConnectedDevices.Transports;
+using ShortDev.Networking;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages.Connection.TransportUpgrade;
 
@@ -11,24 +11,41 @@ public sealed class UpgradeResponse : ICdpPayload<UpgradeResponse>
     /// <summary>
     /// A length-prefixed list of endpoint structures (see following) that are provided by each transport on the host device.
     /// </summary>
-    public required HostEndpoint[] HostEndpoints { get; init; }
-    public required EndpointMetadata[] Endpoints { get; init; }
+    public required EndpointInfo[] Endpoints { get; init; }
+    public required EndpointMetadata[] MetaData { get; init; }
 
     public static UpgradeResponse Parse(EndianReader reader)
     {
-        throw new NotImplementedException();
+        var length = reader.ReadUInt16();
+        var endpoints = new EndpointInfo[length];
+        for (int i = 0; i < length; i++)
+        {
+            var host = reader.ReadStringWithLength();
+            var service = reader.ReadStringWithLength();
+            var type = (CdpTransportType)reader.ReadUInt16();
+
+            endpoints[i] = new(type, host, service);
+        }
+
+        var metaData = EndpointMetadata.ParseArray(reader);
+
+        return new()
+        {
+            Endpoints = endpoints,
+            MetaData = metaData
+        };
     }
 
     public void Write(EndianWriter writer)
     {
-        writer.Write((ushort)HostEndpoints.Length);
-        foreach (var endpoint in HostEndpoints)
+        writer.Write((ushort)Endpoints.Length);
+        foreach (var endpoint in Endpoints)
         {
-            writer.WriteWithLength(endpoint.Host);
+            writer.WriteWithLength(endpoint.Address);
             writer.WriteWithLength(endpoint.Service);
-            writer.Write((ushort)endpoint.Type);
+            writer.Write((ushort)endpoint.TransportType);
         }
 
-        EndpointMetadata.WriteArray(writer, Endpoints);
+        EndpointMetadata.WriteArray(writer, MetaData);
     }
 }

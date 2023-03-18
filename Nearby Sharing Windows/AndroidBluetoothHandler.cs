@@ -6,6 +6,7 @@ using ShortDev.Microsoft.ConnectedDevices;
 using ShortDev.Microsoft.ConnectedDevices.Platforms.Bluetooth;
 using BLeScanResult = Android.Bluetooth.LE.ScanResult;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
+using System.Net.NetworkInformation;
 
 namespace Nearby_Sharing_Windows;
 
@@ -13,10 +14,14 @@ public sealed class AndroidBluetoothHandler : IBluetoothHandler
 {
     public BluetoothAdapter Adapter { get; }
     public ICdpPlatformHandler PlatformHandler { get; }
-    public AndroidBluetoothHandler(ICdpPlatformHandler handler, BluetoothAdapter adapter)
+
+    public PhysicalAddress MacAddress { get; }
+
+    public AndroidBluetoothHandler(ICdpPlatformHandler handler, BluetoothAdapter adapter, PhysicalAddress macAddress)
     {
         PlatformHandler = handler;
         Adapter = adapter;
+        MacAddress = macAddress;
     }
 
     #region BLe Scan
@@ -67,7 +72,7 @@ public sealed class AndroidBluetoothHandler : IBluetoothHandler
         if (Adapter == null)
             throw new InvalidOperationException($"{nameof(Adapter)} is not initialized!");
 
-        var btDevice = Adapter.GetRemoteDevice(device.Address) ?? throw new ArgumentException($"Could not find bt device with address \"{device.Address}\"");
+        var btDevice = Adapter.GetRemoteDevice(device.Endpoint.Address) ?? throw new ArgumentException($"Could not find bt device with address \"{device.Endpoint.Address}\"");
         var btSocket = btDevice.CreateRfcommSocketToServiceRecord(Java.Util.UUID.FromString(options.ServiceId)) ?? throw new ArgumentException("Could not create service socket");
         await btSocket.ConnectAsync();
         return btSocket.ToCdp();

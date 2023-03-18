@@ -1,6 +1,5 @@
 ﻿using Android.Bluetooth;
 using Android.Content.PM;
-using Android.Net.Wifi;
 using Android.Runtime;
 using Android.Views;
 using AndroidX.AppCompat.App;
@@ -10,17 +9,15 @@ using ShortDev.Android.UI;
 using ShortDev.Microsoft.ConnectedDevices;
 using ShortDev.Microsoft.ConnectedDevices.NearShare;
 using ShortDev.Microsoft.ConnectedDevices.Platforms;
-using ShortDev.Microsoft.ConnectedDevices.Platforms.Network;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Net;
 using System.Net.NetworkInformation;
 
 namespace Nearby_Sharing_Windows;
 
 [Activity(Label = "@string/app_name", Theme = "@style/AppTheme", ConfigurationChanges = UIHelper.ConfigChangesFlags)]
-public sealed class ReceiveActivity : AppCompatActivity, INetworkHandler, INearSharePlatformHandler
+public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandler
 {
     BluetoothAdapter? _btAdapter;
 
@@ -144,19 +141,21 @@ public sealed class ReceiveActivity : AppCompatActivity, INetworkHandler, INearS
         var service = (BluetoothManager)GetSystemService(BluetoothService)!;
         _btAdapter = service.Adapter!;
 
-        FindViewById<TextView>(Resource.Id.deviceInfoTextView)!.Text = 
+        FindViewById<TextView>(Resource.Id.deviceInfoTextView)!.Text =
             $"Visible as \"{_btAdapter.Name!}\"\n" +
             $"BT-Address: {btAddress.ToStringFormatted()}\n" +
-            $"IP-Address: {GetLocalIp()}";
+            $"IP-Address: {AndroidNetworkHandler.GetLocalIp(this)}";
         debugLogTextView = FindViewById<TextView>(Resource.Id.debugLogTextView)!;
 
         Debug.Assert(_cdp == null);
 
         _cdp = new(this);
 
-        AndroidBluetoothHandler bluetoothHandler = new(this, _btAdapter);
+        AndroidBluetoothHandler bluetoothHandler = new(this, _btAdapter, btAddress);
         _cdp.AddTransport<BluetoothTransport>(new(bluetoothHandler));
-        _cdp.AddTransport<NetworkTransport>(new(this));
+
+        AndroidNetworkHandler networkHandler = new(this, this);
+        _cdp.AddTransport<NetworkTransport>(new(networkHandler));
 
         _cdp.Listen(_cancellationTokenSource.Token);
         _cdp.Advertise(new CdpAdvertisement(
@@ -225,14 +224,6 @@ public sealed class ReceiveActivity : AppCompatActivity, INetworkHandler, INearS
         });
     }
 
-    public string GetLocalIp()
-    {
-        WifiManager wifiManager = (WifiManager)GetSystemService(WifiService)!;
-        WifiInfo wifiInfo = wifiManager.ConnectionInfo!;
-        int ip = wifiInfo.IpAddress;
-        return new IPAddress(ip).ToString();
-    }
-
     void UpdateUI()
     {
         RunOnUiThread(() =>
@@ -259,8 +250,11 @@ static class Extensions
     public static CdpDevice ToCdp(this BluetoothDevice @this)
         => new(
             @this.Name ?? throw new InvalidDataException("Empty name"),
-            CdpTransportType.Rfcomm,
-            @this.Address ?? throw new InvalidDataException("Empty address")
+            new(
+                CdpTransportType.Rfcomm,
+                @this.Address ?? throw new InvalidDataException("Empty address"),
+                Constants.RfcommServiceId
+            )
         );
 
     public static CdpSocket ToCdp(this BluetoothSocket @this)

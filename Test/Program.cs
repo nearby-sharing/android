@@ -8,22 +8,10 @@ using ShortDev.Microsoft.ConnectedDevices.Messages.Session;
 using ShortDev.Microsoft.ConnectedDevices.Serialization;
 using ShortDev.Networking;
 using Spectre.Console;
-using System.IO.Pipes;
+using System.Diagnostics;
+using System.Text.Json;
 
-//var adapter = await BluetoothAdapter.GetDefaultAsync();
-//Debug.Print(adapter.BluetoothAddress.ToString("X"));
-
-{
-    NamedPipeServerStream pipeServer = new("\\\\.\\pipe\\CDPInOut", PipeDirection.InOut);
-    Console.WriteLine("Waiting...");
-    pipeServer.WaitForConnection();
-    Console.WriteLine("Connected!!");
-    using StreamReader reader = new(pipeServer);
-    while (true)
-        Console.Write(reader.ReadToEnd());
-}
-
-var secret = BinaryConvert.ToBytes("37fc508508ba8d6d7ba7ddc79ad29fecdf855879e2a48b6811f310e80dcab98a81500925c1c8019c05b418d3bc22a870fc52d3735b43babc85c57a1fe12d4fb4");
+var secret = BinaryConvert.ToBytes("c77e603b1e78507906bc34e113f59f7242405a57d8af49ad1c65c5b6c8967f81fc1a0bd9742c650b585a26f6876460a476f4c412cb606f96183203c088a733d0");
 CdpCryptor cryptor = new(secret);
 
 while (true)
@@ -75,6 +63,7 @@ void HandleMessage(CommonHeader header, EndianReader reader)
     {
         BinaryMsgHeader binaryHeader = BinaryMsgHeader.Parse(reader);
         var valueSet = ValueSet.Parse(reader);
+        Debug.Print(JsonSerializer.Serialize(valueSet));
     }
     else if (header.Type == MessageType.Control)
     {

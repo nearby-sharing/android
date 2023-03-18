@@ -92,7 +92,7 @@ public sealed class ConnectedDevicesPlatform : IDisposable
 
     private void OnDeviceConnected(ICdpTransport sender, CdpSocket socket)
     {
-        Handler.Log(0, $"Device {socket.RemoteDevice.Name} ({socket.RemoteDevice.Address}) connected via {socket.TransportType}");
+        Handler.Log(0, $"Device {socket.RemoteDevice.Name} ({socket.RemoteDevice.Endpoint.Address}) connected via {socket.TransportType}");
         ReceiveLoop(socket);
     }
     #endregion
@@ -115,7 +115,6 @@ public sealed class ConnectedDevicesPlatform : IDisposable
 
     public async Task<CdpSession> ConnectAsync(CdpDevice device)
     {
-        // var transport = TryGetTransport<BluetoothTransport>() ?? throw new InvalidOperationException("Bluetooth transport is needed!");
         var socket = await CreateSocketAsync(device);
 
         var session = CdpSession.CreateAndConnectClient(this, socket);
@@ -126,8 +125,22 @@ public sealed class ConnectedDevicesPlatform : IDisposable
 
     internal async Task<CdpSocket> CreateSocketAsync(CdpDevice device)
     {
-        var transport = TryGetTransport(device.TransportType) ?? throw new InvalidOperationException($"No single transport found for type {device.TransportType}");
+        var transport = TryGetTransport(device.Endpoint.TransportType) ?? throw new InvalidOperationException($"No single transport found for type {device.Endpoint.TransportType}");
         var socket = await transport.ConnectAsync(device);
+        ReceiveLoop(socket);
+        return socket;
+    }
+
+    internal async Task<CdpSocket?> TryCreateSocketAsync(CdpDevice device, TimeSpan connectTimeout)
+    {
+        var transport = TryGetTransport(device.Endpoint.TransportType);
+        if (transport == null)
+            return null;
+
+        var socket = await transport.TryConnectAsync(device, connectTimeout);
+        if (socket == null)
+            return null;
+
         ReceiveLoop(socket);
         return socket;
     }

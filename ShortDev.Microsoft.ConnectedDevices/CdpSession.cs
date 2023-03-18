@@ -11,6 +11,7 @@ using ShortDev.Networking;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -25,7 +26,10 @@ public sealed class CdpSession : IDisposable
     public required uint LocalSessionId { get; init; }
     public uint RemoteSessionId { get; private set; }
     public required ConnectedDevicesPlatform Platform { get; init; }
+
     public required bool IsHost { get; init; }
+    public PeerCapabilities HostCapabilities { get; private set; } = 0;
+    public PeerCapabilities ClientCapabilities { get; private set; } = 0;
 
     public CdpDevice Device { get; }
 
@@ -118,13 +122,19 @@ public sealed class CdpSession : IDisposable
 
         return session;
     }
+    #endregion
 
-    void SendConnectRequest(CdpSocket socket)
+    void SendConnectRequest(CdpSocket socket, bool upgradeSupported = true)
     {
         CommonHeader header = new()
         {
             Type = MessageType.Connect,
-            SessionId = GetSessionId()
+            AdditionalHeaders =
+            {
+                AdditionalHeader.FromUInt32(AdditionalHeaderType.Header129, 0x70_00_00_03),
+                AdditionalHeader.FromUInt64(AdditionalHeaderType.PeerCapabilities, (ulong)PeerCapabilities.All),
+                AdditionalHeader.FromUInt64(AdditionalHeaderType.Header131, upgradeSupported ? 7u : 6u)
+            }
         };
 
         SendMessage(socket, header, writer =>
@@ -147,7 +157,6 @@ public sealed class CdpSession : IDisposable
             }.Write(writer);
         });
     }
-    #endregion
 
     public void SendMessage(CdpSocket socket, CommonHeader header, BodyCallback bodyCallback, bool supplyRequestId = false)
     {
@@ -231,7 +240,7 @@ public sealed class CdpSession : IDisposable
         // All upgrade messages (belong to connect) need to be seen
         // See HandleConnect(...)
         if (header.Type != MessageType.Connect && !_upgradeHandler.IsSocketAllowed(socket))
-            throw UnexpectedMessage(socket.RemoteDevice.Address);
+            throw UnexpectedMessage(socket.RemoteDevice.Endpoint.Address);
 
         if (header.Type == MessageType.Connect)
         {
@@ -267,11 +276,13 @@ public sealed class CdpSession : IDisposable
         ConnectionHeader connectionHeader = ConnectionHeader.Parse(reader);
         Platform.Handler.Log(0, $"Received {header.Type} message {connectionHeader.MessageType} from session {header.SessionId.ToString("X")} via {socket.TransportType}");
 
+        Debug.Print(connectionHeader.MessageType.ToString());
+
         if (_upgradeHandler.HandleConnect(socket, header, connectionHeader, reader))
             return;
 
         if (!_upgradeHandler.IsSocketAllowed(socket))
-            throw UnexpectedMessage(socket.RemoteDevice.Address);
+            throw UnexpectedMessage(socket.RemoteDevice.Endpoint.Address);
 
         if (connectionHeader.MessageType == ConnectionType.ConnectRequest)
         {
@@ -330,6 +341,8 @@ public sealed class CdpSession : IDisposable
 
     void HandleConnectRequest(CommonHeader header, EndianReader reader, CdpSocket socket)
     {
+        ClientCapabilities = (PeerCapabilities)(header.TryGetHeader(AdditionalHeaderType.PeerCapabilities)?.AsUInt64() ?? 0);
+
         var connectionRequest = ConnectionRequest.Parse(reader);
         _remoteEncryption = CdpEncryptionInfo.FromRemote(connectionRequest.PublicKeyX, connectionRequest.PublicKeyY, connectionRequest.Nonce, CdpEncryptionParams.Default);
 
@@ -359,6 +372,8 @@ public sealed class CdpSession : IDisposable
     }
     void HandleConnectResponse(CommonHeader header, EndianReader reader, CdpSocket socket)
     {
+        HostCapabilities = (PeerCapabilities)(header.TryGetHeader(AdditionalHeaderType.PeerCapabilities)?.AsUInt64() ?? 0);
+
         var connectionResponse = ConnectionResponse.Parse(reader);
         _remoteEncryption = CdpEncryptionInfo.FromRemote(connectionResponse.PublicKeyX, connectionResponse.PublicKeyY, connectionResponse.Nonce, CdpEncryptionParams.Default);
 
@@ -424,15 +439,26 @@ public sealed class CdpSession : IDisposable
             return;
         }
 
-        header.Flags = 0;
-        SendMessage(socket, header, (writer) =>
+        PrepareSession(socket);
+
+        async void PrepareSession(CdpSocket socket)
         {
-            new ConnectionHeader()
+            try
             {
-                ConnectionMode = ConnectionMode.Proximal,
-                MessageType = ConnectionType.AuthDoneRequest
-            }.Write(writer);
-        });
+                socket = await _upgradeHandler.RequestUpgradeAsync(socket);
+            }
+            catch { }
+
+            header.Flags = 0;
+            SendMessage(socket, header, (writer) =>
+            {
+                new ConnectionHeader()
+                {
+                    ConnectionMode = ConnectionMode.Proximal,
+                    MessageType = ConnectionType.AuthDoneRequest
+                }.Write(writer);
+            });
+        }
     }
     void HandleAuthDoneRequest(CommonHeader header, CdpSocket socket)
     {
@@ -456,7 +482,7 @@ public sealed class CdpSession : IDisposable
     public Task WaitForAuthDone()
     {
         TaskCompletionSource promise = new();
-        void callback()
+        async void callback()
         {
             promise.SetResult();
             OnAuthDoneInternal -= callback;
@@ -585,7 +611,7 @@ public sealed class CdpSession : IDisposable
     }
     #endregion
 
-    #region SequenceNumber
+    #region IDs
     uint _sequenceNumber = 0;
     internal uint SequenceNumber()
         => Interlocked.Increment(ref _sequenceNumber);
@@ -595,7 +621,7 @@ public sealed class CdpSession : IDisposable
         => Interlocked.Increment(ref _requestId);
     #endregion
 
-    #region Messages
+    #region Message Registration
     readonly ConcurrentDictionary<uint, CdpMessage> _msgRegistry = new();
     CdpMessage GetOrCreateMessage(CommonHeader header)
         => _msgRegistry.GetOrAdd(header.SequenceNumber, (id) => new(header));
@@ -666,15 +692,18 @@ public sealed class CdpSession : IDisposable
         => _channelRegistry.Remove(channel.ChannelId);
     #endregion
 
+    #region Utils
     public static Exception UnexpectedMessage(string? info = null)
         => new CdpSecurityException($"Received unexpected message {info ?? "null"}");
 
-    void ThrowIfWrongMode(bool shouldBeHost)
+    internal void ThrowIfWrongMode(bool shouldBeHost)
     {
         if (shouldBeHost && !IsHost || !shouldBeHost && IsHost)
             throw UnexpectedMessage($"{(shouldBeHost ? "client" : "host")} msg");
     }
+    #endregion
 
+    #region Dispose
     public bool IsDisposed { get; private set; } = false;
 
     private void ThrowIfDisposed()
@@ -699,4 +728,5 @@ public sealed class CdpSession : IDisposable
             msg.Dispose();
         _msgRegistry.Clear();
     }
+    #endregion
 }

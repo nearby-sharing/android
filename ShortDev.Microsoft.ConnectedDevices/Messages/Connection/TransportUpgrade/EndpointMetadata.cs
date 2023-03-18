@@ -7,6 +7,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Messages.Connection.TransportUpgra
 public record class EndpointMetadata(CdpTransportType Type, byte[] Data) : ICdpPayload<EndpointMetadata>, ICdpArraySerializable<EndpointMetadata>
 {
     public static EndpointMetadata Tcp { get; } = new(CdpTransportType.Tcp, Array.Empty<byte>());
+    public static EndpointMetadata WifiDirect { get; } = new(CdpTransportType.WifiDirect, Array.Empty<byte>());
 
     public static EndpointMetadata Parse(EndianReader reader)
     {

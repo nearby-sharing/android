@@ -121,16 +121,19 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
     }
 
     #region Initialization
-    CancellationTokenSource _discoverCancellationTokenSource = new();
+    readonly CancellationTokenSource _discoverCancellationTokenSource = new();
     [AllowNull] ConnectedDevicesPlatform Platform { get; set; }
     void InitializePlatform()
     {
+        Platform = new(this);
+
         var service = (BluetoothManager)GetSystemService(BluetoothService)!;
         var adapter = service.Adapter!;
-        AndroidBluetoothHandler bluetoothHandler = new(this, adapter);
-
-        Platform = new(this);
+        AndroidBluetoothHandler bluetoothHandler = new(this, adapter, null);
         Platform.AddTransport<BluetoothTransport>(new(bluetoothHandler));
+
+        AndroidNetworkHandler networkHandler = new(this, this);
+        Platform.AddTransport<NetworkTransport>(new(networkHandler));
 
         Platform.DeviceDiscovered += Platform_DeviceDiscovered;
         Platform.Discover(_discoverCancellationTokenSource.Token);

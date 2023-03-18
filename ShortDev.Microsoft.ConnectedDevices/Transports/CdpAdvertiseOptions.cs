@@ -1,4 +1,5 @@
 ﻿using ShortDev.Networking;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.NetworkInformation;
 using System.Text;
@@ -7,10 +8,21 @@ namespace ShortDev.Microsoft.ConnectedDevices.Transports;
 
 public sealed record CdpAdvertisement(DeviceType DeviceType, PhysicalAddress MacAddress, string DeviceName)
 {
+    [Flags]
     enum BeaconFlags : byte
     {
         MyDevice,
         Public
+    }
+
+    [Flags]
+    enum SessionPolicy
+    {
+        RemoteSessionsHosted = 1,
+        RemoteSessionsNotHosted = 2,
+        NearShareAuthPolicySameUser = 4,
+        NearShareAuthPolicyPermissive = 8,
+        NearShareAuthPolicyFamily = 0x10
     }
 
     public static bool TryParse(byte[] beaconData, [MaybeNullWhen(false)] out CdpAdvertisement data)
@@ -26,21 +38,20 @@ public sealed record CdpAdvertisement(DeviceType DeviceType, PhysicalAddress Mac
         if (scenarioType != 1)
             return false;
 
-            var deviceType = (DeviceType)reader.ReadByte();
+        var deviceType = (DeviceType)reader.ReadByte();
 
-            var versionAndFlags = reader.ReadByte();
-            if (versionAndFlags >> 5 != 1)
-                return false; // wrong version
+        var versionAndFlags = reader.ReadByte();
+        if (versionAndFlags >> 5 != 1)
+            return false; // wrong version
 
-            var flags = (BeaconFlags)(versionAndFlags & 0x1f);
-            if ((int)flags >= 2)
-                return false; // wrong flags
+        var flags = (BeaconFlags)(versionAndFlags & 0x1f);
+        if ((int)flags >= 2)
+            return false; // wrong flags
 
-            if (flags != BeaconFlags.Public)
-                return false;
+        if (flags != BeaconFlags.Public)
+            return false;
 
-            /* Reserved */
-            reader.ReadByte();
+        var policy = (SessionPolicy)reader.ReadByte();
 
         data = new(
             deviceType,

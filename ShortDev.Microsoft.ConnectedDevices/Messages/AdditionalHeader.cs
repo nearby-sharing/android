@@ -1,5 +1,8 @@
 ﻿using Microsoft.CorrelationVector;
+using Newtonsoft.Json.Linq;
 using System;
+using System.Buffers.Binary;
+using System.Reflection.PortableExecutable;
 using System.Text;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages;
@@ -24,5 +27,31 @@ public record AdditionalHeader(AdditionalHeaderType Type, ReadOnlyMemory<byte> V
             AdditionalHeaderType.CorrelationVector,
             Encoding.ASCII.GetBytes(cv)
         );
+    }
+
+    public static AdditionalHeader FromUInt64(AdditionalHeaderType type, ulong value)
+    {
+        Memory<byte> buffer = new byte[sizeof(ulong)];
+        BinaryPrimitives.WriteUInt64BigEndian(buffer.Span, value);
+        return new(type, buffer);
+    }
+
+    public static AdditionalHeader FromUInt32(AdditionalHeaderType type, uint value)
+    {
+        Memory<byte> buffer = new byte[sizeof(uint)];
+        BinaryPrimitives.WriteUInt32BigEndian(buffer.Span, value);
+        return new(type, buffer);
+    }
+
+    public ulong AsUInt64()
+        => BinaryPrimitives.ReadUInt64BigEndian(Value.Span);
+
+    public ulong AsUInt32()
+        => BinaryPrimitives.ReadUInt32BigEndian(Value.Span);
+
+    public CorrelationVector ToCorrelationVector()
+    {
+        var raw = Encoding.ASCII.GetString(Value.Span);
+        return CorrelationVector.Parse(raw);
     }
 }
