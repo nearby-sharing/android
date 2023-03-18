@@ -1,15 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net6.0-android31.0</TargetFramework>
+		<TargetFramework>net7.0-android33.0</TargetFramework>
 		<OutputType>Exe</OutputType>
 		<SupportedOSPlatformVersion>21</SupportedOSPlatformVersion>
-		<LangVersion>preview</LangVersion>
+		<LangVersion>latest</LangVersion>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<ApplicationId>de.shortdev.nearby_sharing_windows</ApplicationId>
 		<ApplicationVersion>12</ApplicationVersion>
 		<ApplicationDisplayVersion>1.2.3-alpha</ApplicationDisplayVersion>
-		<EnablePreviewFeatures>true</EnablePreviewFeatures>
 		<UseAndroidCrypto>true</UseAndroidCrypto>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

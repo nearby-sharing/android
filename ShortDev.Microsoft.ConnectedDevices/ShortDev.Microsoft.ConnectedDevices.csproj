@@ -1,9 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
-		<LangVersion>preview</LangVersion>
-		<EnablePreviewFeatures>True</EnablePreviewFeatures>
+		<TargetFramework>net7.0</TargetFramework>
+		<LangVersion>latest</LangVersion>
 		<Nullable>enable</Nullable>
 		<Version>0.1.0</Version>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
