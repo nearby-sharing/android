@@ -100,14 +100,15 @@ public sealed class NearShareSender
             await _promise.Task;
         }
 
-        CdpFileProvider[] _files;
-        IProgress<NearShareProgress> _fileProgress;
-        CancellationToken _fileCancellationToken;
+        CdpFileProvider[]? _files;
+        IProgress<NearShareProgress>? _fileProgress;
+        CancellationToken? _fileCancellationToken;
         ulong _bytesToSend;
         public async Task SendFilesAsync(CdpFileProvider[] files, IProgress<NearShareProgress> progress, CancellationToken cancellationToken)
         {
             _files = files;
             _fileProgress = progress;
+            _fileCancellationToken = cancellationToken;
 
             uint fileCount = (uint)files.Length;
             _bytesToSend = CalcBytesToSend(files);
@@ -151,7 +152,7 @@ public sealed class NearShareSender
 
         public override void HandleMessage(CdpMessage msg)
         {
-            if (_fileCancellationToken.IsCancellationRequested)
+            if (_fileCancellationToken?.IsCancellationRequested == true)
                 return;
 
             var payload = ValueSet.Parse(msg.ReadBinary(out var header));
@@ -186,10 +187,10 @@ public sealed class NearShareSender
             var start = payload.Get<ulong>("BlobPosition");
             var length = payload.Get<uint>("BlobSize");
 
-            var fileProvider = _files[contentId];
+            var fileProvider = _files?[contentId] ?? throw new NullReferenceException("Could not access files to transfer");
             var blob = fileProvider.ReadBlob(start, length);
 
-            _fileProgress.Report(new()
+            _fileProgress?.Report(new()
             {
                 BytesSent = Interlocked.Add(ref _bytesSent, length),
                 FilesSent = contentId + 1, // ToDo: How to calculate?

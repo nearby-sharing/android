@@ -137,7 +137,4 @@ public sealed class AndroidBluetoothHandler : IBluetoothHandler
         }
     }
     #endregion
-
-    public void Log(int level, string message)
-        => PlatformHandler.Log(level, message);
 }

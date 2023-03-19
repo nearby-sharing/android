@@ -1,20 +1,27 @@
-﻿using ShortDev.Microsoft.ConnectedDevices.Exceptions;
+﻿using Microsoft.Extensions.Logging;
+using ShortDev.Microsoft.ConnectedDevices.Exceptions;
 using ShortDev.Microsoft.ConnectedDevices.Messages;
 using ShortDev.Microsoft.ConnectedDevices.NearShare.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Serialization;
 using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 namespace ShortDev.Microsoft.ConnectedDevices.NearShare.Internal;
 
 internal sealed class NearShareApp : CdpAppBase
 {
+    const uint PartitionSize = 102400u; // 131072u
     public static string Name { get; } = "NearSharePlatform";
 
     public required INearSharePlatformHandler PlatformHandler { get; init; }
     public required string Id { get; init; }
 
-    const uint PartitionSize = 102400u; // 131072u
+    [AllowNull] ILogger<NearShareApp> _logger;
+    protected override void OnInitialized(CdpChannel channel)
+    {
+        _logger = channel.Session.Platform.DeviceInfo.LoggerFactory.CreateLogger<NearShareApp>();
+    }
 
     uint _messageId = 0;
     public override void HandleMessage(CdpMessage msg)
@@ -52,7 +59,11 @@ internal sealed class NearShareApp : CdpAppBase
                     if (fileNames.Count != 1)
                         throw new NotImplementedException("Only able to receive one file at a time");
 
-                    PlatformHandler.Log(0, $"Receiving file \"{fileNames[0]}\" from session {msg.Header.SessionId:X} via {Channel.Socket.TransportType}");
+                    _logger.LogInformation("Receiving file \"{0}\" from session {1:X} via {2}",
+                        fileNames[0],
+                        msg.Header.SessionId,
+                        Channel.Socket.TransportType
+                    );
 
                     bytesToSend = payload.Get<ulong>("BytesToSend");
 
@@ -70,7 +81,10 @@ internal sealed class NearShareApp : CdpAppBase
             case DataKind.Uri:
                 {
                     var uri = payload.Get<string>("Uri");
-                    PlatformHandler.Log(0, $"Received uri \"{uri}\" from session {msg.Header.SessionId:X}");
+                    _logger.LogInformation("Received uri \"{0}\" from session {1:X}",
+                        uri,
+                        msg.Header.SessionId
+                    );
                     PlatformHandler.OnReceivedUri(new()
                     {
                         DeviceName = Channel.Session.Device.Name ?? "UNKNOWN",

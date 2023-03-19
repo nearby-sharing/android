@@ -27,7 +27,4 @@ internal sealed class AndroidNetworkHandler : INetworkHandler
         int ip = wifiInfo.IpAddress;
         return new IPAddress(ip).ToString();
     }
-
-    public void Log(int level, string message)
-        => PlatformHandler.Log(level, message);
 }

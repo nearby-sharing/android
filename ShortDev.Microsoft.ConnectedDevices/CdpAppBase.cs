@@ -2,6 +2,7 @@
 using ShortDev.Microsoft.ConnectedDevices.Messages.Control;
 using ShortDev.Microsoft.ConnectedDevices.Serialization;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading.Channels;
 
 namespace ShortDev.Microsoft.ConnectedDevices;
 
@@ -11,14 +12,24 @@ namespace ShortDev.Microsoft.ConnectedDevices;
 /// </summary>
 public abstract class CdpAppBase
 {
+    [AllowNull] CdpChannel _channel;
     /// <summary>
     /// Gets the corresponding channel. <br/>
     /// The value is set immediately after instantiation. <br/>
     /// <br/>
     /// <inheritdoc cref="CdpChannel"/>
     /// </summary>
-    [AllowNull]
-    public CdpChannel Channel { get; internal set; }
+    public CdpChannel Channel
+    {
+        get => _channel;
+        internal set
+        {
+            _channel = value;
+            OnInitialized(value);
+        }
+    }
+
+    protected virtual void OnInitialized(CdpChannel channel) { }
 
     /// <summary>
     /// Handle the received message.

@@ -1,11 +1,11 @@
-﻿using ShortDev.Microsoft.ConnectedDevices.Messages;
+﻿using Microsoft.Extensions.Logging;
+using ShortDev.Microsoft.ConnectedDevices.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.TransportUpgrade;
 using ShortDev.Microsoft.ConnectedDevices.Platforms;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
 using ShortDev.Networking;
 using System;
-using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,10 +14,12 @@ namespace ShortDev.Microsoft.ConnectedDevices.Internal;
 
 internal sealed class UpgradeHandler
 {
+    readonly ILogger<UpgradeHandler> _logger;
     readonly CdpSession _session;
     public UpgradeHandler(CdpSession session, CdpDevice initalDevice)
     {
         _session = session;
+        _logger = session.Platform.DeviceInfo.LoggerFactory.CreateLogger<UpgradeHandler>();
 
         // Initial address is always allowed
         _allowedAddresses.Add(initalDevice.Endpoint.Address);
@@ -58,8 +60,8 @@ internal sealed class UpgradeHandler
                 _session.ThrowIfWrongMode(true);
                 HandleUpgradeFinalization(socket, reader);
                 return true;
+
             case ConnectionType.UpgradeFailure:
-                _session.ThrowIfWrongMode(true);
                 HandleUpgradeFailure(reader);
                 return true;
 
@@ -94,7 +96,10 @@ internal sealed class UpgradeHandler
             allowed = true;
         }
 
-        _session.Platform.Handler.Log(0, $"Transport upgrade {msg.UpgradeId} {(allowed ? "succeeded" : "failed")}");
+        _logger.LogInformation("Transport upgrade {0} {1}",
+            msg.UpgradeId,
+            allowed ? "succeeded" : "failed"
+        );
 
         CommonHeader header = new()
         {
@@ -115,7 +120,10 @@ internal sealed class UpgradeHandler
     void HandleUpgradeRequest(CdpSocket socket, EndianReader reader)
     {
         var msg = UpgradeRequest.Parse(reader);
-        _session.Platform.Handler.Log(0, $"Upgrade request {msg.UpgradeId} to {string.Join(',', msg.Endpoints.Select((x) => x.Type.ToString()))}");
+        _logger.LogInformation("Upgrade request {0} to {1}",
+            msg.UpgradeId,
+            string.Join(',', msg.Endpoints.Select((x) => x.Type.ToString()))
+        );
 
         CommonHeader header = new()
         {
@@ -167,7 +175,9 @@ internal sealed class UpgradeHandler
     void HandleUpgradeFinalization(CdpSocket socket, EndianReader reader)
     {
         var msg = EndpointMetadata.ParseArray(reader);
-        _session.Platform.Handler.Log(0, $"Transport upgrade to {string.Join(',', msg.Select((x) => x.Type.ToString()))}");
+        _logger.LogInformation("Transport upgrade to {0}",
+            string.Join(',', msg.Select((x) => x.Type.ToString()))
+        );
 
         CommonHeader header = new()
         {
@@ -190,7 +200,7 @@ internal sealed class UpgradeHandler
         var msg = HResultPayload.Parse(reader);
 
         var errorMsg = $"Transport upgrade failed with HResult {msg.HResult}";
-        _session.Platform.Handler.Log(0, errorMsg);
+        _logger.LogWarning(errorMsg);
         _currentUpgradePromise?.TrySetException(new Exception(errorMsg));
     }
 

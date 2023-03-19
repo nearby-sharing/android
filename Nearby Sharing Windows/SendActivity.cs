@@ -11,10 +11,12 @@ using Google.Android.Material.ProgressIndicator;
 using Google.Android.Material.Snackbar;
 using ShortDev.Android.UI;
 using ShortDev.Microsoft.ConnectedDevices;
+using ShortDev.Microsoft.ConnectedDevices.Encryption;
 using ShortDev.Microsoft.ConnectedDevices.NearShare;
 using ShortDev.Microsoft.ConnectedDevices.Platforms;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
 using System.Diagnostics.CodeAnalysis;
+using System.Net.NetworkInformation;
 using AndroidUri = Android.Net.Uri;
 using ManifestPermission = Android.Manifest.Permission;
 
@@ -82,31 +84,30 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
     }
 
     #region UI
-    public WindowInsets? OnApplyWindowInsets(View? v, WindowInsets? windowInsets)
+    public WindowInsets OnApplyWindowInsets(View? v, WindowInsets? windowInsets)
     {
-        if (windowInsets != null)
+        ArgumentNullException.ThrowIfNull(windowInsets);
+
+        if (OperatingSystem.IsAndroidVersionAtLeast(30))
         {
-            if (OperatingSystem.IsAndroidVersionAtLeast(30))
-            {
-                var insets = windowInsets.GetInsetsIgnoringVisibility(WindowInsets.Type.SystemBars());
-                bottomSheetFrame.SetPadding(
-                    insets.Left,
-                    /* insets.Top */ 0,
-                    insets.Right,
-                    insets.Bottom
-                );
-            }
-            else
-            {
+            var insets = windowInsets.GetInsetsIgnoringVisibility(WindowInsets.Type.SystemBars());
+            bottomSheetFrame.SetPadding(
+                insets.Left,
+                /* insets.Top */ 0,
+                insets.Right,
+                insets.Bottom
+            );
+        }
+        else
+        {
 #pragma warning disable CS0618 // Type or member is obsolete
-                bottomSheetFrame.SetPadding(
-                    windowInsets.StableInsetLeft,
-                    /* insets.Top */ 0,
-                    windowInsets.StableInsetRight,
-                    windowInsets.StableInsetBottom
-                );
+            bottomSheetFrame.SetPadding(
+                windowInsets.StableInsetLeft,
+                /* insets.Top */ 0,
+                windowInsets.StableInsetRight,
+                windowInsets.StableInsetBottom
+            );
 #pragma warning restore CS0618 // Type or member is obsolete
-            }
         }
         return windowInsets;
     }
@@ -125,11 +126,20 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
     [AllowNull] ConnectedDevicesPlatform Platform { get; set; }
     void InitializePlatform()
     {
-        Platform = new(this);
-
         var service = (BluetoothManager)GetSystemService(BluetoothService)!;
         var adapter = service.Adapter!;
-        AndroidBluetoothHandler bluetoothHandler = new(this, adapter, null);
+
+        Platform = new(new()
+        {
+            Type = DeviceType.Android,
+            Name = adapter.Name ?? throw new NullReferenceException("Could not find device name"),
+            OemModelName = Build.Model ?? string.Empty,
+            OemManufacturerName = Build.Manufacturer ?? string.Empty,
+            DeviceCertificate = ConnectedDevicesPlatform.CreateDeviceCertificate(CdpEncryptionParams.Default),
+            LoggerFactory = ConnectedDevicesPlatform.CreateLoggerFactory(msg => System.Diagnostics.Debug.Print(msg))
+        });
+
+        AndroidBluetoothHandler bluetoothHandler = new(this, adapter, PhysicalAddress.None);
         Platform.AddTransport<BluetoothTransport>(new(bluetoothHandler));
 
         AndroidNetworkHandler networkHandler = new(this, this);
@@ -308,11 +318,6 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
     public override void Finish()
     {
         base.Finish();
-    }
-
-    public void Log(int level, string message)
-    {
-        System.Diagnostics.Debug.Print(message);
     }
     #endregion
 }

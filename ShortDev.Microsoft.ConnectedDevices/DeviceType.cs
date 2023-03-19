@@ -28,3 +28,30 @@ public enum DeviceType : short
     WindowsLaptop = 15,
     WindowsTablet = 16
 }
+
+public static class DeviceTypeExtensions
+{
+    public static DdsPlatformType GetPlatformType(this DeviceType deviceType)
+    {
+        if (deviceType == ConnectedDevices.DeviceType.Linux)
+            return DdsPlatformType.Linux;
+
+        if (deviceType == ConnectedDevices.DeviceType.Android)
+            return DdsPlatformType.Android;
+
+        if (deviceType == ConnectedDevices.DeviceType.iPad || deviceType == ConnectedDevices.DeviceType.iPhone)
+            return DdsPlatformType.iOS;
+
+        return DdsPlatformType.Windows;
+    }
+}
+
+
+public enum DdsPlatformType
+{
+    Unknown = 0,
+    Windows = 1,
+    Android = 2,
+    iOS = 3,
+    Linux = 5
+}

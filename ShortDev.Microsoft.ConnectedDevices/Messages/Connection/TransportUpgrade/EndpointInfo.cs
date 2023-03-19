@@ -2,10 +2,15 @@
 using System;
 using System.Net;
 using System.Net.NetworkInformation;
+using System.Text.Json.Serialization;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages.Connection.TransportUpgrade;
 
-public record class EndpointInfo(CdpTransportType TransportType, string Address, string Service)
+public record class EndpointInfo(
+    [property: JsonPropertyName("endpointType")] CdpTransportType TransportType,
+    [property: JsonPropertyName("host")] string Address,
+    [property: JsonPropertyName("service")] string Service
+)
 {
     public IPEndPoint ToIPEndPoint()
     {

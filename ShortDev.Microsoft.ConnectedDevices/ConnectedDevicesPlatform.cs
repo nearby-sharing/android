@@ -1,4 +1,7 @@
-﻿using ShortDev.Microsoft.ConnectedDevices.Messages;
+﻿using Microsoft.Extensions.Logging;
+using ShortDev.Microsoft.ConnectedDevices.Encryption;
+using ShortDev.Microsoft.ConnectedDevices.Messages;
+using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.DeviceInfo;
 using ShortDev.Microsoft.ConnectedDevices.Platforms;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
 using ShortDev.Networking;
@@ -8,6 +11,8 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,11 +20,13 @@ namespace ShortDev.Microsoft.ConnectedDevices;
 
 public sealed class ConnectedDevicesPlatform : IDisposable
 {
-    public ICdpPlatformHandler Handler { get; }
+    public LocalDeviceInfo DeviceInfo { get; }
 
-    public ConnectedDevicesPlatform(ICdpPlatformHandler platform)
+    readonly ILogger<ConnectedDevicesPlatform> _logger;
+    public ConnectedDevicesPlatform(LocalDeviceInfo deviceInfo)
     {
-        Handler = platform;
+        DeviceInfo = deviceInfo;
+        _logger = deviceInfo.LoggerFactory.CreateLogger<ConnectedDevicesPlatform>();
     }
 
     #region Transport
@@ -53,6 +60,8 @@ public sealed class ConnectedDevicesPlatform : IDisposable
             IsAdvertising = true;
         }
 
+        _logger.LogDebug("Startet advertising");
+
         foreach (var (_, transport) in _transports)
             if (transport is ICdpDiscoverableTransport discoverableTransport)
                 discoverableTransport.Advertise(options, cancellationToken);
@@ -77,6 +86,8 @@ public sealed class ConnectedDevicesPlatform : IDisposable
             IsListening = true;
         }
 
+        _logger.LogDebug("Startet listening");
+
         foreach (var (_, transport) in _transports)
         {
             transport.Listen(cancellationToken);
@@ -92,7 +103,7 @@ public sealed class ConnectedDevicesPlatform : IDisposable
 
     private void OnDeviceConnected(ICdpTransport sender, CdpSocket socket)
     {
-        Handler.Log(0, $"Device {socket.RemoteDevice.Name} ({socket.RemoteDevice.Endpoint.Address}) connected via {socket.TransportType}");
+        _logger.Log(LogLevel.Information, "Device {0} ({1}) connected via {2}", socket.RemoteDevice.Name, socket.RemoteDevice.Endpoint.Address, socket.TransportType);
         ReceiveLoop(socket);
     }
     #endregion
@@ -170,7 +181,11 @@ public sealed class ConnectedDevicesPlatform : IDisposable
                     }
                     catch (Exception ex)
                     {
-                        Handler.Log(1, $"{ex.GetType().Name} in session {session?.LocalSessionId.ToString() ?? "null"} \n {ex.Message}");
+                        _logger.Log(LogLevel.Warning, "{0} in session {1} \n {2}",
+                            ex.GetType().Name,
+                            session?.LocalSessionId.ToString() ?? "null",
+                            ex.Message
+                        );
                         break;
                     }
                 } while (!socket.IsClosed);
@@ -178,9 +193,30 @@ public sealed class ConnectedDevicesPlatform : IDisposable
         });
     }
 
+    public CdpDeviceInfo GetCdpDeviceInfo()
+        => DeviceInfo.ToCdpDeviceInfo(_transports.Select(x => x.Value.GetEndpoint()).ToArray());
+
     public void Dispose()
     {
         foreach (var (_, transport) in _transports)
             transport.Dispose();
     }
+
+    public static X509Certificate2 CreateDeviceCertificate(CdpEncryptionParams encryptionParams)
+    {
+        CertificateRequest certRequest = new("CN=Ms-Cdp", ECDsa.Create(encryptionParams.Curve), HashAlgorithmName.SHA256);
+        return certRequest.CreateSelfSigned(DateTimeOffset.Now, DateTimeOffset.Now.AddYears(5));
+    }
+
+    public static ILoggerFactory CreateLoggerFactory(Action<string> messageCallback)
+        => LoggerFactory.Create(builder =>
+        {
+            builder.ClearProviders();
+
+            BasicLoggingProvider provider = new();
+            provider.MessageReceived += messageCallback;
+            builder.AddProvider(provider);
+
+            builder.SetMinimumLevel(LogLevel.Debug);
+        });
 }

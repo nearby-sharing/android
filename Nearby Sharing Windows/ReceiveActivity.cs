@@ -1,5 +1,6 @@
 ﻿using Android.Bluetooth;
 using Android.Content.PM;
+using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using AndroidX.AppCompat.App;
@@ -7,12 +8,14 @@ using AndroidX.RecyclerView.Widget;
 using Google.Android.Material.ProgressIndicator;
 using ShortDev.Android.UI;
 using ShortDev.Microsoft.ConnectedDevices;
+using ShortDev.Microsoft.ConnectedDevices.Encryption;
 using ShortDev.Microsoft.ConnectedDevices.NearShare;
 using ShortDev.Microsoft.ConnectedDevices.Platforms;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.NetworkInformation;
+using SystemDebug = System.Diagnostics.Debug;
 
 namespace Nearby_Sharing_Windows;
 
@@ -147,9 +150,17 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
             $"IP-Address: {AndroidNetworkHandler.GetLocalIp(this)}";
         debugLogTextView = FindViewById<TextView>(Resource.Id.debugLogTextView)!;
 
-        Debug.Assert(_cdp == null);
+        SystemDebug.Assert(_cdp == null);
 
-        _cdp = new(this);
+        _cdp = new(new()
+        {
+            Type = DeviceType.Android,
+            Name = _btAdapter.Name ?? throw new NullReferenceException("Could not find device name"),
+            OemModelName = Build.Model ?? string.Empty,
+            OemManufacturerName = Build.Manufacturer ?? string.Empty,
+            DeviceCertificate = ConnectedDevicesPlatform.CreateDeviceCertificate(CdpEncryptionParams.Default),
+            LoggerFactory = ConnectedDevicesPlatform.CreateLoggerFactory(Log)
+        });
 
         AndroidBluetoothHandler bluetoothHandler = new(this, _btAdapter, btAddress);
         _cdp.AddTransport<BluetoothTransport>(new(bluetoothHandler));
@@ -182,7 +193,7 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
     FileStream CreateFile(string name)
     {
         var path = GetFilePath(name);
-        Log(0, $"Saving file to \"{path}\"");
+        Log($"Saving file to \"{path}\"");
         return File.Create(path);
 
         // ToDo: OutputStream cannot seek!
@@ -216,11 +227,11 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
 
 
 
-    public void Log(int level, string message)
+    public void Log(string message)
     {
         RunOnUiThread(() =>
         {
-            debugLogTextView.Text += "\n" + $"[{DateTime.Now.ToString("HH:mm:ss")}]: {message}";
+            debugLogTextView.Text += "\n" + $"[{DateTime.Now:HH:mm:ss}]: {message}";
         });
     }
 

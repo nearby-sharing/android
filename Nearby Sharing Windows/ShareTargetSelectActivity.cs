@@ -94,7 +94,7 @@ public sealed class ShareTargetSelectActivity : AppCompatActivity, View.IOnApply
     }
 
     #region UI
-    public WindowInsets? OnApplyWindowInsets(View? v, WindowInsets? windowInsets)
+    public WindowInsets OnApplyWindowInsets(View? v, WindowInsets? windowInsets)
     {
         if (windowInsets != null)
         {
@@ -120,7 +120,7 @@ public sealed class ShareTargetSelectActivity : AppCompatActivity, View.IOnApply
 #pragma warning restore CS0618 // Type or member is obsolete
             }
         }
-        return windowInsets;
+        return windowInsets!;
     }
     #endregion
 

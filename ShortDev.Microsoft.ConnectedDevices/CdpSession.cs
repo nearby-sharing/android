@@ -1,4 +1,5 @@
-﻿using ShortDev.Microsoft.ConnectedDevices.Encryption;
+﻿using Microsoft.Extensions.Logging;
+using ShortDev.Microsoft.ConnectedDevices.Encryption;
 using ShortDev.Microsoft.ConnectedDevices.Exceptions;
 using ShortDev.Microsoft.ConnectedDevices.Internal;
 using ShortDev.Microsoft.ConnectedDevices.Messages;
@@ -11,7 +12,6 @@ using ShortDev.Networking;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -25,20 +25,22 @@ public sealed class CdpSession : IDisposable
 {
     public required uint LocalSessionId { get; init; }
     public uint RemoteSessionId { get; private set; }
-    public required ConnectedDevicesPlatform Platform { get; init; }
 
     public required bool IsHost { get; init; }
     public PeerCapabilities HostCapabilities { get; private set; } = 0;
     public PeerCapabilities ClientCapabilities { get; private set; } = 0;
 
+    public ConnectedDevicesPlatform Platform { get; }
     public CdpDevice Device { get; }
 
-
+    readonly ILogger<CdpSession> _logger;
     readonly UpgradeHandler _upgradeHandler;
-    private CdpSession(CdpDevice device)
+    private CdpSession(ConnectedDevicesPlatform platform, CdpDevice device)
     {
+        Platform = platform;
         Device = device;
 
+        _logger = platform.DeviceInfo.LoggerFactory.CreateLogger<CdpSession>();
         _upgradeHandler = new(this, device);
     }
 
@@ -98,10 +100,9 @@ public sealed class CdpSession : IDisposable
         else
         {
             // Create
-            return _sessionRegistry.Create(localSessionId => new(device)
+            return _sessionRegistry.Create(localSessionId => new(platform, device)
             {
                 IsHost = true,
-                Platform = platform,
                 LocalSessionId = (uint)localSessionId,
                 RemoteSessionId = remoteSessionId
             }, out _);
@@ -110,10 +111,9 @@ public sealed class CdpSession : IDisposable
 
     internal static CdpSession CreateAndConnectClient(ConnectedDevicesPlatform platform, CdpSocket socket)
     {
-        var session = _sessionRegistry.Create(localSessionId => new(socket.RemoteDevice)
+        var session = _sessionRegistry.Create(localSessionId => new(platform, socket.RemoteDevice)
         {
             IsHost = false,
-            Platform = platform,
             LocalSessionId = (uint)localSessionId,
             RemoteSessionId = 0
         }, out _);
@@ -265,7 +265,6 @@ public sealed class CdpSession : IDisposable
         {
             // We might receive a "ReliabilityResponse"
             // ignore
-            // Platform.Handler.Log(0, $"Received {header.Type} message from session {header.SessionId.ToString("X")} via {socket.TransportType}");
         }
     }
 
@@ -274,9 +273,12 @@ public sealed class CdpSession : IDisposable
     void HandleConnect(CdpSocket socket, CommonHeader header, EndianReader reader)
     {
         ConnectionHeader connectionHeader = ConnectionHeader.Parse(reader);
-        Platform.Handler.Log(0, $"Received {header.Type} message {connectionHeader.MessageType} from session {header.SessionId.ToString("X")} via {socket.TransportType}");
-
-        Debug.Print(connectionHeader.MessageType.ToString());
+        _logger.LogDebug("Received {0} message {1} from session {2} via {3}",
+            header.Type,
+            connectionHeader.MessageType,
+            header.SessionId.ToString("X"),
+            socket.TransportType
+        );
 
         if (_upgradeHandler.HandleConnect(socket, header, connectionHeader, reader))
             return;
@@ -389,7 +391,7 @@ public sealed class CdpSession : IDisposable
                 MessageType = ConnectionType.DeviceAuthRequest
             }.Write(writer);
             AuthenticationPayload.Create(
-                _localEncryption.DeviceCertificate!, // ToDo: User cert
+                Platform.DeviceInfo.DeviceCertificate!, // ToDo: User cert
                 hostNonce: _remoteEncryption!.Nonce, clientNonce: _localEncryption.Nonce
             ).Write(writer);
         });
@@ -409,7 +411,7 @@ public sealed class CdpSession : IDisposable
                 MessageType = connectionType == ConnectionType.DeviceAuthRequest ? ConnectionType.DeviceAuthResponse : ConnectionType.UserDeviceAuthResponse
             }.Write(writer);
             AuthenticationPayload.Create(
-                _localEncryption.DeviceCertificate!, // ToDo: User cert
+                Platform.DeviceInfo.DeviceCertificate, // ToDo: User cert
                 hostNonce: _localEncryption.Nonce, clientNonce: _remoteEncryption!.Nonce
             ).Write(writer);
         });
@@ -431,7 +433,7 @@ public sealed class CdpSession : IDisposable
                     MessageType = ConnectionType.UserDeviceAuthRequest
                 }.Write(writer);
                 AuthenticationPayload.Create(
-                    _localEncryption.DeviceCertificate!, // ToDo: User cert
+                    Platform.DeviceInfo.DeviceCertificate!, // ToDo: User cert
                     hostNonce: _remoteEncryption!.Nonce, clientNonce: _localEncryption.Nonce
                 ).Write(writer);
             });
@@ -482,7 +484,7 @@ public sealed class CdpSession : IDisposable
     public Task WaitForAuthDone()
     {
         TaskCompletionSource promise = new();
-        async void callback()
+        void callback()
         {
             promise.SetResult();
             OnAuthDoneInternal -= callback;
@@ -497,6 +499,24 @@ public sealed class CdpSession : IDisposable
         var msg = ResultPayload.Parse(reader);
         msg.ThrowOnError();
         OnAuthDoneInternal?.Invoke();
+
+        SendMessage(socket, new CommonHeader()
+        {
+            Type = MessageType.Connect
+        },
+        (writer) =>
+        {
+            new ConnectionHeader()
+            {
+                ConnectionMode = ConnectionMode.Proximal,
+                MessageType = ConnectionType.DeviceInfoMessage
+            }.Write(writer);
+            new DeviceInfoMessage()
+            {
+                DeviceInfo = Platform.GetCdpDeviceInfo()
+            }.Write(writer);
+        });
+
         socket.Dispose();
     }
     void HandleDeviceInfoMessage(CommonHeader header, EndianReader reader, CdpSocket socket)
@@ -522,7 +542,12 @@ public sealed class CdpSession : IDisposable
             throw UnexpectedMessage("Encryption");
 
         var controlHeader = ControlHeader.Parse(reader);
-        Platform.Handler.Log(0, $"Received {header.Type} message {controlHeader.MessageType} from session {header.SessionId.ToString("X")} via {socket.TransportType}");
+        _logger.LogDebug("Received {0} message {1} from session {2} via {3}",
+            header.Type,
+            controlHeader.MessageType,
+            header.SessionId.ToString("X"),
+            socket.TransportType
+        );
         switch (controlHeader.MessageType)
         {
             case ControlMessageType.StartChannelRequest:
