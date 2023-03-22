@@ -5,10 +5,17 @@
 #include "Utils.h"
 #include "CdpTypes.h"
 
+void PauseIfRequested() {
+	if (GetEnvironmentVariableW(L"CDP_WaitForDebugger", NULL, 0) == 0 && GetLastError() == ERROR_ENVVAR_NOT_FOUND)
+		return;
+	
+	WaitForDebugger();
+}
+
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
 {
 	if (IsCdpSvc())
-		WaitForDebugger();
+		PauseIfRequested();
 
 	return TRUE;
 }
@@ -20,7 +27,7 @@ void EnsureCdpSvcLib() {
 }
 
 WinAPIExport void ServiceMain(void* a1, void** a2) {
-	WaitForDebugger();
+	PauseIfRequested();
 	EnsureCdpSvcLib();
 
 	auto pProc = GetProcAddress(CdpSvcLib, "ServiceMain");
@@ -28,7 +35,7 @@ WinAPIExport void ServiceMain(void* a1, void** a2) {
 }
 
 WinAPIExport int SvchostPushServiceGlobals(void* a1) {
-	WaitForDebugger();
+	PauseIfRequested();
 	EnsureCdpSvcLib();
 
 	auto pProc = GetProcAddress(CdpSvcLib, "SvchostPushServiceGlobals");
