@@ -498,7 +498,7 @@ public sealed class CdpSession : IDisposable
         return promise.Task;
     }
     #endregion
-    CdpSocket? _currentSocket;
+    
     void HandleAuthDoneResponse(CdpSocket socket, EndianReader reader)
     {
         var msg = ResultPayload.Parse(reader);
@@ -521,8 +521,6 @@ public sealed class CdpSession : IDisposable
                 DeviceInfo = Platform.GetCdpDeviceInfo()
             }.Write(writer);
         });
-
-        _currentSocket = socket;
     }
     void HandleDeviceInfoMessage(CommonHeader header, EndianReader reader, CdpSocket socket)
     {
@@ -679,7 +677,7 @@ public sealed class CdpSession : IDisposable
         if (IsHost)
             throw new InvalidOperationException("Session is not a client");
 
-        var socket = _currentSocket ?? await Platform.CreateSocketAsync(Device);
+        var socket = await Platform.CreateSocketAsync(Device);
         return await StartClientChannelAsync(appId, appName, handler, socket);
     }
 

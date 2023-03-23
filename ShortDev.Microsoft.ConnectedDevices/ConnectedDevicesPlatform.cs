@@ -2,6 +2,7 @@
 using ShortDev.Microsoft.ConnectedDevices.Encryption;
 using ShortDev.Microsoft.ConnectedDevices.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.DeviceInfo;
+using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.TransportUpgrade;
 using ShortDev.Microsoft.ConnectedDevices.Platforms;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
 using ShortDev.Networking;
@@ -9,6 +10,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -136,6 +138,9 @@ public sealed class ConnectedDevicesPlatform : IDisposable
 
     internal async Task<CdpSocket> CreateSocketAsync(CdpDevice device)
     {
+        if (TryGetKnownSocket(device.Endpoint, out var knownSocket))
+            return knownSocket;
+
         var transport = TryGetTransport(device.Endpoint.TransportType) ?? throw new InvalidOperationException($"No single transport found for type {device.Endpoint.TransportType}");
         var socket = await transport.ConnectAsync(device);
         ReceiveLoop(socket);
@@ -144,6 +149,9 @@ public sealed class ConnectedDevicesPlatform : IDisposable
 
     internal async Task<CdpSocket?> TryCreateSocketAsync(CdpDevice device, TimeSpan connectTimeout)
     {
+        if (TryGetKnownSocket(device.Endpoint, out var knownSocket))
+            return knownSocket;
+
         var transport = TryGetTransport(device.Endpoint.TransportType);
         if (transport == null)
             return null;
@@ -159,6 +167,7 @@ public sealed class ConnectedDevicesPlatform : IDisposable
 
     private void ReceiveLoop(CdpSocket socket)
     {
+        RegisterKnownSocket(socket);
         Task.Run(() =>
         {
             EndianReader streamReader = new(Endianness.BigEndian, socket.InputStream);
@@ -203,6 +212,30 @@ public sealed class ConnectedDevicesPlatform : IDisposable
             }
         });
     }
+
+    #region Socket Management
+    readonly ConcurrentDictionary<EndpointInfo, CdpSocket> _knownSockets = new();
+
+    void RegisterKnownSocket(CdpSocket socket)
+    {
+        socket.Disposed += () => _knownSockets.TryRemove(socket.RemoteDevice.Endpoint, out _); // ToDo: We might remove a newer socket here!!
+        _knownSockets.AddOrUpdate(socket.RemoteDevice.Endpoint, socket, (key, current) =>
+        {
+            // ToDo: Alive check
+            return socket;
+        });
+    }
+
+    bool TryGetKnownSocket(EndpointInfo endpoint, [MaybeNullWhen(false)] out CdpSocket socket)
+    {
+        if (!_knownSockets.TryGetValue(endpoint, out socket))
+            return false;
+
+        // ToDo: Alive check!!
+
+        return true;
+    }
+    #endregion
 
     public CdpDeviceInfo GetCdpDeviceInfo()
         => DeviceInfo.ToCdpDeviceInfo(_transports.Select(x => x.Value.GetEndpoint()).ToArray());

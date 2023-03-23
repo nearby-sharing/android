@@ -24,6 +24,9 @@ public sealed class CdpSocket : IDisposable
 
     public bool IsClosed { get; private set; }
     public Action? Close { private get; set; }
+
+    public event Action? Disposed;
+
     public void Dispose()
     {
         if (Close == null)
@@ -35,5 +38,7 @@ public sealed class CdpSocket : IDisposable
         Close();
 
         IsClosed = true;
+
+        Disposed?.Invoke();
     }
 }
