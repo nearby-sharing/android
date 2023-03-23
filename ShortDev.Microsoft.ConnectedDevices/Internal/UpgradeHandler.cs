@@ -35,7 +35,7 @@ internal sealed class UpgradeHandler
         => _allowedAddresses.Contains(socket.RemoteDevice.Endpoint.Address);
     #endregion
 
-    public bool HandleConnect(CdpSocket socket, CommonHeader header, ConnectionHeader connectionHeader, EndianReader reader)
+    public bool TryHandleConnect(CdpSocket socket, CommonHeader header, ConnectionHeader connectionHeader, EndianReader reader)
     {
         // This part needs to be always accessible!
         // This is used to validate
@@ -87,7 +87,7 @@ internal sealed class UpgradeHandler
     readonly ConcurrentList<Guid> _upgradeIds = new();
     void HandleTransportRequest(CdpSocket socket, EndianReader reader)
     {
-        var msg = TransportRequest.Parse(reader);
+        var msg = UpgradeIdPayload.Parse(reader);
 
         // Sometimes the device sends multiple transport requests
         // If we know it already then let it pass
@@ -331,7 +331,7 @@ internal sealed class UpgradeHandler
                 ConnectionMode = ConnectionMode.Proximal,
                 MessageType = ConnectionType.TransportRequest
             }.Write(writer);
-            new TransportRequest()
+            new UpgradeIdPayload()
             {
                 UpgradeId = _currentUpgrade.Id
             }.Write(writer);
@@ -340,9 +340,17 @@ internal sealed class UpgradeHandler
 
     void HandleTransportConfirmation(CdpSocket socket, EndianReader reader)
     {
+        var msg = UpgradeIdPayload.Parse(reader);
+
+        if (_currentUpgrade == null)
+            return;
+
+        if (_currentUpgrade.Id != msg.UpgradeId)
+            return;
+
         // Upgrade successful
         // Complete promise
-        _currentUpgrade?.Promise.TrySetResult(socket);
+        _currentUpgrade.Promise.TrySetResult(socket);
     }
 
     sealed class UpgradeInstance

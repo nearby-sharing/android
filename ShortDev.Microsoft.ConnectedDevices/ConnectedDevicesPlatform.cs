@@ -129,11 +129,7 @@ public sealed class ConnectedDevicesPlatform : IDisposable
     public async Task<CdpSession> ConnectAsync(CdpDevice device)
     {
         var socket = await CreateSocketAsync(device);
-
-        var session = CdpSession.CreateAndConnectClient(this, socket);
-        await session.WaitForAuthDone();
-
-        return session;
+        return await CdpSession.CreateClientAndConnectAsync(this, socket);
     }
 
     internal async Task<CdpSocket> CreateSocketAsync(CdpDevice device)
@@ -218,7 +214,13 @@ public sealed class ConnectedDevicesPlatform : IDisposable
 
     void RegisterKnownSocket(CdpSocket socket)
     {
-        socket.Disposed += () => _knownSockets.TryRemove(socket.RemoteDevice.Endpoint, out _); // ToDo: We might remove a newer socket here!!
+        socket.Disposed += OnSocketClosed;
+        void OnSocketClosed()
+        {
+            _knownSockets.TryRemove(socket.RemoteDevice.Endpoint, out _); // ToDo: We might remove a newer socket here!!
+            socket.Disposed -= OnSocketClosed;
+        }
+
         _knownSockets.AddOrUpdate(socket.RemoteDevice.Endpoint, socket, (key, current) =>
         {
             // ToDo: Alive check
@@ -232,6 +234,8 @@ public sealed class ConnectedDevicesPlatform : IDisposable
             return false;
 
         // ToDo: Alive check!!
+        if (socket.IsClosed)
+            return false;
 
         return true;
     }

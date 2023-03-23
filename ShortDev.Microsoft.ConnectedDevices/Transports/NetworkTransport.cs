@@ -55,6 +55,7 @@ public sealed class NetworkTransport : ICdpTransport
 
     public async Task<CdpSocket> ConnectAsync(CdpDevice device)
     {
+        // ToDo: If the windows machine tries to connect back it uses the port assigned here not 5040!!
         TcpClient client = new();
         await client.ConnectAsync(device.Endpoint.ToIPEndPoint());
         return new()

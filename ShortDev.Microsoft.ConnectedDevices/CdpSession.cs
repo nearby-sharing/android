@@ -35,6 +35,7 @@ public sealed class CdpSession : IDisposable
 
     readonly ILogger<CdpSession> _logger;
     readonly UpgradeHandler _upgradeHandler;
+    readonly ConnectHandler _connectHandler;
     private CdpSession(ConnectedDevicesPlatform platform, CdpDevice device)
     {
         Platform = platform;
@@ -42,6 +43,7 @@ public sealed class CdpSession : IDisposable
 
         _logger = platform.DeviceInfo.LoggerFactory.CreateLogger<CdpSession>();
         _upgradeHandler = new(this, device);
+        _connectHandler = new(this, _upgradeHandler);
     }
 
     internal ulong GetSessionId()
@@ -109,7 +111,7 @@ public sealed class CdpSession : IDisposable
         }
     }
 
-    internal static CdpSession CreateAndConnectClient(ConnectedDevicesPlatform platform, CdpSocket socket)
+    internal static async Task<CdpSession> CreateClientAndConnectAsync(ConnectedDevicesPlatform platform, CdpSocket socket)
     {
         var session = _sessionRegistry.Create(localSessionId => new(platform, socket.RemoteDevice)
         {
@@ -118,49 +120,15 @@ public sealed class CdpSession : IDisposable
             RemoteSessionId = 0
         }, out _);
 
-        session.SendConnectRequest(socket);
+        await session._connectHandler.ConnectAsync(socket);
 
         return session;
     }
     #endregion
 
-    void SendConnectRequest(CdpSocket socket, bool upgradeSupported = true)
-    {
-        CommonHeader header = new()
-        {
-            Type = MessageType.Connect,
-            AdditionalHeaders =
-            {
-                AdditionalHeader.FromUInt32(AdditionalHeaderType.Header129, 0x70_00_00_03),
-                AdditionalHeader.FromUInt64(AdditionalHeaderType.PeerCapabilities, (ulong)PeerCapabilities.All),
-                AdditionalHeader.FromUInt64(AdditionalHeaderType.Header131, upgradeSupported ? 7u : 6u)
-            }
-        };
-
-        SendMessage(socket, header, writer =>
-        {
-            new ConnectionHeader()
-            {
-                ConnectionMode = ConnectionMode.Proximal,
-                MessageType = ConnectionType.ConnectRequest
-            }.Write(writer);
-
-            var publicKey = _localEncryption.PublicKey;
-            new ConnectionRequest()
-            {
-                CurveType = CurveType.CT_NIST_P256_KDF_SHA512,
-                HmacSize = Constants.HMacSize,
-                MessageFragmentSize = Constants.DefaultMessageFragmentSize,
-                Nonce = _localEncryption.Nonce,
-                PublicKeyX = publicKey.X!,
-                PublicKeyY = publicKey.Y!
-            }.Write(writer);
-        });
-    }
-
     public void SendMessage(CdpSocket socket, CommonHeader header, BodyCallback bodyCallback, bool supplyRequestId = false)
     {
-        if (header.Type == MessageType.Session && _cryptor == null)
+        if (header.Type == MessageType.Session && cryptor == null)
             throw new InvalidOperationException("Invalid session state!");
 
         // header
@@ -206,9 +174,9 @@ public sealed class CdpSession : IDisposable
         void SendFragment(CommonHeader header, ReadOnlySpan<byte> fragmentPayload)
         {
             EndianWriter writer = new(Endianness.BigEndian);
-            if (_cryptor != null)
+            if (cryptor != null)
             {
-                _cryptor.EncryptMessage(writer, header, fragmentPayload);
+                cryptor.EncryptMessage(writer, header, fragmentPayload);
             }
             else
             {
@@ -222,34 +190,27 @@ public sealed class CdpSession : IDisposable
     }
 
     #region HandleMessages
-    CdpCryptor? _cryptor;
-    readonly CdpEncryptionInfo _localEncryption = CdpEncryptionInfo.Create(CdpEncryptionParams.Default);
-    CdpEncryptionInfo? _remoteEncryption = null;
-
     bool _connectionEstablished = false;
     public void HandleMessage(CdpSocket socket, CommonHeader header, EndianReader reader)
     {
         ThrowIfDisposed();
 
-        EndianWriter writer = new(Endianness.BigEndian);
-        var payloadReader = _cryptor != null ? _cryptor.Read(reader, header) : reader;
+        var payloadReader = cryptor != null ? cryptor.Read(reader, header) : reader;
 
         header.CorrectClientSessionBit();
-
-        // Only validate socket if it's not a connection msg
-        // All upgrade messages (belong to connect) need to be seen
-        // See HandleConnect(...)
-        if (header.Type != MessageType.Connect && !_upgradeHandler.IsSocketAllowed(socket))
-            throw UnexpectedMessage(socket.RemoteDevice.Endpoint.Address);
 
         if (header.Type == MessageType.Connect)
         {
             if (_connectionEstablished)
-                return; //  throw UnexpectedMessage(header.Type.ToString());
+                return;
 
-            HandleConnect(socket, header, payloadReader);
+            _connectHandler.HandleConnect(socket, header, payloadReader);
         }
-        else if (header.Type == MessageType.Control)
+
+        if (!_upgradeHandler.IsSocketAllowed(socket))
+            throw UnexpectedMessage(socket.RemoteDevice.Endpoint.Address);
+
+        if (header.Type == MessageType.Control)
         {
             _connectionEstablished = true;
 
@@ -261,287 +222,331 @@ public sealed class CdpSession : IDisposable
 
             HandleSession(header, payloadReader);
         }
-        else
-        {
-            // We might receive a "ReliabilityResponse"
-            // ignore
-        }
     }
 
-
-    #region Connect
-    void HandleConnect(CdpSocket socket, CommonHeader header, EndianReader reader)
+    CdpCryptor? cryptor;
+    readonly CdpEncryptionInfo localEncryption = CdpEncryptionInfo.Create(CdpEncryptionParams.Default);
+    CdpEncryptionInfo? remoteEncryption = null;
+    sealed class ConnectHandler
     {
-        ConnectionHeader connectionHeader = ConnectionHeader.Parse(reader);
-        _logger.LogDebug("Received {0} message {1} from session {2} via {3}",
-            header.Type,
-            connectionHeader.MessageType,
-            header.SessionId.ToString("X"),
-            socket.TransportType
-        );
-
-        if (_upgradeHandler.HandleConnect(socket, header, connectionHeader, reader))
-            return;
-
-        if (!_upgradeHandler.IsSocketAllowed(socket))
-            throw UnexpectedMessage(socket.RemoteDevice.Endpoint.Address);
-
-        if (connectionHeader.MessageType == ConnectionType.ConnectRequest)
+        readonly ILogger<ConnectHandler> _logger;
+        readonly CdpSession _session;
+        readonly UpgradeHandler _upgradeHandler;
+        public ConnectHandler(CdpSession session, UpgradeHandler upgradeHandler)
         {
-            if (_cryptor != null)
-                throw UnexpectedMessage("Encryption");
-
-            ThrowIfWrongMode(shouldBeHost: true);
-            HandleConnectRequest(header, reader, socket);
-
-            return;
+            _session = session;
+            _upgradeHandler = upgradeHandler;
+            _logger = session.Platform.DeviceInfo.LoggerFactory.CreateLogger<ConnectHandler>();
         }
 
-        if (connectionHeader.MessageType == ConnectionType.ConnectResponse)
+        TaskCompletionSource? _currentConnectPromise;
+        public async Task ConnectAsync(CdpSocket socket, bool upgradeSupported = true)
         {
-            if (_cryptor != null)
-                throw UnexpectedMessage("Encryption");
+            if (_currentConnectPromise != null)
+                throw new InvalidOperationException("Already connecting");
 
-            ThrowIfWrongMode(shouldBeHost: false);
-            HandleConnectResponse(header, reader, socket);
+            _currentConnectPromise = new();
 
-            return;
-        }
-
-        if (_cryptor == null)
-            throw UnexpectedMessage("Encryption");
-
-        switch (connectionHeader.MessageType)
-        {
-            case ConnectionType.DeviceAuthRequest:
-            case ConnectionType.UserDeviceAuthRequest:
-                ThrowIfWrongMode(shouldBeHost: true);
-                HandleAuthRequest(header, reader, socket, connectionHeader.MessageType);
-                break;
-            case ConnectionType.DeviceAuthResponse:
-            case ConnectionType.UserDeviceAuthResponse:
-                ThrowIfWrongMode(shouldBeHost: false);
-                HandleAuthResponse(header, reader, socket, connectionHeader.MessageType);
-                break;
-            case ConnectionType.AuthDoneRequest:
-                ThrowIfWrongMode(shouldBeHost: true);
-                HandleAuthDoneRequest(header, socket);
-                break;
-            case ConnectionType.AuthDoneRespone:
-                ThrowIfWrongMode(shouldBeHost: false);
-                HandleAuthDoneResponse(socket, reader);
-                break;
-            case ConnectionType.DeviceInfoMessage:
-                HandleDeviceInfoMessage(header, reader, socket);
-                break;
-            default:
-                throw UnexpectedMessage(connectionHeader.MessageType.ToString());
-        }
-    }
-
-    void HandleConnectRequest(CommonHeader header, EndianReader reader, CdpSocket socket)
-    {
-        ClientCapabilities = (PeerCapabilities)(header.TryGetHeader(AdditionalHeaderType.PeerCapabilities)?.AsUInt64() ?? 0);
-
-        var connectionRequest = ConnectionRequest.Parse(reader);
-        _remoteEncryption = CdpEncryptionInfo.FromRemote(connectionRequest.PublicKeyX, connectionRequest.PublicKeyY, connectionRequest.Nonce, CdpEncryptionParams.Default);
-
-        SendMessage(socket, header, writer =>
-        {
-            new ConnectionHeader()
+            CommonHeader header = new()
             {
-                ConnectionMode = ConnectionMode.Proximal,
-                MessageType = ConnectionType.ConnectResponse
-            }.Write(writer);
+                Type = MessageType.Connect,
+                AdditionalHeaders =
+                {
+                    AdditionalHeader.FromUInt32(AdditionalHeaderType.Header129, 0x70_00_00_03),
+                    AdditionalHeader.FromUInt64(AdditionalHeaderType.PeerCapabilities, (ulong)PeerCapabilities.All),
+                    AdditionalHeader.FromUInt64(AdditionalHeaderType.Header131, upgradeSupported ? 7u : 6u)
+                }
+            };
 
-            var publicKey = _localEncryption.PublicKey;
-            new ConnectionResponse()
-            {
-                Result = ConnectionResult.Pending,
-                HmacSize = connectionRequest.HmacSize,
-                MessageFragmentSize = connectionRequest.MessageFragmentSize,
-                Nonce = _localEncryption.Nonce,
-                PublicKeyX = publicKey.X!,
-                PublicKeyY = publicKey.Y!
-            }.Write(writer);
-        });
-
-        // We have to set cryptor after we send the message because it would be encrypted otherwise
-        var secret = _localEncryption.GenerateSharedSecret(_remoteEncryption);
-        _cryptor = new(secret);
-    }
-    void HandleConnectResponse(CommonHeader header, EndianReader reader, CdpSocket socket)
-    {
-        HostCapabilities = (PeerCapabilities)(header.TryGetHeader(AdditionalHeaderType.PeerCapabilities)?.AsUInt64() ?? 0);
-
-        var connectionResponse = ConnectionResponse.Parse(reader);
-        _remoteEncryption = CdpEncryptionInfo.FromRemote(connectionResponse.PublicKeyX, connectionResponse.PublicKeyY, connectionResponse.Nonce, CdpEncryptionParams.Default);
-
-        var secret = _localEncryption.GenerateSharedSecret(_remoteEncryption);
-        _cryptor = new(secret);
-
-        header.Flags = 0;
-        SendMessage(socket, header, (writer) =>
-        {
-            new ConnectionHeader()
-            {
-                ConnectionMode = ConnectionMode.Proximal,
-                MessageType = ConnectionType.DeviceAuthRequest
-            }.Write(writer);
-            AuthenticationPayload.Create(
-                Platform.DeviceInfo.DeviceCertificate!, // ToDo: User cert
-                hostNonce: _remoteEncryption!.Nonce, clientNonce: _localEncryption.Nonce
-            ).Write(writer);
-        });
-    }
-    void HandleAuthRequest(CommonHeader header, EndianReader reader, CdpSocket socket, ConnectionType connectionType)
-    {
-        var authRequest = AuthenticationPayload.Parse(reader);
-        if (!authRequest.VerifyThumbprint(hostNonce: _localEncryption.Nonce, clientNonce: _remoteEncryption!.Nonce))
-            throw new CdpSecurityException("Invalid thumbprint");
-
-        header.Flags = 0;
-        SendMessage(socket, header, (writer) =>
-        {
-            new ConnectionHeader()
-            {
-                ConnectionMode = ConnectionMode.Proximal,
-                MessageType = connectionType == ConnectionType.DeviceAuthRequest ? ConnectionType.DeviceAuthResponse : ConnectionType.UserDeviceAuthResponse
-            }.Write(writer);
-            AuthenticationPayload.Create(
-                Platform.DeviceInfo.DeviceCertificate, // ToDo: User cert
-                hostNonce: _localEncryption.Nonce, clientNonce: _remoteEncryption!.Nonce
-            ).Write(writer);
-        });
-    }
-    void HandleAuthResponse(CommonHeader header, EndianReader reader, CdpSocket socket, ConnectionType connectionType)
-    {
-        var authRequest = AuthenticationPayload.Parse(reader);
-        if (!authRequest.VerifyThumbprint(hostNonce: _remoteEncryption!.Nonce, clientNonce: _localEncryption.Nonce))
-            throw new CdpSecurityException("Invalid thumbprint");
-
-        if (connectionType == ConnectionType.DeviceAuthResponse)
-        {
-            header.Flags = 0;
-            SendMessage(socket, header, (writer) =>
+            _session.SendMessage(socket, header, writer =>
             {
                 new ConnectionHeader()
                 {
                     ConnectionMode = ConnectionMode.Proximal,
-                    MessageType = ConnectionType.UserDeviceAuthRequest
+                    MessageType = ConnectionType.ConnectRequest
+                }.Write(writer);
+
+                var publicKey = _session.localEncryption.PublicKey;
+                new ConnectionRequest()
+                {
+                    CurveType = CurveType.CT_NIST_P256_KDF_SHA512,
+                    HmacSize = Constants.HMacSize,
+                    MessageFragmentSize = Constants.DefaultMessageFragmentSize,
+                    Nonce = _session.localEncryption.Nonce,
+                    PublicKeyX = publicKey.X!,
+                    PublicKeyY = publicKey.Y!
+                }.Write(writer);
+            });
+
+            await _currentConnectPromise.Task;
+        }
+
+        public void HandleConnect(CdpSocket socket, CommonHeader header, EndianReader reader)
+        {
+            ConnectionHeader connectionHeader = ConnectionHeader.Parse(reader);
+            _logger.LogDebug("Received {0} message {1} from session {2} via {3}",
+                header.Type,
+                connectionHeader.MessageType,
+                header.SessionId.ToString("X"),
+                socket.TransportType
+            );
+
+            if (_upgradeHandler.TryHandleConnect(socket, header, connectionHeader, reader))
+                return;
+
+            if (!_upgradeHandler.IsSocketAllowed(socket))
+                throw UnexpectedMessage(socket.RemoteDevice.Endpoint.Address);
+
+            if (connectionHeader.MessageType == ConnectionType.ConnectRequest)
+            {
+                if (_session.cryptor != null)
+                    throw UnexpectedMessage("Encryption");
+
+                _session.ThrowIfWrongMode(shouldBeHost: true);
+                HandleConnectRequest(header, reader, socket);
+                return;
+            }
+
+            if (connectionHeader.MessageType == ConnectionType.ConnectResponse)
+            {
+                if (_session.cryptor != null)
+                    throw UnexpectedMessage("Encryption");
+
+                _session.ThrowIfWrongMode(shouldBeHost: false);
+                HandleConnectResponse(header, reader, socket);
+                return;
+            }
+
+            if (_session.cryptor == null)
+                throw UnexpectedMessage("Encryption");
+
+            switch (connectionHeader.MessageType)
+            {
+                case ConnectionType.DeviceAuthRequest:
+                case ConnectionType.UserDeviceAuthRequest:
+                    _session.ThrowIfWrongMode(shouldBeHost: true);
+                    HandleAuthRequest(header, reader, socket, connectionHeader.MessageType);
+                    break;
+
+                case ConnectionType.DeviceAuthResponse:
+                case ConnectionType.UserDeviceAuthResponse:
+                    _session.ThrowIfWrongMode(shouldBeHost: false);
+                    HandleAuthResponse(header, reader, socket, connectionHeader.MessageType);
+                    break;
+
+                case ConnectionType.AuthDoneRequest:
+                    _session.ThrowIfWrongMode(shouldBeHost: true);
+                    HandleAuthDoneRequest(header, socket);
+                    break;
+
+                case ConnectionType.AuthDoneRespone:
+                    _session.ThrowIfWrongMode(shouldBeHost: false);
+                    HandleAuthDoneResponse(socket, reader);
+                    break;
+
+                case ConnectionType.DeviceInfoMessage:
+                    HandleDeviceInfoMessage(header, reader, socket);
+                    break;
+
+                case ConnectionType.DeviceInfoResponseMessage:
+                    break;
+            }
+        }
+
+        void HandleConnectRequest(CommonHeader header, EndianReader reader, CdpSocket socket)
+        {
+            _session.ClientCapabilities = (PeerCapabilities)(header.TryGetHeader(AdditionalHeaderType.PeerCapabilities)?.AsUInt64() ?? 0);
+
+            var connectionRequest = ConnectionRequest.Parse(reader);
+            _session.remoteEncryption = CdpEncryptionInfo.FromRemote(connectionRequest.PublicKeyX, connectionRequest.PublicKeyY, connectionRequest.Nonce, CdpEncryptionParams.Default);
+
+            _session.SendMessage(socket, header, writer =>
+            {
+                new ConnectionHeader()
+                {
+                    ConnectionMode = ConnectionMode.Proximal,
+                    MessageType = ConnectionType.ConnectResponse
+                }.Write(writer);
+
+                var publicKey = _session.localEncryption.PublicKey;
+                new ConnectionResponse()
+                {
+                    Result = ConnectionResult.Pending,
+                    HmacSize = connectionRequest.HmacSize,
+                    MessageFragmentSize = connectionRequest.MessageFragmentSize,
+                    Nonce = _session.localEncryption.Nonce,
+                    PublicKeyX = publicKey.X!,
+                    PublicKeyY = publicKey.Y!
+                }.Write(writer);
+            });
+
+            // We have to set cryptor after we send the message because it would be encrypted otherwise
+            var secret = _session.localEncryption.GenerateSharedSecret(_session.remoteEncryption);
+            _session.cryptor = new(secret);
+        }
+
+        void HandleConnectResponse(CommonHeader header, EndianReader reader, CdpSocket socket)
+        {
+            _session.HostCapabilities = (PeerCapabilities)(header.TryGetHeader(AdditionalHeaderType.PeerCapabilities)?.AsUInt64() ?? 0);
+
+            var connectionResponse = ConnectionResponse.Parse(reader);
+            _session.remoteEncryption = CdpEncryptionInfo.FromRemote(connectionResponse.PublicKeyX, connectionResponse.PublicKeyY, connectionResponse.Nonce, CdpEncryptionParams.Default);
+
+            var secret = _session.localEncryption.GenerateSharedSecret(_session.remoteEncryption);
+            _session.cryptor = new(secret);
+
+            header.Flags = 0;
+            _session.SendMessage(socket, header, (writer) =>
+            {
+                new ConnectionHeader()
+                {
+                    ConnectionMode = ConnectionMode.Proximal,
+                    MessageType = ConnectionType.DeviceAuthRequest
                 }.Write(writer);
                 AuthenticationPayload.Create(
-                    Platform.DeviceInfo.DeviceCertificate!, // ToDo: User cert
-                    hostNonce: _remoteEncryption!.Nonce, clientNonce: _localEncryption.Nonce
+                    _session.Platform.DeviceInfo.DeviceCertificate!, // ToDo: User cert
+                    hostNonce: _session.remoteEncryption!.Nonce, clientNonce: _session.localEncryption.Nonce
                 ).Write(writer);
             });
-
-            return;
         }
 
-        PrepareSession(socket);
-
-        async void PrepareSession(CdpSocket socket)
+        void HandleAuthRequest(CommonHeader header, EndianReader reader, CdpSocket socket, ConnectionType connectionType)
         {
-            try
-            {
-                var oldSocket = socket;
-                socket = await _upgradeHandler.RequestUpgradeAsync(oldSocket);
-                oldSocket.Dispose();
-
-                Device = socket.RemoteDevice;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Upgrade failed");
-            }
+            var authRequest = AuthenticationPayload.Parse(reader);
+            if (!authRequest.VerifyThumbprint(hostNonce: _session.localEncryption.Nonce, clientNonce: _session.remoteEncryption!.Nonce))
+                throw new CdpSecurityException("Invalid thumbprint");
 
             header.Flags = 0;
-            SendMessage(socket, header, (writer) =>
+            _session.SendMessage(socket, header, (writer) =>
             {
                 new ConnectionHeader()
                 {
                     ConnectionMode = ConnectionMode.Proximal,
-                    MessageType = ConnectionType.AuthDoneRequest
+                    MessageType = connectionType == ConnectionType.DeviceAuthRequest ? ConnectionType.DeviceAuthResponse : ConnectionType.UserDeviceAuthResponse
+                }.Write(writer);
+                AuthenticationPayload.Create(
+                    _session.Platform.DeviceInfo.DeviceCertificate, // ToDo: User cert
+                    hostNonce: _session.localEncryption.Nonce, clientNonce: _session.remoteEncryption!.Nonce
+                ).Write(writer);
+            });
+        }
+
+        void HandleAuthResponse(CommonHeader header, EndianReader reader, CdpSocket socket, ConnectionType connectionType)
+        {
+            var authRequest = AuthenticationPayload.Parse(reader);
+            if (!authRequest.VerifyThumbprint(hostNonce: _session.remoteEncryption!.Nonce, clientNonce: _session.localEncryption.Nonce))
+                throw new CdpSecurityException("Invalid thumbprint");
+
+            if (connectionType == ConnectionType.DeviceAuthResponse)
+            {
+                header.Flags = 0;
+                _session.SendMessage(socket, header, (writer) =>
+                {
+                    new ConnectionHeader()
+                    {
+                        ConnectionMode = ConnectionMode.Proximal,
+                        MessageType = ConnectionType.UserDeviceAuthRequest
+                    }.Write(writer);
+                    AuthenticationPayload.Create(
+                        _session.Platform.DeviceInfo.DeviceCertificate!, // ToDo: User cert
+                        hostNonce: _session.remoteEncryption!.Nonce, clientNonce: _session.localEncryption.Nonce
+                    ).Write(writer);
+                });
+
+                return;
+            }
+
+            PrepareSession(socket);
+
+            async void PrepareSession(CdpSocket socket)
+            {
+                try
+                {
+                    var oldSocket = socket;
+                    socket = await _upgradeHandler.RequestUpgradeAsync(oldSocket);
+                    oldSocket.Dispose();
+
+                    _session.Device = socket.RemoteDevice;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Upgrade failed");
+                }
+
+                header.Flags = 0;
+                _session.SendMessage(socket, header, (writer) =>
+                {
+                    new ConnectionHeader()
+                    {
+                        ConnectionMode = ConnectionMode.Proximal,
+                        MessageType = ConnectionType.AuthDoneRequest
+                    }.Write(writer);
+                });
+            }
+        }
+
+        void HandleAuthDoneRequest(CommonHeader header, CdpSocket socket)
+        {
+            header.Flags = 0;
+            _session.SendMessage(socket, header, (writer) =>
+            {
+                new ConnectionHeader()
+                {
+                    ConnectionMode = ConnectionMode.Proximal,
+                    MessageType = ConnectionType.AuthDoneRespone // Ack
+                }.Write(writer);
+                new ResultPayload()
+                {
+                    Result = CdpResult.Success
+                }.Write(writer);
+            });
+        }
+
+        void HandleAuthDoneResponse(CdpSocket socket, EndianReader reader)
+        {
+            var msg = ResultPayload.Parse(reader);
+            msg.ThrowOnError();
+
+            _session.SendMessage(socket, new CommonHeader()
+            {
+                Type = MessageType.Connect
+            },
+            (writer) =>
+            {
+                new ConnectionHeader()
+                {
+                    ConnectionMode = ConnectionMode.Proximal,
+                    MessageType = ConnectionType.DeviceInfoMessage
+                }.Write(writer);
+                new DeviceInfoMessage()
+                {
+                    DeviceInfo = _session.Platform.GetCdpDeviceInfo()
+                }.Write(writer);
+            });
+
+            _currentConnectPromise?.TrySetResult();
+        }
+
+        void HandleDeviceInfoMessage(CommonHeader header, EndianReader reader, CdpSocket socket)
+        {
+            var msg = DeviceInfoMessage.Parse(reader);
+
+            header.Flags = 0;
+            _session.SendMessage(socket, header, (writer) =>
+            {
+                new ConnectionHeader()
+                {
+                    ConnectionMode = ConnectionMode.Proximal,
+                    MessageType = ConnectionType.DeviceInfoResponseMessage // Ack
                 }.Write(writer);
             });
         }
     }
-    void HandleAuthDoneRequest(CommonHeader header, CdpSocket socket)
-    {
-        header.Flags = 0;
-        SendMessage(socket, header, (writer) =>
-        {
-            new ConnectionHeader()
-            {
-                ConnectionMode = ConnectionMode.Proximal,
-                MessageType = ConnectionType.AuthDoneRespone // Ack
-            }.Write(writer);
-            new ResultPayload()
-            {
-                Result = CdpResult.Success
-            }.Write(writer);
-        });
-    }
-
-    #region OnAuthDone
-    event Action? OnAuthDoneInternal;
-    public Task WaitForAuthDone()
-    {
-        TaskCompletionSource promise = new();
-        void callback()
-        {
-            promise.SetResult();
-            OnAuthDoneInternal -= callback;
-        }
-        OnAuthDoneInternal += callback;
-        return promise.Task;
-    }
-    #endregion
-    
-    void HandleAuthDoneResponse(CdpSocket socket, EndianReader reader)
-    {
-        var msg = ResultPayload.Parse(reader);
-        msg.ThrowOnError();
-        OnAuthDoneInternal?.Invoke();
-
-        SendMessage(socket, new CommonHeader()
-        {
-            Type = MessageType.Connect
-        },
-        (writer) =>
-        {
-            new ConnectionHeader()
-            {
-                ConnectionMode = ConnectionMode.Proximal,
-                MessageType = ConnectionType.DeviceInfoMessage
-            }.Write(writer);
-            new DeviceInfoMessage()
-            {
-                DeviceInfo = Platform.GetCdpDeviceInfo()
-            }.Write(writer);
-        });
-    }
-    void HandleDeviceInfoMessage(CommonHeader header, EndianReader reader, CdpSocket socket)
-    {
-        var msg = DeviceInfoMessage.Parse(reader);
-
-        header.Flags = 0;
-        SendMessage(socket, header, (writer) =>
-        {
-            new ConnectionHeader()
-            {
-                ConnectionMode = ConnectionMode.Proximal,
-                MessageType = ConnectionType.DeviceInfoResponseMessage // Ack
-            }.Write(writer);
-        });
-    }
-    #endregion
 
     #region Control
     void HandleControl(CommonHeader header, EndianReader reader, CdpSocket socket)
     {
-        if (_cryptor == null)
+        if (cryptor == null)
             throw UnexpectedMessage("Encryption");
 
         var controlHeader = ControlHeader.Parse(reader);
@@ -617,7 +622,7 @@ public sealed class CdpSession : IDisposable
 
     void HandleSession(CommonHeader header, EndianReader reader)
     {
-        if (_cryptor == null)
+        if (cryptor == null)
             throw UnexpectedMessage("Encryption");
 
         CdpMessage msg = GetOrCreateMessage(header);
