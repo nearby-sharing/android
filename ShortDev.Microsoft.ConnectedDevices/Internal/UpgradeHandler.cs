@@ -8,6 +8,7 @@ using ShortDev.Networking;
 using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Internal;
@@ -69,6 +70,10 @@ internal sealed class UpgradeHandler
             case ConnectionType.UpgradeResponse:
                 _session.ThrowIfWrongMode(false);
                 HandleUpgradeResponse(socket, reader);
+                return true;
+            case ConnectionType.UpgradeFinalizationResponse:
+                _session.ThrowIfWrongMode(false);
+                HandleUpgradeFinalizationResponse(socket, reader);
                 return true;
             case ConnectionType.TransportConfirmation:
                 _session.ThrowIfWrongMode(false);
@@ -201,28 +206,25 @@ internal sealed class UpgradeHandler
 
         var errorMsg = $"Transport upgrade failed with HResult {msg.HResult}";
         _logger.LogWarning(errorMsg);
-        _currentUpgradePromise?.TrySetException(new Exception(errorMsg));
+        _currentUpgrade?.Promise.TrySetException(new Exception(errorMsg));
     }
 
     #region Client
-    TaskCompletionSource<CdpSocket>? _currentUpgradePromise;
-    Guid _currentUpgradeId = Guid.Empty;
-    public async ValueTask<CdpSocket> RequestUpgradeAsync(CdpSocket socket)
+    UpgradeInstance? _currentUpgrade;
+    public async ValueTask<CdpSocket> RequestUpgradeAsync(CdpSocket oldSocket)
     {
-        if (_currentUpgradePromise != null)
+        if (_currentUpgrade != null)
             throw new InvalidOperationException("Only a single upgrade may occur at the same time");
 
-        _currentUpgradeId = Guid.NewGuid();
-        SendUpgradeRequest(socket, _currentUpgradeId);
-
-        _currentUpgradePromise = new();
+        _currentUpgrade = new();
         try
         {
-            return await _currentUpgradePromise.Task;
+            SendUpgradeRequest(oldSocket, _currentUpgrade.Id);
+            return await _currentUpgrade.Promise.Task;
         }
         finally
         {
-            _currentUpgradePromise = null;
+            _currentUpgrade = null;
         }
 
         void SendUpgradeRequest(CdpSocket socket, Guid upgradeId)
@@ -245,19 +247,19 @@ internal sealed class UpgradeHandler
                     UpgradeId = upgradeId,
                     Endpoints = new[]
                     {
-                    EndpointMetadata.Tcp,
-                    EndpointMetadata.WifiDirect
-                }
+                        EndpointMetadata.Tcp
+                    }
                 }.Write(writer);
             });
         }
     }
 
-    static readonly TimeSpan UpgradeTestTimeout = TimeSpan.FromSeconds(5);
-    void HandleUpgradeResponse(CdpSocket socket, EndianReader reader)
+    void HandleUpgradeResponse(CdpSocket oldSocket, EndianReader reader)
     {
-        var msg = UpgradeResponse.Parse(reader);
+        if (_currentUpgrade == null)
+            return;
 
+        var msg = UpgradeResponse.Parse(reader);
         FindNewEndpoint();
 
         async void FindNewEndpoint()
@@ -270,17 +272,20 @@ internal sealed class UpgradeHandler
                 if (!int.TryParse(endpoint.Service, out var port))
                     return null;
 
-                return await _session.Platform.TryCreateSocketAsync(_session.Device.WithEndpoint(endpoint), UpgradeTestTimeout);
+                return await _session.Platform.TryCreateSocketAsync(_session.Device.WithEndpoint(endpoint), UpgradeInstance.Timeout);
             }));
-            var newSocket = tasks.FirstOrDefault(x => x != null);
-            if (newSocket == null)
+
+            if (_currentUpgrade == null)
+                return;
+
+            _currentUpgrade.NewSocket = tasks.FirstOrDefault(x => x != null);
+            if (_currentUpgrade.NewSocket == null)
             {
-                Debug.Assert(_currentUpgradePromise != null);
-                _currentUpgradePromise?.TrySetCanceled();
+                _currentUpgrade.Promise.TrySetCanceled();
                 return;
             }
 
-            _session.SendMessage(newSocket, new()
+            _session.SendMessage(oldSocket, new()
             {
                 Type = MessageType.Connect,
             }, writer =>
@@ -288,19 +293,69 @@ internal sealed class UpgradeHandler
                 new ConnectionHeader()
                 {
                     ConnectionMode = ConnectionMode.Proximal,
-                    MessageType = ConnectionType.TransportRequest
+                    MessageType = ConnectionType.UpgradeFinalization
                 }.Write(writer);
-                new TransportRequest()
+                EndpointMetadata.WriteArray(writer, new[]
                 {
-                    UpgradeId = _currentUpgradeId
-                }.Write(writer);
+                    EndpointMetadata.Tcp
+                });
             });
+
+            // Cancel after timeout if upgrade has not finished yet
+            await Task.Delay(UpgradeInstance.Timeout);
+
+            _currentUpgrade?.Promise.TrySetCanceled();
         }
+    }
+
+    void HandleUpgradeFinalizationResponse(CdpSocket socket, EndianReader reader)
+    {
+        // Upgrade has been acknowledged
+
+        if (_currentUpgrade == null)
+            return;
+
+        Debug.Assert(_currentUpgrade.NewSocket != null);
+
+        // Allow the new address
+        _allowedAddresses.Add(_currentUpgrade.NewSocket.RemoteDevice.Endpoint.Address);
+
+        // Request transport permission for new socket
+        _session.SendMessage(_currentUpgrade.NewSocket, new()
+        {
+            Type = MessageType.Connect,
+        }, writer =>
+        {
+            new ConnectionHeader()
+            {
+                ConnectionMode = ConnectionMode.Proximal,
+                MessageType = ConnectionType.TransportRequest
+            }.Write(writer);
+            new TransportRequest()
+            {
+                UpgradeId = _currentUpgrade.Id
+            }.Write(writer);
+        });
     }
 
     void HandleTransportConfirmation(CdpSocket socket, EndianReader reader)
     {
-        _currentUpgradePromise?.TrySetResult(socket);
+        // Upgrade successful
+        // Complete promise
+        _currentUpgrade?.Promise.TrySetResult(socket);
+    }
+
+    sealed class UpgradeInstance
+    {
+        public static readonly TimeSpan Timeout = TimeSpan.FromSeconds(2);
+
+        public Guid Id { get; } = Guid.NewGuid();
+        public TaskCompletionSource<CdpSocket> Promise { get; } = new();
+
+        public TaskAwaiter<CdpSocket> GetAwaiter()
+            => Promise.Task.GetAwaiter();
+
+        public CdpSocket? NewSocket { get; set; }
     }
     #endregion
 }

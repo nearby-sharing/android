@@ -31,7 +31,7 @@ public sealed class CdpSession : IDisposable
     public PeerCapabilities ClientCapabilities { get; private set; } = 0;
 
     public ConnectedDevicesPlatform Platform { get; }
-    public CdpDevice Device { get; }
+    public CdpDevice Device { get; internal set; }
 
     readonly ILogger<CdpSession> _logger;
     readonly UpgradeHandler _upgradeHandler;
@@ -245,7 +245,7 @@ public sealed class CdpSession : IDisposable
         if (header.Type == MessageType.Connect)
         {
             if (_connectionEstablished)
-                throw UnexpectedMessage(header.Type.ToString());
+                return; //  throw UnexpectedMessage(header.Type.ToString());
 
             HandleConnect(socket, header, payloadReader);
         }
@@ -330,8 +330,6 @@ public sealed class CdpSession : IDisposable
             case ConnectionType.AuthDoneRespone:
                 ThrowIfWrongMode(shouldBeHost: false);
                 HandleAuthDoneResponse(socket, reader);
-
-                socket.Dispose();
                 break;
             case ConnectionType.DeviceInfoMessage:
                 HandleDeviceInfoMessage(header, reader, socket);
@@ -447,9 +445,16 @@ public sealed class CdpSession : IDisposable
         {
             try
             {
-                socket = await _upgradeHandler.RequestUpgradeAsync(socket);
+                var oldSocket = socket;
+                socket = await _upgradeHandler.RequestUpgradeAsync(oldSocket);
+                oldSocket.Dispose();
+
+                Device = socket.RemoteDevice;
             }
-            catch { }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Upgrade failed");
+            }
 
             header.Flags = 0;
             SendMessage(socket, header, (writer) =>
@@ -493,7 +498,7 @@ public sealed class CdpSession : IDisposable
         return promise.Task;
     }
     #endregion
-
+    CdpSocket? _currentSocket;
     void HandleAuthDoneResponse(CdpSocket socket, EndianReader reader)
     {
         var msg = ResultPayload.Parse(reader);
@@ -517,7 +522,7 @@ public sealed class CdpSession : IDisposable
             }.Write(writer);
         });
 
-        socket.Dispose();
+        _currentSocket = socket;
     }
     void HandleDeviceInfoMessage(CommonHeader header, EndianReader reader, CdpSocket socket)
     {
@@ -674,7 +679,7 @@ public sealed class CdpSession : IDisposable
         if (IsHost)
             throw new InvalidOperationException("Session is not a client");
 
-        var socket = await Platform.CreateSocketAsync(Device);
+        var socket = _currentSocket ?? await Platform.CreateSocketAsync(Device);
         return await StartClientChannelAsync(appId, appName, handler, socket);
     }
 

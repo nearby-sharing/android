@@ -170,6 +170,10 @@ public sealed class ConnectedDevicesPlatform : IDisposable
                     try
                     {
                         var header = CommonHeader.Parse(streamReader);
+
+                        if (socket.IsClosed)
+                            return;
+
                         session = CdpSession.GetOrCreate(
                             this,
                             socket.RemoteDevice ?? throw new InvalidDataException(),
@@ -177,10 +181,17 @@ public sealed class ConnectedDevicesPlatform : IDisposable
                         );
 
                         var payload = streamReader.ReadBytes(header.PayloadSize);
+
+                        if (socket.IsClosed)
+                            return;
+
                         session.HandleMessage(socket, header, new EndianReader(Endianness.BigEndian, payload));
                     }
                     catch (Exception ex)
                     {
+                        if (socket.IsClosed)
+                            return;
+
                         _logger.Log(LogLevel.Warning, "{0} in session {1} \n {2}",
                             ex.GetType().Name,
                             session?.LocalSessionId.ToString() ?? "null",
