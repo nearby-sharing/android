@@ -45,10 +45,6 @@
 			<Project>{195c941f-5eef-45a9-a65c-16186e4bb131}</Project>
 			<Name>ShortDev.Android</Name>
 		</ProjectReference>
-		<ProjectReference Include="..\ShortDev.Microsoft.ConnectedDevices.AndroidSdk\ShortDev.Microsoft.ConnectedDevices.AndroidSdk.csproj">
-			<Project>{9cd32cf6-76dc-46de-afa6-47b008ad17a7}</Project>
-			<Name>ShortDev.Microsoft.ConnectedDevices.AndroidSdk</Name>
-		</ProjectReference>
 		<ProjectReference Include="..\ShortDev.Microsoft.ConnectedDevices.NearShare\ShortDev.Microsoft.ConnectedDevices.NearShare.csproj" />
 		<ProjectReference Include="..\ShortDev.Networking\ShortDev.Networking.csproj">
 			<Project>{18fcc134-71cc-4be9-9271-3839a6ffe380}</Project>
