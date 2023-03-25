@@ -21,6 +21,19 @@
  - Romanian
  - [Add a new one](https://github.com/ShortDevelopment/Nearby-Sharing-Windows/wiki/Contributing#add-translation)
 
+# Credits
+## Contributions
+ - Lukas Kurz (@ShortDevelopment)
+ 
+## Translations
+ - Guille (@Sappstal) (Spanish)
+ - Zakhar Markelov (@markelovz) (Russian)
+ - Sergiy (@sergd88) (Ukrainian)
+ - Simon (@QWERT-commits) (Chinese)
+ - 舰队的偶像-岛风酱! (@frg2089) (Chinese (Simplified))
+ - Clément Fresse (@MaisClement) (French)
+ - Andrei Muntean (@andreimuntean1) (Romanian)
+
 ## Building
 This is a new `Xamarin.Android` project based on `net6.0`.   
 You can use `Visual Studio 2022` to build and deploy the app.
