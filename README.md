@@ -21,7 +21,7 @@
  - Romanian
  - [Add a new one](https://github.com/ShortDevelopment/Nearby-Sharing-Windows/wiki/Contributing#add-translation)
 
-# Credits
+# [Credits](https://nearshare.shortdev.de/CREDITS)
 ## Contributions
  - Lukas Kurz (@ShortDevelopment)
  
