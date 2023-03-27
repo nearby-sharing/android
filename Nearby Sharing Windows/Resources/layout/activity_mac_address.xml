@@ -35,7 +35,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="3dp"
-                android:text="Important" />
+                android:text="@string/generic_important" />
 
             <TextView
                 android:id="@+id/infoTextView"
@@ -52,7 +52,7 @@
                 android:id="@+id/launchSettingsButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Open Settings" />
+                android:text="@string/launch_settings" />
 
             <View
                 android:layout_width="match_parent"
@@ -62,7 +62,7 @@
                 android:id="@+id/btMacAddressTextInputLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Bluetooth Mac Address">
+                android:hint="@string/bt_mac_address">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
@@ -83,14 +83,14 @@
                     android:id="@+id/backButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Back"
+                    android:text="@string/generic_back"
                     app:icon="@drawable/ic_fluent_chevron_left_24_regular" />
 
                 <Button
                     android:id="@+id/nextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Next"
+                    android:text="@string/generic_next"
                     android:layout_alignParentRight="true"
                     app:icon="@drawable/ic_fluent_chevron_right_24_regular"
                     app:iconGravity="end" />

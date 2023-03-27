@@ -16,14 +16,15 @@ using ShortDev.Microsoft.ConnectedDevices.NearShare;
 using ShortDev.Microsoft.ConnectedDevices.Platforms;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
 using System.Diagnostics.CodeAnalysis;
+using System.Net;
 using System.Net.NetworkInformation;
 using AndroidUri = Android.Net.Uri;
 using ManifestPermission = Android.Manifest.Permission;
 
 namespace Nearby_Sharing_Windows;
 
-[IntentFilter(new[] { Intent.ActionSend, Intent.ActionSendMultiple }, Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable }, DataMimeType = "*/*", Label = "Send file")]
-[IntentFilter(new[] { Intent.ActionSend }, Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable }, DataMimeType = "text/plain", Label = "Send url")]
+[IntentFilter(new[] { Intent.ActionSend, Intent.ActionSendMultiple }, Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable }, DataMimeType = "*/*", Label = "@string/share_file")]
+[IntentFilter(new[] { Intent.ActionSend }, Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable }, DataMimeType = "text/plain", Label = "@string/share_url")]
 [Activity(Label = "@string/app_name", Exported = true, Theme = "@style/AppTheme.TranslucentOverlay", ConfigurationChanges = UIHelper.ConfigChangesFlags)]
 public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsListener, ICdpPlatformHandler
 {
@@ -116,7 +117,7 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
     public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
     {
         if (grantResults.Contains(Android.Content.PM.Permission.Denied))
-            Snackbar.Make(Window!.DecorView, "Error: Missing permission!", Snackbar.LengthLong).Show();
+            Snackbar.Make(Window!.DecorView, GetString(Resource.String.send_missing_permissions), Snackbar.LengthLong).Show();
         else
             RunOnUiThread(() => InitializePlatform());
     }
@@ -195,7 +196,7 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
     {
         _discoverCancellationTokenSource.Cancel();
 
-        StatusTextView.Text = "Waiting for acceptance...";
+        StatusTextView.Text = GetString(Resource.String.wait_for_acceptance);
         try
         {
             try
@@ -217,9 +218,14 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
                     }
                     else
                     {
+                        var uri = Intent.GetStringExtra(Intent.ExtraText);
+                        if (!Uri.IsWellFormedUriString(uri, UriKind.Absolute))
+                        {
+                            uri = $"https://nearshare.shortdev.de/docs/txt_view?transfer_txt={WebUtility.UrlEncode(uri)}";
+                        }
                         uriTransferOperation = NearShareSender.SendUriAsync(
                             remoteSystem,
-                           new Uri(Intent.GetStringExtra(Intent.ExtraText)!)
+                            new Uri(uri)
                         );
                     }
                 }
@@ -255,7 +261,11 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
 
                             if (args.TotalFilesToSend != 0 && args.TotalBytesToSend != 0)
                             {
-                                StatusTextView.Text = $"Sending ... {args.FilesSent}/{args.TotalFilesToSend} files ... {Math.Round((decimal)args.BytesSent / args.TotalBytesToSend * 100)}%";
+                                StatusTextView.Text = this.Localize(
+                                    Resource.String.sending_template,
+                                    args.FilesSent, args.TotalFilesToSend,
+                                    Math.Round((decimal)args.BytesSent / args.TotalBytesToSend * 100)
+                                );
                                 OnRequestAccepted();
                             }
 #if !DEBUG
@@ -286,7 +296,7 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
         }
         catch (Exception ex)
         {
-            Snackbar.Make(Window!.DecorView, $"Error: {ex.Message}", Snackbar.LengthLong).Show();
+            Snackbar.Make(Window!.DecorView, this.Localize(Resource.String.generic_error_template, ex.Message), Snackbar.LengthLong).Show();
         }
     }
 

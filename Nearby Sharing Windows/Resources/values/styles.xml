@@ -4,6 +4,7 @@
 	<style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
 		<!-- Customize your theme here. -->
 		<item name="colorPrimary">@color/colorPrimary</item>
+		<item name="colorOnPrimary">#fff</item>
 		<item name="colorPrimaryDark">@color/colorPrimaryDark</item>
 		<item name="colorAccent">@color/colorAccent</item>
 		<item name="android:statusBarColor">?attr/colorPrimary</item>

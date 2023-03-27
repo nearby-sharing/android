@@ -22,7 +22,9 @@ public sealed class MainActivity : AppCompatActivity
         //    StartActivity(intent);
         //};
 
-        UIHelper.SetupToolBar(this, "Send data to Windows 10 / 11");
+        UIHelper.SetupToolBar(this, GetString(Resource.String.app_titlebar_title_default));
+
+        FindViewById<TextView>(Resource.Id.infoTextView)!.TextFormatted = UIHelper.LoadHtmlAsset(this, "Welcome");
 
         Button sendButton = FindViewById<Button>(Resource.Id.sendButton)!;
         sendButton.Click += SendButton_Click;

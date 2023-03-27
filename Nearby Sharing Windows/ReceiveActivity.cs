@@ -46,7 +46,7 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
         SetContentView(Resource.Layout.activity_receive);
 
         UIHelper.RequestReceivePermissions(this);
-        UIHelper.SetupToolBar(this, "Receive data from Windows 10 / 11");
+        UIHelper.SetupToolBar(this, GetString(Resource.String.app_titlebar_title_receive));
 
         notificationsRecyclerView = FindViewById<RecyclerView>(Resource.Id.notificationsRecyclerView)!;
         notificationsRecyclerView.SetLayoutManager(new LinearLayoutManager(this));
@@ -144,10 +144,11 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
         var service = (BluetoothManager)GetSystemService(BluetoothService)!;
         _btAdapter = service.Adapter!;
 
-        FindViewById<TextView>(Resource.Id.deviceInfoTextView)!.Text =
-            $"Visible as \"{_btAdapter.Name!}\"\n" +
-            $"BT-Address: {btAddress.ToStringFormatted()}\n" +
-            $"IP-Address: {AndroidNetworkHandler.GetLocalIp(this)}";
+        FindViewById<TextView>(Resource.Id.deviceInfoTextView)!.Text = this.Localize(
+            Resource.String.visible_as_template,
+            $"{_btAdapter.Name!}.\n" +
+            $"Address: {btAddress.ToStringFormatted()}\n" +
+            $"IP-Address: {AndroidNetworkHandler.GetLocalIp(this)}");
         debugLogTextView = FindViewById<TextView>(Resource.Id.debugLogTextView)!;
 
         SystemDebug.Assert(_cdp == null);
@@ -208,7 +209,7 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
         if (!grantResults.All((x) => x != Permission.Granted))
             InitializeCDP();
         else
-            Toast.MakeText(this, "Can't receive without permissions!", ToastLength.Long)!.Show();
+            Toast.MakeText(this, this.Localize(Resource.String.receive_missing_permissions), ToastLength.Long)!.Show();
     }
 
     public override bool OnCreateOptionsMenu(IMenu? menu)

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="app_titlebar_title_default">Надсилання файлів на Windows 10 / 11</string>
+	<string name="app_titlebar_title_receive">Отримання файлів із Windows 10 / 11</string>
+	<string name="app_titlebar_title_receive_setup">Налаштування / Інформація</string>
+	
+	<string name="assets_prefix">uk</string>
+
+	<!-- #region generic -->
+	<string name="generic_back">Назад</string>
+	<string name="generic_next">Далі</string>
+	<string name="generic_cancel">Відміна</string>
+
+	<string name="generic_send">Відправити</string>
+	<string name="generic_receive">Отримати</string>
+	
+	<string name="generic_status_template">Статус: {0}</string>
+	<string name="generic_error_template">Помилка: {0}</string>
+
+	<string name="generic_important">Важливо</string>
+	<string name="generic_notifications">Повідомлення</string>
+	<string name="generic_settings">Налаштування</string>
+	<string name="device_name">Ім\'я пристрою</string>
+	<!-- #endregion -->
+
+	<!-- #region activity_mac_address.xml -->
+	<string name="launch_settings">Відкрити налаштування</string>
+	<string name="bt_mac_address">MAC-Адрес Bluetooth</string>
+	<!-- #endregion -->
+
+	<!-- #region activity_receive.xml -->
+	<string name="visible_as_template">Відображати як {0}</string>
+	<string name="debug_log">Журнал налагодження</string>
+	<!-- #endregion -->
+
+	<!-- #region activity_share.xml -->
+	<string name="scanning">Сканування ...</string>
+	<!-- #endregion -->
+
+	<!-- #region preferences.xml -->
+	<string name="category_general">Основне</string>
+
+	<string name="request_permissions_title">Запит на дозвіл</string>
+	<string name="request_permissions_summary">Надайте необхідні дозволи додатку</string>
+
+	<string name="open_sponsor_title">Спонсор</string>
+	<string name="open_sponsor_summary">Підтримайте розробника програми</string>
+
+	<string name="open_faq_title">Довідка</string>
+	<string name="open_faq_summary">Відкрити FAQ</string>
+
+
+	<string name="category_device_info">Інформація про пристрій</string>
+
+	<string name="goto_mac_address_title">Вказати MAC-Адрес</string>
+	<string name="goto_mac_address_summary">Вкажіть MAC-Адрес цього пристрою</string>
+	<!-- #endregion -->
+
+	<!-- #region ReceiveActivity.cs -->
+	<string name="receive_missing_permissions">Неможливо отримати файл без дозволів.</string>
+	<!-- #endregion -->
+
+	<!-- #region ReceiveActivity.cs -->
+	<string name="share_file">Поділитись файлом</string>
+	<string name="share_url">Подiлитись посиланням</string>
+
+	<string name="send_missing_permissions">Недостатньо дозволів!</string>
+	<string name="wait_for_acceptance">Очікуємо на прийняття файлу одержувачем...</string>
+	<string name="sending_template">Надсилання ... {0}/{1} файл(а/ів) ... {2}%</string>
+	<!-- #endregion -->
+</resources>

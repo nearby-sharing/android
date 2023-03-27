@@ -7,8 +7,8 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<ApplicationId>de.shortdev.nearby_sharing_windows</ApplicationId>
-		<ApplicationVersion>12</ApplicationVersion>
-		<ApplicationDisplayVersion>1.2.3-alpha</ApplicationDisplayVersion>
+		<ApplicationVersion>16</ApplicationVersion>
+		<ApplicationDisplayVersion>1.3.3-beta</ApplicationDisplayVersion>
 		<UseAndroidCrypto>true</UseAndroidCrypto>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -21,7 +21,10 @@
 	  <AndroidCreatePackagePerAbi>False</AndroidCreatePackagePerAbi>
 	</PropertyGroup>
 	<ItemGroup>
+		<None Remove="Assets\de\Welcome.html" />
+		<None Remove="Assets\en\Welcome.html" />
 		<None Remove="Assets\MacAddressInfo.html" />
+		<None Remove="Assets\MacAddressInfo_en.html" />
 		<None Remove="Resources\drawable\quick_settings_tile_icon.xml" />
 		<None Remove="Resources\layout\activity_receive.xml" />
 		<None Remove="Resources\layout\activity_settings.xml" />
@@ -30,6 +33,7 @@
 		<None Remove="Resources\layout\activity_share__send__progress.xml" />
 		<None Remove="Resources\layout\item_transfer_notification.xml" />
 		<None Remove="Resources\layout\layout_appbar.xml" />
+		<None Remove="Resources\values-de\strings.xml" />
 		<None Remove="Resources\xml\file_paths.xml" />
 		<None Remove="Resources\xml\preferences.xml" />
 	</ItemGroup>

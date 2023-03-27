@@ -2,6 +2,7 @@
 
 Service: `CDPSvc`   
 Settings directory: `%LOCALAPPDATA%\ConnectedDevicesPlatform\`    
+Settings directory: `C:\Windows\ServiceProfiles\LocalService\AppData\Local\ConnectedDevicesPlatform`    
 
 ## Enable Logging
  1. Create `.\CDPGlobalSettings.cdp.override` with this content:

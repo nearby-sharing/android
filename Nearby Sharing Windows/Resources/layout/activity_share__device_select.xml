@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/deviceSelector"
-        android:background="#fff"
+        android:background="?android:attr/colorBackground"
         android:scrollbars="vertical" />
     <ImageView
         android:id="@+id/emptyDeviceListView"
