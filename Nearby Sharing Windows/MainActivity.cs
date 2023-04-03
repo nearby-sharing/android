@@ -1,4 +1,5 @@
 ﻿using Android.Content;
+using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using AndroidX.AppCompat.App;
@@ -48,21 +49,45 @@ public sealed class MainActivity : AppCompatActivity
             new Intent(Intent.ActionOpenDocument)
                 .SetType("*/*")
                 .AddCategory(Intent.CategoryOpenable)
-                .PutExtra(Intent.ExtraAllowMultiple, false),
+                .PutExtra(Intent.ExtraAllowMultiple, true),
             FilePickCode
         );
     }
 
     protected override void OnActivityResult(int requestCode, [GeneratedEnum] Result resultCode, Intent? data)
     {
-        if (data == null)
+        if (resultCode != Result.Ok || data == null)
             return;
 
-        if (requestCode == FilePickCode && resultCode == Result.Ok && data.Data != null)
+        if (requestCode == FilePickCode)
         {
-            Intent intent = new Intent(this, typeof(SendActivity));
-            intent.SetAction(Intent.ActionSend);
-            intent.PutExtra(Intent.ExtraStream, data.Data);
+            Intent intent = new(this, typeof(SendActivity));
+
+            var clipData = data.ClipData;
+            if (data.Data != null)
+            {
+                intent.SetAction(Intent.ActionSend);
+                intent.PutExtra(Intent.ExtraStream, data.Data);
+            }
+            else if (clipData != null)
+            {
+                intent.SetAction(Intent.ActionSendMultiple);
+
+                List<IParcelable> uriList = new();
+                for (int i = 0; i < clipData.ItemCount; i++)
+                {
+                    var item = clipData.GetItemAt(i);
+                    if (item?.Uri == null)
+                        continue;
+
+                    uriList.Add(item.Uri);
+                }
+
+                intent.PutParcelableArrayListExtra(Intent.ExtraStream, uriList);
+            }
+            else
+                return;
+
             StartActivity(intent);
         }
     }
