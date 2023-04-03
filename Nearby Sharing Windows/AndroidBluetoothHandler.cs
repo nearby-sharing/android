@@ -73,7 +73,7 @@ public sealed class AndroidBluetoothHandler : IBluetoothHandler
             throw new InvalidOperationException($"{nameof(Adapter)} is not initialized!");
 
         var btDevice = Adapter.GetRemoteDevice(device.Endpoint.Address) ?? throw new ArgumentException($"Could not find bt device with address \"{device.Endpoint.Address}\"");
-        var btSocket = btDevice.CreateRfcommSocketToServiceRecord(Java.Util.UUID.FromString(options.ServiceId)) ?? throw new ArgumentException("Could not create service socket");
+        var btSocket = btDevice.CreateInsecureRfcommSocketToServiceRecord(Java.Util.UUID.FromString(options.ServiceId)) ?? throw new ArgumentException("Could not create service socket");
         await btSocket.ConnectAsync();
         return btSocket.ToCdp();
     }
@@ -109,31 +109,18 @@ public sealed class AndroidBluetoothHandler : IBluetoothHandler
         if (Adapter == null)
             throw new InvalidOperationException($"{nameof(Adapter)} is null");
 
-        using (var insecureListener = Adapter.ListenUsingInsecureRfcommWithServiceRecord(
+        using var listener = Adapter.ListenUsingInsecureRfcommWithServiceRecord(
             options.ServiceName,
             Java.Util.UUID.FromString(options.ServiceId)
-        )!)
-        using (var securelistener = Adapter.ListenUsingRfcommWithServiceRecord(
-            options.ServiceName,
-            Java.Util.UUID.FromString(options.ServiceId)
-        )!)
+        )!;
+        while (true)
         {
-            Func<BluetoothServerSocket, Task> processor = async (listener) =>
-            {
-                while (true)
-                {
-                    var socket = await listener.AcceptAsync();
-                    if (cancellationToken.IsCancellationRequested)
-                        return;
+            var socket = await listener.AcceptAsync();
+            if (cancellationToken.IsCancellationRequested)
+                return;
 
-                    if (socket != null)
-                        options!.SocketConnected!(socket.ToCdp());
-                }
-            };
-            await Task.WhenAny(new[] {
-                Task.Run(() => processor(securelistener), cancellationToken),
-                Task.Run(() => processor(insecureListener), cancellationToken)
-            });
+            if (socket != null)
+                options!.SocketConnected!(socket.ToCdp());
         }
     }
     #endregion
