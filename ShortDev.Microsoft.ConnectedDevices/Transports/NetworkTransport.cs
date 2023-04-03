@@ -40,7 +40,8 @@ public sealed class NetworkTransport : ICdpTransport
                     InputStream = stream,
                     OutputStream = stream,
                     RemoteDevice = new(
-                        null,
+                        null, // ToDo: ToDo!!
+                        DeviceType.Invalid,
                         new EndpointInfo(
                             TransportType,
                             ((IPEndPoint?)client.Client.RemoteEndPoint)?.Address.ToString() ?? throw new InvalidDataException("No ip address"),

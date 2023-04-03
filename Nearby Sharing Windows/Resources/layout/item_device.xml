@@ -28,7 +28,7 @@
             android:background="@drawable/round_outline"
             android:backgroundTint="?android:attr/colorBackground"
             android:tint="?attr/colorOnSurface"
-            android:src="@drawable/ic_fluent_bluetooth_24_regular" />
+            android:src="@drawable/ic_fluent_live_24_regular" />
     </RelativeLayout>
 
     <TextView

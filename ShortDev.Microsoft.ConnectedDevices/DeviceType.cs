@@ -4,6 +4,8 @@ namespace ShortDev.Microsoft.ConnectedDevices;
 
 public enum DeviceType : short
 {
+    Invalid = -1,
+
     XboxOne = 1,
 
     Xbox360 = 2,
@@ -33,17 +35,20 @@ public static class DeviceTypeExtensions
 {
     public static DdsPlatformType GetPlatformType(this DeviceType deviceType)
     {
-        if (deviceType == ConnectedDevices.DeviceType.Linux)
+        if (deviceType == DeviceType.Linux)
             return DdsPlatformType.Linux;
 
-        if (deviceType == ConnectedDevices.DeviceType.Android)
+        if (deviceType == DeviceType.Android)
             return DdsPlatformType.Android;
 
-        if (deviceType == ConnectedDevices.DeviceType.iPad || deviceType == ConnectedDevices.DeviceType.iPhone)
+        if (deviceType == DeviceType.iPad || deviceType == DeviceType.iPhone)
             return DdsPlatformType.iOS;
 
         return DdsPlatformType.Windows;
     }
+
+    public static bool IsMobile(this DeviceType deviceType)
+        => deviceType is DeviceType.Android or DeviceType.iPhone or DeviceType.Windows10Phone;
 }
 
 

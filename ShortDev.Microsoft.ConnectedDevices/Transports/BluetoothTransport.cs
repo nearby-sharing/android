@@ -59,6 +59,7 @@ public sealed class BluetoothTransport : ICdpTransport, ICdpDiscoverableTranspor
             {
                 CdpDevice device = new(
                     advertisement.DeviceName,
+                    advertisement.DeviceType,
                     EndpointInfo.FromRfcommDevice(advertisement.MacAddress)
                 );
                 DeviceDiscovered?.Invoke(this, device, advertisement);

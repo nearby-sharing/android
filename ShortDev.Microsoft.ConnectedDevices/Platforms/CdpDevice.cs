@@ -2,8 +2,8 @@
 
 namespace ShortDev.Microsoft.ConnectedDevices.Platforms;
 
-public record CdpDevice(string? Name, EndpointInfo Endpoint)
+public record CdpDevice(string? Name, DeviceType Type, EndpointInfo Endpoint)
 {
     public CdpDevice WithEndpoint(EndpointInfo endpoint)
-        => new(Name, endpoint);
+        => new(Name, Type, endpoint);
 }
