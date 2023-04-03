@@ -1,5 +1,5 @@
-﻿using ShortDev.Microsoft.ConnectedDevices.Platforms.Bluetooth;
-using ShortDev.Networking;
+﻿using ShortDev.Networking;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.NetworkInformation;
 using System.Text;
@@ -8,25 +8,40 @@ namespace ShortDev.Microsoft.ConnectedDevices.Transports;
 
 public sealed record CdpAdvertisement(DeviceType DeviceType, PhysicalAddress MacAddress, string DeviceName)
 {
-    public static bool TryParse(BluetoothDevice device, [MaybeNullWhen(false)] out CdpAdvertisement data)
+    [Flags]
+    enum BeaconFlags : byte
+    {
+        MyDevice,
+        Public
+    }
+
+    public static bool TryParse(byte[] beaconData, [MaybeNullWhen(false)] out CdpAdvertisement data)
     {
         data = null;
 
-        if (device.BeaconData == null)
+        if (beaconData == null)
             return false;
 
-        EndianReader reader = new(Endianness.BigEndian, device.BeaconData);
+        EndianReader reader = new(Endianness.BigEndian, beaconData);
 
         var scenarioType = reader.ReadByte();
-        if (scenarioType != 1)
+        if (scenarioType != Constants.BLeBeaconScenarioType)
             return false;
 
-        var versionAndDeviceType = reader.ReadByte();
-        var deviceType = (DeviceType)versionAndDeviceType;
+        var deviceType = (DeviceType)reader.ReadByte();
 
         var versionAndFlags = reader.ReadByte();
-        /* Reserved */
-        reader.ReadByte();
+        if (versionAndFlags >> 5 != 1)
+            return false; // wrong version
+
+        var flags = (BeaconFlags)(versionAndFlags & 0x1f);
+        if ((int)flags >= 2)
+            return false; // wrong flags
+
+        var deviceStatus = (ExtendedDeviceStatus)reader.ReadByte();
+
+        if (flags != BeaconFlags.Public)
+            return false;
 
         data = new(
             deviceType,
@@ -40,12 +55,22 @@ public sealed record CdpAdvertisement(DeviceType DeviceType, PhysicalAddress Mac
     public byte[] GenerateBLeBeacon()
     {
         EndianWriter writer = new(Endianness.LittleEndian);
-        writer.Write((byte)0x1);
+        writer.Write(Constants.BLeBeaconScenarioType);
         writer.Write((byte)DeviceType);
-        writer.Write((byte)0x21);
-        writer.Write((byte)0x0a);
+
+        byte versionAndFlags = (byte)BeaconFlags.Public;
+        versionAndFlags |= Constants.BLeBeaconVersion << 5;
+        writer.Write(versionAndFlags);
+
+        var deviceStatus = ExtendedDeviceStatus.RemoteSessionsNotHosted | ExtendedDeviceStatus.NearShareAuthPolicyPermissive;
+        writer.Write((byte)deviceStatus);
+
         writer.Write(BinaryConvert.ToReversed(MacAddress.GetAddressBytes()));
-        writer.Write(DeviceName);
+
+        // ToDo: Don't crop characters wider that 2 bytes!
+        ReadOnlySpan<byte> deviceNameBuffer = Encoding.UTF8.GetBytes(DeviceName);
+        var deviceNameLength = Math.Min(deviceNameBuffer.Length, Constants.BLeBeaconDeviceNameMaxByteLength);
+        writer.Write(deviceNameBuffer[..deviceNameLength]);
 
         return writer.Buffer.ToArray();
     }

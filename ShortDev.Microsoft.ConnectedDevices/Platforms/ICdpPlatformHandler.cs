@@ -2,5 +2,5 @@
 
 public interface ICdpPlatformHandler
 {
-    void Log(int level, string message);
+    // void Log(int level, string message);
 }

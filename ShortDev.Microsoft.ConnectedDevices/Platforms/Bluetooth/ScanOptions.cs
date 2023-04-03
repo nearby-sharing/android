@@ -1,8 +1,9 @@
-﻿using System;
+﻿using ShortDev.Microsoft.ConnectedDevices.Transports;
+using System;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Platforms.Bluetooth;
 
-public sealed class ScanOptions<TDevice>
+public sealed class ScanOptions
 {
-    public Action<TDevice>? OnDeviceDiscovered { get; set; }
+    public Action<CdpAdvertisement>? OnDeviceDiscovered { get; set; }
 }

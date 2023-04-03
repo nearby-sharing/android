@@ -24,5 +24,14 @@ public enum AdditionalHeaderType : byte
     /// Identifies the last seen message that both participants can agree upon.
     /// </summary>
     WatermarkId,
-    UserMessageRequestId = 5
+    UserMessageRequestId = 5,
+
+    // Extended Headers
+
+    Header129 = 0x81,
+    /// <summary>
+    /// <see cref="Messages.PeerCapabilities"/>
+    /// </summary>
+    PeerCapabilities = 0x82,
+    Header131 = 0x83
 }

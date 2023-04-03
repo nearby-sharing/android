@@ -1,36 +1,38 @@
-﻿using Bond.IO.Unsafe;
-using Bond.Protocols;
-using ShortDev.Microsoft.ConnectedDevices;
+﻿using ShortDev.Microsoft.ConnectedDevices;
+using ShortDev.Microsoft.ConnectedDevices.Encryption;
+using ShortDev.Microsoft.ConnectedDevices.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.Authentication;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.DeviceInfo;
-using ShortDev.Microsoft.ConnectedDevices.Encryption;
+using ShortDev.Microsoft.ConnectedDevices.Messages.Control;
+using ShortDev.Microsoft.ConnectedDevices.Messages.Session;
+using ShortDev.Microsoft.ConnectedDevices.Platforms;
+using ShortDev.Microsoft.ConnectedDevices.Platforms.Network;
 using ShortDev.Microsoft.ConnectedDevices.Serialization;
+using ShortDev.Microsoft.ConnectedDevices.Transports;
 using ShortDev.Networking;
 using Spectre.Console;
-using ShortDev.Microsoft.ConnectedDevices.Messages;
+using System.Diagnostics;
+using System.Text.Json;
 
-//var adapter = await BluetoothAdapter.GetDefaultAsync();
-//Debug.Print(adapter.BluetoothAddress.ToString("X"));
-
-while (false)
-{
-    MemoryStream stream = new(BinaryConvert.ToBytes(AnsiConsole.Ask<string>("Bytes")));
-    CompactBinaryReader<InputStream> reader = new(new(stream));
-    reader.ReadFieldBegin(out var a, out var b);
-    var typeId = reader.ReadInt32();
-    reader.ReadFieldBegin(out var fieldType, out var fieldId);
-    bool array = fieldType == Bond.BondDataType.BT_LIST;
-    int length = 0;
-    if (array)
-        reader.ReadContainerBegin(out length, out fieldType);
-    Console.WriteLine($"{fieldType} = {typeId}; {fieldId}: {(array ? $"array Count = {length}" : "")}");
-
-    Console.ReadLine();
-}
-
-var secret = BinaryConvert.ToBytes("37fc508508ba8d6d7ba7ddc79ad29fecdf855879e2a48b6811f310e80dcab98a81500925c1c8019c05b418d3bc22a870fc52d3735b43babc85c57a1fe12d4fb4");
+var secret = BinaryConvert.ToBytes("c77e603b1e78507906bc34e113f59f7242405a57d8af49ad1c65c5b6c8967f81fc1a0bd9742c650b585a26f6876460a476f4c412cb606f96183203c088a733d0");
 CdpCryptor cryptor = new(secret);
+
+DoStuff().GetAwaiter().GetResult();
+
+async Task DoStuff()
+{
+    ConnectedDevicesPlatform cdp = new(new PlatformHandler());
+    cdp.AddTransport<NetworkTransport>(new(new PlatformHandler()));
+
+    CdpDevice device = new(
+        null,
+        new(CdpTransportType.Tcp, "127.0.0.1", Constants.TcpPort.ToString())
+    );
+
+    ICdpTransport transport = cdp.TryGetTransport<NetworkTransport>()!;
+    var socket = await transport.TryConnectAsync(device, TimeSpan.FromSeconds(2));
+}
 
 while (true)
 {
@@ -79,13 +81,44 @@ void HandleMessage(CommonHeader header, EndianReader reader)
     }
     else if (header.Type == MessageType.Session)
     {
-        // reader.PrintPayload();
-        //var prepend = reader.ReadBytes(0x0000000C);
-        //var valueSet = ValueSet.Parse(reader.BaseStream);
+        BinaryMsgHeader binaryHeader = BinaryMsgHeader.Parse(reader);
+        var valueSet = ValueSet.Parse(reader);
+        Debug.Print(JsonSerializer.Serialize(valueSet));
+    }
+    else if (header.Type == MessageType.Control)
+    {
+        ControlHeader controlHeader = ControlHeader.Parse(reader);
+        switch (controlHeader.MessageType)
+        {
+            case ControlMessageType.StartChannelRequest:
+                StartChannelRequest startChannelRequest = StartChannelRequest.Parse(reader);
+                break;
+            case ControlMessageType.StartChannelResponse:
+                break;
+            case ControlMessageType.EnumerateAppsReponse:
+                break;
+            case ControlMessageType.EnumerateAppTargetNamesRequest:
+                break;
+            case ControlMessageType.EnumerateAppTargetNamesResponse:
+                break;
+            default:
+                break;
+        }
     }
     else
     {
         Console.WriteLine();
         //Console.WriteLine(BinaryConvert.ToString(reader.ReadPayload()));
+    }
+}
+
+class PlatformHandler : INetworkHandler
+{
+    public string GetLocalIp()
+        => "127.0.0.1";
+
+    public void Log(int a, string msg)
+    {
+
     }
 }

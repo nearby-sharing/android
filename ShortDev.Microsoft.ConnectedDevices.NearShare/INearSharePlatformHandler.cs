@@ -4,6 +4,6 @@ namespace ShortDev.Microsoft.ConnectedDevices.NearShare;
 
 public interface INearSharePlatformHandler : ICdpPlatformHandler
 {
-    void OnReceivedUri(UriTranferToken transfer);
+    void OnReceivedUri(UriTransferToken transfer);
     void OnFileTransfer(FileTransferToken transfer);
 }

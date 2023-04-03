@@ -1,8 +1,11 @@
-﻿using ShortDev.Networking;
+﻿using Microsoft.CorrelationVector;
+using ShortDev.Networking;
 using System;
 using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages;
 
@@ -174,7 +177,7 @@ public sealed class CommonHeader : ICdpHeader<CommonHeader>
 
     #region Message Length
     public const int MessageLengthOffset = 2;
-    public void SetMessageLength(int payloadSize)
+    public void SetPayloadLength(int payloadSize)
     {
         MessageLength = (ushort)(payloadSize + ((ICdpSerializable<CommonHeader>)this).CalcSize());
     }
@@ -209,5 +212,17 @@ public sealed class CommonHeader : ICdpHeader<CommonHeader>
             AdditionalHeaderType.ReplyToId,
             value
         ));
+    }
+
+    public AdditionalHeader? TryGetHeader(AdditionalHeaderType type)
+        => AdditionalHeaders.FirstOrDefault(x => x.Type == type);
+
+    public ulong? TryGetReplyToId()
+    {
+        var header = TryGetHeader(AdditionalHeaderType.ReplyToId);
+        if (header == null)
+            return null;
+
+        return BinaryPrimitives.ReadUInt64LittleEndian(header.Value.Span);
     }
 }
