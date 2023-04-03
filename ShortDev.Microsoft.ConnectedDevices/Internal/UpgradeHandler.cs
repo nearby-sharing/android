@@ -167,7 +167,7 @@ internal sealed class UpgradeHandler
             {
                 Endpoints = new[]
                 {
-                    EndpointInfo.FromTcpIp(networkTransport.Handler.GetLocalIp())
+                    EndpointInfo.FromTcp(networkTransport.Handler.GetLocalIp())
                 },
                 MetaData = new[]
                 {

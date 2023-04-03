@@ -23,8 +23,14 @@ public record class EndpointInfo(
         return new(ipAddress, port);
     }
 
-    public static EndpointInfo FromTcpIp(string ip)
-        => new(CdpTransportType.Tcp, ip, Constants.TcpPort.ToString());
+    public static EndpointInfo FromTcp(IPEndPoint endpoint)
+        => FromTcp(endpoint.Address);
+
+    public static EndpointInfo FromTcp(IPAddress address)
+    => FromTcp(address.ToString());
+
+    public static EndpointInfo FromTcp(string address)
+        => new(CdpTransportType.Tcp, address, Constants.TcpPort.ToString());
 
     public static EndpointInfo FromRfcommDevice(PhysicalAddress macAddress)
         => new(CdpTransportType.Rfcomm, macAddress.ToStringFormatted(), Constants.RfcommServiceId);
