@@ -123,12 +123,13 @@ public sealed class NetworkTransport : ICdpTransport, ICdpDiscoverableTransport
             EndianWriter writer = new(Endianness.BigEndian);
             new CommonHeader()
             {
-                Type = MessageType.Discovery
+                Type = MessageType.Discovery,
+                MessageLength = 43
             }.Write(writer);
             new DiscoveryHeader()
             {
                 Type = DiscoveryType.PresenceRequest
-            }.Write(writer);
+            }.Write(writer);            
             return writer.Buffer;
         }
     }
@@ -174,7 +175,7 @@ public sealed class NetworkTransport : ICdpTransport, ICdpDiscoverableTransport
                     DeviceDiscovered?.Invoke(this,
                         new CdpDevice(
                             response.DeviceName,
-                            DeviceType.Invalid, // ToDo: ToDo
+                            response.DeviceType,
                             EndpointInfo.FromTcp(result.RemoteEndPoint)
                         ),
                         new CdpAdvertisement(
@@ -195,7 +196,8 @@ public sealed class NetworkTransport : ICdpTransport, ICdpDiscoverableTransport
             EndianWriter writer = new(Endianness.BigEndian);
             new CommonHeader()
             {
-                Type = MessageType.Discovery
+                Type = MessageType.Discovery,
+                MessageLength = 97
             }.Write(writer);
             new DiscoveryHeader()
             {
