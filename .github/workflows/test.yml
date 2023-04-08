@@ -1,0 +1,27 @@
+name: "Unit Tests"
+
+on:
+  push:
+    branches: [ "master" ]
+    paths: ["**.cs"]
+  pull_request:
+    paths: ["**.cs"]
+  workflow_dispatch:
+
+jobs:
+  cdp:
+    name: ShortDev.Microsoft.ConnectedDevices.Test
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Setup .NET Core SDK
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '7.0.x'
+        include-prerelease: true
+        
+    - name: Test
+      run: dotnet test ShortDev.Microsoft.ConnectedDevices.Test
