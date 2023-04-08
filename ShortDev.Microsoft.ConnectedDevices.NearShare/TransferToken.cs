@@ -83,4 +83,7 @@ public sealed class FileTransferToken : TransferToken
         Progress = listener;
     }
     #endregion
+
+    internal ulong[] ContentSizes { get; init; } = Array.Empty<ulong>();
+    internal uint[] ContentIds { get; init; } = Array.Empty<uint>();
 }

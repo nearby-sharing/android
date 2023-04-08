@@ -45,8 +45,6 @@ internal sealed class NearShareApp : CdpAppBase
         throw CdpSession.UnexpectedMessage(msgType.ToString());
     }
 
-    ulong transferedBytes = 0;
-    ulong bytesToSend = 0;
     FileTransferToken? _fileTransferToken;
     void HandleStartTransfer(CdpMessage msg, ValueSet payload)
     {
@@ -56,22 +54,23 @@ internal sealed class NearShareApp : CdpAppBase
             case DataKind.File:
                 {
                     var fileNames = payload.Get<List<string>>("FileNames");
-                    if (fileNames.Count != 1)
-                        throw new NotImplementedException("Only able to receive one file at a time");
 
+                    var fileDisplayStr = string.Join(", ", fileNames);
                     _logger.LogInformation("Receiving file \"{0}\" from session {1:X} via {2}",
-                        fileNames[0],
+                        fileDisplayStr,
                         msg.Header.SessionId,
                         Channel.Socket.TransportType
                     );
 
-                    bytesToSend = payload.Get<ulong>("BytesToSend");
-
+                    var bytesToSend = payload.Get<ulong>("BytesToSend");
                     _fileTransferToken = new()
                     {
                         DeviceName = Channel.Session.Device.Name ?? "UNKNOWN",
-                        FileName = fileNames[0],
-                        FileSize = bytesToSend
+                        FileName = fileDisplayStr,
+                        FileSize = bytesToSend,
+                        // Internal
+                        ContentIds = payload.Get<IList<uint>>("ContentIds").ToArray(),
+                        ContentSizes = payload.Get<IList<ulong>>("ContentSizes").ToArray()
                     };
                     HandleFileTransferToken(_fileTransferToken);
 
@@ -105,12 +104,39 @@ internal sealed class NearShareApp : CdpAppBase
         {
             await token.TaskInternal;
 
-            _blobCursor = CreateBlobCursor();
+            _blobCursor = CreateBlobCursor(token);
             _blobCursor.MoveNext();
         }
         catch (TaskCanceledException)
         {
             OnCancel();
+        }
+
+        IEnumerator CreateBlobCursor(FileTransferToken transferToken)
+        {
+            for (int i = 0; i < transferToken.ContentIds.Length; i++)
+            {
+                var contentId = transferToken.ContentIds[i];
+                var bytesToSend = transferToken.ContentSizes[i];
+
+                ulong requestedPosition = 0;
+                for (; requestedPosition + PartitionSize < bytesToSend; requestedPosition += PartitionSize)
+                {
+                    RequestBlob(requestedPosition);
+                    yield return null;
+                }
+                RequestBlob(requestedPosition, contentId, (uint)(bytesToSend - requestedPosition));
+            }
+
+            void RequestBlob(ulong requestedPosition, uint contentId = 0u, uint size = PartitionSize)
+            {
+                ValueSet request = new();
+                request.Add("ControlMessage", (uint)NearShareControlMsgType.FetchDataRequest);
+                request.Add("BlobPosition", requestedPosition);
+                request.Add("BlobSize", size);
+                request.Add("ContentId", contentId);
+                SendValueSet(request, _messageId);
+            }
         }
     }
 
@@ -123,7 +149,7 @@ internal sealed class NearShareApp : CdpAppBase
         var blob = payload.Get<List<byte>>("DataBlob");
         var blobSize = (ulong)blob.Count;
 
-        if (position > bytesToSend || blobSize > PartitionSize)
+        if (blobSize > PartitionSize) // ToDo: position > _bytesToSend
             throw new CdpSecurityException("Device tried to send too much data!");
 
         // PlatformHandler.Log(0, $"BlobPosition: {position}; ({newPosition * 100 / bytesToSend}%)");
@@ -134,35 +160,13 @@ internal sealed class NearShareApp : CdpAppBase
             stream.Write(CollectionsMarshal.AsSpan(blob));
         }
 
-        transferedBytes += blobSize;
-        _fileTransferToken.ReceivedBytes = transferedBytes;
+        _fileTransferToken.ReceivedBytes += blobSize;
 
         var expectMessage = !_fileTransferToken.IsTransferComplete;
         if (expectMessage)
             _blobCursor?.MoveNext();
         else
             OnCompleted();
-    }
-
-    IEnumerator CreateBlobCursor()
-    {
-        ulong requestedPosition = 0;
-        for (; requestedPosition + PartitionSize < bytesToSend; requestedPosition += PartitionSize)
-        {
-            RequestBlob(requestedPosition);
-            yield return null;
-        }
-        RequestBlob(requestedPosition, (uint)(bytesToSend - requestedPosition));
-    }
-
-    void RequestBlob(ulong requestedPosition, uint size = PartitionSize)
-    {
-        ValueSet request = new();
-        request.Add("ControlMessage", (uint)NearShareControlMsgType.FetchDataRequest);
-        request.Add("BlobPosition", requestedPosition);
-        request.Add("BlobSize", size);
-        request.Add("ContentId", 0u);
-        SendValueSet(request, _messageId);
     }
 
     void OnCancel()
