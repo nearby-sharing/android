@@ -18,22 +18,6 @@ using System.Text.Json;
 var secret = BinaryConvert.ToBytes("c77e603b1e78507906bc34e113f59f7242405a57d8af49ad1c65c5b6c8967f81fc1a0bd9742c650b585a26f6876460a476f4c412cb606f96183203c088a733d0");
 CdpCryptor cryptor = new(secret);
 
-DoStuff().GetAwaiter().GetResult();
-
-async Task DoStuff()
-{
-    ConnectedDevicesPlatform cdp = new(new PlatformHandler());
-    cdp.AddTransport<NetworkTransport>(new(new PlatformHandler()));
-
-    CdpDevice device = new(
-        null,
-        new(CdpTransportType.Tcp, "127.0.0.1", Constants.TcpPort.ToString())
-    );
-
-    ICdpTransport transport = cdp.TryGetTransport<NetworkTransport>()!;
-    var socket = await transport.TryConnectAsync(device, TimeSpan.FromSeconds(2));
-}
-
 while (true)
 {
     Console.Clear();
