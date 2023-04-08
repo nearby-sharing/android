@@ -24,4 +24,4 @@ jobs:
         include-prerelease: true
         
     - name: Test
-      run: dotnet test ShortDev.Microsoft.ConnectedDevices.Test
+      run: dotnet test tests/ShortDev.Microsoft.ConnectedDevices.Test
