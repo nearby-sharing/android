@@ -21,6 +21,13 @@ public static class Extensions
         return promise.Task;
     }
 
+    public static async Task<T?> WithTimeout<T>(this Task<T> task, TimeSpan timeout)
+    {
+        if (await Task.WhenAny(task, Task.Delay(timeout)) == task)
+            return task.Result;
+        return default;
+    }
+
     public static ECDsa ToECDsa(this ECDiffieHellman @this)
     {
         ECDsa result = ECDsa.Create();

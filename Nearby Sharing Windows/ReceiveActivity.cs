@@ -1,38 +1,34 @@
 ﻿using Android.Bluetooth;
-using Android.Bluetooth.LE;
 using Android.Content.PM;
-using Android.Net.Wifi;
+using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using AndroidX.AppCompat.App;
 using AndroidX.RecyclerView.Widget;
 using Google.Android.Material.ProgressIndicator;
 using ShortDev.Android.UI;
-using ShortDev.Microsoft.ConnectedDevices.NearShare;
 using ShortDev.Microsoft.ConnectedDevices;
+using ShortDev.Microsoft.ConnectedDevices.Encryption;
+using ShortDev.Microsoft.ConnectedDevices.NearShare;
 using ShortDev.Microsoft.ConnectedDevices.Platforms;
-using ShortDev.Microsoft.ConnectedDevices.Platforms.Bluetooth;
-using ShortDev.Microsoft.ConnectedDevices.Platforms.Network;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Net;
 using System.Net.NetworkInformation;
-using BLeScanResult = Android.Bluetooth.LE.ScanResult;
-using CdpBluetoothDevice = ShortDev.Microsoft.ConnectedDevices.Platforms.Bluetooth.BluetoothDevice;
+using SystemDebug = System.Diagnostics.Debug;
 
 namespace Nearby_Sharing_Windows;
 
 [Activity(Label = "@string/app_name", Theme = "@style/AppTheme", ConfigurationChanges = UIHelper.ConfigChangesFlags)]
-public sealed class ReceiveActivity : AppCompatActivity, IBluetoothHandler, INetworkHandler, INearSharePlatformHandler
+public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandler
 {
     BluetoothAdapter? _btAdapter;
 
     [AllowNull] TextView debugLogTextView;
 
-    [AllowNull] AdapterDescriptor<TranferToken> adapterDescriptor;
+    [AllowNull] AdapterDescriptor<TransferToken> adapterDescriptor;
     [AllowNull] RecyclerView notificationsRecyclerView;
-    readonly List<TranferToken> _notifications = new();
+    readonly List<TransferToken> _notifications = new();
 
     PhysicalAddress? btAddress = null;
     protected override void OnCreate(Bundle? savedInstanceState)
@@ -112,7 +108,7 @@ public sealed class ReceiveActivity : AppCompatActivity, IBluetoothHandler, INet
                             acceptButton.SetOnClickListener(new DelegateClickListener((s, e) => onAccept()));
                     }
                 }
-                else if (transfer is UriTranferToken uriTranfer)
+                else if (transfer is UriTransferToken uriTranfer)
                 {
                     fileNameTextView.Text = uriTranfer.Uri;
                     detailsTextView.Text = uriTranfer.DeviceName;
@@ -151,20 +147,27 @@ public sealed class ReceiveActivity : AppCompatActivity, IBluetoothHandler, INet
         FindViewById<TextView>(Resource.Id.deviceInfoTextView)!.Text = this.Localize(
             Resource.String.visible_as_template,
             $"{_btAdapter.Name!}.\n" +
-            $"Address: {btAddress.ToStringFormatted()}");
+            $"Address: {btAddress.ToStringFormatted()}\n" +
+            $"IP-Address: {AndroidNetworkHandler.GetLocalIp(this)}");
         debugLogTextView = FindViewById<TextView>(Resource.Id.debugLogTextView)!;
 
-        CdpAppRegistration.RegisterApp<NearShareHandshakeApp>(() => new()
+        SystemDebug.Assert(_cdp == null);
+
+        _cdp = new(new()
         {
-            PlatformHandler = this
+            Type = DeviceType.Android,
+            Name = _btAdapter.Name ?? throw new NullReferenceException("Could not find device name"),
+            OemModelName = Build.Model ?? string.Empty,
+            OemManufacturerName = Build.Manufacturer ?? string.Empty,
+            DeviceCertificate = ConnectedDevicesPlatform.CreateDeviceCertificate(CdpEncryptionParams.Default),
+            LoggerFactory = ConnectedDevicesPlatform.CreateLoggerFactory(Log)
         });
 
-        Debug.Assert(_cdp == null);
+        AndroidBluetoothHandler bluetoothHandler = new(this, _btAdapter, btAddress);
+        _cdp.AddTransport<BluetoothTransport>(new(bluetoothHandler));
 
-        _cdp = new(this);
-
-        _cdp.AddTransport<BluetoothTransport>(new(this));
-        _cdp.AddTransport<NetworkTransport>(new(this));
+        AndroidNetworkHandler networkHandler = new(this, this);
+        _cdp.AddTransport<NetworkTransport>(new(networkHandler));
 
         _cdp.Listen(_cancellationTokenSource.Token);
         _cdp.Advertise(new CdpAdvertisement(
@@ -172,6 +175,8 @@ public sealed class ReceiveActivity : AppCompatActivity, IBluetoothHandler, INet
             btAddress, // "00:fa:21:3e:fb:19"
             _btAdapter.Name!
         ), _cancellationTokenSource.Token);
+
+        NearShareReceiver.Start(_cdp, this);
     }
 
     string GetFilePath(string name)
@@ -189,7 +194,7 @@ public sealed class ReceiveActivity : AppCompatActivity, IBluetoothHandler, INet
     FileStream CreateFile(string name)
     {
         var path = GetFilePath(name);
-        Log(0, $"Saving file to \"{path}\"");
+        Log($"Saving file to \"{path}\"");
         return File.Create(path);
 
         // ToDo: OutputStream cannot seek!
@@ -217,129 +222,18 @@ public sealed class ReceiveActivity : AppCompatActivity, IBluetoothHandler, INet
     {
         _cancellationTokenSource?.Cancel();
         _cdp?.Dispose();
+        NearShareReceiver.Stop();
         base.Finish();
     }
 
-    #region Communication
-    #region BLe Scan
-    public async Task ScanBLeAsync(ScanOptions<CdpBluetoothDevice> scanOptions, CancellationToken cancellationToken = default)
-    {
-        using var scanner = _btAdapter?.BluetoothLeScanner ?? throw new InvalidOperationException($"\"{nameof(_btAdapter)}\" is not initialized");
 
-        BluetoothLeScannerCallback scanningCallback = new();
-        scanningCallback.OnFoundDevice += (result) => scanOptions.OnDeviceDiscovered?.Invoke(result.Device!.ToCdp());
-        scanner.StartScan(scanningCallback);
 
-        await cancellationToken.AwaitCancellation();
-
-        scanner.StopScan(scanningCallback);
-    }
-
-    sealed class BluetoothLeScannerCallback : ScanCallback
-    {
-        public event Action<BLeScanResult>? OnFoundDevice;
-
-        public override void OnScanResult([GeneratedEnum] ScanCallbackType callbackType, BLeScanResult? result)
-        {
-            if (result != null)
-                OnFoundDevice?.Invoke(result);
-        }
-
-        public override void OnBatchScanResults(IList<BLeScanResult>? results)
-        {
-            if (results != null)
-                foreach (var result in results)
-                    if (result != null)
-                        OnFoundDevice?.Invoke(result);
-        }
-    }
-
-    public async Task<CdpSocket> ConnectRfcommAsync(CdpBluetoothDevice device, RfcommOptions options, CancellationToken cancellationToken = default)
-    {
-        if (_btAdapter == null)
-            throw new InvalidOperationException($"{nameof(_btAdapter)} is not initialized!");
-
-        var btDevice = _btAdapter.GetRemoteDevice(device.Address) ?? throw new ArgumentException($"Could not find bt device with address \"{device.Address}\"");
-        var btSocket = btDevice.CreateRfcommSocketToServiceRecord(Java.Util.UUID.FromString(options.ServiceId)) ?? throw new ArgumentException("Could not create service socket");
-        await btSocket.ConnectAsync();
-        return btSocket.ToCdp();
-    }
-    #endregion
-
-    #region BLe Advertisement
-    public async Task AdvertiseBLeBeaconAsync(AdvertiseOptions options, CancellationToken cancellationToken = default)
-    {
-        var settings = new AdvertiseSettings.Builder()
-            .SetAdvertiseMode(AdvertiseMode.LowLatency)!
-            .SetTxPowerLevel(AdvertiseTx.PowerHigh)!
-            .SetConnectable(false)!
-            .Build();
-
-        var data = new AdvertiseData.Builder()
-            .AddManufacturerData(options.ManufacturerId, options.BeaconData!)!
-            .Build();
-
-        BLeAdvertiseCallback callback = new();
-        _btAdapter!.BluetoothLeAdvertiser!.StartAdvertising(settings, data, callback);
-
-        await cancellationToken.AwaitCancellation();
-
-        _btAdapter.BluetoothLeAdvertiser.StopAdvertising(callback);
-    }
-
-    class BLeAdvertiseCallback : AdvertiseCallback { }
-    #endregion
-
-    #region Rfcomm
-    public async Task ListenRfcommAsync(RfcommOptions options, CancellationToken cancellationToken = default)
-    {
-        if (_btAdapter == null)
-            throw new InvalidOperationException($"{nameof(_btAdapter)} is null");
-
-        using (var insecureListener = _btAdapter.ListenUsingInsecureRfcommWithServiceRecord(
-            options.ServiceName,
-            Java.Util.UUID.FromString(options.ServiceId)
-        )!)
-        using (var securelistener = _btAdapter.ListenUsingRfcommWithServiceRecord(
-            options.ServiceName,
-            Java.Util.UUID.FromString(options.ServiceId)
-        )!)
-        {
-            Func<BluetoothServerSocket, Task> processor = async (listener) =>
-            {
-                while (true)
-                {
-                    var socket = await listener.AcceptAsync();
-                    if (cancellationToken.IsCancellationRequested)
-                        return;
-
-                    if (socket != null)
-                        options!.SocketConnected!(socket.ToCdp());
-                }
-            };
-            await Task.WhenAny(new[] {
-                Task.Run(() => processor(securelistener), cancellationToken),
-                Task.Run(() => processor(insecureListener), cancellationToken)
-            });
-        }
-    }
-    #endregion
-    #endregion
-
-    public void Log(int level, string message)
+    public void Log(string message)
     {
         RunOnUiThread(() =>
         {
-            debugLogTextView.Text += "\n" + $"[{DateTime.Now.ToString("HH:mm:ss")}]: {message}";
+            debugLogTextView.Text += "\n" + $"[{DateTime.Now:HH:mm:ss}]: {message}";
         });
-    }
-
-    public string GetLocalIp()
-    {
-        WifiManager wifiManager = (WifiManager)GetSystemService(WifiService)!;
-        WifiInfo wifiInfo = wifiManager.ConnectionInfo!;
-        int ip = wifiInfo.IpAddress;
-        return new IPAddress(ip).ToString();
     }
 
     void UpdateUI()
@@ -350,7 +244,7 @@ public sealed class ReceiveActivity : AppCompatActivity, IBluetoothHandler, INet
         });
     }
 
-    public void OnReceivedUri(UriTranferToken transfer)
+    public void OnReceivedUri(UriTransferToken transfer)
     {
         _notifications.Add(transfer);
         UpdateUI();
@@ -365,14 +259,16 @@ public sealed class ReceiveActivity : AppCompatActivity, IBluetoothHandler, INet
 
 static class Extensions
 {
-    public static CdpBluetoothDevice ToCdp(this Android.Bluetooth.BluetoothDevice @this, byte[]? beaconData = null)
-        => new()
-        {
-            Address = @this.Address ?? throw new NullReferenceException(),
-            Alias = OperatingSystem.IsAndroidVersionAtLeast(30) ? @this.Alias : null,
-            Name = @this.Name ?? throw new NullReferenceException(),
-            BeaconData = beaconData
-        };
+    public static CdpDevice ToCdp(this BluetoothDevice @this)
+        => new(
+            @this.Name ?? throw new InvalidDataException("Empty name"),
+            DeviceType.Invalid,
+            new(
+                CdpTransportType.Rfcomm,
+                @this.Address ?? throw new InvalidDataException("Empty address"),
+                Constants.RfcommServiceId
+            )
+        );
 
     public static CdpSocket ToCdp(this BluetoothSocket @this)
         => new()

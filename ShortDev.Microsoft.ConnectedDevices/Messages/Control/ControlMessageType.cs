@@ -1,6 +1,6 @@
 ﻿namespace ShortDev.Microsoft.ConnectedDevices.Messages.Control;
 
-public enum ControlMessageType
+public enum ControlMessageType : byte
 {
     StartChannelRequest = 0,
     StartChannelResponse = 1,

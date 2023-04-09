@@ -3,6 +3,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
 
 enum PropertyType {
   PropertyType_Empty = 0,
+  PropertyType_Int32 = 4,
   PropertyType_UInt32 = 5,
   // PropertyType_Int64 = 6,
   PropertyType_UInt64 = 7,
@@ -23,6 +24,7 @@ struct UUID {
 
 struct PropertyValue {
 	0: required PropertyType Type = PropertyType_Empty;
+	103: int32 Int32Value; // ToDo: This might not be the right property id
 	104: uint32 UInt32Value;
 	106: uint64 UInt64Value;
 	114: vector<UUID> GuidArrayValue;

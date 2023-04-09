@@ -98,16 +98,12 @@ public sealed class CdpCryptor : IDisposable
             throw new CdpSecurityException("Invalid hmac!");
     }
 
-    public void EncryptMessage(EndianWriter writer, CommonHeader header, BodyCallback bodyCallback)
+    public void EncryptMessage(EndianWriter writer, CommonHeader header, ReadOnlySpan<byte> payloadBuffer)
     {
         EndianWriter msgWriter = new(Endianness.BigEndian);
 
         Span<byte> iv = stackalloc byte[Constants.IVSize];
         GenerateIV(header, iv);
-
-        EndianWriter bodyWriter = new(Endianness.BigEndian);
-        bodyCallback(bodyWriter);
-        var payloadBuffer = bodyWriter.Buffer.AsSpan();
 
         EndianWriter payloadWriter = new(Endianness.BigEndian);
         payloadWriter.Write((uint)payloadBuffer.Length);
@@ -119,7 +115,7 @@ public sealed class CdpCryptor : IDisposable
         var encryptedPayload = _aes.EncryptCbc(buffer, iv, paddingMode);
 
         header.Flags |= MessageFlags.SessionEncrypted | MessageFlags.HasHMAC;
-        header.SetMessageLength(encryptedPayload.Length);
+        header.SetPayloadLength(encryptedPayload.Length);
         header.Write(msgWriter);
 
         msgWriter.Write(encryptedPayload);

@@ -1,23 +1,29 @@
-﻿using ShortDev.Networking;
-using System;
-using System.IO;
+﻿using ShortDev.Microsoft.ConnectedDevices.Exceptions;
+using ShortDev.Networking;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages.Control;
 
 public sealed class StartChannelResponse : ICdpPayload<StartChannelResponse>
 {
     public static StartChannelResponse Parse(EndianReader reader)
-    {
-        throw new NotImplementedException();
-    }
+       => new()
+       {
+           Result = (ChannelResult)reader.ReadByte(),
+           ChannelId = reader.ReadUInt64()
+       };
 
-    public required long ReponseId { get; init; }
-    public required int Unknown { get; init; }
+    public required ChannelResult Result { get; init; }
+    public required ulong ChannelId { get; init; }
+
+    public void ThrowOnError()
+    {
+        if (Result != ChannelResult.Success)
+            throw new CdpProtocolException($"Could not create channel. {Result}");
+    }
 
     public void Write(EndianWriter writer)
     {
-        writer.Write(ReponseId);
-        writer.Write(Unknown);
-        writer.Write((uint)0);
+        writer.Write((byte)Result);
+        writer.Write(ChannelId);
     }
 }

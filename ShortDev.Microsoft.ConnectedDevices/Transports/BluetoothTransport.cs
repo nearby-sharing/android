@@ -1,12 +1,15 @@
-﻿using ShortDev.Microsoft.ConnectedDevices.Platforms;
+﻿using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.TransportUpgrade;
+using ShortDev.Microsoft.ConnectedDevices.Platforms;
 using ShortDev.Microsoft.ConnectedDevices.Platforms.Bluetooth;
-using System;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Transports;
 
 public sealed class BluetoothTransport : ICdpTransport, ICdpDiscoverableTransport
 {
+    public CdpTransportType TransportType { get; } = CdpTransportType.Rfcomm;
+
     public IBluetoothHandler Handler { get; }
     public BluetoothTransport(IBluetoothHandler handler)
     {
@@ -27,10 +30,13 @@ public sealed class BluetoothTransport : ICdpTransport, ICdpDiscoverableTranspor
         );
     }
 
-    public CdpSocket Connect(CdpDevice device)
-    {
-        throw new NotImplementedException();
-    }
+    public async Task<CdpSocket> ConnectAsync(CdpDevice device)
+        => await Handler.ConnectRfcommAsync(device, new RfcommOptions()
+        {
+            ServiceId = Constants.RfcommServiceId,
+            ServiceName = Constants.RfcommServiceName,
+            SocketConnected = (socket) => DeviceConnected?.Invoke(this, socket)
+        });
 
     public void Advertise(CdpAdvertisement options, CancellationToken cancellationToken)
     {
@@ -49,10 +55,14 @@ public sealed class BluetoothTransport : ICdpTransport, ICdpDiscoverableTranspor
     {
         _ = Handler.ScanBLeAsync(new()
         {
-            OnDeviceDiscovered = (device) =>
+            OnDeviceDiscovered = (advertisement) =>
             {
-                if (CdpAdvertisement.TryParse(device, out var data))
-                    DeviceDiscovered?.Invoke(this, device, data);
+                CdpDevice device = new(
+                    advertisement.DeviceName,
+                    advertisement.DeviceType,
+                    EndpointInfo.FromRfcommDevice(advertisement.MacAddress)
+                );
+                DeviceDiscovered?.Invoke(this, device, advertisement);
             }
         }, cancellationToken);
     }
@@ -61,4 +71,7 @@ public sealed class BluetoothTransport : ICdpTransport, ICdpDiscoverableTranspor
     {
         DeviceConnected = null;
     }
+
+    public EndpointInfo GetEndpoint()
+        => new(TransportType, Handler.MacAddress.ToStringFormatted(), Constants.RfcommServiceId);
 }

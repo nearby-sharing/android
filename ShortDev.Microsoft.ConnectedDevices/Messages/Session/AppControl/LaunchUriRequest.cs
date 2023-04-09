@@ -11,7 +11,7 @@ public sealed class LaunchUriRequest : ICdpPayload<LaunchUriRequest>
             Uri = reader.ReadStringWithLength(),
             LaunchLocation = (LaunchLocation)reader.ReadInt16(),
             RequestID = reader.ReadInt64(),
-            InputData = reader.ReadStringWithLength()
+            InputData = reader.ReadStringWithLength() // ToDo: Optional??
         };
 
     /// <summary>
@@ -35,5 +35,6 @@ public sealed class LaunchUriRequest : ICdpPayload<LaunchUriRequest>
         writer.WriteWithLength(Uri);
         writer.Write((short)LaunchLocation);
         writer.Write(RequestID);
+        writer.WriteWithLength(InputData);
     }
 }

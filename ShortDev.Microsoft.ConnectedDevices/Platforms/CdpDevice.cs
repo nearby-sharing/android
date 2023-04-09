@@ -1,8 +1,9 @@
-﻿namespace ShortDev.Microsoft.ConnectedDevices.Platforms;
+﻿using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.TransportUpgrade;
 
-public class CdpDevice
+namespace ShortDev.Microsoft.ConnectedDevices.Platforms;
+
+public record CdpDevice(string? Name, DeviceType Type, EndpointInfo Endpoint)
 {
-    public required string Name { get; init; }
-    public required string Address { get; init; }
-    public string? Alias { get; init; }
+    public CdpDevice WithEndpoint(EndpointInfo endpoint)
+        => new(Name, Type, endpoint);
 }

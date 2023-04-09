@@ -1,6 +1,6 @@
-# Nearby Sharing (Windows)
-This application is a port of the `nearsharestandalone` example of Microsofts `Project Rome` with some UI and UX improvements   
+# Android - Nearby Sharing Windows
+This android app is capable of sending and receiving using the `Ms-NearShare` protocol implemented [here](https://github.com/ShortDevelopment/Nearby-Sharing-Windows/tree/master/ShortDev.Microsoft.ConnectedDevices.NearShare).   
 
-<a href="https://github.com/microsoft/project-rome/tree/master/Android/samples/nearsharestandalone/app/src/main/java/com/microsoft/connecteddevices/nearshare">
-    <img src="https://img.shields.io/static/v1?label=Original%20Source&message=nearsharestandalone&color=green&style=for-the-badge&logo=github&logoColor=white" />
-</a>
+## Download
+[![grafic](https://img.shields.io/static/v1?style=for-the-badge&labelColor=212225&logoColor=fff&color=green&label=PlayStore&message=Stable&logo=google-play)](https://play.google.com/store/apps/details?id=de.shortdev.nearby_sharing_windows)   
+[![grafic](https://img.shields.io/static/v1?style=for-the-badge&labelColor=212225&logoColor=fff&color=yellow&label=PlayStore&message=Preview&logo=google-play)](https://play.google.com/apps/testing/de.shortdev.nearby_sharing_windows)

@@ -1,15 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net6.0-android31.0</TargetFramework>
+		<TargetFramework>net7.0-android33.0</TargetFramework>
 		<OutputType>Exe</OutputType>
 		<SupportedOSPlatformVersion>21</SupportedOSPlatformVersion>
-		<LangVersion>preview</LangVersion>
+		<LangVersion>latest</LangVersion>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<ApplicationId>de.shortdev.nearby_sharing_windows</ApplicationId>
-		<ApplicationVersion>15</ApplicationVersion>
-		<ApplicationDisplayVersion>1.3.2-beta</ApplicationDisplayVersion>
-		<EnablePreviewFeatures>true</EnablePreviewFeatures>
+		<ApplicationVersion>16</ApplicationVersion>
+		<ApplicationDisplayVersion>1.3.3-beta</ApplicationDisplayVersion>
 		<UseAndroidCrypto>true</UseAndroidCrypto>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -49,10 +48,6 @@
 		<ProjectReference Include="..\ShortDev.Android\ShortDev.Android.csproj">
 			<Project>{195c941f-5eef-45a9-a65c-16186e4bb131}</Project>
 			<Name>ShortDev.Android</Name>
-		</ProjectReference>
-		<ProjectReference Include="..\ShortDev.Microsoft.ConnectedDevices.AndroidSdk\ShortDev.Microsoft.ConnectedDevices.AndroidSdk.csproj">
-			<Project>{9cd32cf6-76dc-46de-afa6-47b008ad17a7}</Project>
-			<Name>ShortDev.Microsoft.ConnectedDevices.AndroidSdk</Name>
 		</ProjectReference>
 		<ProjectReference Include="..\ShortDev.Microsoft.ConnectedDevices.NearShare\ShortDev.Microsoft.ConnectedDevices.NearShare.csproj" />
 		<ProjectReference Include="..\ShortDev.Networking\ShortDev.Networking.csproj">

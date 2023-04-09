@@ -7,9 +7,11 @@ namespace ShortDev.Microsoft.ConnectedDevices.Messages.Session.AppControl;
 public sealed class LaunchUriResult : ICdpPayload<LaunchUriResult>
 {
     public static LaunchUriResult Parse(EndianReader reader)
-    {
-        throw new NotImplementedException();
-    }
+        => new()
+        {
+            Result = reader.ReadInt32(),
+            ResponseID = reader.ReadInt32()
+        };
 
     /// <summary>
     /// The HRESULT returned by the call, zero if successful.
@@ -24,6 +26,7 @@ public sealed class LaunchUriResult : ICdpPayload<LaunchUriResult>
 
     public void Write(EndianWriter writer)
     {
-
+        writer.Write(Result);
+        writer.Write(ResponseID);
     }
 }

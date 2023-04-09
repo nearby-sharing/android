@@ -1,4 +1,5 @@
-﻿using ShortDev.Networking;
+﻿using ShortDev.Microsoft.ConnectedDevices.Messages.Session;
+using ShortDev.Networking;
 using System;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages;
@@ -42,20 +43,24 @@ public sealed class CdpMessage : IDisposable
 
     public EndianReader Read()
     {
-        if (!IsComplete)
-            throw new InvalidOperationException("Wait for completion");
+        ThrowIfNotCompleted();
 
         return new(Endianness.BigEndian, _buffer.AsSpan());
     }
 
-    public EndianReader Read(out byte[] prepend)
+    public EndianReader ReadBinary(out BinaryMsgHeader header)
+    {
+        ThrowIfNotCompleted();
+
+        var reader = Read();
+        header = BinaryMsgHeader.Parse(reader);
+        return reader;
+    }
+
+    void ThrowIfNotCompleted()
     {
         if (!IsComplete)
             throw new InvalidOperationException("Wait for completion");
-
-        var reader = Read();
-        prepend = reader.ReadBytes(0x0000000C).ToArray();
-        return reader;
     }
 
     public void Dispose()
