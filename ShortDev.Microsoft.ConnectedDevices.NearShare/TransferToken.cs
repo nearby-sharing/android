@@ -38,12 +38,9 @@ public abstract class FileTransferToken : TransferToken
 
 
     #region Acceptance
-    readonly TaskCompletionSource<FileStream[]> _promise = new();
-    internal Task TaskInternal
-        => _promise.Task;
-
-    internal FileStream[] StreamS
-        => _promise.Task.Result;
+    readonly protected TaskCompletionSource<FileStream[]> _promise = new();
+    internal async ValueTask AwaitAcceptance()
+        => await _promise.Task;
 
     public bool IsAccepted { get; private set; }
 
@@ -86,6 +83,12 @@ internal sealed class FileTransferTokenImpl : FileTransferToken
     public ulong BytesSent { get; set; }
     public uint FilesSent { get; set; }
 
+    internal FileStream GetStream(uint contentId)
+    {
+        var index = Array.IndexOf(ContentIds, contentId);
+        return _promise.Task.Result[index];
+    }
+
     public void SendProgressEvent()
         => OnProgress(new()
         {
@@ -94,4 +97,14 @@ internal sealed class FileTransferTokenImpl : FileTransferToken
             TotalBytesToSend = TotalBytesToSend,
             TotalFilesToSend = TotalFilesToSend,
         });
+
+    public void Close()
+    {
+        foreach (var stream in _promise.Task.Result)
+        {
+            stream.Flush();
+            stream.Close();
+            stream.Dispose();
+        }
+    }
 }

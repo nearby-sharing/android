@@ -102,7 +102,7 @@ internal sealed class NearShareApp : CdpAppBase
     {
         try
         {
-            await token.TaskInternal;
+            await token.AwaitAcceptance();
 
             _blobCursor = CreateBlobCursor(token);
             _blobCursor.MoveNext();
@@ -122,7 +122,7 @@ internal sealed class NearShareApp : CdpAppBase
                 ulong requestedPosition = 0;
                 for (; requestedPosition + PartitionSize < bytesToSend; requestedPosition += PartitionSize)
                 {
-                    RequestBlob(requestedPosition);
+                    RequestBlob(requestedPosition, contentId);
                     yield return null;
                 }
                 RequestBlob(requestedPosition, contentId, (uint)(bytesToSend - requestedPosition));
@@ -131,7 +131,7 @@ internal sealed class NearShareApp : CdpAppBase
                 transferToken.SendProgressEvent();
             }
 
-            void RequestBlob(ulong requestedPosition, uint contentId = 0u, uint size = PartitionSize)
+            void RequestBlob(ulong requestedPosition, uint contentId, uint size = PartitionSize)
             {
                 ValueSet request = new();
                 request.Add("ControlMessage", (uint)NearShareControlMsgType.FetchDataRequest);
@@ -159,7 +159,7 @@ internal sealed class NearShareApp : CdpAppBase
         // PlatformHandler.Log(0, $"BlobPosition: {position}; ({newPosition * 100 / bytesToSend}%)");
         lock (_fileTransferToken)
         {
-            var stream = _fileTransferToken.StreamS[contentId];
+            var stream = _fileTransferToken.GetStream(contentId);
             stream.Position = (long)position;
             stream.Write(CollectionsMarshal.AsSpan(blob));
         }
@@ -171,7 +171,10 @@ internal sealed class NearShareApp : CdpAppBase
         if (expectMessage)
             _blobCursor?.MoveNext();
         else
+        {
             OnCompleted();
+            _fileTransferToken.Close();
+        }
     }
 
     void OnCancel()
