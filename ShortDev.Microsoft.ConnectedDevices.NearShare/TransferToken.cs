@@ -70,7 +70,10 @@ public abstract class FileTransferToken : TransferToken
     }
 
     protected void OnProgress(NearShareProgress args)
-        => Progress?.Invoke(args);
+    {
+        IsTransferComplete = args.BytesSent >= args.TotalBytesToSend;
+        _ = Task.Run(() => Progress?.Invoke(args));
+    }
     #endregion
 }
 
@@ -84,13 +87,11 @@ internal sealed class FileTransferTokenImpl : FileTransferToken
     public uint FilesSent { get; set; }
 
     public void SendProgressEvent()
-    {
-        _ = Task.Run(() => OnProgress(new()
+        => OnProgress(new()
         {
             BytesSent = BytesSent,
             FilesSent = FilesSent,
             TotalBytesToSend = TotalBytesToSend,
             TotalFilesToSend = TotalFilesToSend,
-        }));
-    }
+        });
 }
