@@ -10,11 +10,11 @@ public sealed class UriTransferToken : TransferToken
     public required string Uri { get; init; }
 }
 
-public sealed class FileTransferToken : TransferToken
+public abstract class FileTransferToken : TransferToken
 {
-    public required string FileName { get; init; }
+    public required IReadOnlyList<string> FileNames { get; init; }
 
-    public required ulong FileSize { get; init; }
+    public required ulong TotalBytesToSend { get; init; }
 
 
     #region Formatting
@@ -38,16 +38,16 @@ public sealed class FileTransferToken : TransferToken
 
 
     #region Acceptance
-    readonly TaskCompletionSource<FileStream> _promise = new();
+    readonly TaskCompletionSource<FileStream[]> _promise = new();
     internal Task TaskInternal
         => _promise.Task;
 
-    internal FileStream Stream
+    internal FileStream[] StreamS
         => _promise.Task.Result;
 
     public bool IsAccepted { get; private set; }
 
-    public void Accept(FileStream fileStream)
+    public void Accept(FileStream[] fileStream)
     {
         _promise.SetResult(fileStream);
         IsAccepted = true;
@@ -59,31 +59,38 @@ public sealed class FileTransferToken : TransferToken
 
 
     #region Progress
-    ulong _receivedBytes;
-    public ulong ReceivedBytes
-    {
-        get => _receivedBytes;
-        internal set
-        {
-            _receivedBytes = value;
-            if (value >= FileSize)
-                IsTransferComplete = true;
+    public bool IsTransferComplete { get; internal set; }
 
-            Progress?.Invoke(this);
-        }
-    }
+    public event Action<NearShareProgress>? Progress;
 
-    public bool IsTransferComplete { get; private set; }
-
-    public event Action<FileTransferToken>? Progress;
-
-    public void SetProgressListener(Action<FileTransferToken> listener)
+    public void SetProgressListener(Action<NearShareProgress> listener)
     {
         ArgumentNullException.ThrowIfNull(listener);
         Progress = listener;
     }
-    #endregion
 
-    internal ulong[] ContentSizes { get; init; } = Array.Empty<ulong>();
-    internal uint[] ContentIds { get; init; } = Array.Empty<uint>();
+    protected void OnProgress(NearShareProgress args)
+        => Progress?.Invoke(args);
+    #endregion
+}
+
+internal sealed class FileTransferTokenImpl : FileTransferToken
+{
+    public required ulong[] ContentSizes { get; init; } = Array.Empty<ulong>();
+    public required uint[] ContentIds { get; init; } = Array.Empty<uint>();
+    public required uint TotalFilesToSend { get; init; }
+
+    public ulong BytesSent { get; set; }
+    public uint FilesSent { get; set; }
+
+    public void SendProgressEvent()
+    {
+        _ = Task.Run(() => OnProgress(new()
+        {
+            BytesSent = BytesSent,
+            FilesSent = FilesSent,
+            TotalBytesToSend = TotalBytesToSend,
+            TotalFilesToSend = TotalFilesToSend,
+        }));
+    }
 }
