@@ -62,46 +62,53 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
 
                 if (transfer is FileTransferToken fileTransfer)
                 {
-                    fileNameTextView.Text = fileTransfer.FileName;
-                    detailsTextView.Text = $"{fileTransfer.DeviceName} • {FileTransferToken.FormatFileSize(fileTransfer.FileSize)}";
+                    fileNameTextView.Text = string.Join(", ", fileTransfer.FileNames);
+                    detailsTextView.Text = $"{fileTransfer.DeviceName} • {FileTransferToken.FormatFileSize(fileTransfer.TotalBytesToSend)}";
 
                     var loadingProgressIndicator = view.FindViewById<CircularProgressIndicator>(Resource.Id.loadingProgressIndicator)!;
-                    Action onCompleted = () =>
+                    void onCompleted()
                     {
                         acceptButton.Visibility = ViewStates.Gone;
                         loadingProgressIndicator.Visibility = ViewStates.Gone;
                         openButton.Visibility = ViewStates.Visible;
-                        openButton.SetOnClickListener(new DelegateClickListener((s, e) => UIHelper.OpenFile(this, GetFilePath(fileTransfer.FileName))));
-                    };
+                        openButton.SetOnClickListener(new DelegateClickListener((s, e) =>
+                        {
+                            var firstFilePath = GetFilePath(fileTransfer.FileNames[0]);
+                            if (fileTransfer.FileNames.Count == 1)
+                                UIHelper.OpenFile(this, firstFilePath);
+
+                            // ToDo: UIHelper.OpenDirectory(this, Path.GetDirectoryName(firstFilePath));
+                        }));
+                    }
                     if (fileTransfer.IsTransferComplete)
                         onCompleted();
                     else
                     {
-                        Action onAccept = () =>
+                        void onAccept()
                         {
                             if (!fileTransfer.IsAccepted)
-                                fileTransfer.Accept(CreateFile(fileTransfer.FileName));
+                                fileTransfer.Accept(fileTransfer.FileNames.Select(CreateFile).ToArray());
 
                             acceptButton.Visibility = ViewStates.Gone;
                             loadingProgressIndicator.Visibility = ViewStates.Visible;
 
                             loadingProgressIndicator.Progress = 0;
-                            Action<bool> onProgress = (animate) =>
+                            void onProgress(NearShareProgress progress, bool animate)
                             {
                                 loadingProgressIndicator.Indeterminate = false;
 
-                                int progress = Math.Min((int)(fileTransfer.ReceivedBytes * 100 / fileTransfer.FileSize), 100);
+                                int progressInt = Math.Min((int)(progress.BytesSent * 100 / progress.TotalBytesToSend), 100);
                                 if (OperatingSystem.IsAndroidVersionAtLeast(24))
-                                    loadingProgressIndicator.SetProgress(progress, animate);
+                                    loadingProgressIndicator.SetProgress(progressInt, animate);
                                 else
-                                    loadingProgressIndicator.Progress = progress;
+                                    loadingProgressIndicator.Progress = progressInt;
 
                                 if (fileTransfer.IsTransferComplete)
                                     onCompleted();
-                            };
-                            fileTransfer.SetProgressListener((s) => RunOnUiThread(() => onProgress(/*animate*/true)));
+                            }
+                            fileTransfer.SetProgressListener(progress => RunOnUiThread(() => onProgress(progress, animate: true)));
                             loadingProgressIndicator.Indeterminate = true;
-                        };
+                        }
                         if (fileTransfer.IsAccepted)
                             onAccept();
                         else
