@@ -1,4 +1,6 @@
-﻿namespace ShortDev.Microsoft.ConnectedDevices.NearShare;
+﻿using System.Text;
+
+namespace ShortDev.Microsoft.ConnectedDevices.NearShare;
 
 public sealed class CdpFileProvider
 {
@@ -7,6 +9,15 @@ public sealed class CdpFileProvider
     {
         FileName = fileName;
         _buffer = buffer;
+    }
+
+    public static CdpFileProvider FromContent(string fileName, string content)
+        => FromContent(fileName, content, Encoding.UTF8);
+
+    public static CdpFileProvider FromContent(string fileName, string content, Encoding encoding)
+    {
+        var buffer = encoding.GetBytes(content);
+        return FromBuffer(fileName, buffer);
     }
 
     public static CdpFileProvider FromBuffer(string fileName, ReadOnlyMemory<byte> buffer)

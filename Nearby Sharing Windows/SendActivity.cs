@@ -221,15 +221,23 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
                     }
                     else
                     {
-                        var uri = Intent.GetStringExtra(Intent.ExtraText);
-                        if (!Uri.IsWellFormedUriString(uri, UriKind.Absolute))
+                        var text = Intent.GetStringExtra(Intent.ExtraText);
+                        if (Uri.IsWellFormedUriString(text, UriKind.Absolute))
                         {
-                            uri = $"https://nearshare.shortdev.de/docs/txt_view?transfer_txt={WebUtility.UrlEncode(uri)}";
+                            uriTransferOperation = NearShareSender.SendUriAsync(
+                                remoteSystem,
+                                new Uri(text)
+                            );
                         }
-                        uriTransferOperation = NearShareSender.SendUriAsync(
-                            remoteSystem,
-                            new Uri(uri)
-                        );
+                        else
+                        {
+                            fileTransferOperation = NearShareSender.SendFileAsync(
+                                remoteSystem,
+                                CdpFileProvider.FromContent($"Text-Transfer-{DateTime.Now:dd_MM_yyyy-HH_mm_ss}.txt", text ?? throw new NullReferenceException("Text was null")),
+                                fileSendProgress,
+                                _fileSendCancellationTokenSource.Token
+                            );
+                        }                        
                     }
                 }
                 else if (Intent?.Action == Intent.ActionSendMultiple)
