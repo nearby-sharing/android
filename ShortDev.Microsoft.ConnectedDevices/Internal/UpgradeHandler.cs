@@ -204,7 +204,7 @@ internal sealed class UpgradeHandler
     {
         var msg = HResultPayload.Parse(reader);
 
-        var errorMsg = $"Transport upgrade failed with HResult {msg.HResult}";
+        var errorMsg = $"Transport upgrade failed with HResult {msg.HResult} (hresult: {HResultPayload.HResultToString(msg.HResult)}, errorCode: {HResultPayload.ErrorCodeToString(msg.HResult)})";
         _logger.LogWarning(errorMsg);
         _currentUpgrade?.Promise.TrySetException(new Exception(errorMsg));
     }
