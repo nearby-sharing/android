@@ -5,9 +5,11 @@
 #pragma region SharedGlobalSettings
 
 enum TransportSettingsType {
+	Udp = 1,
 	Tcp = 2,
+	Cloud = 3,
 	Rfcomm = 4,
-	WiFiDirect = 4,
+	WiFiDirect = 5,
 	BLeGatt = 6
 };
 

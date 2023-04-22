@@ -8,7 +8,7 @@
 void PauseIfRequested() {
 	if (GetEnvironmentVariableW(L"CDP_WaitForDebugger", NULL, 0) == 0 && GetLastError() == ERROR_ENVVAR_NOT_FOUND)
 		return;
-	
+
 	WaitForDebugger();
 }
 
@@ -39,7 +39,12 @@ WinAPIExport int SvchostPushServiceGlobals(void* a1) {
 	EnsureCdpSvcLib();
 
 	auto pProc = GetProcAddress(CdpSvcLib, "SvchostPushServiceGlobals");
-	return ((int(*)(void*))pProc)(a1);
+	auto result = ((int(*)(void*))pProc)(a1);
+
+	// cdp!GetHost will be called by CdpSvc
+	// ToDo: custom init here
+
+	return result;
 }
 
 typedef void* GetInstanceProc(void** pResult);
@@ -77,6 +82,18 @@ WinAPIExport HRESULT CdpInitialize(GetInstanceProc* pGetInstanceSettingsManager)
 
 	globalSettings->vtbl->SetTransportEnabled(globalSettings, TransportSettingsType::BLeGatt, true);
 	globalSettings->vtbl->SetTransportHostingAllowed(globalSettings, TransportSettingsType::BLeGatt, true);
+
+	OutputDebugString(L"Enabled BLeGatt");
+
+	globalSettings->vtbl->SetTransportEnabled(globalSettings, TransportSettingsType::WiFiDirect, true);
+	globalSettings->vtbl->SetTransportHostingAllowed(globalSettings, TransportSettingsType::WiFiDirect, true);
+
+	OutputDebugString(L"Enabled WiFiDirect");
+
+	globalSettings->vtbl->SetTransportEnabled(globalSettings, TransportSettingsType::Udp, true);
+	globalSettings->vtbl->SetTransportHostingAllowed(globalSettings, TransportSettingsType::Udp, true);
+
+	OutputDebugString(L"Enabled Udp");
 
 	return S_OK;
 }
