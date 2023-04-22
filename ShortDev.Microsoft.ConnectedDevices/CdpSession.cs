@@ -460,17 +460,20 @@ public sealed class CdpSession : IDisposable
 
             async void PrepareSession(CdpSocket socket)
             {
-                try
+                if (socket.TransportType == Transports.CdpTransportType.Rfcomm)
                 {
-                    var oldSocket = socket;
-                    socket = await _upgradeHandler.RequestUpgradeAsync(oldSocket);
-                    oldSocket.Dispose();
+                    try
+                    {
+                        var oldSocket = socket;
+                        socket = await _upgradeHandler.RequestUpgradeAsync(oldSocket);
+                        oldSocket.Dispose();
 
-                    _session.Device = socket.RemoteDevice;
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Upgrade failed");
+                        _session.Device = socket.RemoteDevice;
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Upgrade failed");
+                    }
                 }
 
                 header.Flags = 0;
