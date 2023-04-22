@@ -161,7 +161,7 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
         if (!RemoteSystems.Contains(device))
         {
             RemoteSystems.Add(device);
-            UpdateUI();
+            RunOnUiThread(() => UpdateUI());
         }
     }
     #endregion
@@ -237,7 +237,7 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
                                 fileSendProgress,
                                 _fileSendCancellationTokenSource.Token
                             );
-                        }                        
+                        }
                     }
                 }
                 else if (Intent?.Action == Intent.ActionSendMultiple)
