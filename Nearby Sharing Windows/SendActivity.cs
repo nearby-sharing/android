@@ -338,6 +338,7 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
         => Finish();
     public override void Finish()
     {
+        Platform?.Dispose();
         base.Finish();
     }
     #endregion

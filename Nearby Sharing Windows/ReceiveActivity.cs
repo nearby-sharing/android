@@ -233,8 +233,6 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
         base.Finish();
     }
 
-
-
     public void Log(string message)
     {
         RunOnUiThread(() =>

@@ -77,6 +77,7 @@ public sealed class NetworkTransport : ICdpTransport, ICdpDiscoverableTransport
     {
         DeviceConnected = null;
         _listener.Stop();
+        _udpclient.Dispose();
     }
 
     public EndpointInfo GetEndpoint()
@@ -129,7 +130,7 @@ public sealed class NetworkTransport : ICdpTransport, ICdpDiscoverableTransport
             new DiscoveryHeader()
             {
                 Type = DiscoveryType.PresenceRequest
-            }.Write(writer);            
+            }.Write(writer);
             return writer.Buffer;
         }
     }
@@ -151,6 +152,12 @@ public sealed class NetworkTransport : ICdpTransport, ICdpDiscoverableTransport
                     HandleMsg(result);
                 }
             }, cancellationToken);
+        }
+        catch (ObjectDisposedException) { }
+        catch (SocketException ex)
+        {
+            if (ex.SocketErrorCode is not (SocketError.Shutdown or SocketError.OperationAborted))
+                throw;
         }
         finally
         {
