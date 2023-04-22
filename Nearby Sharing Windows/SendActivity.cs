@@ -53,7 +53,7 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
                     device.Type.IsMobile() ? Resource.Drawable.ic_fluent_phone_24_regular : Resource.Drawable.ic_fluent_desktop_24_regular
                 );
                 view.FindViewById<ImageView>(Resource.Id.transportTypeImageView)?.SetImageResource(
-                    device.Endpoint.TransportType == CdpTransportType.Tcp ? Resource.Drawable.ic_fluent_database_plug_connected_20_regular : Resource.Drawable.ic_fluent_live_20_regular
+                    device.Endpoint.TransportType == CdpTransportType.Tcp ? Resource.Drawable.ic_fluent_plug_connected_20_regular : Resource.Drawable.ic_fluent_live_20_regular
                 );
                 view.FindViewById<TextView>(Resource.Id.deviceNameTextView)!.Text = device.Name;
                 view.Click += (s, e) => SendData(device);
