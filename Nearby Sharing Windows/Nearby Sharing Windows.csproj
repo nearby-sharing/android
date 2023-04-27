@@ -7,8 +7,8 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<ApplicationId>de.shortdev.nearby_sharing_windows</ApplicationId>
-		<ApplicationVersion>16</ApplicationVersion>
-		<ApplicationDisplayVersion>1.3.3-beta</ApplicationDisplayVersion>
+		<ApplicationVersion>17</ApplicationVersion>
+		<ApplicationDisplayVersion>1.4.0-beta</ApplicationDisplayVersion>
 		<UseAndroidCrypto>true</UseAndroidCrypto>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
