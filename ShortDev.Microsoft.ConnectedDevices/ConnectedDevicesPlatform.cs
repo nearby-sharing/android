@@ -200,7 +200,7 @@ public sealed class ConnectedDevicesPlatform : IDisposable
                         _logger.Log(LogLevel.Warning, "{0} in session {1} \n {2}",
                             ex.GetType().Name,
                             session?.LocalSessionId.ToString() ?? "null",
-                            ex.Message
+                            ex
                         );
                         break;
                     }

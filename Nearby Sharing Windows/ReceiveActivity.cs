@@ -157,6 +157,7 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
             $"Address: {btAddress.ToStringFormatted()}\n" +
             $"IP-Address: {AndroidNetworkHandler.GetLocalIp(this)}");
         debugLogTextView = FindViewById<TextView>(Resource.Id.debugLogTextView)!;
+        debugLogTextView.SetTextIsSelectable(true);
 
         SystemDebug.Assert(_cdp == null);
 
