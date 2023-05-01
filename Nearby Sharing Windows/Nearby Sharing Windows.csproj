@@ -7,8 +7,8 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<ApplicationId>de.shortdev.nearby_sharing_windows</ApplicationId>
-		<ApplicationVersion>17</ApplicationVersion>
-		<ApplicationDisplayVersion>1.4.0-beta</ApplicationDisplayVersion>
+		<ApplicationVersion>18</ApplicationVersion>
+		<ApplicationDisplayVersion>1.4.1-beta</ApplicationDisplayVersion>
 		<UseAndroidCrypto>true</UseAndroidCrypto>
 		<AndroidErrorOnCustomJavaObject>false</AndroidErrorOnCustomJavaObject>
 	</PropertyGroup>
