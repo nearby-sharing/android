@@ -10,15 +10,18 @@
 		<ApplicationVersion>17</ApplicationVersion>
 		<ApplicationDisplayVersion>1.4.0-beta</ApplicationDisplayVersion>
 		<UseAndroidCrypto>true</UseAndroidCrypto>
+		<AndroidErrorOnCustomJavaObject>false</AndroidErrorOnCustomJavaObject>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-	  <EnableLLVM>True</EnableLLVM>
-	  <RunAOTCompilation>False</RunAOTCompilation>
-	  <TrimMode>copyused</TrimMode>
-	  <AndroidLinkTool>r8</AndroidLinkTool>
-	  <AndroidPackageFormat>aab</AndroidPackageFormat>
-	  <AndroidUseAapt2>True</AndroidUseAapt2>
-	  <AndroidCreatePackagePerAbi>False</AndroidCreatePackagePerAbi>
+		<EnableLLVM>True</EnableLLVM>
+		<RunAOTCompilation>False</RunAOTCompilation>
+		<PublishTrimmed>false</PublishTrimmed>
+		<TrimmerSingleWarn>false</TrimmerSingleWarn>
+		<EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+		<AndroidLinkTool>r8</AndroidLinkTool>
+		<AndroidPackageFormat>aab</AndroidPackageFormat>
+		<AndroidUseAapt2>True</AndroidUseAapt2>
+		<AndroidCreatePackagePerAbi>False</AndroidCreatePackagePerAbi>
 	</PropertyGroup>
 	<ItemGroup>
 		<None Remove="Assets\de\Welcome.html" />

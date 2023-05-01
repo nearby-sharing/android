@@ -26,7 +26,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CdpSvcUtil", "utils\CdpSvcU
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{F0E5B489-0FD2-4A7E-B660-C28450479583}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShortDev.Microsoft.ConnectedDevices.Test", "tests\ShortDev.Microsoft.ConnectedDevices.Test\ShortDev.Microsoft.ConnectedDevices.Test.csproj", "{B0DE3385-5FD7-4D05-8296-6E298A3F1BA2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShortDev.Microsoft.ConnectedDevices.Test", "tests\ShortDev.Microsoft.ConnectedDevices.Test\ShortDev.Microsoft.ConnectedDevices.Test.csproj", "{B0DE3385-5FD7-4D05-8296-6E298A3F1BA2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShortDev.Microsoft.Bond.SourceGenerator", "ShortDev.Microsoft.Bond.SourceGenerator\ShortDev.Microsoft.Bond.SourceGenerator.csproj", "{4480CB98-4FC4-4EF4-B1D3-010ED43B6980}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -152,6 +154,18 @@ Global
 		{B0DE3385-5FD7-4D05-8296-6E298A3F1BA2}.Release|x64.Build.0 = Release|Any CPU
 		{B0DE3385-5FD7-4D05-8296-6E298A3F1BA2}.Release|x86.ActiveCfg = Release|Any CPU
 		{B0DE3385-5FD7-4D05-8296-6E298A3F1BA2}.Release|x86.Build.0 = Release|Any CPU
+		{4480CB98-4FC4-4EF4-B1D3-010ED43B6980}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4480CB98-4FC4-4EF4-B1D3-010ED43B6980}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4480CB98-4FC4-4EF4-B1D3-010ED43B6980}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4480CB98-4FC4-4EF4-B1D3-010ED43B6980}.Debug|x64.Build.0 = Debug|Any CPU
+		{4480CB98-4FC4-4EF4-B1D3-010ED43B6980}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4480CB98-4FC4-4EF4-B1D3-010ED43B6980}.Debug|x86.Build.0 = Debug|Any CPU
+		{4480CB98-4FC4-4EF4-B1D3-010ED43B6980}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4480CB98-4FC4-4EF4-B1D3-010ED43B6980}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4480CB98-4FC4-4EF4-B1D3-010ED43B6980}.Release|x64.ActiveCfg = Release|Any CPU
+		{4480CB98-4FC4-4EF4-B1D3-010ED43B6980}.Release|x64.Build.0 = Release|Any CPU
+		{4480CB98-4FC4-4EF4-B1D3-010ED43B6980}.Release|x86.ActiveCfg = Release|Any CPU
+		{4480CB98-4FC4-4EF4-B1D3-010ED43B6980}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
