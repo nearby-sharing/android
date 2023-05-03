@@ -36,6 +36,8 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
     [AllowNull] Button cancelButton;
     protected override void OnCreate(Bundle? savedInstanceState)
     {
+        SentryHelper.EnsureInitialized();
+
         base.OnCreate(savedInstanceState);
         SetContentView(Resource.Layout.activity_share);
 

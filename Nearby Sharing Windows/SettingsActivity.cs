@@ -12,6 +12,8 @@ public sealed class SettingsActivity : AppCompatActivity
 {
     protected override void OnCreate(Bundle? savedInstanceState)
     {
+        SentryHelper.EnsureInitialized();
+
         base.OnCreate(savedInstanceState);
         SetContentView(Resource.Layout.activity_settings);
         UIHelper.SetupToolBar(this, GetString(Resource.String.generic_settings));

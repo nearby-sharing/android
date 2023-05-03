@@ -41,6 +41,7 @@
 		<None Remove="Resources\xml\preferences.xml" />
 	</ItemGroup>
 	<ItemGroup>
+		<PackageReference Include="Sentry" Version="3.31.0" />
 		<PackageReference Include="Xamarin.AndroidX.AppCompat" Version="1.5.1" />
 		<PackageReference Include="Xamarin.AndroidX.Preference" Version="1.2.0.2" />
 		<PackageReference Include="Xamarin.Google.Android.Material" Version="1.6.1.1" />
