@@ -26,6 +26,7 @@ There's also an [android app](Nearby%20Sharing%20Windows/) to share (send and re
  - Chinese (Simplified)
  - French
  - Romanian
+ - Polish
  
 </details>
 
