@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<string name="app_name">Bliskie udostępnianie (Windows)</string>
-	<string name="app_titlebar_title_default">Wyślij dane do Windows 10 / 11 Send data to Windows 10 / 11</string>
-	<string name="app_titlebar_title_receive">Otrzymuj dane z Windows 10 / 11 Receive data from Windows 10 / 11</string>
+	<string name="app_titlebar_title_default">Wyślij dane do Windows 10 / 11</string>
+	<string name="app_titlebar_title_receive">Otrzymuj dane z Windows 10 / 11</string>
 	<string name="app_titlebar_title_receive_setup">Konfiguracja / Informacje</string>
 	
 	<string name="assets_prefix">pl</string>
