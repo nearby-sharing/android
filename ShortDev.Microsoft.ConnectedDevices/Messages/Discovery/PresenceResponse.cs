@@ -28,14 +28,16 @@ public class PresenceResponse : ICdpPayload<PresenceResponse>
             DeviceIdHash = reader.ReadInt32(),
             PrincipalUserNameHash = reader.ReadInt32()
         };
-
+    public static byte[] fakeDeviceIdHash = new byte[32];
+    public static int fakeDeviceIdsalt = 0;
     public void Write(EndianWriter writer)
     {
         writer.Write((short)ConnectionMode);
         writer.Write((short)DeviceType);
         writer.WriteWithLength(DeviceName);
-        writer.Write((int)DeviceIdSalt);
-        writer.Write((int)DeviceIdHash);
-        writer.Write((int)PrincipalUserNameHash);
+        writer.Write((int)fakeDeviceIdsalt);
+        writer.Write(fakeDeviceIdHash);
+        writer.Write((byte)0x0a);//0x0a mean "Everyone",0x06 mean "My devices only",0x02 mean "shutdown"
+        //writer.Write((int)PrincipalUserNameHash);
     }
 }

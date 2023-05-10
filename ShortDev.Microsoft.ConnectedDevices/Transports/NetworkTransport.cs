@@ -8,6 +8,7 @@ using System;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -204,7 +205,7 @@ public sealed class NetworkTransport : ICdpTransport, ICdpDiscoverableTransport
             new CommonHeader()
             {
                 Type = MessageType.Discovery,
-                MessageLength = 97
+                MessageLength = (ushort)(87+(ushort)Encoding.UTF8.GetBytes(advertisement.DeviceName).Length)
             }.Write(writer);
             new DiscoveryHeader()
             {
