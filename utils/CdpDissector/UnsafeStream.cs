@@ -15,10 +15,10 @@ internal sealed unsafe class UnsafeStream : Stream
         set => throw new NotImplementedException();
     }
 
-    public required TvBuff* Buffer { get; init; }
+    public required FieldInfo FieldInfo { get; init; }
 
     public override long Length
-        => LibWireShark.tvb_captured_length(Buffer);
+        => FieldInfo.length;
 
     public override int Read(byte[] buffer, int offset, int count)
     {
@@ -34,7 +34,7 @@ internal sealed unsafe class UnsafeStream : Stream
 
         for (int i = 0; i < length; i++)
         {
-            buffer[i] = LibWireShark.tvb_get_guint8(Buffer, _position + i);
+            buffer[i] = LibWireShark.tvb_get_guint8(FieldInfo.dsTvb, (int)FieldInfo.start + _position + i);
         }
 
         _position += length;

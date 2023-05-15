@@ -55,6 +55,20 @@ public static unsafe partial class Registration
     #endregion
 
     private static ProtocolHandle hProtocol = ProtocolHandle.Invalid;
+    private static HeaderFieldInfo* _headerFieldInfo;
+
+    public static HeaderFieldInfo* GetFieldByName(string name)
+    {
+        var pStr = Marshal.StringToHGlobalAnsi(name);
+        try
+        {
+            return proto_registrar_get_byname((byte*)pStr);
+        }
+        finally
+        {
+            Marshal.FreeHGlobal(pStr);
+        }
+    }
 
     [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
     public static void proto_register_mscdp()
@@ -65,6 +79,8 @@ public static unsafe partial class Registration
             var hDissector = create_dissector_handle(&dissect_mscdp, hProtocol);
             register_postdissector(hDissector);
 
+            _headerFieldInfo = GetFieldByName("data.data");
+
             return 0;
         });
     }
@@ -74,12 +90,25 @@ public static unsafe partial class Registration
     {
         return TryRun(() =>
         {
-            EndianReader reader = new(Endianness.BigEndian, new UnsafeStream() { Buffer = tvb });
+            var array = proto_get_finfo_ptr_array(tree, _headerFieldInfo->id);
+            if (array != (void*)0 && array->pdata != (void*)0)
+            {
+                var fieldInfo = array->AsSpan<FieldInfo>()[0];
 
-            if (CommonHeader.TryParse(reader, out var header, out var ex))
-                proto_tree_add_protocol_format(tree, hProtocol, tvb, 0, -1, $"Das ist ein Test! {header?.SessionId}");
-            else
-                proto_tree_add_protocol_format(tree, hProtocol, tvb, 0, -1, ex.Message);
+                EndianReader reader = new(Endianness.BigEndian, new UnsafeStream()
+                {
+                    FieldInfo = fieldInfo
+                });
+
+                try
+                {
+                    if (CommonHeader.TryParse(reader, out var header, out var ex))
+                        proto_tree_add_protocol_format(tree, hProtocol, tvb, 0, -1, $"Das ist ein Test! {header?.SessionId}");
+                    else
+                        proto_tree_add_protocol_format(tree, hProtocol, tvb, 0, -1, ex.Message);
+                }
+                catch (IOException) { }
+            }
 
             return tvb_captured_length(tvb);
         });
