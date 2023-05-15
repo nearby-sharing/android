@@ -28,7 +28,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{F0E5B489
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShortDev.Microsoft.ConnectedDevices.Test", "tests\ShortDev.Microsoft.ConnectedDevices.Test\ShortDev.Microsoft.ConnectedDevices.Test.csproj", "{B0DE3385-5FD7-4D05-8296-6E298A3F1BA2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShortDev.Microsoft.Bond.SourceGenerator", "ShortDev.Microsoft.Bond.SourceGenerator\ShortDev.Microsoft.Bond.SourceGenerator.csproj", "{4480CB98-4FC4-4EF4-B1D3-010ED43B6980}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShortDev.Microsoft.Bond.SourceGenerator", "ShortDev.Microsoft.Bond.SourceGenerator\ShortDev.Microsoft.Bond.SourceGenerator.csproj", "{4480CB98-4FC4-4EF4-B1D3-010ED43B6980}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CdpDissector", "utils\CdpDissector\CdpDissector.csproj", "{D65C04C0-A645-4CF3-9D75-21E93D382B82}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CdpDissectorShim", "utils\CdpDissectorShim\CdpDissectorShim.vcxproj", "{ABEBA629-8BFF-4CE0-98E4-1873700A1DDF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -166,6 +170,30 @@ Global
 		{4480CB98-4FC4-4EF4-B1D3-010ED43B6980}.Release|x64.Build.0 = Release|Any CPU
 		{4480CB98-4FC4-4EF4-B1D3-010ED43B6980}.Release|x86.ActiveCfg = Release|Any CPU
 		{4480CB98-4FC4-4EF4-B1D3-010ED43B6980}.Release|x86.Build.0 = Release|Any CPU
+		{D65C04C0-A645-4CF3-9D75-21E93D382B82}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D65C04C0-A645-4CF3-9D75-21E93D382B82}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D65C04C0-A645-4CF3-9D75-21E93D382B82}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D65C04C0-A645-4CF3-9D75-21E93D382B82}.Debug|x64.Build.0 = Debug|Any CPU
+		{D65C04C0-A645-4CF3-9D75-21E93D382B82}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D65C04C0-A645-4CF3-9D75-21E93D382B82}.Debug|x86.Build.0 = Debug|Any CPU
+		{D65C04C0-A645-4CF3-9D75-21E93D382B82}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D65C04C0-A645-4CF3-9D75-21E93D382B82}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D65C04C0-A645-4CF3-9D75-21E93D382B82}.Release|x64.ActiveCfg = Release|Any CPU
+		{D65C04C0-A645-4CF3-9D75-21E93D382B82}.Release|x64.Build.0 = Release|Any CPU
+		{D65C04C0-A645-4CF3-9D75-21E93D382B82}.Release|x86.ActiveCfg = Release|Any CPU
+		{D65C04C0-A645-4CF3-9D75-21E93D382B82}.Release|x86.Build.0 = Release|Any CPU
+		{ABEBA629-8BFF-4CE0-98E4-1873700A1DDF}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{ABEBA629-8BFF-4CE0-98E4-1873700A1DDF}.Debug|Any CPU.Build.0 = Debug|x64
+		{ABEBA629-8BFF-4CE0-98E4-1873700A1DDF}.Debug|x64.ActiveCfg = Debug|x64
+		{ABEBA629-8BFF-4CE0-98E4-1873700A1DDF}.Debug|x64.Build.0 = Debug|x64
+		{ABEBA629-8BFF-4CE0-98E4-1873700A1DDF}.Debug|x86.ActiveCfg = Debug|Win32
+		{ABEBA629-8BFF-4CE0-98E4-1873700A1DDF}.Debug|x86.Build.0 = Debug|Win32
+		{ABEBA629-8BFF-4CE0-98E4-1873700A1DDF}.Release|Any CPU.ActiveCfg = Release|x64
+		{ABEBA629-8BFF-4CE0-98E4-1873700A1DDF}.Release|Any CPU.Build.0 = Release|x64
+		{ABEBA629-8BFF-4CE0-98E4-1873700A1DDF}.Release|x64.ActiveCfg = Release|x64
+		{ABEBA629-8BFF-4CE0-98E4-1873700A1DDF}.Release|x64.Build.0 = Release|x64
+		{ABEBA629-8BFF-4CE0-98E4-1873700A1DDF}.Release|x86.ActiveCfg = Release|Win32
+		{ABEBA629-8BFF-4CE0-98E4-1873700A1DDF}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -173,6 +201,8 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{CFABE26A-FBFF-4CF9-8C94-B603B317A223} = {B1BBE46E-5DC6-410A-84FC-157E31F31E92}
 		{B0DE3385-5FD7-4D05-8296-6E298A3F1BA2} = {F0E5B489-0FD2-4A7E-B660-C28450479583}
+		{D65C04C0-A645-4CF3-9D75-21E93D382B82} = {B1BBE46E-5DC6-410A-84FC-157E31F31E92}
+		{ABEBA629-8BFF-4CE0-98E4-1873700A1DDF} = {B1BBE46E-5DC6-410A-84FC-157E31F31E92}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {86DED607-FA3F-4D8A-B226-8AE9C9F08F84}

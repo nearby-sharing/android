@@ -3,6 +3,7 @@ using ShortDev.Networking;
 using System;
 using System.Buffers.Binary;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -21,13 +22,13 @@ public sealed class CommonHeader : ICdpHeader<CommonHeader>
         return result ?? throw new NullReferenceException("No result");
     }
 
-    public static bool TryParse(EndianReader reader, out CommonHeader? result, out Exception? ex)
+    public static bool TryParse(EndianReader reader, [MaybeNullWhen(false)] out CommonHeader result, [MaybeNullWhen(true)] out Exception ex)
     {
         result = new();
         var sig = reader.ReadUInt16();
         if (sig != Constants.Signature)
         {
-            ex = new InvalidDataException($"Wrong signature. Expected \"{Constants.Signature}\"");
+            ex = new InvalidDataException($"Wrong signature. Expected \"{Constants.Signature}\" got \"{sig}\"");
             return false;
         }
 
