@@ -13,39 +13,16 @@
 		<AndroidErrorOnCustomJavaObject>false</AndroidErrorOnCustomJavaObject>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-		<EnableLLVM>True</EnableLLVM>
 		<RunAOTCompilation>False</RunAOTCompilation>
 		<PublishTrimmed>false</PublishTrimmed>
-		<TrimmerSingleWarn>false</TrimmerSingleWarn>
-		<EnableTrimAnalyzer>true</EnableTrimAnalyzer>
-		<AndroidLinkTool>r8</AndroidLinkTool>
 		<AndroidPackageFormat>aab</AndroidPackageFormat>
-		<AndroidUseAapt2>True</AndroidUseAapt2>
-		<AndroidCreatePackagePerAbi>False</AndroidCreatePackagePerAbi>
 	</PropertyGroup>
 	<ItemGroup>
-		<None Remove="Assets\de\Welcome.html" />
-		<None Remove="Assets\en\Welcome.html" />
-		<None Remove="Assets\MacAddressInfo.html" />
-		<None Remove="Assets\MacAddressInfo_en.html" />
-		<None Remove="Resources\drawable\quick_settings_tile_icon.xml" />
-		<None Remove="Resources\layout\activity_receive.xml" />
-		<None Remove="Resources\layout\activity_settings.xml" />
-		<None Remove="Resources\layout\activity_share__device_select.xml" />
-		<None Remove="Resources\layout\activity_share__send.xml" />
-		<None Remove="Resources\layout\activity_share__send__progress.xml" />
-		<None Remove="Resources\layout\item_transfer_notification.xml" />
-		<None Remove="Resources\layout\layout_appbar.xml" />
-		<None Remove="Resources\values-de\strings.xml" />
-		<None Remove="Resources\xml\file_paths.xml" />
-		<None Remove="Resources\xml\preferences.xml" />
-	</ItemGroup>
-	<ItemGroup>
 		<PackageReference Include="Sentry" Version="3.31.0" />
-		<PackageReference Include="Xamarin.AndroidX.AppCompat" Version="1.5.1" />
-		<PackageReference Include="Xamarin.AndroidX.Preference" Version="1.2.0.2" />
-		<PackageReference Include="Xamarin.Google.Android.Material" Version="1.6.1.1" />
-		<PackageReference Include="Xamarin.Essentials" Version="1.7.3" />
+		<PackageReference Include="Xamarin.AndroidX.AppCompat" Version="1.6.1.1" />
+		<PackageReference Include="Xamarin.AndroidX.Preference" Version="1.2.0.5" />
+		<PackageReference Include="Xamarin.Google.Android.Material" Version="1.8.0.1" />
+		<PackageReference Include="Xamarin.Essentials" Version="1.7.5" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\ShortDev.Android.FluentIcons\ShortDev.Android.FluentIcons.csproj" />
