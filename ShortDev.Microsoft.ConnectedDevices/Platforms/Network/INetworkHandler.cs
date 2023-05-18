@@ -7,9 +7,9 @@ namespace ShortDev.Microsoft.ConnectedDevices.Platforms.Network;
 
 public interface INetworkHandler : ICdpPlatformHandler
 {
-    string GetLocalIp();
+    IPAddress GetLocalIp();
 
-    public static string GetLocalIpDefault()
+    public static IPAddress GetLocalIpDefault()
     {
         var data = Dns.GetHostEntry(string.Empty).AddressList;
         var ips = Dns.GetHostEntry(string.Empty).AddressList
@@ -18,6 +18,6 @@ public interface INetworkHandler : ICdpPlatformHandler
         if (ips.Length != 1)
             throw new InvalidDataException("Could not resolve ip");
 
-        return ips[0].ToString();
+        return ips[0];
     }
 }

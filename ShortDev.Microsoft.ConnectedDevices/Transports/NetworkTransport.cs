@@ -81,7 +81,7 @@ public sealed class NetworkTransport : ICdpTransport, ICdpDiscoverableTransport
     }
 
     public EndpointInfo GetEndpoint()
-        => new(TransportType, Handler.GetLocalIp(), Constants.TcpPort.ToString());
+        => new(TransportType, Handler.GetLocalIp().ToString(), Constants.TcpPort.ToString());
 
     #region Discovery (Udp)
 
