@@ -6,6 +6,8 @@ using Android.Runtime;
 using Android.Views;
 using AndroidX.AppCompat.App;
 using AndroidX.Core.App;
+using AndroidX.Core.Content;
+using AndroidX.Core.View;
 using AndroidX.RecyclerView.Widget;
 using Google.Android.Material.ProgressIndicator;
 using Google.Android.Material.Snackbar;
@@ -62,12 +64,15 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
             }
         );
 
-        if (Build.VERSION.SdkInt >= BuildVersionCodes.Kitkat)
-        {
-            Window!.SetFlags(WindowManagerFlags.LayoutNoLimits, WindowManagerFlags.LayoutNoLimits);
+        Window!.SetFlags(WindowManagerFlags.LayoutNoLimits, WindowManagerFlags.LayoutNoLimits);
+        if (OperatingSystem.IsAndroidVersionAtLeast(30))
+            Window.InsetsController!.SetSystemBarsAppearance(
+                (int)WindowInsetsControllerAppearance.LightNavigationBars,
+                (int)WindowInsetsControllerAppearance.LightNavigationBars
+            );
+        else
             Window!.DecorView.SystemUiVisibility = (StatusBarVisibility)SystemUiFlags.LightNavigationBar;
-            Window!.DecorView.SetOnApplyWindowInsetsListener(this);
-        }
+        Window!.DecorView.SetOnApplyWindowInsetsListener(this);
 
         cancelButton.Click += CancelButton_Click;
 
@@ -106,14 +111,12 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
         }
         else
         {
-#pragma warning disable CS0618 // Type or member is obsolete
             bottomSheetFrame.SetPadding(
                 windowInsets.StableInsetLeft,
                 /* insets.Top */ 0,
                 windowInsets.StableInsetRight,
                 windowInsets.StableInsetBottom
             );
-#pragma warning restore CS0618 // Type or member is obsolete
         }
         return windowInsets;
     }
@@ -213,7 +216,7 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
                 {
                     if (Intent.HasExtra(Intent.ExtraStream))
                     {
-                        AndroidUri file = (Intent.GetParcelableExtra(Intent.ExtraStream) as AndroidUri)!;
+                        AndroidUri file = Intent.GetParcelableExtra<AndroidUri>(Intent.ExtraStream)!;
                         fileTransferOperation = NearShareSender.SendFileAsync(
                             remoteSystem,
                             await CreateNearShareFileFromContentUriAsync(file),
@@ -244,7 +247,7 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
                 }
                 else if (Intent?.Action == Intent.ActionSendMultiple)
                 {
-                    var files = Intent.GetParcelableArrayListExtra(Intent.ExtraStream)?.Cast<AndroidUri>() ?? throw new InvalidDataException("Could not get extra files from intent");
+                    var files = Intent.GetParcelableArrayListExtra<AndroidUri>(Intent.ExtraStream) ?? throw new InvalidDataException("Could not get extra files from intent");
                     fileTransferOperation = NearShareSender.SendFilesAsync(
                         remoteSystem,
                         await Task.WhenAll(files.Select(CreateNearShareFileFromContentUriAsync)),
@@ -269,18 +272,18 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
                             try
                             {
 #endif
-                            progressIndicator.Max = (int)args.TotalBytesToSend;
-                            progressIndicator.Progress = (int)args.BytesSent;
+                                progressIndicator.Max = (int)args.TotalBytesToSend;
+                                progressIndicator.Progress = (int)args.BytesSent;
 
-                            if (args.TotalFilesToSend != 0 && args.TotalBytesToSend != 0)
-                            {
-                                StatusTextView.Text = this.Localize(
-                                    Resource.String.sending_template,
-                                    args.FilesSent, args.TotalFilesToSend,
-                                    Math.Round((decimal)args.BytesSent / args.TotalBytesToSend * 100)
-                                );
-                                OnRequestAccepted();
-                            }
+                                if (args.TotalFilesToSend != 0 && args.TotalBytesToSend != 0)
+                                {
+                                    StatusTextView.Text = this.Localize(
+                                        Resource.String.sending_template,
+                                        args.FilesSent, args.TotalFilesToSend,
+                                        Math.Round((decimal)args.BytesSent / args.TotalBytesToSend * 100)
+                                    );
+                                    OnRequestAccepted();
+                                }
 #if !DEBUG
                             }
                             catch { }

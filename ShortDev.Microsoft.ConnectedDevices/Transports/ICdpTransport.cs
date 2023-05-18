@@ -20,9 +20,7 @@ public interface ICdpTransport : IDisposable
         {
             return await ConnectAsync(device).WithTimeout(timeout);
         }
-        catch (Exception ex)
-        {
-        }
+        catch { }
         return null;
     }
 

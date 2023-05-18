@@ -95,14 +95,18 @@ internal static class UIHelper
     {
         string langCode = activity.GetString(Resource.String.assets_prefix);
         string fileName = $"{assetPath}.html";
-        if (!activity.Assets!.List($"{langCode}/").Contains(fileName))
+        if (!activity.Assets!.List($"{langCode}/")!.Contains(fileName))
             langCode = "en";
 
         using var stream = activity.Assets!.Open($"{langCode}/{fileName}");
         using StreamReader reader = new(stream);
-#pragma warning disable CS0618 // Type or member is obsolete
-        return Html.FromHtml(reader.ReadToEnd())!;
-#pragma warning restore CS0618 // Type or member is obsolete
+
+        ISpanned? result;
+        if (OperatingSystem.IsAndroidVersionAtLeast(24))
+            result = Html.FromHtml(reader.ReadToEnd(), FromHtmlOptions.ModeLegacy);
+        else
+            result = Html.FromHtml(reader.ReadToEnd());
+        return result ?? throw new NullReferenceException("\"Html.FromHtml\" returned \"null\"");
     }
 
     public static string Localize(this Activity activity, int resId, params object[] args)

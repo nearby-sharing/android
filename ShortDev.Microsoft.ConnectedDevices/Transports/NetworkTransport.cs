@@ -187,7 +187,7 @@ public sealed class NetworkTransport : ICdpTransport, ICdpDiscoverableTransport
                         ),
                         new CdpAdvertisement(
                             response.DeviceType,
-                            null,
+                            null!, // ToDo: 
                             response.DeviceName
                         )
                     );

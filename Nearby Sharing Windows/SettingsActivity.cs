@@ -33,7 +33,7 @@ public sealed class SettingsActivity : AppCompatActivity
 
     public override bool OnSupportNavigateUp()
     {
-        OnBackPressed();
+        OnBackPressedDispatcher.OnBackPressed();
         return true;
     }
 
