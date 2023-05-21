@@ -4,7 +4,7 @@
 	<string name="app_titlebar_title_default">Send data to Windows 10 / 11</string>
 	<string name="app_titlebar_title_receive">Receive data from Windows 10 / 11</string>
 	<string name="app_titlebar_title_receive_setup">Setup / Information</string>
-	
+
 	<string name="assets_prefix">en</string>
 
 	<!-- #region generic -->
@@ -14,7 +14,7 @@
 
 	<string name="generic_send">Send</string>
 	<string name="generic_receive">Receive</string>
-	
+
 	<string name="generic_status_template">Status: {0}</string>
 	<string name="generic_error_template">Error: {0}</string>
 
@@ -40,6 +40,10 @@
 
 	<!-- #region preferences.xml -->
 	<string name="category_general">General</string>
+	<string name="category_links">Links / Help</string>
+	<string name="category_permissions">Permissions</string>
+	<string name="category_setup">Setup</string>
+	<string name="category_about">About</string>
 
 	<string name="request_permissions_title">Request Permissions</string>
 	<string name="request_permissions_summary">Grant necessary permissions to app</string>
@@ -50,11 +54,22 @@
 	<string name="open_faq_title">Help</string>
 	<string name="open_faq_summary">Open the FAQ</string>
 
+	<string name="open_discord_title">Discord</string>
+	<string name="open_discord_summary">Join Discord-Server</string>
 
-	<string name="category_device_info">Device Information</string>
+	<string name="preference_appearance_title">UI / Design</string>
+	<string name="preference_appearance_summary">Language, Dark Mode</string>
+
+	<string name="preference_cdp_title">Connected Devices Platform</string>
+	<string name="preference_cdp_summary">Setup sending and receiving</string>
+
+	<string name="open_setup_title">PC Setup</string>
+	<string name="open_setup_summary">Tutorial about the necessary PC Settings</string>
 
 	<string name="goto_mac_address_title">Specify Mac Address</string>
 	<string name="goto_mac_address_summary">Specify the mac address of this device</string>
+
+	<string name="show_credits_title">Show credits</string>
 	<!-- #endregion -->
 
 	<!-- #region ReceiveActivity.cs -->

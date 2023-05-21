@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net7.0-android</TargetFramework>
+		<SupportedOSPlatformVersion>21</SupportedOSPlatformVersion>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Xamarin.AndroidX.Preference" Version="1.2.0.5" />
+		<PackageReference Include="Xamarin.Google.Android.Material" Version="1.8.0.1" />
+	</ItemGroup>
+</Project>

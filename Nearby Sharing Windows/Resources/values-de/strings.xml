@@ -3,7 +3,7 @@
 	<string name="app_titlebar_title_default">Sende zu Windows 10 / 11</string>
 	<string name="app_titlebar_title_receive">Empfange von Windows 10 / 11</string>
 	<string name="app_titlebar_title_receive_setup">Setup / Information</string>
-	
+
 	<string name="assets_prefix">de</string>
 
 	<!-- #region generic -->
@@ -39,6 +39,10 @@
 
 	<!-- #region preferences.xml -->
 	<string name="category_general">Generell</string>
+	<string name="category_links">Links / Hilfe</string>
+	<string name="category_permissions">Berechtigungen</string>
+	<string name="category_setup">Einrichtung</string>
+	<string name="category_about">Über</string>
 
 	<string name="request_permissions_title">Berechtigungen anfragen</string>
 	<string name="request_permissions_summary">Notwendige Berechtigungen erlauben</string>
@@ -49,8 +53,17 @@
 	<string name="open_faq_title">Hilfe</string>
 	<string name="open_faq_summary">Öffne das FAQ</string>
 
+	<string name="open_discord_title">Discord</string>
+	<string name="open_discord_summary">Discord-Server beitreten</string>
 
-	<string name="category_device_info">Geräte Informationen</string>
+	<string name="preference_appearance_title">Darstellung</string>
+	<string name="preference_appearance_summary">Sprache, Dark Mode</string>
+
+	<string name="preference_cdp_title">Connected Devices Platform</string>
+	<string name="preference_cdp_summary">Senden und Empfangen</string>
+
+	<string name="open_setup_title">PC Einrichtung</string>
+	<string name="open_setup_summary">Tutorial zu den notwendigen PC Einstellungen</string>
 
 	<string name="goto_mac_address_title">Mac-Adresse angeben</string>
 	<string name="goto_mac_address_summary">Mac-Adresse für dieses Geräte angeben</string>

@@ -10,12 +10,13 @@
 		<item name="android:statusBarColor">?attr/colorPrimary</item>
 		<item name="actionBarTheme">@style/ThemeOverlay.Material3.Dark.ActionBar</item>
 		<item name="actionOverflowButtonStyle">@style/OverflowButtonStyle</item>
-		<item name="preferenceTheme">@style/AppTheme.Preference</item>
+		<item name="preferenceTheme">@style/App.Preferences</item>
 	</style>
 
-	<style name="AppTheme.Preference" parent="@style/Theme.Material3.DayNight.Dialog">
-		<item name="android:textColorPrimary">#222</item>
-		<item name="android:textColorSecondary">#222</item>
+	<style name="App.Preferences" parent="@style/PreferenceTheme.SettingsLib">
+		<item name="preferenceCategoryTitleTextAppearance">?attr/textAppearanceTitleSmall</item>
+		<item name="preferenceCategoryTitleTextColor">?attr/colorSecondary</item>
+		<item name="android:tint">?attr/colorOnPrimary</item>
 	</style>
 
 	<style name="OverflowButtonStyle" parent="Widget.AppCompat.ActionButton.Overflow">

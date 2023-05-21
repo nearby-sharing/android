@@ -1,12 +1,12 @@
 ﻿using Android.Content;
 using Android.Content.PM;
-using Android.Drm;
 using Android.Text;
 using Android.Views;
 using AndroidX.AppCompat.App;
 using AndroidX.Browser.CustomTabs;
 using AndroidX.Core.App;
 using AndroidX.Core.Content;
+using Nearby_Sharing_Windows.Settings;
 using CompatToolbar = AndroidX.AppCompat.Widget.Toolbar;
 using ManifestPermission = Android.Manifest.Permission;
 
@@ -14,7 +14,7 @@ namespace Nearby_Sharing_Windows;
 
 internal static class UIHelper
 {
-    public const ConfigChanges ConfigChangesFlags = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.Density;
+    public const ConfigChanges ConfigChangesFlags = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.Density | ConfigChanges.UiMode;
 
     public static bool OnCreateOptionsMenu(Activity activity, IMenu? menu)
     {
@@ -44,6 +44,15 @@ internal static class UIHelper
 
     public static void OpenSponsor(Activity activity)
         => DisplayWebSite(activity, "https://nearshare.shortdev.de/docs/sponsor");
+
+    public static void OpenDiscord(Activity activity)
+        => DisplayWebSite(activity, "https://nearshare.shortdev.de/docs/discord");
+
+    public static void OpenSetup(Activity activity)
+        => DisplayWebSite(activity, "https://nearshare.shortdev.de/docs/setup");
+
+    public static void OpenCredits(Activity activity)
+        => DisplayWebSite(activity, "https://nearshare.shortdev.de/CREDITS");
 
     public static void DisplayWebSite(Activity activity, string url)
     {

@@ -1,29 +1,57 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen
+<androidx.preference.PreferenceScreen
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto">
 	<PreferenceCategory
 		android:key="general"
         android:title="@string/category_general">
+		
 		<Preference
-            app:key="request_permissions"
-            app:title="@string/request_permissions_title"
-            app:summary="@string/request_permissions_summary" />
+			app:key="design_screen"
+			app:icon="@drawable/ic_fluent_color_24_regular"
+            app:title="@string/preference_appearance_title"
+            app:summary="@string/preference_appearance_summary" />
+
 		<Preference
-            app:key="open_sponsor"
-            app:title="@string/open_sponsor_title"
-            app:summary="@string/open_sponsor_summary" />
+			app:key="cdp_screen"
+			app:icon="@drawable/ic_fluent_send_copy_24_regular"
+            app:title="@string/preference_cdp_title"
+            app:summary="@string/preference_cdp_summary" />
+
+	</PreferenceCategory>
+	
+	<PreferenceCategory
+		android:key="links"
+		android:title="@string/category_links">
+		
 		<Preference
             app:key="open_faq"
             app:title="@string/open_faq_title"
-            app:summary="@string/open_faq_summary" />		
-	</PreferenceCategory>
-	<PreferenceCategory
-		android:key="device_info"
-        android:title="@string/category_device_info">
+            app:summary="@string/open_faq_summary"
+			app:icon="@drawable/ic_fluent_question_circle_24_regular"/>
+
 		<Preference
-            app:key="goto_mac_address"
-            app:title="@string/goto_mac_address_title"
-            app:summary="@string/goto_mac_address_summary" />
+			app:key="open_discord"
+			app:title="@string/open_discord_title"
+			app:summary="@string/open_discord_summary"
+			app:icon="@drawable/ic_fluent_chat_24_regular"/>
+					 
+		<Preference
+            app:key="open_sponsor"
+            app:title="@string/open_sponsor_title"
+            app:summary="@string/open_sponsor_summary"
+			app:icon="@drawable/ic_fluent_handshake_24_selector"/>
+	
 	</PreferenceCategory>
-</PreferenceScreen>
+
+	<PreferenceCategory
+		android:key="about"
+		android:title="@string/category_about">
+
+		<Preference
+            app:key="show_credits"
+            app:title="@string/show_credits_title"
+			app:icon="@drawable/ic_fluent_question_circle_24_regular"/>
+
+	</PreferenceCategory>
+</androidx.preference.PreferenceScreen>
