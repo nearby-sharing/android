@@ -3,7 +3,7 @@ This repo contains a fully functional [implementation](ShortDev.Microsoft.Connec
 There's also an [android app](Nearby%20Sharing%20Windows/) to share (send and receive) files and websites between your phone and PC using this lib.
 
 [![grafic](https://img.shields.io/static/v1?style=for-the-badge&labelColor=212225&logoColor=fff&color=37393E&label=GitHub&message=Source-Code&logo=GitHub)](https://github.com/ShortDevelopment/Nearby-Sharing-Windows/)   
-[![grafic](https://img.shields.io/static/v1?style=for-the-badge&labelColor=212225&logoColor=fff&color=EA4AAA&label=GitHub&message=Support&logo=github-sponsors)](https://github.com/sponsors/ShortDevelopment)
+[![grafic](https://img.shields.io/static/v1?style=for-the-badge&labelColor=212225&logoColor=fff&color=EA4AAA&label=GitHub&message=Support&logo=github-sponsors)](https://nearshare.shortdev.de/docs/sponsor)
 
 ## Download
 [![grafic](https://img.shields.io/static/v1?style=for-the-badge&labelColor=212225&logoColor=fff&color=green&label=PlayStore&message=Stable&logo=google-play)](https://play.google.com/store/apps/details?id=de.shortdev.nearby_sharing_windows)   
