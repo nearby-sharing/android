@@ -59,6 +59,12 @@
 	<string name="preference_appearance_title">Darstellung</string>
 	<string name="preference_appearance_summary">Sprache, Dark Mode</string>
 
+	<string name="force_dark_mode_title">Dark Mode</string>
+	<string name="force_dark_mode_summary">Dark Mode erzwingen</string>
+
+	<string name="switch_language_title">App Sprache</string>
+	<string name="switch_language_summary">App Anzeige-Sprache ändern</string>
+
 	<string name="preference_cdp_title">Connected Devices Platform</string>
 	<string name="preference_cdp_summary">Senden und Empfangen</string>
 
@@ -67,6 +73,9 @@
 
 	<string name="goto_mac_address_title">Mac-Adresse angeben</string>
 	<string name="goto_mac_address_summary">Mac-Adresse für dieses Geräte angeben</string>
+
+	<string name="device_name_title">Geräte Name</string>
+	<string name="device_name_summary">Lege fest, wie andere dich sehen</string>
 	<!-- #endregion -->
 
 	<!-- #region ReceiveActivity.cs -->

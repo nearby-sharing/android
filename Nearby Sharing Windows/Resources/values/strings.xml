@@ -60,6 +60,12 @@
 	<string name="preference_appearance_title">UI / Design</string>
 	<string name="preference_appearance_summary">Language, Dark Mode</string>
 
+	<string name="force_dark_mode_title">Dark Mode</string>
+	<string name="force_dark_mode_summary">Force Dark Mode</string>
+
+	<string name="switch_language_title">App Language</string>
+	<string name="switch_language_summary">Change app display language</string>
+
 	<string name="preference_cdp_title">Connected Devices Platform</string>
 	<string name="preference_cdp_summary">Setup sending and receiving</string>
 
@@ -68,6 +74,9 @@
 
 	<string name="goto_mac_address_title">Specify Mac Address</string>
 	<string name="goto_mac_address_summary">Specify the mac address of this device</string>
+
+	<string name="device_name_title">Device Name</string>
+	<string name="device_name_summary">Change how others see you</string>
 
 	<string name="show_credits_title">Show credits</string>
 	<!-- #endregion -->

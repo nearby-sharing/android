@@ -11,6 +11,9 @@
 		<item name="actionBarTheme">@style/ThemeOverlay.Material3.Dark.ActionBar</item>
 		<item name="actionOverflowButtonStyle">@style/OverflowButtonStyle</item>
 		<item name="preferenceTheme">@style/App.Preferences</item>
+	
+		<item name="alertDialogTheme">@style/Theme.Material3.DayNight.Dialog</item>
+		<item name="dialogCornerRadius">28dp</item>
 	</style>
 
 	<style name="App.Preferences" parent="@style/PreferenceTheme.SettingsLib">

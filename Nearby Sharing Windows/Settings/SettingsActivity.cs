@@ -61,6 +61,8 @@ sealed class SettingsHomepageFragment : SettingsFragment
 
         PreferenceScreen!.FindPreference("show_credits")!.PreferenceClick +=
             (s, e) => UIHelper.OpenCredits(Activity!);
+        PreferenceScreen!.FindPreference("open_github")!.PreferenceClick +=
+            (s, e) => UIHelper.OpenGitHub(Activity!);
     }
 }
 
@@ -68,7 +70,8 @@ sealed class DesignScreenFragment : SettingsFragment
 {
     public override void OnCreatePreferences(Bundle? savedInstanceState, string? rootKey)
     {
-        SetPreferencesFromResource(Resource.Xml.preferences, rootKey);
+        SetPreferencesFromResource(Resource.Xml.preferences_design, rootKey);
+        // ToDo: Implement design preferences
     }
 }
 

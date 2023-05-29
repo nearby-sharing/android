@@ -54,6 +54,9 @@ internal static class UIHelper
     public static void OpenCredits(Activity activity)
         => DisplayWebSite(activity, "https://nearshare.shortdev.de/CREDITS");
 
+    public static void OpenGitHub(Activity activity)
+        => DisplayWebSite(activity, "https://github.com/ShortDevelopment/Nearby-Sharing-Windows/");
+
     public static void DisplayWebSite(Activity activity, string url)
     {
         CustomTabsIntent intent = new CustomTabsIntent.Builder()
