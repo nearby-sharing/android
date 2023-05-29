@@ -20,8 +20,6 @@ using ShortDev.Microsoft.ConnectedDevices.Transports;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.NetworkInformation;
-using AndroidUri = Android.Net.Uri;
-using ManifestPermission = Android.Manifest.Permission;
 
 namespace Nearby_Sharing_Windows;
 

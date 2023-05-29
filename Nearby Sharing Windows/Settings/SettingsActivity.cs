@@ -2,7 +2,7 @@
 using Android.Service.QuickSettings;
 using Android.Views;
 using AndroidX.AppCompat.App;
-using AndroidX.Preference;
+using Google.Android.Material.Dialog;
 
 namespace Nearby_Sharing_Windows.Settings;
 
@@ -71,7 +71,26 @@ sealed class DesignScreenFragment : SettingsFragment
     public override void OnCreatePreferences(Bundle? savedInstanceState, string? rootKey)
     {
         SetPreferencesFromResource(Resource.Xml.preferences_design, rootKey);
-        // ToDo: Implement design preferences
+
+        PreferenceScreen!.FindPreference("force_dark_mode")!.PreferenceChange += (s, e) =>
+        {
+            var value = ((Java.Lang.Boolean)e.NewValue!).BooleanValue();
+            GetSettings().Edit()!.PutBoolean("design-force_dark_mode", value)!.Commit();
+        };
+
+        PreferenceScreen!.FindPreference("switch_language")!.PreferenceClick += (s, e) =>
+        {
+            if (!OperatingSystem.IsAndroidVersionAtLeast(13))
+            {
+                new MaterialAlertDialogBuilder(Activity!)
+                    .SetMessage("Only supported on Android 13+")!
+                    .SetNeutralButton("Ok", (s, e) => { })!
+                    .Show();
+                return;
+            }
+
+            UIHelper.OpenLocaleSettings(Activity!);
+        };
     }
 }
 

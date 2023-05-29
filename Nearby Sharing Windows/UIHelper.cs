@@ -8,7 +8,6 @@ using AndroidX.Core.App;
 using AndroidX.Core.Content;
 using Nearby_Sharing_Windows.Settings;
 using CompatToolbar = AndroidX.AppCompat.Widget.Toolbar;
-using ManifestPermission = Android.Manifest.Permission;
 
 namespace Nearby_Sharing_Windows;
 
@@ -62,6 +61,13 @@ internal static class UIHelper
         CustomTabsIntent intent = new CustomTabsIntent.Builder()
             .Build();
         intent.LaunchUrl(activity, Android.Net.Uri.Parse(url));
+    }
+
+    public static void OpenLocaleSettings(Activity activity)
+    {
+        Intent intent = new(Android.Provider.Settings.ActionAppLocaleSettings);
+        intent.SetData(AndroidUri.FromParts("package", activity.PackageName, null));
+        activity.StartActivity(intent);
     }
 
     public static void OpenFile(Activity activity, string path)
