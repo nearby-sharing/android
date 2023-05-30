@@ -25,6 +25,9 @@ internal abstract class SettingsFragment : PreferenceFragmentCompat
             .Commit();
     }
 
+    public static bool ShouldForceDarkMode(Context context)
+        => PreferenceManager.GetDefaultSharedPreferences(context)!.GetBoolean("force_dark_mode", false);
+
     public static string GetDeviceName(Context context, BluetoothAdapter adapter)
     {
         var deviceName = PreferenceManager.GetDefaultSharedPreferences(context)!.GetString("device_name", null);
