@@ -75,7 +75,7 @@ sealed class DesignScreenFragment : SettingsFragment
         PreferenceScreen!.FindPreference("force_dark_mode")!.PreferenceChange += (s, e) =>
         {
             var value = ((Java.Lang.Boolean)e.NewValue!).BooleanValue();
-            GetSettings().Edit()!.PutBoolean("design-force_dark_mode", value)!.Commit();
+            AppCompatDelegate.DefaultNightMode = value ? AppCompatDelegate.ModeNightYes : AppCompatDelegate.ModeNightFollowSystem;
         };
 
         PreferenceScreen!.FindPreference("switch_language")!.PreferenceClick += (s, e) =>

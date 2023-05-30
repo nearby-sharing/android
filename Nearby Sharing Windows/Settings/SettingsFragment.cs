@@ -23,7 +23,4 @@ internal abstract class SettingsFragment : PreferenceFragmentCompat
             .Replace(Resource.Id.settings_container, new TFragment())
             .Commit();
     }
-
-    public static ISharedPreferences GetSettings()
-        => Application.Context.GetSharedPreferences("settings", Android.Content.FileCreationMode.Private)!;
 }

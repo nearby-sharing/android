@@ -13,7 +13,7 @@ namespace Nearby_Sharing_Windows;
 
 internal static class UIHelper
 {
-    public const ConfigChanges ConfigChangesFlags = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.Density | ConfigChanges.UiMode;
+    public const ConfigChanges ConfigChangesFlags = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.Density;
 
     public static bool OnCreateOptionsMenu(Activity activity, IMenu? menu)
     {
