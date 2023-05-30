@@ -27,6 +27,7 @@
 
 		<EditTextPreference
 			app:key="device_name"
+			app:persistent="true"
 			app:title="@string/device_name_title"
 			app:summary="@string/device_name_summary" />
 

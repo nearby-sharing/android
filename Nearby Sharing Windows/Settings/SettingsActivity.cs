@@ -1,7 +1,9 @@
-﻿using Android.Graphics;
+﻿using Android.Content;
+using Android.Graphics;
 using Android.Service.QuickSettings;
 using Android.Views;
 using AndroidX.AppCompat.App;
+using AndroidX.Preference;
 using Google.Android.Material.Dialog;
 
 namespace Nearby_Sharing_Windows.Settings;

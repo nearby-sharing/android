@@ -6,7 +6,7 @@ using System.Text;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Transports;
 
-public sealed record CdpAdvertisement(DeviceType DeviceType, PhysicalAddress MacAddress, string DeviceName)
+public sealed record BLeBeacon(DeviceType DeviceType, PhysicalAddress MacAddress, string DeviceName)
 {
     [Flags]
     enum BeaconFlags : byte
@@ -15,7 +15,7 @@ public sealed record CdpAdvertisement(DeviceType DeviceType, PhysicalAddress Mac
         Public
     }
 
-    public static bool TryParse(byte[] beaconData, [MaybeNullWhen(false)] out CdpAdvertisement data)
+    public static bool TryParse(byte[] beaconData, [MaybeNullWhen(false)] out BLeBeacon data)
     {
         data = null;
 
@@ -52,7 +52,7 @@ public sealed record CdpAdvertisement(DeviceType DeviceType, PhysicalAddress Mac
         return true;
     }
 
-    public byte[] GenerateBLeBeacon()
+    public byte[] ToArray()
     {
         EndianWriter writer = new(Endianness.LittleEndian);
         writer.Write(Constants.BLeBeaconScenarioType);

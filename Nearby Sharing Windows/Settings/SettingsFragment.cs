@@ -1,4 +1,5 @@
-﻿using Android.Content;
+﻿using Android.Bluetooth;
+using Android.Content;
 using Android.Views;
 using AndroidX.Preference;
 using Google.Android.Material.Theme.Overlay;
@@ -22,5 +23,14 @@ internal abstract class SettingsFragment : PreferenceFragmentCompat
         manager.BeginTransaction()
             .Replace(Resource.Id.settings_container, new TFragment())
             .Commit();
+    }
+
+    public static string GetDeviceName(Context context, BluetoothAdapter adapter)
+    {
+        var deviceName = PreferenceManager.GetDefaultSharedPreferences(context)!.GetString("device_name", null);
+        if (string.IsNullOrEmpty(deviceName))
+            deviceName = adapter.Name;
+
+        return deviceName ?? throw new NullReferenceException("Could not find device name");
     }
 }

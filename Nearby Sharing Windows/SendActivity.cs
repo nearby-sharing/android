@@ -8,9 +8,11 @@ using AndroidX.AppCompat.App;
 using AndroidX.Core.App;
 using AndroidX.Core.Content;
 using AndroidX.Core.View;
+using AndroidX.Preference;
 using AndroidX.RecyclerView.Widget;
 using Google.Android.Material.ProgressIndicator;
 using Google.Android.Material.Snackbar;
+using Nearby_Sharing_Windows.Settings;
 using ShortDev.Android.UI;
 using ShortDev.Microsoft.ConnectedDevices;
 using ShortDev.Microsoft.ConnectedDevices.Encryption;
@@ -139,7 +141,7 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
         Platform = new(new()
         {
             Type = DeviceType.Android,
-            Name = adapter.Name ?? throw new NullReferenceException("Could not find device name"),
+            Name = SettingsFragment.GetDeviceName(this, adapter),
             OemModelName = Build.Model ?? string.Empty,
             OemManufacturerName = Build.Manufacturer ?? string.Empty,
             DeviceCertificate = ConnectedDevicesPlatform.CreateDeviceCertificate(CdpEncryptionParams.Default),
@@ -159,7 +161,7 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
     }
 
     readonly List<CdpDevice> RemoteSystems = new();
-    private void Platform_DeviceDiscovered(ICdpTransport sender, CdpDevice device, CdpAdvertisement advertisement)
+    private void Platform_DeviceDiscovered(ICdpTransport sender, CdpDevice device, BLeBeacon advertisement)
     {
         if (!RemoteSystems.Contains(device))
         {
@@ -270,18 +272,18 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
                             try
                             {
 #endif
-                                progressIndicator.Max = (int)args.TotalBytesToSend;
-                                progressIndicator.Progress = (int)args.BytesSent;
+                            progressIndicator.Max = (int)args.TotalBytesToSend;
+                            progressIndicator.Progress = (int)args.BytesSent;
 
-                                if (args.TotalFilesToSend != 0 && args.TotalBytesToSend != 0)
-                                {
-                                    StatusTextView.Text = this.Localize(
-                                        Resource.String.sending_template,
-                                        args.FilesSent, args.TotalFilesToSend,
-                                        Math.Round((decimal)args.BytesSent / args.TotalBytesToSend * 100)
-                                    );
-                                    OnRequestAccepted();
-                                }
+                            if (args.TotalFilesToSend != 0 && args.TotalBytesToSend != 0)
+                            {
+                                StatusTextView.Text = this.Localize(
+                                    Resource.String.sending_template,
+                                    args.FilesSent, args.TotalFilesToSend,
+                                    Math.Round((decimal)args.BytesSent / args.TotalBytesToSend * 100)
+                                );
+                                OnRequestAccepted();
+                            }
 #if !DEBUG
                             }
                             catch { }
