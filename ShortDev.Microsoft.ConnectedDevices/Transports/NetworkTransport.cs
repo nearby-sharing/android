@@ -91,10 +91,10 @@ public sealed class NetworkTransport : ICdpTransport, ICdpDiscoverableTransport
     };
 
     bool _isAdvertising = false;
-    CdpAdvertisement? advertisement;
-    public void Advertise(CdpAdvertisement options, CancellationToken cancellationToken)
+    LocalDeviceInfo? _deviceInfo;
+    public void Advertise(LocalDeviceInfo deviceInfo, CancellationToken cancellationToken)
     {
-        advertisement = options;
+        _deviceInfo = deviceInfo;
         _isAdvertising = true;
         EnsureListeningUdp(cancellationToken);
         cancellationToken.Register(() => _isAdvertising = false);
@@ -185,7 +185,7 @@ public sealed class NetworkTransport : ICdpTransport, ICdpDiscoverableTransport
                             response.DeviceType,
                             EndpointInfo.FromTcp(result.RemoteEndPoint)
                         ),
-                        new CdpAdvertisement(
+                        new BLeBeacon(
                             response.DeviceType,
                             null!, // ToDo: 
                             response.DeviceName
@@ -197,7 +197,7 @@ public sealed class NetworkTransport : ICdpTransport, ICdpDiscoverableTransport
 
         void SendPresenceResponse(IPAddress device)
         {
-            if (advertisement == null)
+            if (_deviceInfo == null)
                 return;
 
             EndianWriter writer = new(Endianness.BigEndian);
@@ -213,8 +213,8 @@ public sealed class NetworkTransport : ICdpTransport, ICdpDiscoverableTransport
             new PresenceResponse()
             {
                 ConnectionMode = Messages.Connection.ConnectionMode.Proximal,
-                DeviceName = advertisement.DeviceName,
-                DeviceType = advertisement.DeviceType
+                DeviceName = _deviceInfo.Name,
+                DeviceType = _deviceInfo.Type
             }.Write(writer);
 
             _udpclient.Send(writer.Buffer.AsSpan(), new IPEndPoint(device, Constants.UdpPort));

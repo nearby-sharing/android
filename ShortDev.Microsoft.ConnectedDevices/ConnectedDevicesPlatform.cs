@@ -13,6 +13,7 @@ using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
@@ -52,7 +53,7 @@ public sealed class ConnectedDevicesPlatform : IDisposable
     #region Host
     #region Advertise
     public bool IsAdvertising { get; private set; } = false;
-    public void Advertise(CdpAdvertisement options, CancellationToken cancellationToken)
+    public void Advertise(CancellationToken cancellationToken)
     {
         lock (this)
         {
@@ -66,7 +67,7 @@ public sealed class ConnectedDevicesPlatform : IDisposable
 
         foreach (var (_, transport) in _transports)
             if (transport is ICdpDiscoverableTransport discoverableTransport)
-                discoverableTransport.Advertise(options, cancellationToken);
+                discoverableTransport.Advertise(DeviceInfo, cancellationToken);
 
         cancellationToken.Register(() =>
         {

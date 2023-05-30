@@ -28,7 +28,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{F0E5B489
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShortDev.Microsoft.ConnectedDevices.Test", "tests\ShortDev.Microsoft.ConnectedDevices.Test\ShortDev.Microsoft.ConnectedDevices.Test.csproj", "{B0DE3385-5FD7-4D05-8296-6E298A3F1BA2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShortDev.Microsoft.Bond.SourceGenerator", "ShortDev.Microsoft.Bond.SourceGenerator\ShortDev.Microsoft.Bond.SourceGenerator.csproj", "{4480CB98-4FC4-4EF4-B1D3-010ED43B6980}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShortDev.Microsoft.Bond.SourceGenerator", "ShortDev.Microsoft.Bond.SourceGenerator\ShortDev.Microsoft.Bond.SourceGenerator.csproj", "{4480CB98-4FC4-4EF4-B1D3-010ED43B6980}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "lib", "lib", "{D891AC11-E26F-434D-AA9D-0FE6F162DCB9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShortDev.Android.Preferences", "lib\ShortDev.Android.Preferences\ShortDev.Android.Preferences.csproj", "{B80E8155-B326-41BD-B1CC-689801E460AE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -166,6 +170,18 @@ Global
 		{4480CB98-4FC4-4EF4-B1D3-010ED43B6980}.Release|x64.Build.0 = Release|Any CPU
 		{4480CB98-4FC4-4EF4-B1D3-010ED43B6980}.Release|x86.ActiveCfg = Release|Any CPU
 		{4480CB98-4FC4-4EF4-B1D3-010ED43B6980}.Release|x86.Build.0 = Release|Any CPU
+		{B80E8155-B326-41BD-B1CC-689801E460AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B80E8155-B326-41BD-B1CC-689801E460AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B80E8155-B326-41BD-B1CC-689801E460AE}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B80E8155-B326-41BD-B1CC-689801E460AE}.Debug|x64.Build.0 = Debug|Any CPU
+		{B80E8155-B326-41BD-B1CC-689801E460AE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B80E8155-B326-41BD-B1CC-689801E460AE}.Debug|x86.Build.0 = Debug|Any CPU
+		{B80E8155-B326-41BD-B1CC-689801E460AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B80E8155-B326-41BD-B1CC-689801E460AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B80E8155-B326-41BD-B1CC-689801E460AE}.Release|x64.ActiveCfg = Release|Any CPU
+		{B80E8155-B326-41BD-B1CC-689801E460AE}.Release|x64.Build.0 = Release|Any CPU
+		{B80E8155-B326-41BD-B1CC-689801E460AE}.Release|x86.ActiveCfg = Release|Any CPU
+		{B80E8155-B326-41BD-B1CC-689801E460AE}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -173,6 +189,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{CFABE26A-FBFF-4CF9-8C94-B603B317A223} = {B1BBE46E-5DC6-410A-84FC-157E31F31E92}
 		{B0DE3385-5FD7-4D05-8296-6E298A3F1BA2} = {F0E5B489-0FD2-4A7E-B660-C28450479583}
+		{B80E8155-B326-41BD-B1CC-689801E460AE} = {D891AC11-E26F-434D-AA9D-0FE6F162DCB9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {86DED607-FA3F-4D8A-B226-8AE9C9F08F84}

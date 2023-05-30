@@ -38,13 +38,13 @@ public sealed class BluetoothTransport : ICdpTransport, ICdpDiscoverableTranspor
             SocketConnected = (socket) => DeviceConnected?.Invoke(this, socket)
         });
 
-    public void Advertise(CdpAdvertisement options, CancellationToken cancellationToken)
+    public void Advertise(LocalDeviceInfo deviceInfo, CancellationToken cancellationToken)
     {
         _ = Handler.AdvertiseBLeBeaconAsync(
             new AdvertiseOptions()
             {
                 ManufacturerId = Constants.BLeBeaconManufacturerId,
-                BeaconData = options.GenerateBLeBeacon()
+                BeaconData = new BLeBeacon(deviceInfo.Type, Handler.MacAddress, deviceInfo.Name)
             },
             cancellationToken
         );

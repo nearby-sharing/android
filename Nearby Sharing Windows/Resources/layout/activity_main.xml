@@ -41,7 +41,7 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
                     android:text="@string/generic_send"
-                    app:icon="@drawable/file_upload_48"
+                    app:icon="@drawable/ic_fluent_send_copy_24_regular"
                     style="@style/AppTheme.NearbyShareButton" />
                 <Button
                     android:id="@+id/receiveButton"

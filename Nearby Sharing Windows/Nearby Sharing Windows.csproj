@@ -20,11 +20,11 @@
 	<ItemGroup>
 		<PackageReference Include="Sentry" Version="3.31.0" />
 		<PackageReference Include="Xamarin.AndroidX.AppCompat" Version="1.6.1.1" />
-		<PackageReference Include="Xamarin.AndroidX.Preference" Version="1.2.0.5" />
 		<PackageReference Include="Xamarin.Google.Android.Material" Version="1.8.0.1" />
 		<PackageReference Include="Xamarin.Essentials" Version="1.7.5" />
 	</ItemGroup>
 	<ItemGroup>
+		<ProjectReference Include="..\lib\ShortDev.Android.Preferences\ShortDev.Android.Preferences.csproj" />
 		<ProjectReference Include="..\ShortDev.Android.FluentIcons\ShortDev.Android.FluentIcons.csproj" />
 		<ProjectReference Include="..\ShortDev.Android\ShortDev.Android.csproj">
 			<Project>{195c941f-5eef-45a9-a65c-16186e4bb131}</Project>
@@ -37,6 +37,6 @@
 		</ProjectReference>
 	</ItemGroup>
 	<ItemGroup>
-		<TransformFile Include="Resources\xml\preferences.xml" />
+		<AndroidAsset Include="../Credits.md" Link="Assets/Credits.md" />
 	</ItemGroup>
 </Project>

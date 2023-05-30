@@ -6,6 +6,7 @@ using Android.Views;
 using AndroidX.AppCompat.App;
 using AndroidX.RecyclerView.Widget;
 using Google.Android.Material.ProgressIndicator;
+using Nearby_Sharing_Windows.Settings;
 using ShortDev.Android.UI;
 using ShortDev.Microsoft.ConnectedDevices;
 using ShortDev.Microsoft.ConnectedDevices.Encryption;
@@ -153,9 +154,10 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
         var service = (BluetoothManager)GetSystemService(BluetoothService)!;
         _btAdapter = service.Adapter!;
 
+        var deviceName = SettingsFragment.GetDeviceName(this, _btAdapter);
         FindViewById<TextView>(Resource.Id.deviceInfoTextView)!.Text = this.Localize(
             Resource.String.visible_as_template,
-            $"{_btAdapter.Name!}.\n" +
+            $"\"{deviceName}\".\n" +
             $"Address: {btAddress.ToStringFormatted()}\n" +
             $"IP-Address: {AndroidNetworkHandler.GetLocalIp(this)}");
         debugLogTextView = FindViewById<TextView>(Resource.Id.debugLogTextView)!;
@@ -166,7 +168,7 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
         _cdp = new(new()
         {
             Type = DeviceType.Android,
-            Name = _btAdapter.Name ?? throw new NullReferenceException("Could not find device name"),
+            Name = deviceName,
             OemModelName = Build.Model ?? string.Empty,
             OemManufacturerName = Build.Manufacturer ?? string.Empty,
             DeviceCertificate = ConnectedDevicesPlatform.CreateDeviceCertificate(CdpEncryptionParams.Default),
@@ -180,11 +182,7 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
         _cdp.AddTransport<NetworkTransport>(new(networkHandler));
 
         _cdp.Listen(_cancellationTokenSource.Token);
-        _cdp.Advertise(new CdpAdvertisement(
-            DeviceType.Android,
-            btAddress, // "00:fa:21:3e:fb:19"
-            _btAdapter.Name!
-        ), _cancellationTokenSource.Token);
+        _cdp.Advertise(_cancellationTokenSource.Token);
 
         NearShareReceiver.Start(_cdp, this);
     }

@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto">
+
+	<PreferenceCategory
+		android:key="general"
+		android:title="@string/category_permissions">
+		<Preference
+			app:key="request_permissions_send"
+			app:title="@string/generic_send"
+			app:summary="@string/request_permissions_summary" />
+		<Preference
+			app:key="request_permissions_receive"
+			app:title="@string/generic_receive"
+			app:summary="@string/request_permissions_summary" />
+	</PreferenceCategory>
+
+	<PreferenceCategory
+		android:key="setup"
+		android:title="@string/category_setup">
+		
+		<Preference
+			app:key="goto_mac_address"
+			app:title="@string/goto_mac_address_title"
+			app:summary="@string/goto_mac_address_summary" />
+
+		<EditTextPreference
+			app:key="device_name"
+			app:persistent="true"
+			app:title="@string/device_name_title"
+			app:summary="@string/device_name_summary" />
+
+		<Preference
+			app:key="open_setup"
+			app:title="@string/open_setup_title"
+			app:summary="@string/open_setup_summary" />
+
+	</PreferenceCategory>
+
+</androidx.preference.PreferenceScreen>
