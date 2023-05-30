@@ -1,7 +1,9 @@
 ﻿using Android.Content;
 using Android.Graphics;
+using Android.Runtime;
 using Android.Service.QuickSettings;
 using Android.Views;
+using AndroidX.Activity;
 using AndroidX.AppCompat.App;
 using AndroidX.Preference;
 using Google.Android.Material.Dialog;
@@ -10,8 +12,10 @@ namespace Nearby_Sharing_Windows.Settings;
 
 [IntentFilter(new[] { TileService.ActionQsTilePreferences })]
 [Activity(Label = "@string/app_name", Exported = true, Theme = "@style/AppTheme", ConfigurationChanges = UIHelper.ConfigChangesFlags)]
-public sealed class SettingsActivity : AppCompatActivity
+public sealed class SettingsActivity : AppCompatActivity, ISettingsNavigation
 {
+    Stack<SettingsFragment> ISettingsNavigation.NavigationStack { get; } = new();
+
     protected override void OnCreate(Bundle? savedInstanceState)
     {
         SentryHelper.EnsureInitialized();
@@ -27,7 +31,37 @@ public sealed class SettingsActivity : AppCompatActivity
         backDrawable.SetTint(Color.White.ToArgb());
         SupportActionBar!.SetHomeAsUpIndicator(backDrawable);
 
-        SettingsFragment.NavigateFragment<SettingsHomepageFragment>(SupportFragmentManager);
+        SettingsFragment.NavigateFragment<SettingsHomepageFragment>(SupportFragmentManager, this);
+
+        OnBackPressedDispatcher.AddCallback(this, new BackPressedListener(this, SupportFragmentManager, OnBackPressedDispatcher, true));
+    }
+
+    sealed class BackPressedListener : OnBackPressedCallback
+    {
+        readonly ISettingsNavigation _navigation;
+        readonly AndroidX.Fragment.App.FragmentManager _fragmentManager;
+        readonly OnBackPressedDispatcher _dispatcher;
+        public BackPressedListener(ISettingsNavigation navigation, AndroidX.Fragment.App.FragmentManager fragmentManager, OnBackPressedDispatcher dispatcher, bool enabled) : base(enabled)
+        {
+            _navigation = navigation;
+            _fragmentManager = fragmentManager;
+            _dispatcher = dispatcher;
+        }
+
+        public override void HandleOnBackPressed()
+        {
+            if (_navigation.NavigationStack.Count <= 1)
+            {
+                Enabled = false;
+                _dispatcher.OnBackPressed();
+                return;
+            }
+
+            _navigation.NavigationStack.Pop();
+
+            var newFragment = _navigation.NavigationStack.Peek();
+            SettingsFragment.NavigateFragment(_fragmentManager, newFragment);
+        }
     }
 
     public override bool OnSupportNavigateUp()

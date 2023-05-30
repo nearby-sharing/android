@@ -16,12 +16,17 @@ internal abstract class SettingsFragment : PreferenceFragmentCompat
     }
 
     protected void NavigateFragment<TFragment>() where TFragment : SettingsFragment, new()
-        => NavigateFragment<TFragment>(ParentFragmentManager);
+        => NavigateFragment<TFragment>(ParentFragmentManager, Activity as ISettingsNavigation);
 
-    public static void NavigateFragment<TFragment>(AndroidX.Fragment.App.FragmentManager manager) where TFragment : SettingsFragment, new()
+    public static void NavigateFragment<TFragment>(AndroidX.Fragment.App.FragmentManager manager, ISettingsNavigation? navigation = null) where TFragment : SettingsFragment, new()
+        => NavigateFragment(manager, new TFragment(), navigation);
+
+    public static void NavigateFragment(AndroidX.Fragment.App.FragmentManager manager, SettingsFragment fragment, ISettingsNavigation? navigation = null)
     {
+        navigation?.NavigationStack.Push(fragment);
+
         manager.BeginTransaction()
-            .Replace(Resource.Id.settings_container, new TFragment())
+            .Replace(Resource.Id.settings_container, fragment)
             .Commit();
     }
 
