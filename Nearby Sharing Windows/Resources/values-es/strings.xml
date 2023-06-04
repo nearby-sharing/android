@@ -40,6 +40,10 @@
 
 	<!-- #region preferences.xml -->
 	<string name="category_general">General</string>
+	<string name="category_links">Enlaces / Ayuda</string>
+	<string name="category_permissions">Permisos</string>
+	<string name="category_setup">Configuración inicial</string>
+	<string name="category_about">Acerca de</string>
 
 	<string name="request_permissions_title">Solicitar permisos necesarios</string>
 	<string name="request_permissions_summary">Concede los permisos necesarios a la aplicación</string>
@@ -49,12 +53,32 @@
 
 	<string name="open_faq_title">Ayuda</string>
 	<string name="open_faq_summary">Abre las Preguntas Frecuentes</string>
+        
+	<string name="open_discord_title">Discord</string>
+	<string name="open_discord_summary">Unirse al servidor de Discord</string>
 
+	<string name="preference_appearance_title">Interfaz / Diseño</string>
+	<string name="preference_appearance_summary">Idioma, modo oscuro</string>
 
-	<string name="category_device_info">Información del dispositivo</string>
+	<string name="force_dark_mode_title">Modo oscuro</string>
+	<string name="force_dark_mode_summary">Forzar el modo oscuro</string>
+
+	<string name="switch_language_title">Idioma de la aplicación</string>
+	<string name="switch_language_summary">Cambiar el idioma de la aplicación</string>
+
+	<string name="preference_cdp_title">Plataforma de dispositivos conectados</string>
+	<string name="preference_cdp_summary">Configurar el envío y la recepción</string>
+
+	<string name="open_setup_title">Configuración del PC</string>
+	<string name="open_setup_summary">Tutorial sobre los ajustes del PC necesarios</string>
 
 	<string name="goto_mac_address_title">Indica la dirección MAC</string>
 	<string name="goto_mac_address_summary">Indica la dirección MAC de este dispositivo</string>
+
+	<string name="device_name_title">Nombre del dispositivo</string>
+	<string name="device_name_summary">Cambia como te ve el resto</string>
+
+	<string name="show_credits_title">Mostrar creditos</string>
 	<!-- #endregion -->
 
 	<!-- #region ReceiveActivity.cs -->
