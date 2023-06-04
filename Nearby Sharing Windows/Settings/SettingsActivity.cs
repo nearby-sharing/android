@@ -114,19 +114,8 @@ sealed class DesignScreenFragment : SettingsFragment
             AppCompatDelegate.DefaultNightMode = value ? AppCompatDelegate.ModeNightYes : AppCompatDelegate.ModeNightFollowSystem;
         };
 
-        PreferenceScreen!.FindPreference("switch_language")!.PreferenceClick += (s, e) =>
-        {
-            if (!OperatingSystem.IsAndroidVersionAtLeast(13))
-            {
-                new MaterialAlertDialogBuilder(Activity!)
-                    .SetMessage("Only supported on Android 13+")!
-                    .SetNeutralButton("Ok", (s, e) => { })!
-                    .Show();
-                return;
-            }
-
-            UIHelper.OpenLocaleSettings(Activity!);
-        };
+        PreferenceScreen!.FindPreference("switch_language")!.PreferenceClick +=
+            (s, e) => UIHelper.OpenLocaleSettings(Activity!);
     }
 }
 

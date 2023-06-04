@@ -6,6 +6,7 @@ using AndroidX.AppCompat.App;
 using AndroidX.Browser.CustomTabs;
 using AndroidX.Core.App;
 using AndroidX.Core.Content;
+using Google.Android.Material.Dialog;
 using Nearby_Sharing_Windows.Settings;
 using CompatToolbar = AndroidX.AppCompat.Widget.Toolbar;
 
@@ -65,6 +66,15 @@ internal static class UIHelper
 
     public static void OpenLocaleSettings(Activity activity)
     {
+        if (!OperatingSystem.IsAndroidVersionAtLeast(33))
+        {
+            new MaterialAlertDialogBuilder(activity)
+                .SetMessage("Only supported on Android 13+")!
+                .SetNeutralButton("Ok", (s, e) => { })!
+                .Show();
+            return;
+        }
+
         Intent intent = new(Android.Provider.Settings.ActionAppLocaleSettings);
         intent.SetData(AndroidUri.FromParts("package", activity.PackageName, null));
         activity.StartActivity(intent);
