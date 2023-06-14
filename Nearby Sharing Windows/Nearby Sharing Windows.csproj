@@ -19,17 +19,14 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Sentry" Version="3.31.0" />
+		<PackageReference Include="ShortDev.Android.FluentIcons" Version="1.1.203" />
 		<PackageReference Include="Xamarin.AndroidX.AppCompat" Version="1.6.1.1" />
 		<PackageReference Include="Xamarin.Google.Android.Material" Version="1.8.0.1" />
 		<PackageReference Include="Xamarin.Essentials" Version="1.7.5" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\lib\ShortDev.Android.Preferences\ShortDev.Android.Preferences.csproj" />
-		<ProjectReference Include="..\ShortDev.Android.FluentIcons\ShortDev.Android.FluentIcons.csproj" />
-		<ProjectReference Include="..\ShortDev.Android\ShortDev.Android.csproj">
-			<Project>{195c941f-5eef-45a9-a65c-16186e4bb131}</Project>
-			<Name>ShortDev.Android</Name>
-		</ProjectReference>
+		<ProjectReference Include="..\lib\ShortDev.Android\ShortDev.Android.csproj" />
 		<ProjectReference Include="..\ShortDev.Microsoft.ConnectedDevices.NearShare\ShortDev.Microsoft.ConnectedDevices.NearShare.csproj" />
 		<ProjectReference Include="..\ShortDev.Networking\ShortDev.Networking.csproj">
 			<Project>{18fcc134-71cc-4be9-9271-3839a6ffe380}</Project>
