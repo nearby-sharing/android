@@ -95,14 +95,3 @@ void HandleMessage(CommonHeader header, EndianReader reader)
         //Console.WriteLine(BinaryConvert.ToString(reader.ReadPayload()));
     }
 }
-
-class PlatformHandler : INetworkHandler
-{
-    public string GetLocalIp()
-        => "127.0.0.1";
-
-    public void Log(int a, string msg)
-    {
-
-    }
-}

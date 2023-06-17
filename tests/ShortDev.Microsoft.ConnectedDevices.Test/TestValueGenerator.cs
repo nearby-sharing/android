@@ -53,15 +53,13 @@ internal static class TestValueGenerator
         if (type.IsArray)
         {
             var elementType = type.GetElementType() ?? throw new NullReferenceException($"Could not get element-type of type \"{type}\"");
+            return RandomArray(elementType, depth + 1);
+        }
 
-            var arrayLen = RandomNumberGenerator.GetInt32(10);
-            var array = Array.CreateInstance(elementType, arrayLen);
-            for (int i = 0; i < arrayLen; i++)
-            {
-                var value = RandomValueInternal(elementType, depth + 1);
-                array.SetValue(value, i);
-            }
-            return array;
+        if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IReadOnlyList<>))
+        {
+            var elementType = type.GenericTypeArguments[0];
+            return RandomArray(elementType, depth + 1);
         }
 
         return RandomObject(type, depth + 1);
@@ -74,6 +72,18 @@ internal static class TestValueGenerator
 
         fixed (byte* pBuffer = buffer)
             return Unsafe.AsRef<T>(pBuffer);
+    }
+
+    static Array RandomArray(Type elementType, ulong depth)
+    {
+        var arrayLen = RandomNumberGenerator.GetInt32(10);
+        var array = Array.CreateInstance(elementType, arrayLen);
+        for (int i = 0; i < arrayLen; i++)
+        {
+            var value = RandomValueInternal(elementType, depth + 1);
+            array.SetValue(value, i);
+        }
+        return array;
     }
 
     static object RandomObject(Type type, ulong depth)
