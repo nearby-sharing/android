@@ -1,5 +1,6 @@
 ﻿using Android.Content;
 using Android.Content.PM;
+using Android.OS;
 using Android.Text;
 using Android.Views;
 using AndroidX.AppCompat.App;
@@ -103,21 +104,34 @@ internal static class UIHelper
         activity.SupportActionBar!.Subtitle = subtitle;
     }
 
-    public static void RequestReceivePermissions(Activity activity)
+    #region Permissions
+    private static readonly string[] _sendPermissions = new[]
     {
-        ActivityCompat.RequestPermissions(activity, new[] {
-            ManifestPermission.AccessFineLocation,
-            ManifestPermission.AccessCoarseLocation,
-            ManifestPermission.AccessWifiState,
-            ManifestPermission.Bluetooth,
-            ManifestPermission.BluetoothScan,
-            ManifestPermission.BluetoothConnect,
-            ManifestPermission.BluetoothAdvertise,
-            ManifestPermission.AccessBackgroundLocation,
-            ManifestPermission.ReadExternalStorage,
-            ManifestPermission.WriteExternalStorage
-        }, 0);
-    }
+        ManifestPermission.AccessFineLocation,
+        ManifestPermission.AccessCoarseLocation,
+        // Api level 31
+        ManifestPermission.BluetoothScan,
+        ManifestPermission.BluetoothConnect
+    };
+    public static void RequestSendPermissions(Activity activity)
+        => ActivityCompat.RequestPermissions(activity, _sendPermissions, 0);
+
+    private static readonly string[] _receivePermissions = new[]
+    {
+        ManifestPermission.AccessFineLocation,
+        ManifestPermission.AccessCoarseLocation,
+        ManifestPermission.AccessWifiState,
+        ManifestPermission.Bluetooth,
+        ManifestPermission.BluetoothScan,
+        ManifestPermission.BluetoothConnect,
+        ManifestPermission.BluetoothAdvertise,
+        ManifestPermission.AccessBackgroundLocation,
+        ManifestPermission.ReadExternalStorage,
+        ManifestPermission.WriteExternalStorage
+    };
+    public static void RequestReceivePermissions(Activity activity)
+        => ActivityCompat.RequestPermissions(activity, _receivePermissions, 0);
+    #endregion
 
     public static ISpanned LoadHtmlAsset(Activity activity, string assetPath)
     {

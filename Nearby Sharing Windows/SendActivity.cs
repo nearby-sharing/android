@@ -5,10 +5,6 @@ using Android.Provider;
 using Android.Runtime;
 using Android.Views;
 using AndroidX.AppCompat.App;
-using AndroidX.Core.App;
-using AndroidX.Core.Content;
-using AndroidX.Core.View;
-using AndroidX.Preference;
 using AndroidX.RecyclerView.Widget;
 using Google.Android.Material.ProgressIndicator;
 using Google.Android.Material.Snackbar;
@@ -20,7 +16,6 @@ using ShortDev.Microsoft.ConnectedDevices.NearShare;
 using ShortDev.Microsoft.ConnectedDevices.Platforms;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
 using System.Diagnostics.CodeAnalysis;
-using System.Net;
 using System.Net.NetworkInformation;
 
 namespace Nearby_Sharing_Windows;
@@ -38,8 +33,6 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
     [AllowNull] Button cancelButton;
     protected override void OnCreate(Bundle? savedInstanceState)
     {
-        SentryHelper.EnsureInitialized();
-
         base.OnCreate(savedInstanceState);
         SetContentView(Resource.Layout.activity_share);
 
@@ -76,22 +69,7 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
 
         cancelButton.Click += CancelButton_Click;
 
-        if (Build.VERSION.SdkInt >= BuildVersionCodes.S)
-        {
-            ActivityCompat.RequestPermissions(this, new[] {
-                ManifestPermission.AccessFineLocation,
-                ManifestPermission.AccessCoarseLocation,
-                ManifestPermission.BluetoothScan,
-                ManifestPermission.BluetoothConnect
-            }, 0);
-        }
-        else
-        {
-            ActivityCompat.RequestPermissions(this, new[] {
-                ManifestPermission.AccessFineLocation,
-                ManifestPermission.AccessCoarseLocation
-            }, 0);
-        }
+        UIHelper.RequestSendPermissions(this);
     }
 
     #region UI

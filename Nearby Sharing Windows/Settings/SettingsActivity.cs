@@ -1,12 +1,9 @@
 ﻿using Android.Content;
 using Android.Graphics;
-using Android.Runtime;
 using Android.Service.QuickSettings;
 using Android.Views;
 using AndroidX.Activity;
 using AndroidX.AppCompat.App;
-using AndroidX.Preference;
-using Google.Android.Material.Dialog;
 
 namespace Nearby_Sharing_Windows.Settings;
 
@@ -18,8 +15,6 @@ public sealed class SettingsActivity : AppCompatActivity, ISettingsNavigation
 
     protected override void OnCreate(Bundle? savedInstanceState)
     {
-        SentryHelper.EnsureInitialized();
-
         base.OnCreate(savedInstanceState);
         SetContentView(Resource.Layout.activity_settings);
         UIHelper.SetupToolBar(this, GetString(Resource.String.generic_settings));
@@ -126,7 +121,7 @@ sealed class CdpScreenFragment : SettingsFragment
         SetPreferencesFromResource(Resource.Xml.preferences_cdp, rootKey);
 
         PreferenceScreen!.FindPreference("request_permissions_send")!.PreferenceClick +=
-            (s, e) => UIHelper.RequestReceivePermissions(Activity!);
+            (s, e) => UIHelper.RequestSendPermissions(Activity!);
         PreferenceScreen!.FindPreference("request_permissions_receive")!.PreferenceClick +=
             (s, e) => UIHelper.RequestReceivePermissions(Activity!);
 

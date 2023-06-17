@@ -12,8 +12,6 @@ public sealed class MainActivity : AppCompatActivity
 {
     protected override void OnCreate(Bundle? savedInstanceState)
     {
-        SentryHelper.EnsureInitialized();
-
         base.OnCreate(savedInstanceState);
         SetContentView(Resource.Layout.activity_main);
 

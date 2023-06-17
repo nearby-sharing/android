@@ -34,8 +34,6 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
     PhysicalAddress? btAddress = null;
     protected override void OnCreate(Bundle? savedInstanceState)
     {
-        SentryHelper.EnsureInitialized();
-
         base.OnCreate(savedInstanceState);
 
         if (ReceiveSetupActivity.IsSetupRequired(this) || !ReceiveSetupActivity.TryGetBtAddress(this, out btAddress) || btAddress == null)
