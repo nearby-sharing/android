@@ -24,10 +24,4 @@
 		<ProjectReference Include="..\ShortDev.Networking\ShortDev.Networking.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<None Include="../docs/cdp.dll/Crypt.md" Link="Encryption\Crypt.md" />
-		<None Include="../docs/cdp.dll/CdpDllFlow.md" Link="docs/CdpDllFlow.md" />
-		<None Include="../docs/cdp.dll/Logging.md" Link="docs/Logging.md" />
-	</ItemGroup>
-
 </Project>

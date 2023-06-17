@@ -243,7 +243,19 @@ public sealed class ConnectedDevicesPlatform : IDisposable
     #endregion
 
     public CdpDeviceInfo GetCdpDeviceInfo()
-        => DeviceInfo.ToCdpDeviceInfo(_transports.Select(x => x.Value.GetEndpoint()).ToArray());
+    {
+        List<EndpointInfo> endpoints = new();
+        foreach (var (_, transport) in _transports)
+        {
+            try
+            {
+                var endpoint = transport.GetEndpoint();
+                endpoints.Add(endpoint);
+            }
+            catch { }
+        }
+        return DeviceInfo.ToCdpDeviceInfo(endpoints);
+    }
 
     public void Dispose()
     {

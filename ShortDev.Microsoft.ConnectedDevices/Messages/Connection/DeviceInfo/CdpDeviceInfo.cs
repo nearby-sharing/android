@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.TransportUpgrade;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages.Connection.DeviceInfo;
@@ -14,7 +15,7 @@ public sealed class CdpDeviceInfo
     public byte[]? DeviceId { get; set; }
 
     [JsonPropertyName("endpoints")]
-    public EndpointInfo[]? Endpoints { get; set; }
+    public IReadOnlyList<EndpointInfo>? Endpoints { get; set; }
 
     [JsonPropertyName("name")]
     public string? Name { get; set; }

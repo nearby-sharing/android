@@ -135,8 +135,8 @@ internal sealed class UpgradeHandler
             Type = MessageType.Connect
         };
 
-        var networkTransport = _session.Platform.TryGetTransport<NetworkTransport>();
-        if (networkTransport == null)
+        var localIp = _session.Platform.TryGetTransport<NetworkTransport>()?.Handler.TryGetLocalIp();
+        if (localIp == null)
         {
             _session.SendMessage(socket, header, (writer) =>
             {
@@ -167,7 +167,7 @@ internal sealed class UpgradeHandler
             {
                 Endpoints = new[]
                 {
-                    EndpointInfo.FromTcp(networkTransport.Handler.GetLocalIp())
+                    EndpointInfo.FromTcp(localIp)
                 },
                 MetaData = new[]
                 {

@@ -2,6 +2,7 @@
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.DeviceInfo;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.TransportUpgrade;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
@@ -35,7 +36,7 @@ public sealed class LocalDeviceInfo
         return Encoding.ASCII.GetBytes(base64Str);
     }
 
-    public CdpDeviceInfo ToCdpDeviceInfo(EndpointInfo[] endpoints)
+    public CdpDeviceInfo ToCdpDeviceInfo(IReadOnlyList<EndpointInfo> endpoints)
     {
         var deduplicationHint = GetDeduplicationHint();
         return new()

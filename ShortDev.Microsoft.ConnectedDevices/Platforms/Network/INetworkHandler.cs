@@ -9,6 +9,18 @@ public interface INetworkHandler : ICdpPlatformHandler
 {
     IPAddress GetLocalIp();
 
+    public IPAddress? TryGetLocalIp()
+    {
+        try
+        {
+            return GetLocalIp();
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
     public static IPAddress GetLocalIpDefault()
     {
         var data = Dns.GetHostEntry(string.Empty).AddressList;

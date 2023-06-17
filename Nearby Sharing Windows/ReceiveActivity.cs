@@ -12,6 +12,8 @@ using ShortDev.Microsoft.ConnectedDevices;
 using ShortDev.Microsoft.ConnectedDevices.Encryption;
 using ShortDev.Microsoft.ConnectedDevices.NearShare;
 using ShortDev.Microsoft.ConnectedDevices.Platforms;
+using ShortDev.Microsoft.ConnectedDevices.Platforms.Bluetooth;
+using ShortDev.Microsoft.ConnectedDevices.Platforms.Network;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -51,6 +53,9 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
 
         notificationsRecyclerView = FindViewById<RecyclerView>(Resource.Id.notificationsRecyclerView)!;
         notificationsRecyclerView.SetLayoutManager(new LinearLayoutManager(this));
+
+        debugLogTextView = FindViewById<TextView>(Resource.Id.debugLogTextView)!;
+        debugLogTextView.SetTextIsSelectable(true);
 
         adapterDescriptor = new(
             Resource.Layout.item_transfer_notification,
@@ -153,13 +158,6 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
         _btAdapter = service.Adapter!;
 
         var deviceName = SettingsFragment.GetDeviceName(this, _btAdapter);
-        FindViewById<TextView>(Resource.Id.deviceInfoTextView)!.Text = this.Localize(
-            Resource.String.visible_as_template,
-            $"\"{deviceName}\".\n" +
-            $"Address: {btAddress.ToStringFormatted()}\n" +
-            $"IP-Address: {AndroidNetworkHandler.GetLocalIp(this)}");
-        debugLogTextView = FindViewById<TextView>(Resource.Id.debugLogTextView)!;
-        debugLogTextView.SetTextIsSelectable(true);
 
         SystemDebug.Assert(_cdp == null);
 
@@ -173,16 +171,23 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
             LoggerFactory = ConnectedDevicesPlatform.CreateLoggerFactory(Log)
         });
 
-        AndroidBluetoothHandler bluetoothHandler = new(this, _btAdapter, btAddress);
+        IBluetoothHandler bluetoothHandler = new AndroidBluetoothHandler(this, _btAdapter, btAddress);
         _cdp.AddTransport<BluetoothTransport>(new(bluetoothHandler));
 
-        AndroidNetworkHandler networkHandler = new(this, this);
+        INetworkHandler networkHandler = new AndroidNetworkHandler(this, this);
         _cdp.AddTransport<NetworkTransport>(new(networkHandler));
 
         _cdp.Listen(_cancellationTokenSource.Token);
         _cdp.Advertise(_cancellationTokenSource.Token);
 
         NearShareReceiver.Start(_cdp, this);
+
+        FindViewById<TextView>(Resource.Id.deviceInfoTextView)!.Text = this.Localize(
+            Resource.String.visible_as_template,
+            $"\"{deviceName}\".\n" +
+            $"Address: {btAddress.ToStringFormatted()}\n" +
+            $"IP-Address: {networkHandler.TryGetLocalIp()?.ToString() ?? "null"}"
+        );
     }
 
     string GetFilePath(string name)
