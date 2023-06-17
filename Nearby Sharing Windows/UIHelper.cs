@@ -76,9 +76,19 @@ internal static class UIHelper
             return;
         }
 
-        Intent intent = new(Android.Provider.Settings.ActionAppLocaleSettings);
-        intent.SetData(AndroidUri.FromParts("package", activity.PackageName, null));
-        activity.StartActivity(intent);
+        try
+        {
+            Intent intent = new(Android.Provider.Settings.ActionAppLocaleSettings);
+            intent.SetData(AndroidUri.FromParts("package", activity.PackageName, null));
+            activity.StartActivity(intent);
+        }
+        catch (Exception ex)
+        {
+            new MaterialAlertDialogBuilder(activity)
+                .SetMessage("Your phone does not support language settings!\n" + ex.Message)!
+                .SetNeutralButton("Ok", (s, e) => { })!
+                .Show();
+        }
     }
 
     public static void OpenFile(Activity activity, string path)
