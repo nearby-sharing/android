@@ -120,7 +120,7 @@ public sealed class ConnectedDevicesPlatform : IDisposable
             if (transport is ICdpDiscoverableTransport discoverableTransport)
             {
                 discoverableTransport.Discover(cancellationToken);
-                discoverableTransport.DeviceDiscovered += DeviceDiscovered;
+                discoverableTransport.DeviceDiscovered += (a, b, c) => DeviceDiscovered?.Invoke(a, b, c);
             }
         }
     }

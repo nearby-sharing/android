@@ -6,6 +6,7 @@ using Android.Views;
 using AndroidX.AppCompat.App;
 using AndroidX.RecyclerView.Widget;
 using Google.Android.Material.ProgressIndicator;
+using Nearby_Sharing_Windows.Service;
 using Nearby_Sharing_Windows.Settings;
 using ShortDev.Android.UI;
 using ShortDev.Microsoft.ConnectedDevices;
@@ -38,7 +39,7 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
     {
         base.OnCreate(savedInstanceState);
 
-        if (ReceiveSetupActivity.IsSetupRequired(this) || !ReceiveSetupActivity.TryGetBtAddress(this, out btAddress) || btAddress == null)
+        if (ReceiveSetupActivity.IsSetupRequired(this) || !ReceiveSetupActivity.TryGetBtAddress(this, out btAddress))
         {
             StartActivity(new Android.Content.Intent(this, typeof(ReceiveSetupActivity)));
 
@@ -137,49 +138,22 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
         );
     }
 
-    CancellationTokenSource? _cancellationTokenSource;
-    ConnectedDevicesPlatform? _cdp;
-    void InitializeCDP()
+    async void InitializeCDP()
     {
         if (btAddress == null)
             throw new NullReferenceException(nameof(btAddress));
 
-        _cancellationTokenSource?.Dispose();
-        _cancellationTokenSource = new();
+        CdpService.EnsureRunning(this);
+        var service = await CdpServiceConnection.ConnectToServiceAsync(this);
+        var platform = service.Platform;
 
-        var service = (BluetoothManager)GetSystemService(BluetoothService)!;
-        _btAdapter = service.Adapter!;
-
-        var deviceName = SettingsFragment.GetDeviceName(this, _btAdapter);
-
-        SystemDebug.Assert(_cdp == null);
-
-        _cdp = new(new()
-        {
-            Type = DeviceType.Android,
-            Name = deviceName,
-            OemModelName = Build.Model ?? string.Empty,
-            OemManufacturerName = Build.Manufacturer ?? string.Empty,
-            DeviceCertificate = ConnectedDevicesPlatform.CreateDeviceCertificate(CdpEncryptionParams.Default),
-            LoggerFactory = ConnectedDevicesPlatform.CreateLoggerFactory(Log, this.GetLogFilePattern())
-        });
-
-        IBluetoothHandler bluetoothHandler = new AndroidBluetoothHandler(this, _btAdapter, btAddress);
-        _cdp.AddTransport<BluetoothTransport>(new(bluetoothHandler));
-
-        INetworkHandler networkHandler = new AndroidNetworkHandler(this, this);
-        _cdp.AddTransport<NetworkTransport>(new(networkHandler));
-
-        _cdp.Listen(_cancellationTokenSource.Token);
-        _cdp.Advertise(_cancellationTokenSource.Token);
-
-        NearShareReceiver.Start(_cdp, this);
+        NearShareReceiver.Start(platform, this);
 
         FindViewById<TextView>(Resource.Id.deviceInfoTextView)!.Text = this.Localize(
             Resource.String.visible_as_template,
-            $"\"{deviceName}\".\n" +
+            $"\"{platform.DeviceInfo.Name}\".\n" +
             $"Address: {btAddress.ToStringFormatted()}\n" +
-            $"IP-Address: {networkHandler.TryGetLocalIp()?.ToString() ?? "null"}"
+            $"IP-Address: {platform.TryGetTransport<NetworkTransport>()?.Handler.TryGetLocalIp()?.ToString() ?? "null"}"
         );
     }
 
@@ -204,8 +178,6 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
 
     public override void Finish()
     {
-        _cancellationTokenSource?.Cancel();
-        _cdp?.Dispose();
         NearShareReceiver.Stop();
         base.Finish();
     }

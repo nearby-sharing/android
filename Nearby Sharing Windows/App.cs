@@ -1,6 +1,8 @@
-﻿using Android.Runtime;
+﻿using Android.Content;
+using Android.Runtime;
 using AndroidX.AppCompat.App;
 using Google.Android.Material.Color;
+using Nearby_Sharing_Windows.Service;
 using Nearby_Sharing_Windows.Settings;
 using Sentry;
 
@@ -44,5 +46,7 @@ public sealed class App : Application
         AppCompatDelegate.DefaultNightMode = SettingsFragment.ShouldForceDarkMode(this) ? AppCompatDelegate.ModeNightYes : AppCompatDelegate.ModeNightFollowSystem;
 
         DynamicColors.ApplyToActivitiesIfAvailable(this);
+
+        CdpService.EnsureRunning(this);
     }
 }

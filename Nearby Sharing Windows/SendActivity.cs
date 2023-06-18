@@ -7,6 +7,7 @@ using AndroidX.AppCompat.App;
 using AndroidX.RecyclerView.Widget;
 using Google.Android.Material.ProgressIndicator;
 using Google.Android.Material.Snackbar;
+using Nearby_Sharing_Windows.Service;
 using Nearby_Sharing_Windows.Settings;
 using ShortDev.Android.UI;
 using ShortDev.Microsoft.ConnectedDevices;
@@ -15,7 +16,6 @@ using ShortDev.Microsoft.ConnectedDevices.NearShare;
 using ShortDev.Microsoft.ConnectedDevices.Platforms;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
 using System.Diagnostics.CodeAnalysis;
-using System.Net.NetworkInformation;
 
 namespace Nearby_Sharing_Windows;
 
@@ -23,7 +23,7 @@ namespace Nearby_Sharing_Windows;
 [IntentFilter(new[] { Intent.ActionSend, Intent.ActionSendMultiple }, Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable }, DataMimeType = "*/*", Label = "@string/share_file")]
 [IntentFilter(new[] { Intent.ActionSend }, Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable }, DataMimeType = "text/plain", Label = "@string/share_url")]
 [Activity(Label = "@string/app_name", Exported = true, Theme = "@style/AppTheme.TranslucentOverlay", ConfigurationChanges = UIHelper.ConfigChangesFlags)]
-public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsListener, ICdpPlatformHandler
+public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsListener
 {
     [AllowNull] NearShareSender NearShareSender;
 
@@ -110,32 +110,15 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
 
     #region Initialization
     readonly CancellationTokenSource _discoverCancellationTokenSource = new();
-    [AllowNull] ConnectedDevicesPlatform Platform { get; set; }
-    void InitializePlatform()
+    async void InitializePlatform()
     {
-        var service = (BluetoothManager)GetSystemService(BluetoothService)!;
-        var adapter = service.Adapter!;
+        CdpService.EnsureRunning(this);
+        var service = await CdpServiceConnection.ConnectToServiceAsync(this);
+        var platform = service.Platform;
 
-        Platform = new(new()
-        {
-            Type = DeviceType.Android,
-            Name = SettingsFragment.GetDeviceName(this, adapter),
-            OemModelName = Build.Model ?? string.Empty,
-            OemManufacturerName = Build.Manufacturer ?? string.Empty,
-            DeviceCertificate = ConnectedDevicesPlatform.CreateDeviceCertificate(CdpEncryptionParams.Default),
-            LoggerFactory = ConnectedDevicesPlatform.CreateLoggerFactory(msg => System.Diagnostics.Debug.Print(msg), this.GetLogFilePattern())
-        });
+        platform.DeviceDiscovered += Platform_DeviceDiscovered;
 
-        AndroidBluetoothHandler bluetoothHandler = new(this, adapter, PhysicalAddress.None);
-        Platform.AddTransport<BluetoothTransport>(new(bluetoothHandler));
-
-        AndroidNetworkHandler networkHandler = new(this, this);
-        Platform.AddTransport<NetworkTransport>(new(networkHandler));
-
-        Platform.DeviceDiscovered += Platform_DeviceDiscovered;
-        Platform.Discover(_discoverCancellationTokenSource.Token);
-
-        NearShareSender = new NearShareSender(Platform);
+        NearShareSender = new NearShareSender(platform);
     }
 
     readonly List<CdpDevice> RemoteSystems = new();
@@ -327,19 +310,9 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
         catch { }
     }
 
-    #region Finish
     async void FinishAsync(int delayMs = 1500)
     {
         await Task.Delay(delayMs);
         Finish();
     }
-
-    public override void OnBackPressed()
-        => Finish();
-    public override void Finish()
-    {
-        Platform?.Dispose();
-        base.Finish();
-    }
-    #endregion
 }

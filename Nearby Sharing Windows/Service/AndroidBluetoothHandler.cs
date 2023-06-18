@@ -1,25 +1,23 @@
 ﻿using Android.Bluetooth;
 using Android.Bluetooth.LE;
 using Android.Runtime;
-using ShortDev.Microsoft.ConnectedDevices.Platforms;
 using ShortDev.Microsoft.ConnectedDevices;
+using ShortDev.Microsoft.ConnectedDevices.Platforms;
 using ShortDev.Microsoft.ConnectedDevices.Platforms.Bluetooth;
-using BLeScanResult = Android.Bluetooth.LE.ScanResult;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
 using System.Net.NetworkInformation;
+using BLeScanResult = Android.Bluetooth.LE.ScanResult;
 
-namespace Nearby_Sharing_Windows;
+namespace Nearby_Sharing_Windows.Service;
 
 public sealed class AndroidBluetoothHandler : IBluetoothHandler
 {
     public BluetoothAdapter Adapter { get; }
-    public ICdpPlatformHandler PlatformHandler { get; }
 
     public PhysicalAddress MacAddress { get; }
 
-    public AndroidBluetoothHandler(ICdpPlatformHandler handler, BluetoothAdapter adapter, PhysicalAddress macAddress)
+    public AndroidBluetoothHandler(BluetoothAdapter adapter, PhysicalAddress macAddress)
     {
-        PlatformHandler = handler;
         Adapter = adapter;
         MacAddress = macAddress;
     }
