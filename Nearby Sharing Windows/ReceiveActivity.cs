@@ -1,25 +1,19 @@
 ﻿using Android.Bluetooth;
 using Android.Content.PM;
-using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using AndroidX.AppCompat.App;
 using AndroidX.RecyclerView.Widget;
 using Google.Android.Material.ProgressIndicator;
 using Nearby_Sharing_Windows.Service;
-using Nearby_Sharing_Windows.Settings;
 using ShortDev.Android.UI;
 using ShortDev.Microsoft.ConnectedDevices;
-using ShortDev.Microsoft.ConnectedDevices.Encryption;
 using ShortDev.Microsoft.ConnectedDevices.NearShare;
 using ShortDev.Microsoft.ConnectedDevices.Platforms;
-using ShortDev.Microsoft.ConnectedDevices.Platforms.Bluetooth;
-using ShortDev.Microsoft.ConnectedDevices.Platforms.Network;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.NetworkInformation;
-using SystemDebug = System.Diagnostics.Debug;
 
 namespace Nearby_Sharing_Windows;
 
@@ -138,16 +132,17 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
         );
     }
 
+    CdpService? _service;
     async void InitializeCDP()
     {
         if (btAddress == null)
             throw new NullReferenceException(nameof(btAddress));
 
         CdpService.EnsureRunning(this);
-        var service = await CdpServiceConnection.ConnectToServiceAsync(this);
-        var platform = service.Platform;
+        _service = await CdpServiceConnection.ConnectToServiceAsync(this);
+        var platform = _service.Platform;
 
-        NearShareReceiver.Start(platform, this);
+        _service.SetReceiveListener(this);
 
         FindViewById<TextView>(Resource.Id.deviceInfoTextView)!.Text = this.Localize(
             Resource.String.visible_as_template,
@@ -176,10 +171,11 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
     public override bool OnOptionsItemSelected(IMenuItem item)
         => UIHelper.OnOptionsItemSelected(this, item);
 
-    public override void Finish()
+    protected override void OnPause()
     {
-        NearShareReceiver.Stop();
-        base.Finish();
+        _service?.SetReceiveListener(null);
+
+        base.OnPause();
     }
 
     public void Log(string message)

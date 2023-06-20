@@ -99,7 +99,7 @@ public sealed class CdpService : Android.App.Service, INearSharePlatformHandler
     void SendNotification(int id, NotificationCompat.Builder notification)
     {
         NotificationManager manager = (NotificationManager?)GetSystemService(NotificationService) ?? throw new NullReferenceException("Could not get notifcation service");
-        
+
         if (OperatingSystem.IsAndroidVersionAtLeast(26))
         {
             manager.CreateNotificationChannel(new(TransferChannelId, "Data Transfer Receipt", NotificationImportance.High));
@@ -133,7 +133,18 @@ public sealed class CdpService : Android.App.Service, INearSharePlatformHandler
 
     void INearSharePlatformHandler.OnFileTransfer(FileTransferToken transfer)
     {
+        if (_handler != null)
+        {
+            _handler.OnFileTransfer(transfer);
+            return;
+        }
         transfer.Cancel();
     }
     #endregion
+
+    INearSharePlatformHandler? _handler;
+    public void SetReceiveListener(INearSharePlatformHandler? handler)
+    {
+        _handler = handler;
+    }
 }
