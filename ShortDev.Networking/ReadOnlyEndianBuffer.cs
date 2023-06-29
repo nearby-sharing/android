@@ -34,7 +34,7 @@ public readonly ref struct ReadOnlyEndianBuffer
         if (_stream != null)
         {
             Span<byte> buffer = new byte[length];
-            _stream.Read(buffer);
+            ReadStreamInternal(buffer);
             return buffer;
         }
 
