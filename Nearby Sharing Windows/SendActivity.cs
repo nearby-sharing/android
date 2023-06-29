@@ -109,11 +109,9 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
     }
 
     #region Initialization
-    readonly CancellationTokenSource _discoverCancellationTokenSource = new();
     async void InitializePlatform()
     {
-        CdpService.EnsureRunning(this);
-        var service = await CdpServiceConnection.ConnectToServiceAsync(this);
+        var service = await CdpService.EnsureRunning(this);
         var platform = service.Platform;
 
         platform.DeviceDiscovered += Platform_DeviceDiscovered;
@@ -146,8 +144,6 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
     readonly CancellationTokenSource _fileSendCancellationTokenSource = new();
     private async void SendData(CdpDevice remoteSystem)
     {
-        _discoverCancellationTokenSource.Cancel();
-
         StatusTextView.Text = GetString(Resource.String.wait_for_acceptance);
         try
         {

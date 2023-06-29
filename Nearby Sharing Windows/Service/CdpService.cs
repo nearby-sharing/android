@@ -3,6 +3,7 @@ using Android.Content;
 using Android.OS;
 using Android.Runtime;
 using AndroidX.Core.App;
+using Microsoft.Extensions.Logging;
 using Nearby_Sharing_Windows.Settings;
 using ShortDev.Microsoft.ConnectedDevices;
 using ShortDev.Microsoft.ConnectedDevices.Encryption;
@@ -12,51 +13,63 @@ using System.Net.NetworkInformation;
 
 namespace Nearby_Sharing_Windows.Service;
 
-[Service]
+[Service(Exported = true)]
 public sealed class CdpService : Android.App.Service, INearSharePlatformHandler
 {
+    #region Connection
     public override IBinder? OnBind(Intent? intent)
         => new CdpServiceBinder(this);
 
     [return: GeneratedEnum]
     public override StartCommandResult OnStartCommand(Intent? intent, [GeneratedEnum] StartCommandFlags flags, int startId)
-    {
-        return StartCommandResult.Sticky;
-    }
+        => StartCommandResult.Sticky;
 
-    static bool _isRunning = false;
-    public static void EnsureRunning(Context context)
+    static TaskCompletionSource? _promise;
+    static CdpService? _instance;
+    public static async ValueTask<CdpService> EnsureRunning(Context context)
     {
-        if (_isRunning)
-            return;
+        if (_instance != null)
+            return _instance;
+
+        _promise = new();
 
         context.StartService(new Intent(context, typeof(CdpService)));
-    }
 
-    CancellationTokenSource? _cancellationTokenSource;
+        await _promise.Task;
+        _promise = null;
+
+        return _instance ?? throw new InvalidOperationException($"Could not get instance of {nameof(CdpService)}");
+    }
+    #endregion
+
+    CancellationTokenSource? _sendCancellationTokenSource;
+    CancellationTokenSource? _receiveCancellationTokenSource;
     ConnectedDevicesPlatform? _cdp;
-    BluetoothAdapter? _adapter;
+    ILogger? _logger;
     public override void OnCreate()
     {
-        var service = (BluetoothManager)GetSystemService(BluetoothService)!;
-        _adapter = service.Adapter ?? throw new NullReferenceException("Could not get bt adapter");
+        var loggerFactory = ConnectedDevicesPlatform.CreateLoggerFactory(msg => System.Diagnostics.Debug.Print(msg));
+        _logger = loggerFactory.CreateLogger<CdpService>();
 
-        _cancellationTokenSource?.Dispose();
-        _cancellationTokenSource = new();
+        var service = (BluetoothManager)GetSystemService(BluetoothService)!;
+        var btAdapter = service.Adapter ?? throw new NullReferenceException("Could not get bt adapter");
+
+        _sendCancellationTokenSource?.Dispose();
+        _sendCancellationTokenSource = new();
 
         ReceiveSetupActivity.TryGetBtAddress(this, out var btAddress);
 
         _cdp = new(new()
         {
             Type = DeviceType.Android,
-            Name = SettingsFragment.GetDeviceName(this, _adapter),
+            Name = SettingsFragment.GetDeviceName(this, btAdapter),
             OemModelName = Build.Model ?? string.Empty,
             OemManufacturerName = Build.Manufacturer ?? string.Empty,
             DeviceCertificate = ConnectedDevicesPlatform.CreateDeviceCertificate(CdpEncryptionParams.Default),
-            LoggerFactory = ConnectedDevicesPlatform.CreateLoggerFactory(msg => System.Diagnostics.Debug.Print(msg))
+            LoggerFactory = loggerFactory
         });
 
-        AndroidBluetoothHandler bluetoothHandler = new(_adapter, btAddress ?? PhysicalAddress.None);
+        AndroidBluetoothHandler bluetoothHandler = new(btAdapter, btAddress ?? PhysicalAddress.None);
         _cdp.AddTransport<BluetoothTransport>(new(bluetoothHandler));
 
         AndroidNetworkHandler networkHandler = new(this);
@@ -64,13 +77,25 @@ public sealed class CdpService : Android.App.Service, INearSharePlatformHandler
 
         if (btAddress != null)
         {
-            _cdp.Listen(_cancellationTokenSource.Token);
-            _cdp.Advertise(_cancellationTokenSource.Token);
-            NearShareReceiver.Start(_cdp, this);
-        }
-        _cdp.Discover(_cancellationTokenSource.Token);
+            _receiveCancellationTokenSource?.Dispose();
+            _receiveCancellationTokenSource = new();
 
-        _isRunning = true;
+            _cdp.Listen(_receiveCancellationTokenSource.Token);
+            _cdp.Advertise(_receiveCancellationTokenSource.Token);
+            NearShareReceiver.Start(_cdp, this);
+
+            _logger.LogInformation("Started receiving using address {btAddress}", btAddress);
+        }
+        else
+        {
+            _logger.LogInformation("Not advertising because btAddress is empty");
+        }
+
+        _cdp.Discover(_sendCancellationTokenSource.Token);
+        _logger.LogInformation("Start discovery", btAddress);
+
+        _instance = this;
+        _promise?.TrySetResult();
     }
 
     public ConnectedDevicesPlatform Platform
@@ -78,13 +103,27 @@ public sealed class CdpService : Android.App.Service, INearSharePlatformHandler
 
     public override void OnDestroy()
     {
-        _isRunning = false;
+        _instance = null;
+        _promise?.TrySetCanceled();
+        _promise = null;
 
-        if (_cancellationTokenSource != null)
+        if (_sendCancellationTokenSource != null)
         {
-            _cancellationTokenSource.Cancel();
-            _cancellationTokenSource.Dispose();
-            _cancellationTokenSource = null;
+            _sendCancellationTokenSource.Cancel();
+            _sendCancellationTokenSource.Dispose();
+            _sendCancellationTokenSource = null;
+
+            _logger?.LogInformation("Stopped discovery");
+        }
+
+        if (_receiveCancellationTokenSource != null)
+        {
+            _receiveCancellationTokenSource.Cancel();
+            _receiveCancellationTokenSource.Dispose();
+            _receiveCancellationTokenSource = null;
+
+            NearShareReceiver.Stop();
+            _logger?.LogInformation("Stopped receiving");
         }
 
         if (_cdp != null)
