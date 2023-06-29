@@ -7,9 +7,8 @@ namespace ShortDev.Microsoft.ConnectedDevices.Internal;
 internal sealed class AutoKeyRegistry<TValue> : IEnumerable<TValue>
 {
     readonly Dictionary<ulong, TValue> _registry = new();
-    readonly Stack<ulong> _freeKeys = new();
 
-    ulong _nextFreeKey;
+    ulong _nextKey;
     public AutoKeyRegistry()
         => Clear();
 
@@ -34,10 +33,7 @@ internal sealed class AutoKeyRegistry<TValue> : IEnumerable<TValue>
     {
         lock (this)
         {
-            if (_freeKeys.Count > 0)
-                key = _freeKeys.Pop();
-            else
-                key = _nextFreeKey++;
+            key = _nextKey++;
 
             var value = factory(key);
             _registry.Add(key, value);
@@ -50,7 +46,6 @@ internal sealed class AutoKeyRegistry<TValue> : IEnumerable<TValue>
         lock (this)
         {
             _registry.Remove(key);
-            _freeKeys.Push(key);
         }
     }
 
@@ -59,8 +54,7 @@ internal sealed class AutoKeyRegistry<TValue> : IEnumerable<TValue>
         lock (this)
         {
             _registry.Clear();
-            _freeKeys.Clear();
-            _nextFreeKey = 0xe;
+            _nextKey = 0xe;
         }
     }
 
