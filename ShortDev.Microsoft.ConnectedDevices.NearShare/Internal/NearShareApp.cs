@@ -26,7 +26,7 @@ internal sealed class NearShareApp : CdpAppBase
     uint _messageId = 0;
     public override void HandleMessage(CdpMessage msg)
     {
-        var payload = ValueSet.Parse(msg.ReadBinary(out var binaryHeader));
+        msg.ReadBinary(out ValueSet payload, out var binaryHeader);
         _messageId = binaryHeader.MessageId;
 
         if (!payload.ContainsKey("ControlMessage"))

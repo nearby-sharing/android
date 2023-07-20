@@ -5,16 +5,12 @@ using System.Text;
 
 namespace ShortDev.Networking;
 
-public readonly ref struct EndianReader
+public ref struct EndianReader
 {
-    /// <summary>
-    /// <see href="https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/stackalloc"><c>stackalloc</c></see>
-    /// </summary>
-    const int MaxStackLimit = 1024;
     static readonly Encoding DefaultEncoding = Encoding.UTF8;
 
     public readonly bool UseLittleEndian;
-    public readonly ReadOnlyEndianBuffer Buffer;
+    public ReadOnlyEndianBuffer Buffer;
 
     EndianReader(Endianness endianness)
         => UseLittleEndian = endianness == Endianness.LittleEndian;
@@ -31,7 +27,7 @@ public readonly ref struct EndianReader
     public ReadOnlySpan<byte> ReadBytes(int length)
         => Buffer.ReadBytes(length);
 
-    public void ReadBytes(Span<byte> buffer)
+    public void ReadBytes(scoped Span<byte> buffer)
         => Buffer.ReadBytes(buffer);
 
     public byte ReadByte()

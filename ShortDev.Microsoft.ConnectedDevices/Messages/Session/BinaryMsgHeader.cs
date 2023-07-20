@@ -12,7 +12,7 @@ public sealed class BinaryMsgHeader : ICdpHeader<BinaryMsgHeader>
     public uint FragmentIndex { get; set; } = 0;
     public required uint MessageId { get; set; }
 
-    public static BinaryMsgHeader Parse(EndianReader reader)
+    public static BinaryMsgHeader Parse(ref EndianReader reader)
         => new()
         {
             FragmentCount = reader.ReadUInt32(),

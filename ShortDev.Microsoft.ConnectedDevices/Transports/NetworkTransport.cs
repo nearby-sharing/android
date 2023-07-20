@@ -168,17 +168,17 @@ public sealed class NetworkTransport : ICdpTransport, ICdpDiscoverableTransport
         {
             EndianReader reader = new(Endianness.BigEndian, result.Buffer);
             if (
-                CommonHeader.TryParse(reader, out var headers, out _) &&
+                CommonHeader.TryParse(ref reader, out var headers, out _) &&
                 headers != null &&
                 headers.Type == MessageType.Discovery
             )
             {
-                DiscoveryHeader discoveryHeaders = DiscoveryHeader.Parse(reader);
+                DiscoveryHeader discoveryHeaders = DiscoveryHeader.Parse(ref reader);
                 if (_isAdvertising && discoveryHeaders.Type == DiscoveryType.PresenceRequest)
                     SendPresenceResponse(result.RemoteEndPoint.Address);
                 else if (_isDiscovering && discoveryHeaders.Type == DiscoveryType.PresenceResponse)
                 {
-                    var response = PresenceResponse.Parse(reader);
+                    var response = PresenceResponse.Parse(ref reader);
                     DeviceDiscovered?.Invoke(this,
                         new CdpDevice(
                             response.DeviceName,

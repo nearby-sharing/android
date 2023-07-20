@@ -39,7 +39,7 @@ public sealed class ConnectionResponse : ICdpPayload<ConnectionResponse>
     /// </summary>
     public required byte[] PublicKeyY { get; set; }
 
-    public static ConnectionResponse Parse(EndianReader reader)
+    public static ConnectionResponse Parse(ref EndianReader reader)
     {
         var result = (ConnectionResult)reader.ReadByte();
         return new()

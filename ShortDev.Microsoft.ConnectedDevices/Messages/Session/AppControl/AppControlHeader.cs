@@ -7,7 +7,7 @@ public sealed class AppControlHeader : ICdpHeader<AppControlHeader>
 {
     public required AppControlType MessageType { get; set; }
 
-    public static AppControlHeader Parse(EndianReader reader)
+    public static AppControlHeader Parse(ref EndianReader reader)
     {
         return new()
         {

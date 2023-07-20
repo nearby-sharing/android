@@ -8,7 +8,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization;
 
 public partial class ValueSet : ICdpPayload<ValueSet>
 {
-    public static ValueSet Parse(EndianReader reader)
+    public static ValueSet Parse(ref EndianReader reader)
     {
         // ToDo: We really should not re-allocated here!!
         var data = reader.ReadToEnd().ToArray();

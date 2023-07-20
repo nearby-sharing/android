@@ -17,7 +17,7 @@ public sealed class ConnectionHeader : ICdpHeader<ConnectionHeader>
     /// </summary>
     public required ConnectionMode ConnectionMode { get; set; }
 
-    public static ConnectionHeader Parse(EndianReader reader)
+    public static ConnectionHeader Parse(ref EndianReader reader)
     {
         return new()
         {

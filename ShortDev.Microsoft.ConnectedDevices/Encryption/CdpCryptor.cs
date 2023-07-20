@@ -130,10 +130,10 @@ public sealed class CdpCryptor : IDisposable
         writer.Write(hmac);
     }
 
-    public EndianReader Read(EndianReader reader, CommonHeader header)
+    public void Read(ref EndianReader reader, CommonHeader header)
     {
         if (!header.HasFlag(MessageFlags.SessionEncrypted))
-            return reader;
+            return;
 
         int payloadSize = header.PayloadSize;
         if (header.HasFlag(MessageFlags.HasHMAC))
@@ -154,7 +154,7 @@ public sealed class CdpCryptor : IDisposable
         if (payloadLength != decryptedPayload.Length - sizeof(Int32))
             throw new CdpSecurityException($"Expected payload to be {payloadLength} bytes long");
 
-        return payloadReader;
+        reader = payloadReader;
     }
 
     public void Dispose()

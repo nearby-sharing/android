@@ -191,11 +191,11 @@ public sealed class CdpSession : IDisposable
 
     #region HandleMessages
     bool _connectionEstablished = false;
-    public void HandleMessage(CdpSocket socket, CommonHeader header, EndianReader reader)
+    public void HandleMessage(CdpSocket socket, CommonHeader header, ref EndianReader reader)
     {
         ThrowIfDisposed();
 
-        var payloadReader = cryptor != null ? cryptor.Read(reader, header) : reader;
+        cryptor?.Read(ref reader, header);
 
         header.CorrectClientSessionBit();
 
@@ -204,7 +204,7 @@ public sealed class CdpSession : IDisposable
             if (_connectionEstablished)
                 return;
 
-            _connectHandler.HandleConnect(socket, header, payloadReader);
+            _connectHandler.HandleConnect(socket, header, ref reader);
         }
 
         if (!_upgradeHandler.IsSocketAllowed(socket))
@@ -214,13 +214,13 @@ public sealed class CdpSession : IDisposable
         {
             _connectionEstablished = true;
 
-            HandleControl(header, payloadReader, socket);
+            HandleControl(header, ref reader, socket);
         }
         else if (header.Type == MessageType.Session)
         {
             _connectionEstablished = true;
 
-            HandleSession(header, payloadReader);
+            HandleSession(header, ref reader);
         }
     }
 
@@ -281,9 +281,9 @@ public sealed class CdpSession : IDisposable
             await _currentConnectPromise.Task;
         }
 
-        public void HandleConnect(CdpSocket socket, CommonHeader header, EndianReader reader)
+        public void HandleConnect(CdpSocket socket, CommonHeader header, ref EndianReader reader)
         {
-            ConnectionHeader connectionHeader = ConnectionHeader.Parse(reader);
+            ConnectionHeader connectionHeader = ConnectionHeader.Parse(ref reader);
             _logger.LogDebug("Received {0} message {1} from session {2} via {3}",
                 header.Type,
                 connectionHeader.MessageType,
@@ -291,7 +291,7 @@ public sealed class CdpSession : IDisposable
                 socket.TransportType
             );
 
-            if (_upgradeHandler.TryHandleConnect(socket, header, connectionHeader, reader))
+            if (_upgradeHandler.TryHandleConnect(socket, header, connectionHeader, ref reader))
                 return;
 
             if (!_upgradeHandler.IsSocketAllowed(socket))
@@ -303,7 +303,7 @@ public sealed class CdpSession : IDisposable
                     throw UnexpectedMessage("Encryption");
 
                 _session.ThrowIfWrongMode(shouldBeHost: true);
-                HandleConnectRequest(header, reader, socket);
+                HandleConnectRequest(header, ref reader, socket);
                 return;
             }
 
@@ -313,7 +313,7 @@ public sealed class CdpSession : IDisposable
                     throw UnexpectedMessage("Encryption");
 
                 _session.ThrowIfWrongMode(shouldBeHost: false);
-                HandleConnectResponse(header, reader, socket);
+                HandleConnectResponse(header, ref reader, socket);
                 return;
             }
 
@@ -325,13 +325,13 @@ public sealed class CdpSession : IDisposable
                 case ConnectionType.DeviceAuthRequest:
                 case ConnectionType.UserDeviceAuthRequest:
                     _session.ThrowIfWrongMode(shouldBeHost: true);
-                    HandleAuthRequest(header, reader, socket, connectionHeader.MessageType);
+                    HandleAuthRequest(header, ref reader, socket, connectionHeader.MessageType);
                     break;
 
                 case ConnectionType.DeviceAuthResponse:
                 case ConnectionType.UserDeviceAuthResponse:
                     _session.ThrowIfWrongMode(shouldBeHost: false);
-                    HandleAuthResponse(header, reader, socket, connectionHeader.MessageType);
+                    HandleAuthResponse(header, ref reader, socket, connectionHeader.MessageType);
                     break;
 
                 case ConnectionType.AuthDoneRequest:
@@ -341,11 +341,11 @@ public sealed class CdpSession : IDisposable
 
                 case ConnectionType.AuthDoneRespone:
                     _session.ThrowIfWrongMode(shouldBeHost: false);
-                    HandleAuthDoneResponse(socket, reader);
+                    HandleAuthDoneResponse(socket, ref reader);
                     break;
 
                 case ConnectionType.DeviceInfoMessage:
-                    HandleDeviceInfoMessage(header, reader, socket);
+                    HandleDeviceInfoMessage(header, ref reader, socket);
                     break;
 
                 case ConnectionType.DeviceInfoResponseMessage:
@@ -353,11 +353,11 @@ public sealed class CdpSession : IDisposable
             }
         }
 
-        void HandleConnectRequest(CommonHeader header, EndianReader reader, CdpSocket socket)
+        void HandleConnectRequest(CommonHeader header, ref EndianReader reader, CdpSocket socket)
         {
             _session.ClientCapabilities = (PeerCapabilities)(header.TryGetHeader(AdditionalHeaderType.PeerCapabilities)?.AsUInt64() ?? 0);
 
-            var connectionRequest = ConnectionRequest.Parse(reader);
+            var connectionRequest = ConnectionRequest.Parse(ref reader);
             _session.remoteEncryption = CdpEncryptionInfo.FromRemote(connectionRequest.PublicKeyX, connectionRequest.PublicKeyY, connectionRequest.Nonce, CdpEncryptionParams.Default);
 
             _session.SendMessage(socket, header, writer =>
@@ -385,11 +385,11 @@ public sealed class CdpSession : IDisposable
             _session.cryptor = new(secret);
         }
 
-        void HandleConnectResponse(CommonHeader header, EndianReader reader, CdpSocket socket)
+        void HandleConnectResponse(CommonHeader header, ref EndianReader reader, CdpSocket socket)
         {
             _session.HostCapabilities = (PeerCapabilities)(header.TryGetHeader(AdditionalHeaderType.PeerCapabilities)?.AsUInt64() ?? 0);
 
-            var connectionResponse = ConnectionResponse.Parse(reader);
+            var connectionResponse = ConnectionResponse.Parse(ref reader);
             _session.remoteEncryption = CdpEncryptionInfo.FromRemote(connectionResponse.PublicKeyX, connectionResponse.PublicKeyY, connectionResponse.Nonce, CdpEncryptionParams.Default);
 
             var secret = _session.localEncryption.GenerateSharedSecret(_session.remoteEncryption);
@@ -410,9 +410,9 @@ public sealed class CdpSession : IDisposable
             });
         }
 
-        void HandleAuthRequest(CommonHeader header, EndianReader reader, CdpSocket socket, ConnectionType connectionType)
+        void HandleAuthRequest(CommonHeader header, ref EndianReader reader, CdpSocket socket, ConnectionType connectionType)
         {
-            var authRequest = AuthenticationPayload.Parse(reader);
+            var authRequest = AuthenticationPayload.Parse(ref reader);
             if (!authRequest.VerifyThumbprint(hostNonce: _session.localEncryption.Nonce, clientNonce: _session.remoteEncryption!.Nonce))
                 throw new CdpSecurityException("Invalid thumbprint");
 
@@ -431,9 +431,9 @@ public sealed class CdpSession : IDisposable
             });
         }
 
-        void HandleAuthResponse(CommonHeader header, EndianReader reader, CdpSocket socket, ConnectionType connectionType)
+        void HandleAuthResponse(CommonHeader header, ref EndianReader reader, CdpSocket socket, ConnectionType connectionType)
         {
-            var authRequest = AuthenticationPayload.Parse(reader);
+            var authRequest = AuthenticationPayload.Parse(ref reader);
             if (!authRequest.VerifyThumbprint(hostNonce: _session.remoteEncryption!.Nonce, clientNonce: _session.localEncryption.Nonce))
                 throw new CdpSecurityException("Invalid thumbprint");
 
@@ -505,9 +505,9 @@ public sealed class CdpSession : IDisposable
             });
         }
 
-        void HandleAuthDoneResponse(CdpSocket socket, EndianReader reader)
+        void HandleAuthDoneResponse(CdpSocket socket, ref EndianReader reader)
         {
-            var msg = ResultPayload.Parse(reader);
+            var msg = ResultPayload.Parse(ref reader);
             msg.ThrowOnError();
 
             _session.SendMessage(socket, new CommonHeader()
@@ -530,9 +530,9 @@ public sealed class CdpSession : IDisposable
             _currentConnectPromise?.TrySetResult();
         }
 
-        void HandleDeviceInfoMessage(CommonHeader header, EndianReader reader, CdpSocket socket)
+        void HandleDeviceInfoMessage(CommonHeader header, ref EndianReader reader, CdpSocket socket)
         {
-            var msg = DeviceInfoMessage.Parse(reader);
+            var msg = DeviceInfoMessage.Parse(ref reader);
 
             header.Flags = 0;
             _session.SendMessage(socket, header, (writer) =>
@@ -547,12 +547,12 @@ public sealed class CdpSession : IDisposable
     }
 
     #region Control
-    void HandleControl(CommonHeader header, EndianReader reader, CdpSocket socket)
+    void HandleControl(CommonHeader header, ref EndianReader reader, CdpSocket socket)
     {
         if (cryptor == null)
             throw UnexpectedMessage("Encryption");
 
-        var controlHeader = ControlHeader.Parse(reader);
+        var controlHeader = ControlHeader.Parse(ref reader);
         _logger.LogDebug("Received {0} message {1} from session {2} via {3}",
             header.Type,
             controlHeader.MessageType,
@@ -562,19 +562,19 @@ public sealed class CdpSession : IDisposable
         switch (controlHeader.MessageType)
         {
             case ControlMessageType.StartChannelRequest:
-                HandleStartChannelRequest(header, reader, socket);
+                HandleStartChannelRequest(header, ref reader, socket);
                 break;
             case ControlMessageType.StartChannelResponse:
-                HandleStartChannelResponse(header, reader, socket);
+                HandleStartChannelResponse(header, ref reader, socket);
                 break;
             default:
                 throw UnexpectedMessage(controlHeader.MessageType.ToString());
         }
     }
 
-    void HandleStartChannelRequest(CommonHeader header, EndianReader reader, CdpSocket socket)
+    void HandleStartChannelRequest(CommonHeader header, ref EndianReader reader, CdpSocket socket)
     {
-        var request = StartChannelRequest.Parse(reader);
+        var request = StartChannelRequest.Parse(ref reader);
 
         header.AdditionalHeaders.Clear();
         header.SetReplyToId(header.RequestID);
@@ -616,14 +616,14 @@ public sealed class CdpSession : IDisposable
         return promise.Task;
     }
 
-    void HandleStartChannelResponse(CommonHeader header, EndianReader reader, CdpSocket socket)
+    void HandleStartChannelResponse(CommonHeader header, ref EndianReader reader, CdpSocket socket)
     {
-        var msg = StartChannelResponse.Parse(reader);
+        var msg = StartChannelResponse.Parse(ref reader);
         OnStartChannelResponseInternal?.Invoke(header, msg);
     }
     #endregion
 
-    void HandleSession(CommonHeader header, EndianReader reader)
+    void HandleSession(CommonHeader header, ref EndianReader reader)
     {
         if (cryptor == null)
             throw UnexpectedMessage("Encryption");

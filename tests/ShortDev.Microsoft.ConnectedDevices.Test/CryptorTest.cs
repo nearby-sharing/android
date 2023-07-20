@@ -24,7 +24,7 @@ public sealed class CryptorTest
 
         EndianReader reader = new(Endianness.BigEndian, writer.Buffer.AsSpan());
 
-        header = CommonHeader.Parse(reader);
+        header = CommonHeader.Parse(ref reader);
         var readerContent = reader.ReadToEnd();
 
         var encryptedPayload = readerContent[..^Constants.HMacSize];

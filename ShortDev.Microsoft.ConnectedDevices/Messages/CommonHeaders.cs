@@ -14,14 +14,14 @@ namespace ShortDev.Microsoft.ConnectedDevices.Messages;
 /// </summary>
 public sealed class CommonHeader : ICdpHeader<CommonHeader>
 {
-    public static CommonHeader Parse(EndianReader reader)
+    public static CommonHeader Parse(ref EndianReader reader)
     {
-        if (!TryParse(reader, out var result, out var ex))
+        if (!TryParse(ref reader, out var result, out var ex))
             throw ex ?? new NullReferenceException("No exception");
         return result ?? throw new NullReferenceException("No result");
     }
 
-    public static bool TryParse(EndianReader reader, out CommonHeader? result, out Exception? ex)
+    public static bool TryParse(ref EndianReader reader, out CommonHeader? result, out Exception? ex)
     {
         result = new();
         var sig = reader.ReadUInt16();

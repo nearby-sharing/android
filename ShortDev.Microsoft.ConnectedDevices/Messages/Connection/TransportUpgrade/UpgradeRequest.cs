@@ -14,11 +14,11 @@ public sealed class UpgradeRequest : ICdpPayload<UpgradeRequest>
     public required Guid UpgradeId { get; init; }
     public required EndpointMetadata[] Endpoints { get; init; }
 
-    public static UpgradeRequest Parse(EndianReader reader)
+    public static UpgradeRequest Parse(ref EndianReader reader)
         => new()
         {
             UpgradeId = new(reader.ReadBytes(16)),
-            Endpoints = EndpointMetadata.ParseArray(reader)
+            Endpoints = EndpointMetadata.ParseArray(ref reader)
         };
 
     public void Write(EndianWriter writer)

@@ -10,7 +10,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Messages;
 /// </summary>
 public sealed class ResultPayload : ICdpPayload<ResultPayload>
 {
-    public static ResultPayload Parse(EndianReader reader)
+    public static ResultPayload Parse(ref EndianReader reader)
         => new()
         {
             Result = (CdpResult)reader.ReadByte()

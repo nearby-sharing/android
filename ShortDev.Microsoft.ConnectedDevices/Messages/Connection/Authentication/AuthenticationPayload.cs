@@ -16,7 +16,7 @@ public sealed class AuthenticationPayload : ICdpPayload<AuthenticationPayload>
 {
     private AuthenticationPayload() { }
 
-    public static AuthenticationPayload Parse(EndianReader reader)
+    public static AuthenticationPayload Parse(ref EndianReader reader)
         => new()
         {
             Certificate = new(reader.ReadBytesWithLength().ToArray()),

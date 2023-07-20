@@ -35,14 +35,14 @@ internal sealed class UpgradeHandler
         => _allowedAddresses.Contains(socket.RemoteDevice.Endpoint.Address);
     #endregion
 
-    public bool TryHandleConnect(CdpSocket socket, CommonHeader header, ConnectionHeader connectionHeader, EndianReader reader)
+    public bool TryHandleConnect(CdpSocket socket, CommonHeader header, ConnectionHeader connectionHeader, ref EndianReader reader)
     {
         // This part needs to be always accessible!
         // This is used to validate
         if (connectionHeader.MessageType == ConnectionType.TransportRequest)
         {
             _session.ThrowIfWrongMode(true);
-            HandleTransportRequest(socket, reader);
+            HandleTransportRequest(socket, ref reader);
             return true;
         }
 
@@ -55,29 +55,29 @@ internal sealed class UpgradeHandler
             // Host
             case ConnectionType.UpgradeRequest:
                 _session.ThrowIfWrongMode(true);
-                HandleUpgradeRequest(socket, reader);
+                HandleUpgradeRequest(socket, ref reader);
                 return true;
             case ConnectionType.UpgradeFinalization:
                 _session.ThrowIfWrongMode(true);
-                HandleUpgradeFinalization(socket, reader);
+                HandleUpgradeFinalization(socket, ref reader);
                 return true;
 
             case ConnectionType.UpgradeFailure:
-                HandleUpgradeFailure(reader);
+                HandleUpgradeFailure(ref reader);
                 return true;
 
             // Client
             case ConnectionType.UpgradeResponse:
                 _session.ThrowIfWrongMode(false);
-                HandleUpgradeResponse(socket, reader);
+                HandleUpgradeResponse(socket, ref reader);
                 return true;
             case ConnectionType.UpgradeFinalizationResponse:
                 _session.ThrowIfWrongMode(false);
-                HandleUpgradeFinalizationResponse(socket, reader);
+                HandleUpgradeFinalizationResponse(socket, ref reader);
                 return true;
             case ConnectionType.TransportConfirmation:
                 _session.ThrowIfWrongMode(false);
-                HandleTransportConfirmation(socket, reader);
+                HandleTransportConfirmation(socket, ref reader);
                 return true;
         }
         return false;
@@ -85,9 +85,9 @@ internal sealed class UpgradeHandler
 
     #region Host
     readonly ConcurrentList<Guid> _upgradeIds = new();
-    void HandleTransportRequest(CdpSocket socket, EndianReader reader)
+    void HandleTransportRequest(CdpSocket socket, ref EndianReader reader)
     {
-        var msg = UpgradeIdPayload.Parse(reader);
+        var msg = UpgradeIdPayload.Parse(ref reader);
 
         // Sometimes the device sends multiple transport requests
         // If we know it already then let it pass
@@ -122,9 +122,9 @@ internal sealed class UpgradeHandler
         });
     }
 
-    void HandleUpgradeRequest(CdpSocket socket, EndianReader reader)
+    void HandleUpgradeRequest(CdpSocket socket, ref EndianReader reader)
     {
-        var msg = UpgradeRequest.Parse(reader);
+        var msg = UpgradeRequest.Parse(ref reader);
         _logger.LogInformation("Upgrade request {0} to {1}",
             msg.UpgradeId,
             string.Join(',', msg.Endpoints.Select((x) => x.Type.ToString()))
@@ -177,9 +177,9 @@ internal sealed class UpgradeHandler
         });
     }
 
-    void HandleUpgradeFinalization(CdpSocket socket, EndianReader reader)
+    void HandleUpgradeFinalization(CdpSocket socket, ref EndianReader reader)
     {
-        var msg = EndpointMetadata.ParseArray(reader);
+        var msg = EndpointMetadata.ParseArray(ref reader);
         _logger.LogInformation("Transport upgrade to {0}",
             string.Join(',', msg.Select((x) => x.Type.ToString()))
         );
@@ -200,9 +200,9 @@ internal sealed class UpgradeHandler
     }
     #endregion
 
-    void HandleUpgradeFailure(EndianReader reader)
+    void HandleUpgradeFailure(ref EndianReader reader)
     {
-        var msg = HResultPayload.Parse(reader);
+        var msg = HResultPayload.Parse(ref reader);
 
         var errorMsg = $"Transport upgrade failed with HResult {msg.HResult} (hresult: {HResultPayload.HResultToString(msg.HResult)}, errorCode: {HResultPayload.ErrorCodeToString(msg.HResult)})";
         _logger.LogWarning(errorMsg);
@@ -254,12 +254,12 @@ internal sealed class UpgradeHandler
         }
     }
 
-    void HandleUpgradeResponse(CdpSocket oldSocket, EndianReader reader)
+    void HandleUpgradeResponse(CdpSocket oldSocket, ref EndianReader reader)
     {
         if (_currentUpgrade == null)
             return;
 
-        var msg = UpgradeResponse.Parse(reader);
+        var msg = UpgradeResponse.Parse(ref reader);
         FindNewEndpoint();
 
         async void FindNewEndpoint()
@@ -308,7 +308,7 @@ internal sealed class UpgradeHandler
         }
     }
 
-    void HandleUpgradeFinalizationResponse(CdpSocket socket, EndianReader reader)
+    void HandleUpgradeFinalizationResponse(CdpSocket socket, ref EndianReader reader)
     {
         // Upgrade has been acknowledged
 
@@ -338,9 +338,9 @@ internal sealed class UpgradeHandler
         });
     }
 
-    void HandleTransportConfirmation(CdpSocket socket, EndianReader reader)
+    void HandleTransportConfirmation(CdpSocket socket, ref EndianReader reader)
     {
-        var msg = UpgradeIdPayload.Parse(reader);
+        var msg = UpgradeIdPayload.Parse(ref reader);
 
         if (_currentUpgrade == null)
             return;

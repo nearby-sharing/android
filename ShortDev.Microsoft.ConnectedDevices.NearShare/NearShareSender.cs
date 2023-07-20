@@ -74,7 +74,7 @@ public sealed class NearShareSender
 
         public override void HandleMessage(CdpMessage msg)
         {
-            var payload = ValueSet.Parse(msg.ReadBinary(out _));
+            msg.ReadBinary(out ValueSet payload, out _);
             var handshakeResult = payload.Get<uint>("VersionHandShakeResult");
 
             if (handshakeResult != 1)
@@ -155,7 +155,7 @@ public sealed class NearShareSender
             if (_fileCancellationToken?.IsCancellationRequested == true)
                 return;
 
-            var payload = ValueSet.Parse(msg.ReadBinary(out var header));
+            msg.ReadBinary(out ValueSet payload, out var header);
             try
             {
                 var controlMsg = (NearShareControlMsgType)payload.Get<uint>("ControlMessage");

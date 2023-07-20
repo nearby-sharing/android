@@ -13,7 +13,7 @@ public class NearShareHandshakeApp : CdpAppBase, ICdpAppId
 
     public override void HandleMessage(CdpMessage msg)
     {
-        var payload = ValueSet.Parse(msg.ReadBinary(out _));
+        msg.ReadBinary(out ValueSet payload, out _);
 
         string id = payload.Get<Guid>("OperationId").ToString();
         CdpAppRegistration.RegisterApp(

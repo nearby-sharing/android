@@ -4,9 +4,9 @@ using System.IO;
 
 namespace ShortDev.Networking;
 
-public readonly ref struct ReadOnlyEndianBuffer
+public ref struct ReadOnlyEndianBuffer
 {
-    readonly Indexer _indexer = new();
+    int _position = 0;
 
     readonly ReadOnlySpan<byte> _buffer;
     readonly Stream? _stream;
@@ -17,7 +17,7 @@ public readonly ref struct ReadOnlyEndianBuffer
     public ReadOnlyEndianBuffer(Stream stream)
         => _stream = stream;
 
-    public void ReadBytes(Span<byte> buffer)
+    public void ReadBytes(scoped Span<byte> buffer)
     {
         if (_stream != null)
         {
@@ -25,8 +25,8 @@ public readonly ref struct ReadOnlyEndianBuffer
             return;
         }
 
-        _buffer.Slice(_indexer.index, buffer.Length).CopyTo(buffer);
-        _indexer.index += buffer.Length;
+        _buffer.Slice(_position, buffer.Length).CopyTo(buffer);
+        _position += buffer.Length;
     }
 
     public ReadOnlySpan<byte> ReadBytes(int length)
@@ -38,8 +38,8 @@ public readonly ref struct ReadOnlyEndianBuffer
             return buffer;
         }
 
-        var slice = _buffer.Slice(_indexer.index, length);
-        _indexer.index += length;
+        var slice = _buffer.Slice(_position, length);
+        _position += length;
         return slice;
     }
 
@@ -54,8 +54,8 @@ public readonly ref struct ReadOnlyEndianBuffer
             return (byte)buffer;
         }
 
-        var value = _buffer[_indexer.index];
-        _indexer.index++;
+        var value = _buffer[_position];
+        _position++;
         return value;
     }
 
@@ -72,7 +72,7 @@ public readonly ref struct ReadOnlyEndianBuffer
         if (_stream != null)
             throw new InvalidOperationException("Not supported by stream");
 
-        return ReadBytes(_buffer.Length - _indexer.index);
+        return ReadBytes(_buffer.Length - _position);
     }
 
     /// <summary>
@@ -95,11 +95,5 @@ public readonly ref struct ReadOnlyEndianBuffer
         } while (count > 0);
 
         Debug.Assert(numRead == buffer.Length);
-    }
-
-    // ToDo: Remove allocation
-    sealed class Indexer
-    {
-        public int index;
     }
 }

@@ -175,7 +175,7 @@ public sealed class ConnectedDevicesPlatform : IDisposable
                     CdpSession? session = null;
                     try
                     {
-                        var header = CommonHeader.Parse(streamReader);
+                        var header = CommonHeader.Parse(ref streamReader);
 
                         if (socket.IsClosed)
                             return;
@@ -191,7 +191,8 @@ public sealed class ConnectedDevicesPlatform : IDisposable
                         if (socket.IsClosed)
                             return;
 
-                        session.HandleMessage(socket, header, new EndianReader(Endianness.BigEndian, payload));
+                        EndianReader reader = new(Endianness.BigEndian, payload);
+                        session.HandleMessage(socket, header, ref reader);
                     }
                     catch (Exception ex)
                     {

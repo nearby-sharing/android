@@ -5,7 +5,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Messages.Control;
 
 public sealed class StartChannelResponse : ICdpPayload<StartChannelResponse>
 {
-    public static StartChannelResponse Parse(EndianReader reader)
+    public static StartChannelResponse Parse(ref EndianReader reader)
        => new()
        {
            Result = (ChannelResult)reader.ReadByte(),

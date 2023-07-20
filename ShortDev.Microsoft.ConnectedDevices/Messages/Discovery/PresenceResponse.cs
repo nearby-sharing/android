@@ -18,7 +18,7 @@ public class PresenceResponse : ICdpPayload<PresenceResponse>
 
     public int PrincipalUserNameHash { get; init; }
 
-    public static PresenceResponse Parse(EndianReader reader)
+    public static PresenceResponse Parse(ref EndianReader reader)
         => new()
         {
             ConnectionMode = (ConnectionMode)reader.ReadInt16(),
