@@ -47,6 +47,6 @@ public sealed class App : Application
 
         DynamicColors.ApplyToActivitiesIfAvailable(this);
 
-        CdpService.EnsureRunning(this);
+        _ = IServiceSingleton<CdpService>.EnsureRunning(this);
     }
 }

@@ -8,7 +8,7 @@ using ShortDev.Microsoft.ConnectedDevices.Transports;
 using System.Net.NetworkInformation;
 using BLeScanResult = Android.Bluetooth.LE.ScanResult;
 
-namespace Nearby_Sharing_Windows.Service;
+namespace Nearby_Sharing_Windows.Service.Handlers;
 
 public sealed class AndroidBluetoothHandler : IBluetoothHandler
 {

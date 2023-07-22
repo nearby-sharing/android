@@ -4,6 +4,7 @@ using Android.OS;
 using Android.Runtime;
 using AndroidX.Core.App;
 using Microsoft.Extensions.Logging;
+using Nearby_Sharing_Windows.Service.Handlers;
 using Nearby_Sharing_Windows.Settings;
 using ShortDev.Microsoft.ConnectedDevices;
 using ShortDev.Microsoft.ConnectedDevices.Encryption;
@@ -14,32 +15,15 @@ using System.Net.NetworkInformation;
 namespace Nearby_Sharing_Windows.Service;
 
 [Service(Exported = true)]
-public sealed class CdpService : Android.App.Service, INearSharePlatformHandler
+public sealed class CdpService : Android.App.Service, INearSharePlatformHandler, IServiceSingleton<CdpService>
 {
     #region Connection
     public override IBinder? OnBind(Intent? intent)
-        => new CdpServiceBinder(this);
+        => null;
 
     [return: GeneratedEnum]
     public override StartCommandResult OnStartCommand(Intent? intent, [GeneratedEnum] StartCommandFlags flags, int startId)
         => StartCommandResult.Sticky;
-
-    static TaskCompletionSource? _promise;
-    static CdpService? _instance;
-    public static async ValueTask<CdpService> EnsureRunning(Context context)
-    {
-        if (_instance != null)
-            return _instance;
-
-        _promise = new();
-
-        context.StartService(new Intent(context, typeof(CdpService)));
-
-        await _promise.Task;
-        _promise = null;
-
-        return _instance ?? throw new InvalidOperationException($"Could not get instance of {nameof(CdpService)}");
-    }
     #endregion
 
     CancellationTokenSource? _sendCancellationTokenSource;
@@ -54,6 +38,7 @@ public sealed class CdpService : Android.App.Service, INearSharePlatformHandler
         var service = (BluetoothManager)GetSystemService(BluetoothService)!;
         var btAdapter = service.Adapter ?? throw new NullReferenceException("Could not get bt adapter");
 
+        _receiveCancellationTokenSource?.Dispose();
         _sendCancellationTokenSource?.Dispose();
         _sendCancellationTokenSource = new();
 
@@ -77,7 +62,6 @@ public sealed class CdpService : Android.App.Service, INearSharePlatformHandler
 
         if (btAddress != null)
         {
-            _receiveCancellationTokenSource?.Dispose();
             _receiveCancellationTokenSource = new();
 
             _cdp.Listen(_receiveCancellationTokenSource.Token);
@@ -94,8 +78,7 @@ public sealed class CdpService : Android.App.Service, INearSharePlatformHandler
         _cdp.Discover(_sendCancellationTokenSource.Token);
         _logger.LogInformation("Start discovery", btAddress);
 
-        _instance = this;
-        _promise?.TrySetResult();
+        ((IServiceSingleton<CdpService>)this).OnInstanceChanged(this);
     }
 
     public ConnectedDevicesPlatform Platform
@@ -103,33 +86,36 @@ public sealed class CdpService : Android.App.Service, INearSharePlatformHandler
 
     public override void OnDestroy()
     {
-        _instance = null;
-        _promise?.TrySetCanceled();
-        _promise = null;
-
-        if (_sendCancellationTokenSource != null)
+        try
         {
-            _sendCancellationTokenSource.Cancel();
-            _sendCancellationTokenSource.Dispose();
-            _sendCancellationTokenSource = null;
-
-            _logger?.LogInformation("Stopped discovery");
+            ((IServiceSingleton<CdpService>)this).OnInstanceChanged(null);
         }
-
-        if (_receiveCancellationTokenSource != null)
+        finally
         {
-            _receiveCancellationTokenSource.Cancel();
-            _receiveCancellationTokenSource.Dispose();
-            _receiveCancellationTokenSource = null;
+            if (_sendCancellationTokenSource != null)
+            {
+                _sendCancellationTokenSource.Cancel();
+                _sendCancellationTokenSource.Dispose();
+                _sendCancellationTokenSource = null;
 
-            NearShareReceiver.Stop();
-            _logger?.LogInformation("Stopped receiving");
-        }
+                _logger?.LogInformation("Stopped discovery");
+            }
 
-        if (_cdp != null)
-        {
-            _cdp.Dispose();
-            _cdp = null;
+            if (_receiveCancellationTokenSource != null)
+            {
+                _receiveCancellationTokenSource.Cancel();
+                _receiveCancellationTokenSource.Dispose();
+                _receiveCancellationTokenSource = null;
+
+                NearShareReceiver.Stop();
+                _logger?.LogInformation("Stopped receiving");
+            }
+
+            if (_cdp != null)
+            {
+                _cdp.Dispose();
+                _cdp = null;
+            }
         }
     }
 

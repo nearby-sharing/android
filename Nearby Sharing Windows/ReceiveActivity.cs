@@ -138,7 +138,7 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
         if (btAddress == null)
             throw new NullReferenceException(nameof(btAddress));
 
-        _service = await CdpService.EnsureRunning(this);
+        _service = await IServiceSingleton<CdpService>.EnsureRunning(this);
         var platform = _service.Platform;
 
         _service.SetReceiveListener(this);

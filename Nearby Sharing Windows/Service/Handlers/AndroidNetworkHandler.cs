@@ -4,7 +4,7 @@ using Android.Net.Wifi;
 using ShortDev.Microsoft.ConnectedDevices.Platforms.Network;
 using System.Net;
 
-namespace Nearby_Sharing_Windows.Service;
+namespace Nearby_Sharing_Windows.Service.Handlers;
 
 internal sealed class AndroidNetworkHandler : INetworkHandler
 {

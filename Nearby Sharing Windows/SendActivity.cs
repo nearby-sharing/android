@@ -111,7 +111,7 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
     #region Initialization
     async void InitializePlatform()
     {
-        var service = await CdpService.EnsureRunning(this);
+        var service = await IServiceSingleton<CdpService>.EnsureRunning(this);
         var platform = service.Platform;
 
         platform.DeviceDiscovered += Platform_DeviceDiscovered;
