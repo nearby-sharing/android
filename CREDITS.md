@@ -3,7 +3,7 @@
  - Lukas Kurz (@ShortDevelopment)
  
 ## Translations
- - Guille (@Sappstal) (Spanish)
+ - Guille (@Sappstal) (Spanish) & (Catalan (Valencian))
  - Zakhar Markelov (@markelovz) (Russian)
  - Sergiy (@sergd88) (Ukrainian)
  - Simon (@QWERT-commits) (Chinese)
