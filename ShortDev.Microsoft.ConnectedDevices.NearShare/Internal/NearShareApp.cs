@@ -45,7 +45,7 @@ internal sealed class NearShareApp : CdpAppBase
         throw CdpSession.UnexpectedMessage(msgType.ToString());
     }
 
-    FileTransferTokenImpl? _fileTransferToken;
+    FileTransferToken? _fileTransferToken;
     void HandleStartTransfer(CdpMessage msg, ValueSet payload)
     {
         var dataKind = (DataKind)payload.Get<uint>("DataKind");
@@ -55,22 +55,27 @@ internal sealed class NearShareApp : CdpAppBase
                 {
                     var fileNames = payload.Get<List<string>>("FileNames");
 
-                    _logger.LogInformation("Receiving file \"{0}\" from session {1:X} via {2}",
+                    _logger.LogInformation("Receiving file \"{fileNames}\" from session {sessionId:X} via {transportType}",
                         string.Join(", ", fileNames),
                         msg.Header.SessionId,
                         Channel.Socket.TransportType
                     );
 
                     var bytesToSend = payload.Get<ulong>("BytesToSend");
+                    var contentIds = payload.Get<IList<uint>>("ContentIds");
+                    var contentSizes = payload.Get<IList<ulong>>("ContentSizes");
+
+                    var files = new FileShareInfo[fileNames.Count];
+                    for (int i = 0; i < files.Length; i++)
+                    {
+                        files[i] = new(contentIds[i], fileNames[i], contentSizes[i]);
+                    }
                     _fileTransferToken = new()
                     {
                         DeviceName = Channel.Session.Device.Name ?? "UNKNOWN",
-                        FileNames = fileNames,
                         TotalBytesToSend = bytesToSend,
-                        // Internal
-                        ContentIds = payload.Get<IList<uint>>("ContentIds").ToArray(),
-                        ContentSizes = payload.Get<IList<ulong>>("ContentSizes").ToArray(),
-                        TotalFilesToSend = (uint)fileNames.Count
+                        TotalFilesToSend = (uint)fileNames.Count,
+                        Files = files
                     };
                     HandleFileTransferToken(_fileTransferToken);
 
@@ -98,7 +103,7 @@ internal sealed class NearShareApp : CdpAppBase
     }
 
     IEnumerator? _blobCursor;
-    async void HandleFileTransferToken(FileTransferTokenImpl token)
+    async void HandleFileTransferToken(FileTransferToken token)
     {
         try
         {
@@ -112,12 +117,12 @@ internal sealed class NearShareApp : CdpAppBase
             OnCancel();
         }
 
-        IEnumerator CreateBlobCursor(FileTransferTokenImpl transferToken)
+        IEnumerator CreateBlobCursor(FileTransferToken transferToken)
         {
-            for (int i = 0; i < transferToken.ContentIds.Length; i++)
+            foreach (var file in transferToken)
             {
-                var contentId = transferToken.ContentIds[i];
-                var bytesToSend = transferToken.ContentSizes[i];
+                var contentId = file.Id;
+                var bytesToSend = file.Size;
 
                 ulong requestedPosition = 0;
                 for (; requestedPosition + PartitionSize < bytesToSend; requestedPosition += PartitionSize)

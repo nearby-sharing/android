@@ -163,4 +163,10 @@ internal static class UIHelper
 
     public static string Localize(this Activity activity, int resId, params object[] args)
         => string.Format(activity.GetString(resId), args);
+
+    public static DirectoryInfo GetDownloadDirectory(this Activity activity)
+    {
+        DirectoryInfo rootDir = new(Path.Combine(activity.GetExternalMediaDirs()?.FirstOrDefault()?.AbsolutePath ?? "/sdcard/"));
+        return rootDir.CreateSubdirectory("Download");
+    }
 }

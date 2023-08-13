@@ -68,7 +68,7 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
 
                 if (transfer is FileTransferToken fileTransfer)
                 {
-                    fileNameTextView.Text = string.Join(", ", fileTransfer.FileNames);
+                    fileNameTextView.Text = string.Join(", ", fileTransfer.Files.Select(x => x.Name));
                     detailsTextView.Text = $"{fileTransfer.DeviceName} • {FileTransferToken.FormatFileSize(fileTransfer.TotalBytesToSend)}";
 
                     var loadingProgressIndicator = view.FindViewById<CircularProgressIndicator>(Resource.Id.loadingProgressIndicator)!;
@@ -79,8 +79,8 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
                         openButton.Visibility = ViewStates.Visible;
                         openButton.SetOnClickListener(new DelegateClickListener((s, e) =>
                         {
-                            var firstFilePath = GetFilePath(fileTransfer.FileNames[0]);
-                            if (fileTransfer.FileNames.Count == 1)
+                            var firstFilePath = GetFilePath(fileTransfer.Files[0].Name);
+                            if (fileTransfer.Files.Count == 1)
                                 UIHelper.OpenFile(this, firstFilePath);
 
                             // ToDo: UIHelper.OpenDirectory(this, Path.GetDirectoryName(firstFilePath));
@@ -93,7 +93,7 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
                         void onAccept()
                         {
                             if (!fileTransfer.IsAccepted)
-                                fileTransfer.Accept(fileTransfer.FileNames.Select(CreateFile).ToArray());
+                                fileTransfer.Accept(CreateFiles(fileTransfer));
 
                             acceptButton.Visibility = ViewStates.Gone;
                             loadingProgressIndicator.Visibility = ViewStates.Visible;
@@ -112,7 +112,7 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
                                 if (fileTransfer.IsTransferComplete)
                                     onCompleted();
                             }
-                            fileTransfer.SetProgressListener(progress => RunOnUiThread(() => onProgress(progress, animate: true)));
+                            fileTransfer.Progress += progress => RunOnUiThread(() => onProgress(progress, animate: true));
                             loadingProgressIndicator.Indeterminate = true;
                         }
                         if (fileTransfer.IsAccepted)
@@ -191,28 +191,21 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
     }
 
     string GetFilePath(string name)
-    {
-        var downloadDir = Path.Combine(GetExternalMediaDirs()?.FirstOrDefault()?.AbsolutePath ?? "/sdcard/", "Download");
-        if (!Directory.Exists(downloadDir))
-            Directory.CreateDirectory(downloadDir);
-
-        return Path.Combine(
-            downloadDir,
+        => Path.Combine(
+            this.GetDownloadDirectory().FullName,
             name
         );
-    }
 
-    FileStream CreateFile(string name)
+    IReadOnlyList<FileStream> CreateFiles(FileTransferToken token)
     {
-        var path = GetFilePath(name);
-        Log($"Saving file to \"{path}\"");
-        return File.Create(path);
-
-        // ToDo: OutputStream cannot seek!
-        //ContentValues contentValues = new();
-        //contentValues.Put(MediaStore.IMediaColumns.RelativePath, Path.Combine(Android.OS.Environment.DirectoryDownloads!, name));
-        //var uri = ContentResolver!.Insert(MediaStore.Files.GetContentUri("external")!, contentValues)!;
-        //return ContentResolver!.OpenOutputStream(uri, "rwt")!;
+        List<FileStream> streams = new((int)token.TotalFilesToSend);
+        foreach (var file in token)
+        {
+            var path = GetFilePath(file.Name);
+            Log($"Saving file to \"{path}\"");
+            streams.Add(File.Create(path));
+        }
+        return streams;
     }
 
     public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
