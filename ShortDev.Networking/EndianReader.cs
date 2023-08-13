@@ -136,4 +136,21 @@ public ref struct EndianReader
         var length = ReadUInt16();
         return ReadBytes(length);
     }
+
+    #region Utility methods
+
+    public static byte[] ReadToEnd(Stream stream)
+    {
+        var buffer = new byte[stream.Length];
+        Read(stream, buffer);
+        return buffer;
+    }
+
+    public static void Read(Stream stream, Span<byte> buffer)
+    {
+        ReadOnlyEndianBuffer reader = new(stream);
+        reader.ReadBytes(buffer);
+    }
+
+    #endregion
 }

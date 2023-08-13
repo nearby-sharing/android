@@ -15,6 +15,7 @@ using ShortDev.Microsoft.ConnectedDevices.Encryption;
 using ShortDev.Microsoft.ConnectedDevices.NearShare;
 using ShortDev.Microsoft.ConnectedDevices.Platforms;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
+using ShortDev.Networking;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.NetworkInformation;
 
@@ -163,8 +164,7 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
         var fileName = QueryContentName(ContentResolver!, contentUri);
 
         using var contentStream = ContentResolver!.OpenInputStream(contentUri) ?? throw new InvalidOperationException("Could not open input stream");
-        var buffer = new byte[contentStream.Length];
-        await contentStream.ReadAsync(buffer);
+        var buffer = await Task.Run(() => EndianReader.ReadToEnd(contentStream));
 
         return CdpFileProvider.FromBuffer(fileName, buffer);
     }
