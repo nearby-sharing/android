@@ -1,6 +1,5 @@
 ﻿using Android.Content;
 using Android.Content.PM;
-using Android.OS;
 using Android.Text;
 using Android.Views;
 using AndroidX.AppCompat.App;
@@ -9,6 +8,7 @@ using AndroidX.Core.App;
 using AndroidX.Core.Content;
 using Google.Android.Material.Dialog;
 using Nearby_Sharing_Windows.Settings;
+using static Android.Provider.MediaStore;
 using CompatToolbar = AndroidX.AppCompat.Widget.Toolbar;
 
 namespace Nearby_Sharing_Windows;
@@ -105,6 +105,38 @@ internal static class UIHelper
         intent.SetFlags(ActivityFlags.GrantReadUriPermission | ActivityFlags.NewTask);
         var chooserIntent = Intent.CreateChooser(intent, $"Open {Path.GetFileName(path)}");
         activity.StartActivity(chooserIntent);
+    }
+
+    public static void ViewDownloads(this Activity activity)
+    {
+        Intent intent = new(DownloadManager.ActionViewDownloads);
+        activity.StartActivity(intent);
+    }
+
+    public static void RegisterDownload(this Context context, string filePath, ulong size)
+    {
+        return;
+
+        // ToDo: Make this work!
+
+        if (OperatingSystem.IsAndroidVersionAtLeast(29))
+        {
+            ContentValues contentValues = new();
+            contentValues.Put(Downloads.InterfaceConsts.Title, Path.GetFileName(filePath));
+            contentValues.Put(Downloads.InterfaceConsts.DisplayName, Path.GetFileNameWithoutExtension(filePath));
+            contentValues.Put(Downloads.InterfaceConsts.MimeType, "*/*");
+            contentValues.Put(Downloads.InterfaceConsts.Size, (long)size);
+            contentValues.Put(Downloads.InterfaceConsts.RelativePath, filePath);
+
+            // Insert into the database
+            ContentResolver database = context.ContentResolver ?? throw new InvalidOperationException("Could not get content resolver");
+            database.Insert(Downloads.ExternalContentUri, contentValues);
+
+            return;
+        }
+
+        var downloadManager = (DownloadManager)context.GetSystemService(Context.DownloadService)!;
+        downloadManager.AddCompletedDownload(Path.GetFileName(filePath), "File received via Nearby Sharing", true, "*/*", filePath, (long)size, false);
     }
 
     public static void SetupToolBar(AppCompatActivity activity, string? subtitle = null)

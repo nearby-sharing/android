@@ -77,14 +77,7 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
                         acceptButton.Visibility = ViewStates.Gone;
                         loadingProgressIndicator.Visibility = ViewStates.Gone;
                         openButton.Visibility = ViewStates.Visible;
-                        openButton.SetOnClickListener(new DelegateClickListener((s, e) =>
-                        {
-                            var firstFilePath = GetFilePath(fileTransfer.Files[0].Name);
-                            if (fileTransfer.Files.Count == 1)
-                                UIHelper.OpenFile(this, firstFilePath);
-
-                            // ToDo: UIHelper.OpenDirectory(this, Path.GetDirectoryName(firstFilePath));
-                        }));
+                        openButton.Click += (_, _) => this.ViewDownloads();
                     }
                     if (fileTransfer.IsTransferComplete)
                         onCompleted();
@@ -203,6 +196,7 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
         {
             var path = GetFilePath(file.Name);
             Log($"Saving file to \"{path}\"");
+            UIHelper.RegisterDownload(this, path, file.Size);
             streams.Add(File.Create(path));
         }
         return streams;
