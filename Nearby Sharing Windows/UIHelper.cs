@@ -8,7 +8,6 @@ using AndroidX.Core.App;
 using AndroidX.Core.Content;
 using Google.Android.Material.Dialog;
 using Nearby_Sharing_Windows.Settings;
-using static Android.Provider.MediaStore;
 using CompatToolbar = AndroidX.AppCompat.Widget.Toolbar;
 
 namespace Nearby_Sharing_Windows;
@@ -113,32 +112,6 @@ internal static class UIHelper
         activity.StartActivity(intent);
     }
 
-    public static void RegisterDownload(this Context context, string filePath, ulong size)
-    {
-        return;
-
-        // ToDo: Make this work!
-
-        if (OperatingSystem.IsAndroidVersionAtLeast(29))
-        {
-            ContentValues contentValues = new();
-            contentValues.Put(Downloads.InterfaceConsts.Title, Path.GetFileName(filePath));
-            contentValues.Put(Downloads.InterfaceConsts.DisplayName, Path.GetFileNameWithoutExtension(filePath));
-            contentValues.Put(Downloads.InterfaceConsts.MimeType, "*/*");
-            contentValues.Put(Downloads.InterfaceConsts.Size, (long)size);
-            contentValues.Put(Downloads.InterfaceConsts.RelativePath, filePath);
-
-            // Insert into the database
-            ContentResolver database = context.ContentResolver ?? throw new InvalidOperationException("Could not get content resolver");
-            database.Insert(Downloads.ExternalContentUri, contentValues);
-
-            return;
-        }
-
-        var downloadManager = (DownloadManager)context.GetSystemService(Context.DownloadService)!;
-        downloadManager.AddCompletedDownload(Path.GetFileName(filePath), "File received via Nearby Sharing", true, "*/*", filePath, (long)size, false);
-    }
-
     public static void SetupToolBar(AppCompatActivity activity, string? subtitle = null)
     {
         var toolbar = activity.FindViewById<CompatToolbar>(Resource.Id.toolbar)!;
@@ -195,10 +168,4 @@ internal static class UIHelper
 
     public static string Localize(this Activity activity, int resId, params object[] args)
         => string.Format(activity.GetString(resId), args);
-
-    public static DirectoryInfo GetDownloadDirectory(this Activity activity)
-    {
-        DirectoryInfo rootDir = new(Path.Combine(activity.GetExternalMediaDirs()?.FirstOrDefault()?.AbsolutePath ?? "/sdcard/"));
-        return rootDir.CreateSubdirectory("Download");
-    }
 }

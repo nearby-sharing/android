@@ -1,11 +1,12 @@
-﻿using System.Text;
+﻿using System.IO;
+using System.Text;
 
 namespace ShortDev.Microsoft.ConnectedDevices.NearShare;
 
-public sealed class CdpFileProvider
+public sealed class CdpFileProvider : IDisposable
 {
-    readonly ReadOnlyMemory<byte> _buffer;
-    private CdpFileProvider(string fileName, ReadOnlyMemory<byte> buffer)
+    readonly Stream _buffer;
+    private CdpFileProvider(string fileName, Stream buffer)
     {
         FileName = fileName;
         _buffer = buffer;
@@ -21,7 +22,21 @@ public sealed class CdpFileProvider
     }
 
     public static CdpFileProvider FromBuffer(string fileName, ReadOnlyMemory<byte> buffer)
-        => new(fileName, buffer);
+    {
+        MemoryStream stream = new();
+        stream.Write(buffer.Span);
+        return FromStream(fileName, stream);
+    }
+
+    public static CdpFileProvider FromStream(string fileName, Stream stream)
+    {
+        if (!stream.CanSeek)
+            throw new ArgumentException("Stream can't seek", nameof(stream));
+        if (!stream.CanRead)
+            throw new ArgumentException("Stream can't read", nameof(stream));
+
+        return new(fileName, stream);
+    }
 
     public string FileName { get; }
 
@@ -29,5 +44,15 @@ public sealed class CdpFileProvider
         => (ulong)_buffer.Length;
 
     public ReadOnlySpan<byte> ReadBlob(ulong start, uint length)
-        => _buffer.Slice((int)start, (int)length).Span;
+    {
+        Span<byte> buffer = new byte[length];
+        _buffer.Position = (long)start;
+        _buffer.Read(buffer);
+        return buffer;
+    }
+
+    public void Dispose()
+    {
+        _buffer.Dispose();
+    }
 }

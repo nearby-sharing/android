@@ -183,24 +183,8 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
         );
     }
 
-    string GetFilePath(string name)
-        => Path.Combine(
-            this.GetDownloadDirectory().FullName,
-            name
-        );
-
-    IReadOnlyList<FileStream> CreateFiles(FileTransferToken token)
-    {
-        List<FileStream> streams = new((int)token.TotalFilesToSend);
-        foreach (var file in token)
-        {
-            var path = GetFilePath(file.Name);
-            Log($"Saving file to \"{path}\"");
-            UIHelper.RegisterDownload(this, path, file.Size);
-            streams.Add(File.Create(path));
-        }
-        return streams;
-    }
+    IReadOnlyList<Stream> CreateFiles(FileTransferToken token)
+        => token.Select(file => this.CreateDownloadFile(file.Name, file.Size)).ToArray();
 
     public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
     {
