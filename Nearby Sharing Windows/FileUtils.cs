@@ -39,4 +39,13 @@ internal static class FileUtils
 
         return downloadDir;
     }
+
+    public static string GetLogFilePattern(this Activity activity)
+    {
+        DirectoryInfo downloadDir = new(Path.Combine(activity.GetExternalMediaDirs()?.FirstOrDefault()?.AbsolutePath ?? "/sdcard/", "logs"));
+        if (!downloadDir.Exists)
+            downloadDir.Create();
+
+        return Path.Combine( downloadDir.FullName, "nearshare-android-{Date}.log.txt");
+    }
 }

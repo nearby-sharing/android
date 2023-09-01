@@ -274,7 +274,7 @@ public sealed class ConnectedDevicesPlatform : IDisposable
         return certRequest.CreateSelfSigned(DateTimeOffset.Now, DateTimeOffset.Now.AddYears(5));
     }
 
-    public static ILoggerFactory CreateLoggerFactory(Action<string> messageCallback)
+    public static ILoggerFactory CreateLoggerFactory(Action<string> messageCallback, string? filePattern = null)
         => LoggerFactory.Create(builder =>
         {
             builder.ClearProviders();
@@ -284,5 +284,10 @@ public sealed class ConnectedDevicesPlatform : IDisposable
             builder.AddProvider(provider);
 
             builder.SetMinimumLevel(LogLevel.Debug);
+
+            if (!string.IsNullOrEmpty(filePattern))
+            {
+                builder.AddFile(filePattern, LogLevel.Debug);
+            }
         });
 }

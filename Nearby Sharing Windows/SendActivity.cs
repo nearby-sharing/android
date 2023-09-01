@@ -124,7 +124,7 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
             OemModelName = Build.Model ?? string.Empty,
             OemManufacturerName = Build.Manufacturer ?? string.Empty,
             DeviceCertificate = ConnectedDevicesPlatform.CreateDeviceCertificate(CdpEncryptionParams.Default),
-            LoggerFactory = ConnectedDevicesPlatform.CreateLoggerFactory(msg => System.Diagnostics.Debug.Print(msg))
+            LoggerFactory = ConnectedDevicesPlatform.CreateLoggerFactory(msg => System.Diagnostics.Debug.Print(msg), this.GetLogFilePattern())
         });
 
         AndroidBluetoothHandler bluetoothHandler = new(this, adapter, PhysicalAddress.None);

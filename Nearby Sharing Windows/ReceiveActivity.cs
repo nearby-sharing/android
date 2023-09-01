@@ -161,7 +161,7 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
             OemModelName = Build.Model ?? string.Empty,
             OemManufacturerName = Build.Manufacturer ?? string.Empty,
             DeviceCertificate = ConnectedDevicesPlatform.CreateDeviceCertificate(CdpEncryptionParams.Default),
-            LoggerFactory = ConnectedDevicesPlatform.CreateLoggerFactory(Log)
+            LoggerFactory = ConnectedDevicesPlatform.CreateLoggerFactory(Log, this.GetLogFilePattern())
         });
 
         IBluetoothHandler bluetoothHandler = new AndroidBluetoothHandler(this, _btAdapter, btAddress);
