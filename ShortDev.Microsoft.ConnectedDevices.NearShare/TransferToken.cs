@@ -40,14 +40,14 @@ public sealed class FileTransferToken : TransferToken, IEnumerable<FileShareInfo
     #endregion
 
     #region Acceptance
-    readonly TaskCompletionSource<IReadOnlyList<FileStream>> _promise = new();
+    readonly TaskCompletionSource<IReadOnlyList<Stream>> _promise = new();
     internal async ValueTask AwaitAcceptance()
         => await _promise.Task;
 
     public bool IsAccepted
         => _promise.Task.IsCompletedSuccessfully;
 
-    public void Accept(IReadOnlyList<FileStream> fileStream)
+    public void Accept(IReadOnlyList<Stream> fileStream)
     {
         if (fileStream.Count != TotalFilesToSend)
             throw new ArgumentException("Invalid number of streams", nameof(fileStream));
@@ -58,7 +58,7 @@ public sealed class FileTransferToken : TransferToken, IEnumerable<FileShareInfo
     public void Cancel()
         => _promise.SetCanceled();
 
-    internal FileStream GetStream(uint contentId)
+    internal Stream GetStream(uint contentId)
     {
         for (int i = 0; i < Files.Count; i++)
         {

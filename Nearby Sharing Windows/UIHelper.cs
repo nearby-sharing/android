@@ -1,12 +1,10 @@
 ﻿using Android.Content;
 using Android.Content.PM;
-using Android.OS;
 using Android.Text;
 using Android.Views;
 using AndroidX.AppCompat.App;
 using AndroidX.Browser.CustomTabs;
 using AndroidX.Core.App;
-using AndroidX.Core.Content;
 using Google.Android.Material.Dialog;
 using Nearby_Sharing_Windows.Settings;
 using CompatToolbar = AndroidX.AppCompat.Widget.Toolbar;
@@ -62,7 +60,7 @@ internal static class UIHelper
     {
         CustomTabsIntent intent = new CustomTabsIntent.Builder()
             .Build();
-        intent.LaunchUrl(activity, Android.Net.Uri.Parse(url));
+        intent.LaunchUrl(activity, AndroidUri.Parse(url));
     }
 
     public static void OpenLocaleSettings(Activity activity)
@@ -91,20 +89,10 @@ internal static class UIHelper
         }
     }
 
-    public static void OpenFile(Activity activity, string path)
+    public static void ViewDownloads(this Activity activity)
     {
-        Intent intent = new(Intent.ActionView);
-        var contentUri = FileProvider.GetUriForFile(activity, "de.shortdev.nearshare.FileProvider", new Java.IO.File(path))!;
-
-        var mimeType = activity.ContentResolver?.GetType(contentUri);
-        if (string.IsNullOrEmpty(mimeType))
-            intent.SetData(contentUri);
-        else
-            intent.SetDataAndType(contentUri, mimeType);
-
-        intent.SetFlags(ActivityFlags.GrantReadUriPermission | ActivityFlags.NewTask);
-        var chooserIntent = Intent.CreateChooser(intent, $"Open {Path.GetFileName(path)}");
-        activity.StartActivity(chooserIntent);
+        Intent intent = new(DownloadManager.ActionViewDownloads);
+        activity.StartActivity(intent);
     }
 
     public static void SetupToolBar(AppCompatActivity activity, string? subtitle = null)
@@ -163,10 +151,4 @@ internal static class UIHelper
 
     public static string Localize(this Activity activity, int resId, params object[] args)
         => string.Format(activity.GetString(resId), args);
-
-    public static DirectoryInfo GetDownloadDirectory(this Activity activity)
-    {
-        DirectoryInfo rootDir = new(Path.Combine(activity.GetExternalMediaDirs()?.FirstOrDefault()?.AbsolutePath ?? "/sdcard/"));
-        return rootDir.CreateSubdirectory("Download");
-    }
 }

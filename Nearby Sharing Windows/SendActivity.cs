@@ -159,23 +159,7 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
     }
     #endregion
 
-    async Task<CdpFileProvider> CreateNearShareFileFromContentUriAsync(AndroidUri contentUri)
-    {
-        var fileName = QueryContentName(ContentResolver!, contentUri);
 
-        using var contentStream = ContentResolver!.OpenInputStream(contentUri) ?? throw new InvalidOperationException("Could not open input stream");
-        var buffer = await Task.Run(() => EndianReader.ReadToEnd(contentStream));
-
-        return CdpFileProvider.FromBuffer(fileName, buffer);
-    }
-
-    static string QueryContentName(ContentResolver resolver, AndroidUri contentUri)
-    {
-        using var returnCursor = resolver.Query(contentUri, null, null, null, null) ?? throw new InvalidOperationException("Could not open content cursor");
-        int nameIndex = returnCursor.GetColumnIndex(IOpenableColumns.DisplayName);
-        returnCursor.MoveToFirst();
-        return returnCursor.GetString(nameIndex) ?? throw new InvalidOperationException("Could not query content name");
-    }
 
     readonly CancellationTokenSource _fileSendCancellationTokenSource = new();
     private async void SendData(CdpDevice remoteSystem)
@@ -197,7 +181,7 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
                         AndroidUri file = Intent.GetParcelableExtra<AndroidUri>(Intent.ExtraStream)!;
                         fileTransferOperation = NearShareSender.SendFileAsync(
                             remoteSystem,
-                            await CreateNearShareFileFromContentUriAsync(file),
+                            ContentResolver!.CreateNearShareFileFromContentUriAsync(file),
                             fileSendProgress,
                             _fileSendCancellationTokenSource.Token
                         );
@@ -228,7 +212,7 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
                     var files = Intent.GetParcelableArrayListExtra<AndroidUri>(Intent.ExtraStream) ?? throw new InvalidDataException("Could not get extra files from intent");
                     fileTransferOperation = NearShareSender.SendFilesAsync(
                         remoteSystem,
-                        await Task.WhenAll(files.Select(CreateNearShareFileFromContentUriAsync)),
+                        files.Select(x => ContentResolver!.CreateNearShareFileFromContentUriAsync(x)).ToArray(),
                         fileSendProgress,
                         _fileSendCancellationTokenSource.Token
                     );
