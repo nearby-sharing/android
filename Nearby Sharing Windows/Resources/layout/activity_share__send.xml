@@ -13,7 +13,8 @@
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:layout_centerInParent="true"
-        android:src="@drawable/ic_fluent_send_clock_24_regular"/>
+        android:src="@drawable/ic_fluent_send_clock_24_regular"
+        android:tint="?attr/colorOnSurfaceVariant" />
 
     <include
         layout="@layout/activity_share__send__progress"
@@ -29,5 +30,5 @@
         android:text="@string/generic_cancel"
         android:layout_alignParentBottom="true"
         android:enabled="false"
-        style="?attr/materialButtonOutlinedStyle" />
+        style="@style/Widget.Material3.Button.TonalButton" />
 </RelativeLayout>
