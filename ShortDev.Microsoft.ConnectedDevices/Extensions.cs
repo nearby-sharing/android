@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.NetworkInformation;
 using System.Security.Cryptography;
 using System.Threading;
@@ -37,4 +39,27 @@ public static class Extensions
 
     public static string ToStringFormatted(this PhysicalAddress @this)
         => string.Join(':', Array.ConvertAll(@this.GetAddressBytes(), (x) => x.ToString("X2")));
+
+    public static void DisposeAll(params IEnumerable<IDisposable>[] disposables)
+        => disposables.SelectMany(x => x).DisposeAll();
+
+    public static void DisposeAll<T>(this IEnumerable<T> disposables) where T : IDisposable
+    {
+        List<Exception> exceptions = new();
+
+        foreach (var disposable in disposables)
+        {
+            try
+            {
+                disposable.Dispose();
+            }
+            catch (Exception ex)
+            {
+                exceptions.Add(ex);
+            }
+        }
+
+        if (exceptions.Count > 0)
+            throw new AggregateException(exceptions);
+    }
 }

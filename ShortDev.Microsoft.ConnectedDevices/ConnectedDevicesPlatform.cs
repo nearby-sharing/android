@@ -13,7 +13,6 @@ using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
-using System.Net.NetworkInformation;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
@@ -260,8 +259,13 @@ public sealed class ConnectedDevicesPlatform : IDisposable
 
     public void Dispose()
     {
-        foreach (var (_, transport) in _transports)
-            transport.Dispose();
+        Extensions.DisposeAll(
+            _transports.Select(x => x.Value),
+            _knownSockets.Select(x => x.Value)
+        );
+
+        _transports.Clear();
+        _knownSockets.Clear();
     }
 
     public static X509Certificate2 CreateDeviceCertificate(CdpEncryptionParams encryptionParams)
