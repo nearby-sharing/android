@@ -113,11 +113,17 @@ public sealed class AndroidBluetoothHandler : IBluetoothHandler
             options.ServiceName,
             Java.Util.UUID.FromString(options.ServiceId)
         )!;
-        while (true)
+
+        cancellationToken.Register(() => listener.Close());
+
+        while (!cancellationToken.IsCancellationRequested)
         {
             var socket = await listener.AcceptAsync();
             if (cancellationToken.IsCancellationRequested)
+            {
+                socket?.Dispose();
                 return;
+            }
 
             if (socket != null)
                 options!.SocketConnected!(socket.ToCdp());
