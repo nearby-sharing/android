@@ -56,7 +56,7 @@ public sealed class FileTransferToken : TransferToken, IEnumerable<FileShareInfo
     }
 
     public void Cancel()
-        => _promise.SetCanceled();
+        => _promise.TrySetCanceled();
 
     internal Stream GetStream(uint contentId)
     {
