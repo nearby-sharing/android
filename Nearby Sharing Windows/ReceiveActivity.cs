@@ -184,7 +184,7 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
     }
 
     IReadOnlyList<Stream> CreateFiles(FileTransferToken token)
-        => token.Select(file => this.CreateDownloadFile(file.Name, file.Size)).ToArray();
+        => token.Select(file => this.CreateDownloadFile(file.Name)).ToArray();
 
     public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
     {

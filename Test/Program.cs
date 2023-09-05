@@ -34,7 +34,8 @@ while (true)
     Console.ReadLine();
 }
 
-void HandleMessage(CommonHeader header, EndianReader reader)
+#pragma warning disable IDE0059 // Unnecessary assignment of a value
+static void HandleMessage(CommonHeader header, EndianReader reader)
 {
     if (header.Type == MessageType.Connect)
     {

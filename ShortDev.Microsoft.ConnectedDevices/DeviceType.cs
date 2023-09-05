@@ -9,11 +9,11 @@ public enum DeviceType : short
     XboxOne = 1,
 
     Xbox360 = 2,
-    [Obsolete]
+    [Obsolete("Legacy")]
     WindowsDesktopLegacy = 3,
-    [Obsolete]
+    [Obsolete("Legacy")]
     WindowsStoreLegacy = 4,
-    [Obsolete]
+    [Obsolete("Legacy")]
     WindowsPhoneLegacy = 5,
 
     iPhone = 6,

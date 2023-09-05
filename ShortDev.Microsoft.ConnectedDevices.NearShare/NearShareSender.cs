@@ -34,7 +34,7 @@ public sealed class NearShareSender
         return senderStateMachine;
     }
 
-    void Dispose(CdpAppBase app)
+    static void DisposeApp(CdpAppBase app)
     {
         app.Channel.Dispose(closeSession: true, closeSocket: true);
     }
@@ -43,7 +43,7 @@ public sealed class NearShareSender
     {
         var senderStateMachine = await PrepareTransferInternalAsync(device);
         await senderStateMachine.SendUriAsync(uri);
-        Dispose(senderStateMachine);
+        DisposeApp(senderStateMachine);
     }
 
     public async Task SendFileAsync(CdpDevice device, CdpFileProvider file, IProgress<NearShareProgress> progress, CancellationToken cancellationToken = default)
@@ -53,7 +53,7 @@ public sealed class NearShareSender
     {
         var senderStateMachine = await PrepareTransferInternalAsync(device);
         await senderStateMachine.SendFilesAsync(files, progress, cancellationToken);
-        Dispose(senderStateMachine);
+        DisposeApp(senderStateMachine);
     }
 
     sealed class HandshakeHandler : CdpAppBase

@@ -24,7 +24,7 @@ internal static class FileUtils
         return returnCursor.GetString(0) ?? throw new IOException("Could not query content name");
     }
 
-    public static Stream CreateDownloadFile(this Activity activity, string fileName, ulong size)
+    public static Stream CreateDownloadFile(this Activity activity, string fileName)
     {
         var filePath = Path.Combine(activity.GetDownloadDirectory().FullName, fileName);
         return File.Create(filePath);
@@ -46,6 +46,6 @@ internal static class FileUtils
         if (!downloadDir.Exists)
             downloadDir.Create();
 
-        return Path.Combine( downloadDir.FullName, "nearshare-android-{Date}.log.txt");
+        return Path.Combine(downloadDir.FullName, "nearshare-android-{Date}.log.txt");
     }
 }

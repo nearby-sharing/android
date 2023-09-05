@@ -35,7 +35,7 @@ internal sealed class UpgradeHandler
         => _allowedAddresses.Contains(socket.RemoteDevice.Endpoint.Address);
     #endregion
 
-    public bool TryHandleConnect(CdpSocket socket, CommonHeader header, ConnectionHeader connectionHeader, ref EndianReader reader)
+    public bool TryHandleConnect(CdpSocket socket, ConnectionHeader connectionHeader, ref EndianReader reader)
     {
         // This part needs to be always accessible!
         // This is used to validate
@@ -73,7 +73,7 @@ internal sealed class UpgradeHandler
                 return true;
             case ConnectionType.UpgradeFinalizationResponse:
                 _session.ThrowIfWrongMode(false);
-                HandleUpgradeFinalizationResponse(socket, ref reader);
+                HandleUpgradeFinalizationResponse();
                 return true;
             case ConnectionType.TransportConfirmation:
                 _session.ThrowIfWrongMode(false);
@@ -101,7 +101,7 @@ internal sealed class UpgradeHandler
             allowed = true;
         }
 
-        _logger.LogInformation("Transport upgrade {0} {1}",
+        _logger.LogInformation("Transport upgrade {upgradeId} {upgradeStatus}",
             msg.UpgradeId,
             allowed ? "succeeded" : "failed"
         );
@@ -125,7 +125,7 @@ internal sealed class UpgradeHandler
     void HandleUpgradeRequest(CdpSocket socket, ref EndianReader reader)
     {
         var msg = UpgradeRequest.Parse(ref reader);
-        _logger.LogInformation("Upgrade request {0} to {1}",
+        _logger.LogInformation("Upgrade request {upgradeId} to {upgradeTypes}",
             msg.UpgradeId,
             string.Join(',', msg.Endpoints.Select((x) => x.Type.ToString()))
         );
@@ -180,7 +180,7 @@ internal sealed class UpgradeHandler
     void HandleUpgradeFinalization(CdpSocket socket, ref EndianReader reader)
     {
         var msg = EndpointMetadata.ParseArray(ref reader);
-        _logger.LogInformation("Transport upgrade to {0}",
+        _logger.LogInformation("Transport upgrade to {upgradeTypes}",
             string.Join(',', msg.Select((x) => x.Type.ToString()))
         );
 
@@ -308,7 +308,7 @@ internal sealed class UpgradeHandler
         }
     }
 
-    void HandleUpgradeFinalizationResponse(CdpSocket socket, ref EndianReader reader)
+    void HandleUpgradeFinalizationResponse()
     {
         // Upgrade has been acknowledged
 

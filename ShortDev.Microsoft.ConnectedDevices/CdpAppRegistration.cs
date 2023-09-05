@@ -1,6 +1,7 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Control;
 using ShortDev.Microsoft.ConnectedDevices.Serialization;
+using System;
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 
@@ -43,6 +44,9 @@ public static class CdpAppRegistration
 
     internal static CdpAppBase InstantiateApp(string id, string name)
     {
+        ArgumentException.ThrowIfNullOrEmpty(id);
+        ArgumentException.ThrowIfNullOrEmpty(name);
+
         id = id.ToLower();
         return _registration[id].Factory();
     }

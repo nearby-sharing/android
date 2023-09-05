@@ -39,7 +39,7 @@ internal sealed class NearShareApp : CdpAppBase
                 HandleStartTransfer(msg, payload);
                 return;
             case NearShareControlMsgType.FetchDataResponse:
-                HandleFetchDataResponse(msg, payload);
+                HandleFetchDataResponse(payload);
                 return;
         }
         throw CdpSession.UnexpectedMessage(msgType.ToString());
@@ -85,7 +85,7 @@ internal sealed class NearShareApp : CdpAppBase
             case DataKind.Uri:
                 {
                     var uri = payload.Get<string>("Uri");
-                    _logger.LogInformation("Received uri \"{0}\" from session {1:X}",
+                    _logger.LogInformation("Received uri \"{uri}\" from session {sessionId:X}",
                         uri,
                         msg.Header.SessionId
                     );
@@ -148,7 +148,7 @@ internal sealed class NearShareApp : CdpAppBase
         }
     }
 
-    void HandleFetchDataResponse(CdpMessage msg, ValueSet payload)
+    void HandleFetchDataResponse(ValueSet payload)
     {
         if (_fileTransferToken == null)
             throw new CdpProtocolException("FileTransfer has not been initialized");

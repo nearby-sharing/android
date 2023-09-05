@@ -106,7 +106,7 @@ public sealed class ConnectedDevicesPlatform : IDisposable
 
     private void OnDeviceConnected(ICdpTransport sender, CdpSocket socket)
     {
-        _logger.Log(LogLevel.Information, "Device {0} ({1}) connected via {2}", socket.RemoteDevice.Name, socket.RemoteDevice.Endpoint.Address, socket.TransportType);
+        _logger.Log(LogLevel.Information, "Device {deviceName} ({deviceAddress}) connected via {transportType}", socket.RemoteDevice.Name, socket.RemoteDevice.Endpoint.Address, socket.TransportType);
         ReceiveLoop(socket);
     }
     #endregion

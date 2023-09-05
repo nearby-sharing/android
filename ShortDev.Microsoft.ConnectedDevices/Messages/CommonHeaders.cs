@@ -172,7 +172,7 @@ public sealed class CommonHeader : ICdpHeader<CommonHeader>
 
     public const ulong SessionIdHostFlag = 0x80000000;
     public void CorrectClientSessionBit()
-        => SessionId = SessionId ^ SessionIdHostFlag;
+        => SessionId ^= SessionIdHostFlag;
     #endregion
 
     #region Message Length
