@@ -24,12 +24,10 @@ public interface INetworkHandler : ICdpPlatformHandler
     public static IPAddress GetLocalIpDefault()
     {
         var data = Dns.GetHostEntry(string.Empty).AddressList;
-        var ips = Dns.GetHostEntry(string.Empty).AddressList
+        var ip = Dns.GetHostEntry(string.Empty).AddressList
             .Where((x) => x.AddressFamily == AddressFamily.InterNetwork)
-            .ToArray();
-        if (ips.Length != 1)
-            throw new InvalidDataException("Could not resolve ip");
+            .FirstOrDefault();
 
-        return ips[0];
+        return ip ?? throw new InvalidDataException("Could not resolve ip");
     }
 }

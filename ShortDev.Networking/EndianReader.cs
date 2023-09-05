@@ -121,6 +121,13 @@ public ref struct EndianReader
             return BinaryPrimitives.ReadDoubleBigEndian(buffer);
     }
 
+    public Guid ReadGuid()
+    {
+        Span<byte> buffer = stackalloc byte[16];
+        ReadBytes(buffer);
+        return new(buffer);
+    }
+
     public string ReadStringWithLength()
         => ReadStringWithLength(DefaultEncoding);
 

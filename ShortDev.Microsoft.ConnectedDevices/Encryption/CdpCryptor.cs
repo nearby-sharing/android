@@ -143,9 +143,12 @@ public sealed class CdpCryptor : IDisposable
 
         var encryptedPayload = reader.ReadBytes(payloadSize);
 
-        ReadOnlySpan<byte> hmac = ReadOnlySpan<byte>.Empty;
+        scoped Span<byte> hmac = Span<byte>.Empty;
         if (header.HasFlag(MessageFlags.HasHMAC))
-            hmac = reader.ReadBytes(Constants.HMacSize);
+        {
+            hmac = stackalloc byte[Constants.HMacSize];
+            reader.ReadBytes(hmac);
+        }
 
         byte[] decryptedPayload = DecryptMessage(header, encryptedPayload, hmac);
         EndianReader payloadReader = new(Endianness.BigEndian, decryptedPayload);

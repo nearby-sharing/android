@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.NetworkInformation;
@@ -62,4 +63,30 @@ public static class Extensions
         if (exceptions.Count > 0)
             throw new AggregateException(exceptions);
     }
+
+    public readonly struct ArrayPoolToken<T> : IDisposable
+    {
+        private readonly ArrayPool<T>? _pool;
+        private readonly T[] _array;
+        private readonly int _capacity;
+
+        private ArrayPoolToken(ArrayPool<T> pool, int capacity)
+        {
+            _pool = pool;
+            _capacity = capacity;
+            _array = pool.Rent(capacity);
+        }
+
+        public static ArrayPoolToken<T> Create(ArrayPool<T> pool, int capacity)
+            => new(pool, capacity);
+
+        public Memory<T> Memory => _array.AsMemory()[0.._capacity];
+        public Span<T> Span => Memory.Span;
+
+        public void Dispose()
+            => _pool?.Return(_array);
+    }
+
+    public static ArrayPoolToken<T> RentToken<T>(this ArrayPool<T> pool, int capacity)
+        => ArrayPoolToken<T>.Create(pool, capacity);
 }

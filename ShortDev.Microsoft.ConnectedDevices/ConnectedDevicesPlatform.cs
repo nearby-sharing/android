@@ -7,6 +7,7 @@ using ShortDev.Microsoft.ConnectedDevices.Platforms;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
 using ShortDev.Networking;
 using System;
+using System.Buffers;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -161,6 +162,7 @@ public sealed class ConnectedDevicesPlatform : IDisposable
     }
     #endregion
 
+    static readonly ArrayPool<byte> _messagePool = ArrayPool<byte>.Create();
     private void ReceiveLoop(CdpSocket socket)
     {
         RegisterKnownSocket(socket);
@@ -185,12 +187,13 @@ public sealed class ConnectedDevicesPlatform : IDisposable
                             header
                         );
 
-                        var payload = streamReader.ReadBytes(header.PayloadSize);
+                        using var payload = _messagePool.RentToken(header.PayloadSize);
+                        streamReader.ReadBytes(payload.Span);
 
                         if (socket.IsClosed)
                             return;
 
-                        EndianReader reader = new(Endianness.BigEndian, payload);
+                        EndianReader reader = new(Endianness.BigEndian, payload.Span);
                         session.HandleMessage(socket, header, ref reader);
                     }
                     catch (Exception ex)
@@ -198,7 +201,7 @@ public sealed class ConnectedDevicesPlatform : IDisposable
                         if (socket.IsClosed)
                             return;
 
-                        _logger.Log(LogLevel.Warning, "{0} in session {1} \n {2}",
+                        _logger.Log(LogLevel.Warning, "{exceptionTypeName} in session {sessionId} \n {exception}",
                             ex.GetType().Name,
                             session?.LocalSessionId.ToString() ?? "null",
                             ex

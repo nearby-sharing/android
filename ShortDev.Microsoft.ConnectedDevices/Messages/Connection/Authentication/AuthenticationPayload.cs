@@ -83,9 +83,9 @@ public sealed class AuthenticationPayload : ICdpPayload<AuthenticationPayload>
 
     static byte[] CreateSignedThumbprint(X509Certificate2 cert, CdpNonce hostNonce, CdpNonce clientNonce)
     {
-        var data = MergeNoncesWithCertificate(cert, hostNonce, clientNonce).ToArray();
+        var data = MergeNoncesWithCertificate(cert, hostNonce, clientNonce);
         var privateKey = cert.GetECDsaPrivateKey() ?? throw new ArgumentException("No ECDsa private key!", nameof(cert));
-        return privateKey.SignData(data, thumbprintHashType);
+        return privateKey.SignData(data.Span, thumbprintHashType);
     }
     #endregion
 }

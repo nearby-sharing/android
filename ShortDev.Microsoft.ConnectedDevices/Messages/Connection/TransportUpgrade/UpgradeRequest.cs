@@ -17,7 +17,7 @@ public sealed class UpgradeRequest : ICdpPayload<UpgradeRequest>
     public static UpgradeRequest Parse(ref EndianReader reader)
         => new()
         {
-            UpgradeId = new(reader.ReadBytes(16)),
+            UpgradeId = reader.ReadGuid(),
             Endpoints = EndpointMetadata.ParseArray(ref reader)
         };
 
