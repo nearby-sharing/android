@@ -4,6 +4,7 @@
 		<item name="actionBarTheme">@style/ThemeOverlay.Material3.Dark.ActionBar</item>
 		<item name="preferenceTheme">@style/App.Preferences</item>
 		<item name="android:windowTranslucentStatus">true</item>
+		<item name="switchStyle">@style/Widget.Material3.CompoundButton.MaterialSwitch</item>
 	</style>
 
 	<style name="App.Preferences" parent="@style/PreferenceTheme.SettingsLib">
