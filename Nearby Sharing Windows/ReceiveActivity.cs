@@ -188,10 +188,12 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
 
     public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
     {
-        if (!grantResults.All((x) => x != Permission.Granted))
-            InitializeCDP();
-        else
+        if (grantResults.Any((x) => x == Permission.Denied))
+        {
             Toast.MakeText(this, this.Localize(Resource.String.receive_missing_permissions), ToastLength.Long)!.Show();
+        }
+
+        InitializeCDP();
     }
 
     public override bool OnCreateOptionsMenu(IMenu? menu)
