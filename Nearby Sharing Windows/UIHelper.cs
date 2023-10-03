@@ -123,7 +123,7 @@ internal static class UIHelper
         ManifestPermission.BluetoothScan,
         ManifestPermission.BluetoothConnect,
         ManifestPermission.BluetoothAdvertise,
-        ManifestPermission.AccessBackgroundLocation,
+        // ManifestPermission.AccessBackgroundLocation, See #109 and #41
         ManifestPermission.ReadExternalStorage,
         ManifestPermission.WriteExternalStorage
     };
