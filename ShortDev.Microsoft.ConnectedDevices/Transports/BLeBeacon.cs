@@ -24,8 +24,8 @@ public sealed record BLeBeacon(DeviceType DeviceType, PhysicalAddress MacAddress
 
         EndianReader reader = new(Endianness.BigEndian, beaconData);
 
-        var scenarioType = reader.ReadByte();
-        if (scenarioType != Constants.BLeBeaconScenarioType)
+        var scenarioType = (ScenarioType)reader.ReadByte();
+        if (scenarioType != ScenarioType.Bluetooth)
             return false;
 
         var deviceType = (DeviceType)reader.ReadByte();
@@ -55,7 +55,7 @@ public sealed record BLeBeacon(DeviceType DeviceType, PhysicalAddress MacAddress
     public byte[] ToArray()
     {
         EndianWriter writer = new(Endianness.LittleEndian);
-        writer.Write(Constants.BLeBeaconScenarioType);
+        writer.Write((byte)ScenarioType.Bluetooth);
         writer.Write((byte)DeviceType);
 
         byte versionAndFlags = (byte)BeaconFlags.Public;
