@@ -12,6 +12,10 @@ public sealed class ReceiveTileService : TileService
     {
         Intent intent = new(this, typeof(ReceiveActivity));
         intent.AddFlags(ActivityFlags.NewTask);
-        StartActivityAndCollapse(intent);
+
+        if (OperatingSystem.IsAndroidVersionAtLeast(24))
+            StartActivityAndCollapse(intent);
+        else
+            StartActivity(intent);
     }
 }

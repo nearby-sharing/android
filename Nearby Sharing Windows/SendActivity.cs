@@ -5,21 +5,19 @@ using Android.Provider;
 using Android.Runtime;
 using Android.Views;
 using AndroidX.AppCompat.App;
-using AndroidX.Core.App;
 using AndroidX.RecyclerView.Widget;
 using Google.Android.Material.ProgressIndicator;
 using Google.Android.Material.Snackbar;
+using Nearby_Sharing_Windows.Settings;
 using ShortDev.Android.UI;
 using ShortDev.Microsoft.ConnectedDevices;
 using ShortDev.Microsoft.ConnectedDevices.Encryption;
 using ShortDev.Microsoft.ConnectedDevices.NearShare;
 using ShortDev.Microsoft.ConnectedDevices.Platforms;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
+using ShortDev.Networking;
 using System.Diagnostics.CodeAnalysis;
-using System.Net;
 using System.Net.NetworkInformation;
-using AndroidUri = Android.Net.Uri;
-using ManifestPermission = Android.Manifest.Permission;
 
 namespace Nearby_Sharing_Windows;
 
@@ -53,38 +51,26 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
                     device.Type.IsMobile() ? Resource.Drawable.ic_fluent_phone_24_regular : Resource.Drawable.ic_fluent_desktop_24_regular
                 );
                 view.FindViewById<ImageView>(Resource.Id.transportTypeImageView)?.SetImageResource(
-                    device.Endpoint.TransportType == CdpTransportType.Tcp ? Resource.Drawable.ic_fluent_database_plug_connected_20_regular : Resource.Drawable.ic_fluent_live_20_regular
+                    device.Endpoint.TransportType == CdpTransportType.Tcp ? Resource.Drawable.ic_fluent_plug_connected_20_regular : Resource.Drawable.ic_fluent_live_20_regular
                 );
                 view.FindViewById<TextView>(Resource.Id.deviceNameTextView)!.Text = device.Name;
                 view.Click += (s, e) => SendData(device);
             }
         );
 
-        if (Build.VERSION.SdkInt >= BuildVersionCodes.Kitkat)
-        {
-            Window!.SetFlags(WindowManagerFlags.LayoutNoLimits, WindowManagerFlags.LayoutNoLimits);
+        Window!.SetFlags(WindowManagerFlags.LayoutNoLimits, WindowManagerFlags.LayoutNoLimits);
+        if (OperatingSystem.IsAndroidVersionAtLeast(30))
+            Window.InsetsController!.SetSystemBarsAppearance(
+                (int)WindowInsetsControllerAppearance.LightNavigationBars,
+                (int)WindowInsetsControllerAppearance.LightNavigationBars
+            );
+        else
             Window!.DecorView.SystemUiVisibility = (StatusBarVisibility)SystemUiFlags.LightNavigationBar;
-            Window!.DecorView.SetOnApplyWindowInsetsListener(this);
-        }
+        Window!.DecorView.SetOnApplyWindowInsetsListener(this);
 
         cancelButton.Click += CancelButton_Click;
 
-        if (Build.VERSION.SdkInt >= BuildVersionCodes.S)
-        {
-            ActivityCompat.RequestPermissions(this, new[] {
-                ManifestPermission.AccessFineLocation,
-                ManifestPermission.AccessCoarseLocation,
-                ManifestPermission.BluetoothScan,
-                ManifestPermission.BluetoothConnect
-            }, 0);
-        }
-        else
-        {
-            ActivityCompat.RequestPermissions(this, new[] {
-                ManifestPermission.AccessFineLocation,
-                ManifestPermission.AccessCoarseLocation
-            }, 0);
-        }
+        UIHelper.RequestSendPermissions(this);
     }
 
     #region UI
@@ -104,14 +90,12 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
         }
         else
         {
-#pragma warning disable CS0618 // Type or member is obsolete
             bottomSheetFrame.SetPadding(
                 windowInsets.StableInsetLeft,
                 /* insets.Top */ 0,
                 windowInsets.StableInsetRight,
                 windowInsets.StableInsetBottom
             );
-#pragma warning restore CS0618 // Type or member is obsolete
         }
         return windowInsets;
     }
@@ -136,11 +120,11 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
         Platform = new(new()
         {
             Type = DeviceType.Android,
-            Name = adapter.Name ?? throw new NullReferenceException("Could not find device name"),
+            Name = SettingsFragment.GetDeviceName(this, adapter),
             OemModelName = Build.Model ?? string.Empty,
             OemManufacturerName = Build.Manufacturer ?? string.Empty,
             DeviceCertificate = ConnectedDevicesPlatform.CreateDeviceCertificate(CdpEncryptionParams.Default),
-            LoggerFactory = ConnectedDevicesPlatform.CreateLoggerFactory(msg => System.Diagnostics.Debug.Print(msg))
+            LoggerFactory = ConnectedDevicesPlatform.CreateLoggerFactory(msg => System.Diagnostics.Debug.Print(msg), this.GetLogFilePattern())
         });
 
         AndroidBluetoothHandler bluetoothHandler = new(this, adapter, PhysicalAddress.None);
@@ -156,12 +140,12 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
     }
 
     readonly List<CdpDevice> RemoteSystems = new();
-    private void Platform_DeviceDiscovered(ICdpTransport sender, CdpDevice device, CdpAdvertisement advertisement)
+    private void Platform_DeviceDiscovered(ICdpTransport sender, CdpDevice device, BLeBeacon advertisement)
     {
         if (!RemoteSystems.Contains(device))
         {
             RemoteSystems.Add(device);
-            UpdateUI();
+            RunOnUiThread(() => UpdateUI());
         }
     }
     #endregion
@@ -175,24 +159,7 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
     }
     #endregion
 
-    async Task<CdpFileProvider> CreateNearShareFileFromContentUriAsync(AndroidUri contentUri)
-    {
-        var fileName = QueryContentName(ContentResolver!, contentUri);
 
-        using var contentStream = ContentResolver!.OpenInputStream(contentUri) ?? throw new InvalidOperationException("Could not open input stream");
-        var buffer = new byte[contentStream.Length];
-        await contentStream.ReadAsync(buffer);
-
-        return CdpFileProvider.FromBuffer(fileName, buffer);
-    }
-
-    static string QueryContentName(ContentResolver resolver, AndroidUri contentUri)
-    {
-        using var returnCursor = resolver.Query(contentUri, null, null, null, null) ?? throw new InvalidOperationException("Could not open content cursor");
-        int nameIndex = returnCursor.GetColumnIndex(IOpenableColumns.DisplayName);
-        returnCursor.MoveToFirst();
-        return returnCursor.GetString(nameIndex) ?? throw new InvalidOperationException("Could not query content name");
-    }
 
     readonly CancellationTokenSource _fileSendCancellationTokenSource = new();
     private async void SendData(CdpDevice remoteSystem)
@@ -211,33 +178,41 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
                 {
                     if (Intent.HasExtra(Intent.ExtraStream))
                     {
-                        AndroidUri file = (Intent.GetParcelableExtra(Intent.ExtraStream) as AndroidUri)!;
+                        AndroidUri file = Intent.GetParcelableExtra<AndroidUri>(Intent.ExtraStream)!;
                         fileTransferOperation = NearShareSender.SendFileAsync(
                             remoteSystem,
-                            await CreateNearShareFileFromContentUriAsync(file),
+                            ContentResolver!.CreateNearShareFileFromContentUriAsync(file),
                             fileSendProgress,
                             _fileSendCancellationTokenSource.Token
                         );
                     }
                     else
                     {
-                        var uri = Intent.GetStringExtra(Intent.ExtraText);
-                        if (!Uri.IsWellFormedUriString(uri, UriKind.Absolute))
+                        var text = Intent.GetStringExtra(Intent.ExtraText);
+                        if (Uri.IsWellFormedUriString(text, UriKind.Absolute))
                         {
-                            uri = $"https://nearshare.shortdev.de/docs/txt_view?transfer_txt={WebUtility.UrlEncode(uri)}";
+                            uriTransferOperation = NearShareSender.SendUriAsync(
+                                remoteSystem,
+                                new Uri(text)
+                            );
                         }
-                        uriTransferOperation = NearShareSender.SendUriAsync(
-                            remoteSystem,
-                            new Uri(uri)
-                        );
+                        else
+                        {
+                            fileTransferOperation = NearShareSender.SendFileAsync(
+                                remoteSystem,
+                                CdpFileProvider.FromContent($"Text-Transfer-{DateTime.Now:dd_MM_yyyy-HH_mm_ss}.txt", text ?? throw new NullReferenceException("Text was null")),
+                                fileSendProgress,
+                                _fileSendCancellationTokenSource.Token
+                            );
+                        }
                     }
                 }
                 else if (Intent?.Action == Intent.ActionSendMultiple)
                 {
-                    var files = Intent.GetParcelableArrayListExtra(Intent.ExtraStream)?.Cast<AndroidUri>() ?? throw new InvalidDataException("Could not get extra files from intent");
+                    var files = Intent.GetParcelableArrayListExtra<AndroidUri>(Intent.ExtraStream) ?? throw new InvalidDataException("Could not get extra files from intent");
                     fileTransferOperation = NearShareSender.SendFilesAsync(
                         remoteSystem,
-                        await Task.WhenAll(files.Select(CreateNearShareFileFromContentUriAsync)),
+                        files.Select(x => ContentResolver!.CreateNearShareFileFromContentUriAsync(x)).ToArray(),
                         fileSendProgress,
                         _fileSendCancellationTokenSource.Token
                     );
@@ -330,6 +305,7 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
         => Finish();
     public override void Finish()
     {
+        Platform?.Dispose();
         base.Finish();
     }
     #endregion

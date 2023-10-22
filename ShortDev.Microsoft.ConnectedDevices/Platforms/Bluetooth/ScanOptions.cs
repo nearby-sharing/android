@@ -5,5 +5,5 @@ namespace ShortDev.Microsoft.ConnectedDevices.Platforms.Bluetooth;
 
 public sealed class ScanOptions
 {
-    public Action<CdpAdvertisement>? OnDeviceDiscovered { get; set; }
+    public Action<BLeBeacon>? OnDeviceDiscovered { get; set; }
 }

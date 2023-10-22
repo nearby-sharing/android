@@ -1,91 +1,37 @@
 ﻿using System;
 using System.Buffers.Binary;
-using System.Diagnostics;
 using System.IO;
 using System.Text;
 
 namespace ShortDev.Networking;
 
-public readonly ref struct EndianReader
+public ref struct EndianReader
 {
-    /// <summary>
-    /// <see href="https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/stackalloc"><c>stackalloc</c></see>
-    /// </summary>
-    const int MaxStackLimit = 1024;
     static readonly Encoding DefaultEncoding = Encoding.UTF8;
 
     public readonly bool UseLittleEndian;
-    public readonly ReadOnlyEndianBuffer Buffer;
-    public readonly Stream? Stream;
+    public ReadOnlyEndianBuffer Buffer;
 
     EndianReader(Endianness endianness)
-    {
-        UseLittleEndian = endianness == Endianness.LittleEndian;
-    }
+        => UseLittleEndian = endianness == Endianness.LittleEndian;
 
     public EndianReader(Endianness endianness, ReadOnlySpan<byte> data) : this(endianness)
         => Buffer = new(data);
 
     public EndianReader(Endianness endianness, Stream stream) : this(endianness)
-        => Stream = stream;
+        => Buffer = new(stream);
 
     public ReadOnlySpan<byte> ReadToEnd()
         => Buffer.ReadToEnd();
 
     public ReadOnlySpan<byte> ReadBytes(int length)
-    {
-        if (Stream != null)
-        {
-            var buffer = new byte[length];
-            ReadStreamInternal(buffer);
-            return buffer;
-        }
+        => Buffer.ReadBytes(length);
 
-        return Buffer.ReadBytes(length);
-    }
-
-    public void ReadBytes(Span<byte> buffer)
-    {
-        if (Stream != null)
-            ReadStreamInternal(buffer);
-        else
-            Buffer.ReadBytes(buffer);
-    }
-
-    /// <summary>
-    /// <see href="https://github.com/dotnet/runtime/blob/56c84971041ae1debfa5ff360c547392d29f4cb3/src/libraries/System.Private.CoreLib/src/System/IO/BinaryReader.cs#L494-L506">BinaryReader.ReadBytes</see>
-    /// </summary>
-    void ReadStreamInternal(Span<byte> buffer)
-    {
-        Debug.Assert(Stream != null);
-
-        int count = buffer.Length;
-        int numRead = 0;
-        do
-        {
-            int n = Stream.Read(buffer[numRead..]);
-            if (n == 0)
-                throw new EndOfStreamException();
-
-            numRead += n;
-            count -= n;
-        } while (count > 0);
-        
-        Debug.Assert(numRead == buffer.Length);
-    }
+    public void ReadBytes(scoped Span<byte> buffer)
+        => Buffer.ReadBytes(buffer);
 
     public byte ReadByte()
-    {
-        if (Stream != null)
-        {
-            var buffer = Stream.ReadByte();
-            if (buffer == -1)
-                throw new EndOfStreamException();
-            return (byte)buffer;
-        }
-
-        return Buffer.ReadByte();
-    }
+        => Buffer.ReadByte();
 
     public short ReadInt16()
     {
@@ -175,6 +121,13 @@ public readonly ref struct EndianReader
             return BinaryPrimitives.ReadDoubleBigEndian(buffer);
     }
 
+    public Guid ReadGuid()
+    {
+        Span<byte> buffer = stackalloc byte[16];
+        ReadBytes(buffer);
+        return new(buffer);
+    }
+
     public string ReadStringWithLength()
         => ReadStringWithLength(DefaultEncoding);
 
@@ -190,4 +143,21 @@ public readonly ref struct EndianReader
         var length = ReadUInt16();
         return ReadBytes(length);
     }
+
+    #region Utility methods
+
+    public static byte[] ReadToEnd(Stream stream)
+    {
+        var buffer = new byte[stream.Length];
+        Read(stream, buffer);
+        return buffer;
+    }
+
+    public static void Read(Stream stream, Span<byte> buffer)
+    {
+        ReadOnlyEndianBuffer reader = new(stream);
+        reader.ReadBytes(buffer);
+    }
+
+    #endregion
 }

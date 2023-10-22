@@ -11,10 +11,10 @@ public sealed class UpgradeIdPayload : ICdpPayload<UpgradeIdPayload>
 {
     public required Guid UpgradeId { get; init; }
 
-    public static UpgradeIdPayload Parse(EndianReader reader)
+    public static UpgradeIdPayload Parse(ref EndianReader reader)
         => new()
         {
-            UpgradeId = new(reader.ReadBytes(16))
+            UpgradeId = reader.ReadGuid()
         };
 
     public void Write(EndianWriter writer)

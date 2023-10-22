@@ -2,14 +2,13 @@
 
 public static class Constants
 {
-    public const int DiscoveryPort = 5050;
+    public const int UdpPort = 5050;
     public const int TcpPort = 5040;
 
     public const byte ProtocolVersion = 3;
     public const ushort Signature = 0x3030;
 
     public const int BLeBeaconManufacturerId = /* Microsoft */ 0x6;
-    public const byte BLeBeaconScenarioType = 0x1;
     public const byte BLeBeaconVersion = 0x1;
     public const int BLeBeaconDeviceNameMaxByteLength = 17;
 

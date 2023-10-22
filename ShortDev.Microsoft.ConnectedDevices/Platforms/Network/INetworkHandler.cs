@@ -7,17 +7,27 @@ namespace ShortDev.Microsoft.ConnectedDevices.Platforms.Network;
 
 public interface INetworkHandler : ICdpPlatformHandler
 {
-    string GetLocalIp();
+    IPAddress GetLocalIp();
 
-    public static string GetLocalIpDefault()
+    public IPAddress? TryGetLocalIp()
+    {
+        try
+        {
+            return GetLocalIp();
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    public static IPAddress GetLocalIpDefault()
     {
         var data = Dns.GetHostEntry(string.Empty).AddressList;
-        var ips = Dns.GetHostEntry(string.Empty).AddressList
+        var ip = Dns.GetHostEntry(string.Empty).AddressList
             .Where((x) => x.AddressFamily == AddressFamily.InterNetwork)
-            .ToArray();
-        if (ips.Length != 1)
-            throw new InvalidDataException("Could not resolve ip");
+            .FirstOrDefault();
 
-        return ips[0].ToString();
+        return ip ?? throw new InvalidDataException("Could not resolve ip");
     }
 }

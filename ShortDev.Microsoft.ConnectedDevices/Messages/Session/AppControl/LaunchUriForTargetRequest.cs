@@ -6,7 +6,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Messages.Session.AppControl;
 
 public sealed class LaunchUriForTargetRequest : ICdpPayload<LaunchUriForTargetRequest>
 {
-    public static LaunchUriForTargetRequest Parse(EndianReader reader)
+    public static LaunchUriForTargetRequest Parse(ref EndianReader reader)
         => new()
         {
             Uri = reader.ReadStringWithLength(),

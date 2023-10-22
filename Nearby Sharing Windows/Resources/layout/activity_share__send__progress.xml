@@ -31,14 +31,15 @@
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/user"/>
+                android:src="@drawable/ic_fluent_person_24_regular"
+                android:tint="?attr/colorSecondary" />
             <ImageView
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:scaleType="centerCrop"
                 android:id="@+id/doneIndicatorImageView"
                 android:visibility="gone"
-                android:src="@drawable/done"/>
+                android:src="@drawable/done_indicator"/>
         </androidx.cardview.widget.CardView>
     </RelativeLayout>
     <TextView

@@ -25,57 +25,59 @@ while (true)
 
     EndianReader reader = new(Endianness.BigEndian, buffer);
 
-    if (!CommonHeader.TryParse(reader, out var header, out _) || header == null)
+    if (!CommonHeader.TryParse(ref reader, out var header, out _) || header == null)
         throw new InvalidDataException();
 
-    HandleMessage(header, cryptor.Read(reader, header));
+    cryptor.Read(ref reader, header);
+    HandleMessage(header, reader);
 
     Console.ReadLine();
 }
 
-void HandleMessage(CommonHeader header, EndianReader reader)
+#pragma warning disable IDE0059 // Unnecessary assignment of a value
+static void HandleMessage(CommonHeader header, EndianReader reader)
 {
     if (header.Type == MessageType.Connect)
     {
-        ConnectionHeader connectionHeader = ConnectionHeader.Parse(reader);
+        ConnectionHeader connectionHeader = ConnectionHeader.Parse(ref reader);
         switch (connectionHeader.MessageType)
         {
             case ConnectionType.ConnectRequest:
                 {
-                    ConnectionRequest msg = ConnectionRequest.Parse(reader);
+                    ConnectionRequest msg = ConnectionRequest.Parse(ref reader);
                     break;
                 }
             case ConnectionType.ConnectResponse:
                 {
-                    ConnectionResponse msg = ConnectionResponse.Parse(reader);
+                    ConnectionResponse msg = ConnectionResponse.Parse(ref reader);
                     break;
                 }
             case ConnectionType.DeviceAuthRequest:
             case ConnectionType.DeviceAuthResponse:
                 {
-                    AuthenticationPayload msg = AuthenticationPayload.Parse(reader);
+                    AuthenticationPayload msg = AuthenticationPayload.Parse(ref reader);
                     break;
                 }
             case ConnectionType.DeviceInfoMessage:
                 {
-                    var msg = DeviceInfoMessage.Parse(reader);
+                    var msg = DeviceInfoMessage.Parse(ref reader);
                     break;
                 }
         }
     }
     else if (header.Type == MessageType.Session)
     {
-        BinaryMsgHeader binaryHeader = BinaryMsgHeader.Parse(reader);
-        var valueSet = ValueSet.Parse(reader);
+        BinaryMsgHeader binaryHeader = BinaryMsgHeader.Parse(ref reader);
+        var valueSet = ValueSet.Parse(ref reader);
         Debug.Print(JsonSerializer.Serialize(valueSet));
     }
     else if (header.Type == MessageType.Control)
     {
-        ControlHeader controlHeader = ControlHeader.Parse(reader);
+        ControlHeader controlHeader = ControlHeader.Parse(ref reader);
         switch (controlHeader.MessageType)
         {
             case ControlMessageType.StartChannelRequest:
-                StartChannelRequest startChannelRequest = StartChannelRequest.Parse(reader);
+                StartChannelRequest startChannelRequest = StartChannelRequest.Parse(ref reader);
                 break;
             case ControlMessageType.StartChannelResponse:
                 break;
@@ -93,16 +95,5 @@ void HandleMessage(CommonHeader header, EndianReader reader)
     {
         Console.WriteLine();
         //Console.WriteLine(BinaryConvert.ToString(reader.ReadPayload()));
-    }
-}
-
-class PlatformHandler : INetworkHandler
-{
-    public string GetLocalIp()
-        => "127.0.0.1";
-
-    public void Log(int a, string msg)
-    {
-
     }
 }

@@ -14,7 +14,7 @@ public sealed class UpgradeResponse : ICdpPayload<UpgradeResponse>
     public required EndpointInfo[] Endpoints { get; init; }
     public required EndpointMetadata[] MetaData { get; init; }
 
-    public static UpgradeResponse Parse(EndianReader reader)
+    public static UpgradeResponse Parse(ref EndianReader reader)
     {
         var length = reader.ReadUInt16();
         var endpoints = new EndpointInfo[length];
@@ -27,7 +27,7 @@ public sealed class UpgradeResponse : ICdpPayload<UpgradeResponse>
             endpoints[i] = new(type, host, service);
         }
 
-        var metaData = EndpointMetadata.ParseArray(reader);
+        var metaData = EndpointMetadata.ParseArray(ref reader);
 
         return new()
         {

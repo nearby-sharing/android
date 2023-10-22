@@ -1,25 +1,16 @@
 <resources>
-
-	<!-- Base application theme. -->
 	<style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
-		<!-- Customize your theme here. -->
-		<item name="colorPrimary">@color/colorPrimary</item>
-		<item name="colorOnPrimary">#fff</item>
-		<item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-		<item name="colorAccent">@color/colorAccent</item>
-		<item name="android:statusBarColor">?attr/colorPrimary</item>
+		<item name="dynamicColorThemeOverlay">@style/ThemeOverlay.Material3.DynamicColors.DayNight</item>
 		<item name="actionBarTheme">@style/ThemeOverlay.Material3.Dark.ActionBar</item>
-		<item name="actionOverflowButtonStyle">@style/OverflowButtonStyle</item>
-		<item name="preferenceTheme">@style/AppTheme.Preference</item>
+		<item name="preferenceTheme">@style/App.Preferences</item>
+		<item name="android:windowTranslucentStatus">true</item>
+		<item name="switchStyle">@style/Widget.Material3.CompoundButton.MaterialSwitch</item>
 	</style>
 
-	<style name="AppTheme.Preference" parent="@style/Theme.Material3.DayNight.Dialog">
-		<item name="android:textColorPrimary">#222</item>
-		<item name="android:textColorSecondary">#222</item>
-	</style>
-
-	<style name="OverflowButtonStyle" parent="Widget.AppCompat.ActionButton.Overflow">
-		<item name="android:tint">#fff</item>
+	<style name="App.Preferences" parent="@style/PreferenceTheme.SettingsLib">
+		<item name="preferenceCategoryTitleTextAppearance">?attr/textAppearanceTitleSmall</item>
+		<item name="preferenceCategoryTitleTextColor">?attr/colorSecondary</item>
+		<item name="android:tint">?attr/colorPrimary</item>
 	</style>
 
 	<style name="AppTheme.TranslucentOverlay" parent="AppTheme">
@@ -30,11 +21,6 @@
 		<item name="windowNoTitle">true</item>
 		<item name="android:windowTranslucentStatus">true</item>
 		<item name="android:windowTranslucentNavigation">true</item>
-	</style>
-
-	<style name="AppTheme.NearbyShareButton" parent="@style/Widget.Material3.Button.Icon">
-		<item name="colorSurface">#0B57D0</item>
-		<item name="colorOnSurface">#fff</item>
 	</style>
 
 </resources>

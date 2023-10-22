@@ -68,7 +68,7 @@ public sealed class SerializationTest
 
             // parse
             EndianReader reader = new(endianness, writtenMemory1.Span);
-            var parsedObject = T.Parse(reader);
+            var parsedObject = T.Parse(ref reader);
 
             // write - 2nd pass
             writer = new(endianness);

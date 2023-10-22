@@ -2,17 +2,7 @@
 This repo contains a fully functional [implementation](ShortDev.Microsoft.ConnectedDevices.NearShare/) of the Microsoft `NearShare` protocol that can interop with the windows built-in sharing functionality ([See `Project Rome`]( https://github.com/microsoft/project-rome)).   
 There's also an [android app](Nearby%20Sharing%20Windows/) to share (send and receive) files and websites between your phone and PC using this lib.
 
-[![grafic](https://img.shields.io/static/v1?style=for-the-badge&labelColor=212225&logoColor=fff&color=37393E&label=GitHub&message=Source-Code&logo=GitHub)](https://github.com/ShortDevelopment/Nearby-Sharing-Windows/)   
-[![grafic](https://img.shields.io/static/v1?style=for-the-badge&labelColor=212225&logoColor=fff&color=EA4AAA&label=GitHub&message=Support&logo=github-sponsors)](https://github.com/sponsors/ShortDevelopment)
-
-## Download
-[![grafic](https://img.shields.io/static/v1?style=for-the-badge&labelColor=212225&logoColor=fff&color=green&label=PlayStore&message=Stable&logo=google-play)](https://play.google.com/store/apps/details?id=de.shortdev.nearby_sharing_windows)   
-[![grafic](https://img.shields.io/static/v1?style=for-the-badge&labelColor=212225&logoColor=fff&color=yellow&label=PlayStore&message=Preview&logo=google-play)](https://play.google.com/apps/testing/de.shortdev.nearby_sharing_windows)
-
-## Community / Feedback / Help
-[![grafic](https://img.shields.io/static/v1?style=for-the-badge&labelColor=212225&logoColor=fff&color=37393E&label=FAQ&message=Open&logo=GitHubPages)](https://nearshare.shortdev.de/docs/FAQ)    
-[![grafic](https://img.shields.io/static/v1?style=for-the-badge&labelColor=212225&logoColor=fff&color=37393E&label=Setup&message=Windows&logo=windows)](https://nearshare.shortdev.de/docs/setup)    
-[![grafic](https://img.shields.io/static/v1?style=for-the-badge&labelColor=212225&logoColor=fff&color=37393E&label=Discord&message=Join&logo=discord)](https://discord.gg/ArFA3Nymr2)
+Visit [nearshare.shortdev.de](https://nearshare.shortdev.de) to get started!
 
 ## Translations
 
@@ -26,6 +16,7 @@ There's also an [android app](Nearby%20Sharing%20Windows/) to share (send and re
  - Chinese (Simplified)
  - French
  - Romanian
+ - Polish
  
 </details>
 

@@ -41,16 +41,14 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
                     android:text="@string/generic_send"
-                    app:icon="@drawable/file_upload_48"
-                    style="@style/AppTheme.NearbyShareButton" />
+                    app:icon="@drawable/ic_fluent_send_copy_24_regular" />
                 <Button
                     android:id="@+id/receiveButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
                     android:text="@string/generic_receive"
-                    app:icon="@drawable/ic_fluent_mail_inbox_24_regular"
-                    style="@style/AppTheme.NearbyShareButton" />
+                    app:icon="@drawable/ic_fluent_mail_inbox_24_regular" />
             </LinearLayout>
         </LinearLayout>
 

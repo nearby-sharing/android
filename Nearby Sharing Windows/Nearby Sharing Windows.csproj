@@ -7,48 +7,26 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<ApplicationId>de.shortdev.nearby_sharing_windows</ApplicationId>
-		<ApplicationVersion>16</ApplicationVersion>
-		<ApplicationDisplayVersion>1.3.3-beta</ApplicationDisplayVersion>
+		<ApplicationVersion>21</ApplicationVersion>
+		<ApplicationDisplayVersion>1.5.2-beta</ApplicationDisplayVersion>
 		<UseAndroidCrypto>true</UseAndroidCrypto>
+		<AndroidErrorOnCustomJavaObject>false</AndroidErrorOnCustomJavaObject>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-	  <EnableLLVM>True</EnableLLVM>
-	  <RunAOTCompilation>False</RunAOTCompilation>
-	  <TrimMode>copyused</TrimMode>
-	  <AndroidLinkTool>r8</AndroidLinkTool>
-	  <AndroidPackageFormat>aab</AndroidPackageFormat>
-	  <AndroidUseAapt2>True</AndroidUseAapt2>
-	  <AndroidCreatePackagePerAbi>False</AndroidCreatePackagePerAbi>
+		<RunAOTCompilation>False</RunAOTCompilation>
+		<PublishTrimmed>false</PublishTrimmed>
+		<AndroidPackageFormat>aab</AndroidPackageFormat>
 	</PropertyGroup>
 	<ItemGroup>
-		<None Remove="Assets\de\Welcome.html" />
-		<None Remove="Assets\en\Welcome.html" />
-		<None Remove="Assets\MacAddressInfo.html" />
-		<None Remove="Assets\MacAddressInfo_en.html" />
-		<None Remove="Resources\drawable\quick_settings_tile_icon.xml" />
-		<None Remove="Resources\layout\activity_receive.xml" />
-		<None Remove="Resources\layout\activity_settings.xml" />
-		<None Remove="Resources\layout\activity_share__device_select.xml" />
-		<None Remove="Resources\layout\activity_share__send.xml" />
-		<None Remove="Resources\layout\activity_share__send__progress.xml" />
-		<None Remove="Resources\layout\item_transfer_notification.xml" />
-		<None Remove="Resources\layout\layout_appbar.xml" />
-		<None Remove="Resources\values-de\strings.xml" />
-		<None Remove="Resources\xml\file_paths.xml" />
-		<None Remove="Resources\xml\preferences.xml" />
+		<PackageReference Include="Sentry" Version="3.31.0" />
+		<PackageReference Include="ShortDev.Android.FluentIcons" Version="1.1.203" />
+		<PackageReference Include="Xamarin.AndroidX.AppCompat" Version="1.6.1.1" />
+		<PackageReference Include="Xamarin.Google.Android.Material" Version="1.8.0.1" />
+		<PackageReference Include="Xamarin.Essentials" Version="1.7.5" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Xamarin.AndroidX.AppCompat" Version="1.5.1" />
-		<PackageReference Include="Xamarin.AndroidX.Preference" Version="1.2.0.2" />
-		<PackageReference Include="Xamarin.Google.Android.Material" Version="1.6.1.1" />
-		<PackageReference Include="Xamarin.Essentials" Version="1.7.3" />
-	</ItemGroup>
-	<ItemGroup>
-		<ProjectReference Include="..\ShortDev.Android.FluentIcons\ShortDev.Android.FluentIcons.csproj" />
-		<ProjectReference Include="..\ShortDev.Android\ShortDev.Android.csproj">
-			<Project>{195c941f-5eef-45a9-a65c-16186e4bb131}</Project>
-			<Name>ShortDev.Android</Name>
-		</ProjectReference>
+		<ProjectReference Include="..\lib\ShortDev.Android.Preferences\ShortDev.Android.Preferences.csproj" />
+		<ProjectReference Include="..\lib\ShortDev.Android\ShortDev.Android.csproj" />
 		<ProjectReference Include="..\ShortDev.Microsoft.ConnectedDevices.NearShare\ShortDev.Microsoft.ConnectedDevices.NearShare.csproj" />
 		<ProjectReference Include="..\ShortDev.Networking\ShortDev.Networking.csproj">
 			<Project>{18fcc134-71cc-4be9-9271-3839a6ffe380}</Project>
@@ -56,6 +34,6 @@
 		</ProjectReference>
 	</ItemGroup>
 	<ItemGroup>
-		<TransformFile Include="Resources\xml\preferences.xml" />
+		<AndroidAsset Include="../Credits.md" Link="Assets/Credits.md" />
 	</ItemGroup>
 </Project>

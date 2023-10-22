@@ -1,4 +1,6 @@
-﻿namespace ShortDev.Microsoft.ConnectedDevices.NearShare;
+﻿using System.Collections;
+
+namespace ShortDev.Microsoft.ConnectedDevices.NearShare;
 
 public abstract class TransferToken
 {
@@ -10,12 +12,13 @@ public sealed class UriTransferToken : TransferToken
     public required string Uri { get; init; }
 }
 
-public sealed class FileTransferToken : TransferToken
+public record struct FileShareInfo(uint Id, string Name, ulong Size);
+
+public sealed class FileTransferToken : TransferToken, IEnumerable<FileShareInfo>
 {
-    public required string FileName { get; init; }
-
-    public required ulong FileSize { get; init; }
-
+    public required uint TotalFilesToSend { get; init; }
+    public required ulong TotalBytesToSend { get; init; }
+    public required IReadOnlyList<FileShareInfo> Files { get; init; }
 
     #region Formatting
     public static string FormatFileSize(ulong fileSize)
@@ -36,51 +39,75 @@ public sealed class FileTransferToken : TransferToken
         => Math.Round((decimal)size / unit, 2);
     #endregion
 
-
     #region Acceptance
-    readonly TaskCompletionSource<FileStream> _promise = new();
-    internal Task TaskInternal
-        => _promise.Task;
+    readonly TaskCompletionSource<IReadOnlyList<Stream>> _promise = new();
+    internal async ValueTask AwaitAcceptance()
+        => await _promise.Task;
 
-    internal FileStream Stream
-        => _promise.Task.Result;
+    public bool IsAccepted
+        => _promise.Task.IsCompletedSuccessfully;
 
-    public bool IsAccepted { get; private set; }
-
-    public void Accept(FileStream fileStream)
+    public void Accept(IReadOnlyList<Stream> fileStream)
     {
+        if (fileStream.Count != TotalFilesToSend)
+            throw new ArgumentException("Invalid number of streams", nameof(fileStream));
+
         _promise.SetResult(fileStream);
-        IsAccepted = true;
     }
 
     public void Cancel()
         => _promise.TrySetCanceled();
+
+    internal Stream GetStream(uint contentId)
+    {
+        for (int i = 0; i < Files.Count; i++)
+        {
+            if (Files[i].Id == contentId)
+                return _promise.Task.Result[i];
+        }
+
+        throw new ArgumentOutOfRangeException(nameof(contentId));
+    }
     #endregion
 
 
     #region Progress
-    ulong _receivedBytes;
-    public ulong ReceivedBytes
+    public bool IsTransferComplete { get; internal set; }
+
+    public event Action<NearShareProgress>? Progress;
+
+    internal ulong BytesSent { get; set; }
+    internal uint FilesSent { get; set; }
+
+    internal void SendProgressEvent()
     {
-        get => _receivedBytes;
-        internal set
+        NearShareProgress progress = new()
         {
-            _receivedBytes = value;
-            if (value >= FileSize)
-                IsTransferComplete = true;
-
-            Progress?.Invoke(this);
-        }
-    }
-
-    public bool IsTransferComplete { get; private set; }
-
-    public event Action<FileTransferToken>? Progress;
-
-    public void SetProgressListener(Action<FileTransferToken> listener)
-    {
-        ArgumentNullException.ThrowIfNull(listener);
-        Progress = listener;
+            BytesSent = BytesSent,
+            FilesSent = FilesSent,
+            TotalBytesToSend = TotalBytesToSend,
+            TotalFilesToSend = TotalFilesToSend,
+        };
+        IsTransferComplete = progress.BytesSent >= progress.TotalBytesToSend;
+        _ = Task.Run(() => Progress?.Invoke(progress));
     }
     #endregion
+
+    #region Info
+    public IEnumerator<FileShareInfo> GetEnumerator()
+        => Files.GetEnumerator();
+
+    IEnumerator IEnumerable.GetEnumerator()
+        => GetEnumerator();
+    #endregion
+
+    internal void Close()
+    {
+        foreach (var stream in _promise.Task.Result)
+        {
+            stream.Flush();
+            stream.Close();
+            stream.Dispose();
+        }
+    }
 }

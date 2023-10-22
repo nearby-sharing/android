@@ -15,12 +15,10 @@ public readonly struct CdpNonce
 
     public static unsafe CdpNonce Create()
     {
-        using (RandomNumberGenerator cryptographicRandom = RandomNumberGenerator.Create())
-        {
-            Span<byte> buffer = stackalloc byte[sizeof(Int64)];
-            cryptographicRandom.GetBytes(buffer);
-            fixed (byte* pBuffer = buffer)
-                return new(*(ulong*)pBuffer);
-        }
+        using RandomNumberGenerator cryptographicRandom = RandomNumberGenerator.Create();
+        Span<byte> buffer = stackalloc byte[sizeof(Int64)];
+        cryptographicRandom.GetBytes(buffer);
+        fixed (byte* pBuffer = buffer)
+            return new(*(ulong*)pBuffer);
     }
 }

@@ -1,20 +1,19 @@
 ﻿using Android.Content;
 using Android.Content.PM;
-using Android.Drm;
 using Android.Text;
 using Android.Views;
 using AndroidX.AppCompat.App;
 using AndroidX.Browser.CustomTabs;
 using AndroidX.Core.App;
-using AndroidX.Core.Content;
+using Google.Android.Material.Dialog;
+using Nearby_Sharing_Windows.Settings;
 using CompatToolbar = AndroidX.AppCompat.Widget.Toolbar;
-using ManifestPermission = Android.Manifest.Permission;
 
 namespace Nearby_Sharing_Windows;
 
 internal static class UIHelper
 {
-    public const ConfigChanges ConfigChangesFlags = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.Density;
+    public const ConfigChanges ConfigChangesFlags = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.Density;
 
     public static bool OnCreateOptionsMenu(Activity activity, IMenu? menu)
     {
@@ -45,27 +44,55 @@ internal static class UIHelper
     public static void OpenSponsor(Activity activity)
         => DisplayWebSite(activity, "https://nearshare.shortdev.de/docs/sponsor");
 
+    public static void OpenDiscord(Activity activity)
+        => DisplayWebSite(activity, "https://nearshare.shortdev.de/docs/discord");
+
+    public static void OpenSetup(Activity activity)
+        => DisplayWebSite(activity, "https://nearshare.shortdev.de/docs/setup");
+
+    public static void OpenCredits(Activity activity)
+        => DisplayWebSite(activity, "https://nearshare.shortdev.de/CREDITS");
+
+    public static void OpenGitHub(Activity activity)
+        => DisplayWebSite(activity, "https://github.com/ShortDevelopment/Nearby-Sharing-Windows/");
+
     public static void DisplayWebSite(Activity activity, string url)
     {
         CustomTabsIntent intent = new CustomTabsIntent.Builder()
             .Build();
-        intent.LaunchUrl(activity, Android.Net.Uri.Parse(url));
+        intent.LaunchUrl(activity, AndroidUri.Parse(url));
     }
 
-    public static void OpenFile(Activity activity, string path)
+    public static void OpenLocaleSettings(Activity activity)
     {
-        Intent intent = new(Intent.ActionView);
-        var contentUri = FileProvider.GetUriForFile(activity, "de.shortdev.nearshare.FileProvider", new Java.IO.File(path))!;
+        if (!OperatingSystem.IsAndroidVersionAtLeast(33))
+        {
+            new MaterialAlertDialogBuilder(activity)
+                .SetMessage("Only supported on Android 13+")!
+                .SetNeutralButton("Ok", (s, e) => { })!
+                .Show();
+            return;
+        }
 
-        var mimeType = activity.ContentResolver?.GetType(contentUri);
-        if (string.IsNullOrEmpty(mimeType))
-            intent.SetData(contentUri);
-        else
-            intent.SetDataAndType(contentUri, mimeType);
+        try
+        {
+            Intent intent = new(Android.Provider.Settings.ActionAppLocaleSettings);
+            intent.SetData(AndroidUri.FromParts("package", activity.PackageName, null));
+            activity.StartActivity(intent);
+        }
+        catch (Exception ex)
+        {
+            new MaterialAlertDialogBuilder(activity)
+                .SetMessage("Your phone does not support language settings!\n" + ex.Message)!
+                .SetNeutralButton("Ok", (s, e) => { })!
+                .Show();
+        }
+    }
 
-        intent.SetFlags(ActivityFlags.GrantReadUriPermission | ActivityFlags.NewTask);
-        var chooserIntent = Intent.CreateChooser(intent, $"Open {Path.GetFileName(path)}");
-        activity.StartActivity(chooserIntent);
+    public static void ViewDownloads(this Activity activity)
+    {
+        Intent intent = new(DownloadManager.ActionViewDownloads);
+        activity.StartActivity(intent);
     }
 
     public static void SetupToolBar(AppCompatActivity activity, string? subtitle = null)
@@ -75,34 +102,51 @@ internal static class UIHelper
         activity.SupportActionBar!.Subtitle = subtitle;
     }
 
-    public static void RequestReceivePermissions(Activity activity)
+    #region Permissions
+    private static readonly string[] _sendPermissions = new[]
     {
-        ActivityCompat.RequestPermissions(activity, new[] {
-            ManifestPermission.AccessFineLocation,
-            ManifestPermission.AccessCoarseLocation,
-            ManifestPermission.AccessWifiState,
-            ManifestPermission.Bluetooth,
-            ManifestPermission.BluetoothScan,
-            ManifestPermission.BluetoothConnect,
-            ManifestPermission.BluetoothAdvertise,
-            ManifestPermission.AccessBackgroundLocation,
-            ManifestPermission.ReadExternalStorage,
-            ManifestPermission.WriteExternalStorage
-        }, 0);
-    }
+        ManifestPermission.AccessFineLocation,
+        ManifestPermission.AccessCoarseLocation,
+        // Api level 31
+        ManifestPermission.BluetoothScan,
+        ManifestPermission.BluetoothConnect
+    };
+    public static void RequestSendPermissions(Activity activity)
+        => ActivityCompat.RequestPermissions(activity, _sendPermissions, 0);
+
+    private static readonly string[] _receivePermissions = new[]
+    {
+        ManifestPermission.AccessFineLocation,
+        ManifestPermission.AccessCoarseLocation,
+        ManifestPermission.AccessWifiState,
+        ManifestPermission.Bluetooth,
+        ManifestPermission.BluetoothScan,
+        ManifestPermission.BluetoothConnect,
+        ManifestPermission.BluetoothAdvertise,
+        // ManifestPermission.AccessBackgroundLocation, See #109 and #41
+        ManifestPermission.ReadExternalStorage,
+        ManifestPermission.WriteExternalStorage
+    };
+    public static void RequestReceivePermissions(Activity activity)
+        => ActivityCompat.RequestPermissions(activity, _receivePermissions, 0);
+    #endregion
 
     public static ISpanned LoadHtmlAsset(Activity activity, string assetPath)
     {
         string langCode = activity.GetString(Resource.String.assets_prefix);
         string fileName = $"{assetPath}.html";
-        if (!activity.Assets!.List($"{langCode}/").Contains(fileName))
+        if (!activity.Assets!.List($"{langCode}/")!.Contains(fileName))
             langCode = "en";
 
         using var stream = activity.Assets!.Open($"{langCode}/{fileName}");
         using StreamReader reader = new(stream);
-#pragma warning disable CS0618 // Type or member is obsolete
-        return Html.FromHtml(reader.ReadToEnd())!;
-#pragma warning restore CS0618 // Type or member is obsolete
+
+        ISpanned? result;
+        if (OperatingSystem.IsAndroidVersionAtLeast(24))
+            result = Html.FromHtml(reader.ReadToEnd(), FromHtmlOptions.ModeLegacy);
+        else
+            result = Html.FromHtml(reader.ReadToEnd());
+        return result ?? throw new NullReferenceException("\"Html.FromHtml\" returned \"null\"");
     }
 
     public static string Localize(this Activity activity, int resId, params object[] args)

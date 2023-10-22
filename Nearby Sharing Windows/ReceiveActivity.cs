@@ -6,11 +6,14 @@ using Android.Views;
 using AndroidX.AppCompat.App;
 using AndroidX.RecyclerView.Widget;
 using Google.Android.Material.ProgressIndicator;
+using Nearby_Sharing_Windows.Settings;
 using ShortDev.Android.UI;
 using ShortDev.Microsoft.ConnectedDevices;
 using ShortDev.Microsoft.ConnectedDevices.Encryption;
 using ShortDev.Microsoft.ConnectedDevices.NearShare;
 using ShortDev.Microsoft.ConnectedDevices.Platforms;
+using ShortDev.Microsoft.ConnectedDevices.Platforms.Bluetooth;
+using ShortDev.Microsoft.ConnectedDevices.Platforms.Network;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -51,6 +54,9 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
         notificationsRecyclerView = FindViewById<RecyclerView>(Resource.Id.notificationsRecyclerView)!;
         notificationsRecyclerView.SetLayoutManager(new LinearLayoutManager(this));
 
+        debugLogTextView = FindViewById<TextView>(Resource.Id.debugLogTextView)!;
+        debugLogTextView.SetTextIsSelectable(true);
+
         adapterDescriptor = new(
             Resource.Layout.item_transfer_notification,
             (view, transfer) =>
@@ -62,46 +68,46 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
 
                 if (transfer is FileTransferToken fileTransfer)
                 {
-                    fileNameTextView.Text = fileTransfer.FileName;
-                    detailsTextView.Text = $"{fileTransfer.DeviceName} • {FileTransferToken.FormatFileSize(fileTransfer.FileSize)}";
+                    fileNameTextView.Text = string.Join(", ", fileTransfer.Files.Select(x => x.Name));
+                    detailsTextView.Text = $"{fileTransfer.DeviceName} • {FileTransferToken.FormatFileSize(fileTransfer.TotalBytesToSend)}";
 
                     var loadingProgressIndicator = view.FindViewById<CircularProgressIndicator>(Resource.Id.loadingProgressIndicator)!;
-                    Action onCompleted = () =>
+                    void onCompleted()
                     {
                         acceptButton.Visibility = ViewStates.Gone;
                         loadingProgressIndicator.Visibility = ViewStates.Gone;
                         openButton.Visibility = ViewStates.Visible;
-                        openButton.SetOnClickListener(new DelegateClickListener((s, e) => UIHelper.OpenFile(this, GetFilePath(fileTransfer.FileName))));
-                    };
+                        openButton.Click += (_, _) => this.ViewDownloads();
+                    }
                     if (fileTransfer.IsTransferComplete)
                         onCompleted();
                     else
                     {
-                        Action onAccept = () =>
+                        void onAccept()
                         {
                             if (!fileTransfer.IsAccepted)
-                                fileTransfer.Accept(CreateFile(fileTransfer.FileName));
+                                fileTransfer.Accept(CreateFiles(fileTransfer));
 
                             acceptButton.Visibility = ViewStates.Gone;
                             loadingProgressIndicator.Visibility = ViewStates.Visible;
 
                             loadingProgressIndicator.Progress = 0;
-                            Action<bool> onProgress = (animate) =>
+                            void onProgress(NearShareProgress progress, bool animate)
                             {
                                 loadingProgressIndicator.Indeterminate = false;
 
-                                int progress = Math.Min((int)(fileTransfer.ReceivedBytes * 100 / fileTransfer.FileSize), 100);
+                                int progressInt = Math.Min((int)(progress.BytesSent * 100 / progress.TotalBytesToSend), 100);
                                 if (OperatingSystem.IsAndroidVersionAtLeast(24))
-                                    loadingProgressIndicator.SetProgress(progress, animate);
+                                    loadingProgressIndicator.SetProgress(progressInt, animate);
                                 else
-                                    loadingProgressIndicator.Progress = progress;
+                                    loadingProgressIndicator.Progress = progressInt;
 
                                 if (fileTransfer.IsTransferComplete)
                                     onCompleted();
-                            };
-                            fileTransfer.SetProgressListener((s) => RunOnUiThread(() => onProgress(/*animate*/true)));
+                            }
+                            fileTransfer.Progress += progress => RunOnUiThread(() => onProgress(progress, animate: true));
                             loadingProgressIndicator.Indeterminate = true;
-                        };
+                        }
                         if (fileTransfer.IsAccepted)
                             onAccept();
                         else
@@ -144,72 +150,50 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
         var service = (BluetoothManager)GetSystemService(BluetoothService)!;
         _btAdapter = service.Adapter!;
 
-        FindViewById<TextView>(Resource.Id.deviceInfoTextView)!.Text = this.Localize(
-            Resource.String.visible_as_template,
-            $"{_btAdapter.Name!}.\n" +
-            $"Address: {btAddress.ToStringFormatted()}\n" +
-            $"IP-Address: {AndroidNetworkHandler.GetLocalIp(this)}");
-        debugLogTextView = FindViewById<TextView>(Resource.Id.debugLogTextView)!;
+        var deviceName = SettingsFragment.GetDeviceName(this, _btAdapter);
 
         SystemDebug.Assert(_cdp == null);
 
         _cdp = new(new()
         {
             Type = DeviceType.Android,
-            Name = _btAdapter.Name ?? throw new NullReferenceException("Could not find device name"),
+            Name = deviceName,
             OemModelName = Build.Model ?? string.Empty,
             OemManufacturerName = Build.Manufacturer ?? string.Empty,
             DeviceCertificate = ConnectedDevicesPlatform.CreateDeviceCertificate(CdpEncryptionParams.Default),
-            LoggerFactory = ConnectedDevicesPlatform.CreateLoggerFactory(Log)
+            LoggerFactory = ConnectedDevicesPlatform.CreateLoggerFactory(Log, this.GetLogFilePattern())
         });
 
-        AndroidBluetoothHandler bluetoothHandler = new(this, _btAdapter, btAddress);
+        IBluetoothHandler bluetoothHandler = new AndroidBluetoothHandler(this, _btAdapter, btAddress);
         _cdp.AddTransport<BluetoothTransport>(new(bluetoothHandler));
 
-        AndroidNetworkHandler networkHandler = new(this, this);
+        INetworkHandler networkHandler = new AndroidNetworkHandler(this, this);
         _cdp.AddTransport<NetworkTransport>(new(networkHandler));
 
         _cdp.Listen(_cancellationTokenSource.Token);
-        _cdp.Advertise(new CdpAdvertisement(
-            DeviceType.Android,
-            btAddress, // "00:fa:21:3e:fb:19"
-            _btAdapter.Name!
-        ), _cancellationTokenSource.Token);
+        _cdp.Advertise(_cancellationTokenSource.Token);
 
         NearShareReceiver.Start(_cdp, this);
-    }
 
-    string GetFilePath(string name)
-    {
-        var downloadDir = Path.Combine(GetExternalMediaDirs()?.FirstOrDefault()?.AbsolutePath ?? "/sdcard/", "Download");
-        if (!Directory.Exists(downloadDir))
-            Directory.CreateDirectory(downloadDir);
-
-        return Path.Combine(
-            downloadDir,
-            name
+        FindViewById<TextView>(Resource.Id.deviceInfoTextView)!.Text = this.Localize(
+            Resource.String.visible_as_template,
+            $"\"{deviceName}\".\n" +
+            $"Address: {btAddress.ToStringFormatted()}\n" +
+            $"IP-Address: {networkHandler.TryGetLocalIp()?.ToString() ?? "null"}"
         );
     }
 
-    FileStream CreateFile(string name)
-    {
-        var path = GetFilePath(name);
-        Log($"Saving file to \"{path}\"");
-        return File.Create(path);
-
-        // ToDo: OutputStream cannot seek!
-        //ContentValues contentValues = new();
-        //contentValues.Put(MediaStore.IMediaColumns.RelativePath, Path.Combine(Android.OS.Environment.DirectoryDownloads!, name));
-        //var uri = ContentResolver!.Insert(MediaStore.Files.GetContentUri("external")!, contentValues)!;
-        //return ContentResolver!.OpenOutputStream(uri, "rwt")!;
-    }
+    IReadOnlyList<Stream> CreateFiles(FileTransferToken token)
+        => token.Select(file => this.CreateDownloadFile(file.Name)).ToArray();
 
     public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
     {
-        if (!grantResults.All((x) => x != Permission.Granted))
-            InitializeCDP();
-        else
+        if (grantResults.Any((x) => x == Permission.Denied))
+        {
             Toast.MakeText(this, this.Localize(Resource.String.receive_missing_permissions), ToastLength.Long)!.Show();
+        }
+
+        InitializeCDP();
     }
 
     public override bool OnCreateOptionsMenu(IMenu? menu)
@@ -225,8 +209,6 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
         NearShareReceiver.Stop();
         base.Finish();
     }
-
-
 
     public void Log(string message)
     {

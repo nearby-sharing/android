@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<linker>
+	<assembly fullname="Bond.Attributes" preserve="all" />
+	<assembly fullname="Bond" preserve="all" />
+	<assembly fullname="Bond.IO" preserve="all" />
+	<assembly fullname="Bond.JSON" preserve="all" />
+	<assembly fullname="Bond.Reflection" preserve="all" />
+</linker>

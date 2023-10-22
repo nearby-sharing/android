@@ -36,7 +36,7 @@ public sealed class AndroidBluetoothHandler : IBluetoothHandler
             {
                 var address = result.Device?.Address ?? throw new InvalidDataException("No address");
                 var beaconData = result.ScanRecord?.GetManufacturerSpecificData(Constants.BLeBeaconManufacturerId);
-                if (beaconData != null && CdpAdvertisement.TryParse(beaconData, out var data))
+                if (beaconData != null && BLeBeacon.TryParse(beaconData, out var data))
                     scanOptions.OnDeviceDiscovered?.Invoke(data);
             }
             catch (InvalidDataException) { }
@@ -89,7 +89,7 @@ public sealed class AndroidBluetoothHandler : IBluetoothHandler
             .Build();
 
         var data = new AdvertiseData.Builder()
-            .AddManufacturerData(options.ManufacturerId, options.BeaconData!)!
+            .AddManufacturerData(options.ManufacturerId, options.BeaconData.ToArray())!
             .Build();
 
         BLeAdvertiseCallback callback = new();
@@ -113,11 +113,17 @@ public sealed class AndroidBluetoothHandler : IBluetoothHandler
             options.ServiceName,
             Java.Util.UUID.FromString(options.ServiceId)
         )!;
-        while (true)
+
+        cancellationToken.Register(() => listener.Close());
+
+        while (!cancellationToken.IsCancellationRequested)
         {
             var socket = await listener.AcceptAsync();
             if (cancellationToken.IsCancellationRequested)
+            {
+                socket?.Dispose();
                 return;
+            }
 
             if (socket != null)
                 options!.SocketConnected!(socket.ToCdp());

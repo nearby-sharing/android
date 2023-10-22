@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Buffers;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.NetworkInformation;
 using System.Security.Cryptography;
 using System.Threading;
@@ -37,4 +40,53 @@ public static class Extensions
 
     public static string ToStringFormatted(this PhysicalAddress @this)
         => string.Join(':', Array.ConvertAll(@this.GetAddressBytes(), (x) => x.ToString("X2")));
+
+    public static void DisposeAll(params IEnumerable<IDisposable>[] disposables)
+        => disposables.SelectMany(x => x).DisposeAll();
+
+    public static void DisposeAll<T>(this IEnumerable<T> disposables) where T : IDisposable
+    {
+        List<Exception> exceptions = new();
+
+        foreach (var disposable in disposables)
+        {
+            try
+            {
+                disposable.Dispose();
+            }
+            catch (Exception ex)
+            {
+                exceptions.Add(ex);
+            }
+        }
+
+        if (exceptions.Count > 0)
+            throw new AggregateException(exceptions);
+    }
+
+    public readonly struct ArrayPoolToken<T> : IDisposable
+    {
+        private readonly ArrayPool<T>? _pool;
+        private readonly T[] _array;
+        private readonly int _capacity;
+
+        private ArrayPoolToken(ArrayPool<T> pool, int capacity)
+        {
+            _pool = pool;
+            _capacity = capacity;
+            _array = pool.Rent(capacity);
+        }
+
+        public static ArrayPoolToken<T> Create(ArrayPool<T> pool, int capacity)
+            => new(pool, capacity);
+
+        public Memory<T> Memory => _array.AsMemory()[0.._capacity];
+        public Span<T> Span => Memory.Span;
+
+        public void Dispose()
+            => _pool?.Return(_array);
+    }
+
+    public static ArrayPoolToken<T> RentToken<T>(this ArrayPool<T> pool, int capacity)
+        => ArrayPoolToken<T>.Create(pool, capacity);
 }

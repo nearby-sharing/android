@@ -7,7 +7,7 @@ public sealed class ControlHeader : ICdpHeader<ControlHeader>
 {
     public required ControlMessageType MessageType { get; set; }
 
-    public static ControlHeader Parse(EndianReader reader)
+    public static ControlHeader Parse(ref EndianReader reader)
     {
         return new()
         {

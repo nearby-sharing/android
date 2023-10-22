@@ -38,7 +38,7 @@ public sealed class ConnectionRequest : ICdpPayload<ConnectionRequest>
     /// </summary>
     public required byte[] PublicKeyY { get; set; }
 
-    public static ConnectionRequest Parse(EndianReader reader)
+    public static ConnectionRequest Parse(ref EndianReader reader)
         => new()
         {
             CurveType = (CurveType)reader.ReadByte(),

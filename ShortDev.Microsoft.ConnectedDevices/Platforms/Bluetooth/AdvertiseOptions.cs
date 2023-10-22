@@ -1,7 +1,9 @@
-﻿namespace ShortDev.Microsoft.ConnectedDevices.Platforms.Bluetooth;
+﻿using ShortDev.Microsoft.ConnectedDevices.Transports;
+
+namespace ShortDev.Microsoft.ConnectedDevices.Platforms.Bluetooth;
 
 public sealed class AdvertiseOptions
 {
-    public int ManufacturerId { get; set; }
-    public byte[]? BeaconData { get; set; }
+    public required int ManufacturerId { get; set; }
+    public required BLeBeacon BeaconData { get; set; }
 }

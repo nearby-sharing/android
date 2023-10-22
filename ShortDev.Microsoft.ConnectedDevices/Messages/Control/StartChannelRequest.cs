@@ -4,7 +4,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Messages.Control;
 
 public sealed class StartChannelRequest : ICdpPayload<StartChannelRequest>
 {
-    public static StartChannelRequest Parse(EndianReader reader)
+    public static StartChannelRequest Parse(ref EndianReader reader)
         => new()
         {
             Id = reader.ReadStringWithLength(),

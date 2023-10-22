@@ -6,7 +6,7 @@ namespace ShortDev.Networking;
 public static class BinaryDebug
 {
     [Conditional("DEBUG")]
-    public static void PrintContent(EndianReader reader)
+    public static void PrintContent(ref EndianReader reader)
         => PrintContent(reader.Buffer.AsSpan());
 
     [Conditional("DEBUG")]

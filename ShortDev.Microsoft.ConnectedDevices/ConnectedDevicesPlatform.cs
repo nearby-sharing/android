@@ -7,6 +7,7 @@ using ShortDev.Microsoft.ConnectedDevices.Platforms;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
 using ShortDev.Networking;
 using System;
+using System.Buffers;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -52,7 +53,7 @@ public sealed class ConnectedDevicesPlatform : IDisposable
     #region Host
     #region Advertise
     public bool IsAdvertising { get; private set; } = false;
-    public void Advertise(CdpAdvertisement options, CancellationToken cancellationToken)
+    public void Advertise(CancellationToken cancellationToken)
     {
         lock (this)
         {
@@ -66,7 +67,7 @@ public sealed class ConnectedDevicesPlatform : IDisposable
 
         foreach (var (_, transport) in _transports)
             if (transport is ICdpDiscoverableTransport discoverableTransport)
-                discoverableTransport.Advertise(options, cancellationToken);
+                discoverableTransport.Advertise(DeviceInfo, cancellationToken);
 
         cancellationToken.Register(() =>
         {
@@ -105,7 +106,7 @@ public sealed class ConnectedDevicesPlatform : IDisposable
 
     private void OnDeviceConnected(ICdpTransport sender, CdpSocket socket)
     {
-        _logger.Log(LogLevel.Information, "Device {0} ({1}) connected via {2}", socket.RemoteDevice.Name, socket.RemoteDevice.Endpoint.Address, socket.TransportType);
+        _logger.Log(LogLevel.Information, "Device {deviceName} ({deviceAddress}) connected via {transportType}", socket.RemoteDevice.Name, socket.RemoteDevice.Endpoint.Address, socket.TransportType);
         ReceiveLoop(socket);
     }
     #endregion
@@ -161,6 +162,7 @@ public sealed class ConnectedDevicesPlatform : IDisposable
     }
     #endregion
 
+    static readonly ArrayPool<byte> _messagePool = ArrayPool<byte>.Create();
     private void ReceiveLoop(CdpSocket socket)
     {
         RegisterKnownSocket(socket);
@@ -174,7 +176,7 @@ public sealed class ConnectedDevicesPlatform : IDisposable
                     CdpSession? session = null;
                     try
                     {
-                        var header = CommonHeader.Parse(streamReader);
+                        var header = CommonHeader.Parse(ref streamReader);
 
                         if (socket.IsClosed)
                             return;
@@ -185,22 +187,24 @@ public sealed class ConnectedDevicesPlatform : IDisposable
                             header
                         );
 
-                        var payload = streamReader.ReadBytes(header.PayloadSize);
+                        using var payload = _messagePool.RentToken(header.PayloadSize);
+                        streamReader.ReadBytes(payload.Span);
 
                         if (socket.IsClosed)
                             return;
 
-                        session.HandleMessage(socket, header, new EndianReader(Endianness.BigEndian, payload));
+                        EndianReader reader = new(Endianness.BigEndian, payload.Span);
+                        session.HandleMessage(socket, header, ref reader);
                     }
                     catch (Exception ex)
                     {
                         if (socket.IsClosed)
                             return;
 
-                        _logger.Log(LogLevel.Warning, "{0} in session {1} \n {2}",
+                        _logger.Log(LogLevel.Warning, "{exceptionTypeName} in session {sessionId} \n {exception}",
                             ex.GetType().Name,
                             session?.LocalSessionId.ToString() ?? "null",
-                            ex.Message
+                            ex
                         );
                         break;
                     }
@@ -242,12 +246,29 @@ public sealed class ConnectedDevicesPlatform : IDisposable
     #endregion
 
     public CdpDeviceInfo GetCdpDeviceInfo()
-        => DeviceInfo.ToCdpDeviceInfo(_transports.Select(x => x.Value.GetEndpoint()).ToArray());
+    {
+        List<EndpointInfo> endpoints = new();
+        foreach (var (_, transport) in _transports)
+        {
+            try
+            {
+                var endpoint = transport.GetEndpoint();
+                endpoints.Add(endpoint);
+            }
+            catch { }
+        }
+        return DeviceInfo.ToCdpDeviceInfo(endpoints);
+    }
 
     public void Dispose()
     {
-        foreach (var (_, transport) in _transports)
-            transport.Dispose();
+        Extensions.DisposeAll(
+            _transports.Select(x => x.Value),
+            _knownSockets.Select(x => x.Value)
+        );
+
+        _transports.Clear();
+        _knownSockets.Clear();
     }
 
     public static X509Certificate2 CreateDeviceCertificate(CdpEncryptionParams encryptionParams)
@@ -256,7 +277,7 @@ public sealed class ConnectedDevicesPlatform : IDisposable
         return certRequest.CreateSelfSigned(DateTimeOffset.Now, DateTimeOffset.Now.AddYears(5));
     }
 
-    public static ILoggerFactory CreateLoggerFactory(Action<string> messageCallback)
+    public static ILoggerFactory CreateLoggerFactory(Action<string> messageCallback, string? filePattern = null)
         => LoggerFactory.Create(builder =>
         {
             builder.ClearProviders();
@@ -266,5 +287,10 @@ public sealed class ConnectedDevicesPlatform : IDisposable
             builder.AddProvider(provider);
 
             builder.SetMinimumLevel(LogLevel.Debug);
+
+            if (!string.IsNullOrEmpty(filePattern))
+            {
+                builder.AddFile(filePattern, LogLevel.Debug);
+            }
         });
 }

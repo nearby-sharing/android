@@ -38,7 +38,7 @@ public sealed class ReceiveSetupActivity : AppCompatActivity
         var inputLayout = FindViewById<TextInputLayout>(Resource.Id.btMacAddressTextInputLayout)!;
         inputLayout.EditText!.Text = btAddress;
 
-        FindViewById<Button>(Resource.Id.backButton)!.Click += (s, e) => OnBackPressed();
+        FindViewById<Button>(Resource.Id.backButton)!.Click += (s, e) => OnBackPressedDispatcher.OnBackPressed();
         FindViewById<Button>(Resource.Id.nextButton)!.Click += (s, e) =>
         {
             var addressStr = inputLayout.EditText!.Text;
@@ -71,16 +71,10 @@ public sealed class ReceiveSetupActivity : AppCompatActivity
         if (adapter == null)
             throw new ArgumentNullException(nameof(adapter));
 
-        var mServiceField = adapter.Class.GetDeclaredFields().FirstOrDefault((x) => x.Name.Contains("service", StringComparison.OrdinalIgnoreCase));
-        if (mServiceField == null)
-            throw new MissingFieldException("No service field found!");
-
+        var mServiceField = adapter.Class.GetDeclaredFields().FirstOrDefault((x) => x.Name.Contains("service", StringComparison.OrdinalIgnoreCase)) ?? throw new MissingFieldException("No service field found!");
         mServiceField.Accessible = true;
         var serviceProxy = mServiceField.Get(adapter)!;
-        var method = serviceProxy.Class.GetDeclaredMethod("getAddress");
-        if (method == null)
-            throw new MissingMethodException("No method \"getAddress\"");
-
+        var method = serviceProxy.Class.GetDeclaredMethod("getAddress") ?? throw new MissingMethodException("No method \"getAddress\"");
         method.Accessible = true;
         try
         {
@@ -90,6 +84,7 @@ public sealed class ReceiveSetupActivity : AppCompatActivity
         {
             if (ex.Cause == null)
                 throw;
+
             throw ex.Cause;
         }
     }

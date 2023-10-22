@@ -9,7 +9,7 @@ public record class EndpointMetadata(CdpTransportType Type, byte[] Data) : ICdpP
     public static EndpointMetadata Tcp { get; } = new(CdpTransportType.Tcp, Array.Empty<byte>());
     public static EndpointMetadata WifiDirect { get; } = new(CdpTransportType.WifiDirect, Array.Empty<byte>());
 
-    public static EndpointMetadata Parse(EndianReader reader)
+    public static EndpointMetadata Parse(ref EndianReader reader)
     {
         var type = (CdpTransportType)reader.ReadUInt16();
         var length = reader.ReadInt32();
@@ -17,12 +17,12 @@ public record class EndpointMetadata(CdpTransportType Type, byte[] Data) : ICdpP
         return new(type, data.ToArray());
     }
 
-    public static EndpointMetadata[] ParseArray(EndianReader reader)
+    public static EndpointMetadata[] ParseArray(ref EndianReader reader)
     {
         var arrayLength = reader.ReadUInt16();
         var endpoints = new EndpointMetadata[arrayLength];
         for (int i = 0; i < arrayLength; i++)
-            endpoints[i] = Parse(reader);
+            endpoints[i] = Parse(ref reader);
         return endpoints;
     }
 
