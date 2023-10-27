@@ -49,7 +49,7 @@ public sealed class NearShareSender
     public async Task SendFileAsync(CdpDevice device, CdpFileProvider file, IProgress<NearShareProgress> progress, CancellationToken cancellationToken = default)
         => await SendFilesAsync(device, new[] { file }, progress, cancellationToken);
 
-    public async Task SendFilesAsync(CdpDevice device, CdpFileProvider[] files, IProgress<NearShareProgress> progress, CancellationToken cancellationToken = default)
+    public async Task SendFilesAsync(CdpDevice device, IReadOnlyList<CdpFileProvider> files, IProgress<NearShareProgress> progress, CancellationToken cancellationToken = default)
     {
         var senderStateMachine = await PrepareTransferInternalAsync(device);
         await senderStateMachine.SendFilesAsync(files, progress, cancellationToken);
@@ -100,17 +100,17 @@ public sealed class NearShareSender
             await _promise.Task;
         }
 
-        CdpFileProvider[]? _files;
+        IReadOnlyList<CdpFileProvider>? _files;
         IProgress<NearShareProgress>? _fileProgress;
         CancellationToken? _fileCancellationToken;
         ulong _bytesToSend;
-        public async Task SendFilesAsync(CdpFileProvider[] files, IProgress<NearShareProgress> progress, CancellationToken cancellationToken)
+        public async Task SendFilesAsync(IReadOnlyList<CdpFileProvider> files, IProgress<NearShareProgress> progress, CancellationToken cancellationToken)
         {
             _files = files;
             _fileProgress = progress;
             _fileCancellationToken = cancellationToken;
 
-            uint fileCount = (uint)files.Length;
+            uint fileCount = (uint)files.Count;
             _bytesToSend = CalcBytesToSend(files);
 
             ValueSet valueSet = new();
@@ -142,10 +142,10 @@ public sealed class NearShareSender
             return ids;
         }
 
-        static ulong CalcBytesToSend(CdpFileProvider[] files)
+        static ulong CalcBytesToSend(IReadOnlyList<CdpFileProvider> files)
         {
             ulong sum = 0;
-            for (int i = 0; i < files.Length; i++)
+            for (int i = 0; i < files.Count; i++)
                 sum += files[i].FileSize;
             return sum;
         }
@@ -187,7 +187,7 @@ public sealed class NearShareSender
             var start = payload.Get<ulong>("BlobPosition");
             var length = payload.Get<uint>("BlobSize");
 
-            var fileProvider = _files?[contentId] ?? throw new NullReferenceException("Could not access files to transfer");
+            var fileProvider = _files?[(int)contentId] ?? throw new NullReferenceException("Could not access files to transfer");
             var blob = fileProvider.ReadBlob(start, length);
 
             _fileProgress?.Report(new()
@@ -195,7 +195,7 @@ public sealed class NearShareSender
                 BytesSent = Interlocked.Add(ref _bytesSent, length),
                 FilesSent = contentId + 1, // ToDo: How to calculate?
                 TotalBytesToSend = _bytesToSend,
-                TotalFilesToSend = (uint)_files.Length
+                TotalFilesToSend = (uint)_files.Count
             });
 
             ValueSet response = new();

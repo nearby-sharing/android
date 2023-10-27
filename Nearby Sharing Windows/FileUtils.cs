@@ -7,7 +7,7 @@ namespace Nearby_Sharing_Windows;
 
 internal static class FileUtils
 {
-    public static CdpFileProvider CreateNearShareFileFromContentUriAsync(this ContentResolver contentResolver, AndroidUri contentUri)
+    public static CdpFileProvider CreateNearShareFileFromContentUri(this ContentResolver contentResolver, AndroidUri contentUri)
     {
         var fileName = contentResolver.QueryContentName(contentUri);
 

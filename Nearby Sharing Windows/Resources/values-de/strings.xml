@@ -85,6 +85,7 @@
 	<!-- #region ReceiveActivity.cs -->
 	<string name="share_file">Datei teilen</string>
 	<string name="share_url">Webseite teilen</string>
+	<string name="share_text">Text teilen</string>
 
 	<string name="send_missing_permissions">Fehlende Berechtigungen!</string>
 	<string name="wait_for_acceptance">Warte auf Akzeptierung...</string>

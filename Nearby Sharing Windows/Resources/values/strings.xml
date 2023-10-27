@@ -88,6 +88,7 @@
 	<!-- #region ReceiveActivity.cs -->
 	<string name="share_file">Share File</string>
 	<string name="share_url">Share Url</string>
+	<string name="share_text">Share Text</string>
 
 	<string name="send_missing_permissions">Missing permission!</string>
 	<string name="wait_for_acceptance">Waiting for acceptance...</string>

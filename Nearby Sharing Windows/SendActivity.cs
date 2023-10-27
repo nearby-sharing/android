@@ -1,7 +1,6 @@
 ﻿using Android.Bluetooth;
 using Android.Content;
 using Android.OS;
-using Android.Provider;
 using Android.Runtime;
 using Android.Views;
 using AndroidX.AppCompat.App;
@@ -15,12 +14,12 @@ using ShortDev.Microsoft.ConnectedDevices.Encryption;
 using ShortDev.Microsoft.ConnectedDevices.NearShare;
 using ShortDev.Microsoft.ConnectedDevices.Platforms;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
-using ShortDev.Networking;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.NetworkInformation;
 
 namespace Nearby_Sharing_Windows;
 
+[IntentFilter(new[] { Intent.ActionProcessText }, Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable }, DataMimeType = "text/plain", Label = "@string/share_text")]
 [IntentFilter(new[] { Intent.ActionSend, Intent.ActionSendMultiple }, Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable }, DataMimeType = "*/*", Label = "@string/share_file")]
 [IntentFilter(new[] { Intent.ActionSend }, Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable }, DataMimeType = "text/plain", Label = "@string/share_url")]
 [Activity(Label = "@string/app_name", Exported = true, Theme = "@style/AppTheme.TranslucentOverlay", ConfigurationChanges = UIHelper.ConfigChangesFlags)]
@@ -172,49 +171,24 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
             try
             {
                 Task? fileTransferOperation = null;
-                Progress<NearShareProgress> fileSendProgress = new();
+                Progress<NearShareProgress> progress = new();
                 Task? uriTransferOperation = null;
-                if (Intent?.Action == Intent.ActionSend)
+
+                var (files, uri) = ParseIntentAsync();
+                if (files != null)
                 {
-                    if (Intent.HasExtra(Intent.ExtraStream))
-                    {
-                        AndroidUri file = Intent.GetParcelableExtra<AndroidUri>(Intent.ExtraStream)!;
-                        fileTransferOperation = NearShareSender.SendFileAsync(
-                            remoteSystem,
-                            ContentResolver!.CreateNearShareFileFromContentUriAsync(file),
-                            fileSendProgress,
-                            _fileSendCancellationTokenSource.Token
-                        );
-                    }
-                    else
-                    {
-                        var text = Intent.GetStringExtra(Intent.ExtraText);
-                        if (Uri.IsWellFormedUriString(text, UriKind.Absolute))
-                        {
-                            uriTransferOperation = NearShareSender.SendUriAsync(
-                                remoteSystem,
-                                new Uri(text)
-                            );
-                        }
-                        else
-                        {
-                            fileTransferOperation = NearShareSender.SendFileAsync(
-                                remoteSystem,
-                                CdpFileProvider.FromContent($"Text-Transfer-{DateTime.Now:dd_MM_yyyy-HH_mm_ss}.txt", text ?? throw new NullReferenceException("Text was null")),
-                                fileSendProgress,
-                                _fileSendCancellationTokenSource.Token
-                            );
-                        }
-                    }
-                }
-                else if (Intent?.Action == Intent.ActionSendMultiple)
-                {
-                    var files = Intent.GetParcelableArrayListExtra<AndroidUri>(Intent.ExtraStream) ?? throw new InvalidDataException("Could not get extra files from intent");
                     fileTransferOperation = NearShareSender.SendFilesAsync(
                         remoteSystem,
-                        files.Select(x => ContentResolver!.CreateNearShareFileFromContentUriAsync(x)).ToArray(),
-                        fileSendProgress,
+                        files,
+                        progress,
                         _fileSendCancellationTokenSource.Token
+                    );
+                }
+                else if (uri != null)
+                {
+                    uriTransferOperation = NearShareSender.SendUriAsync(
+                        remoteSystem,
+                        uri
                     );
                 }
 
@@ -226,7 +200,7 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
                 CircularProgressIndicator progressIndicator = FindViewById<CircularProgressIndicator>(Resource.Id.sendProgressIndicator)!;
                 if (fileTransferOperation != null)
                 {
-                    fileSendProgress.ProgressChanged += (s, args) =>
+                    progress.ProgressChanged += (s, args) =>
                     {
                         RunOnUiThread(() =>
                         {
@@ -275,6 +249,65 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
         catch (Exception ex)
         {
             Snackbar.Make(Window!.DecorView, this.Localize(Resource.String.generic_error_template, ex.Message), Snackbar.LengthLong).Show();
+        }
+    }
+
+    (IReadOnlyList<CdpFileProvider>? files, Uri? uri) ParseIntentAsync()
+    {
+        ArgumentNullException.ThrowIfNull(Intent);
+
+        if (Intent.Action == Intent.ActionProcessText)
+        {
+            return (
+                files: new[] { SendText(Intent.GetStringExtra(Intent.ExtraProcessText)) },
+                null
+            );
+        }
+
+        if (Intent.Action == Intent.ActionSendMultiple)
+        {
+            return (
+                files: (Intent.GetParcelableArrayListExtra<AndroidUri>(Intent.ExtraStream) ?? throw new InvalidDataException("Could not get extra files from intent"))
+                    .Select(ContentResolver!.CreateNearShareFileFromContentUri)
+                    .ToArray(),
+                null
+            );
+        }
+
+        if (Intent.Action == Intent.ActionSend)
+        {
+            if (Intent.HasExtra(Intent.ExtraStream))
+            {
+                AndroidUri fileUri = Intent.GetParcelableExtra<AndroidUri>(Intent.ExtraStream) ?? throw new InvalidDataException("Could not get ExtraStream");
+                return (
+                    files: new[] { ContentResolver!.CreateNearShareFileFromContentUri(fileUri) },
+                    null
+                );
+            }
+
+            var text = Intent.GetStringExtra(Intent.ExtraText) ?? "";
+            if (Uri.IsWellFormedUriString(text, UriKind.Absolute))
+            {
+                return (
+                    null,
+                    uri: new(text)
+                );
+            }
+
+            return (
+                files: new[] { SendText(text) },
+                null
+            );
+        }
+
+        return (null, null);
+
+        static CdpFileProvider SendText(string? text)
+        {
+            return CdpFileProvider.FromContent(
+                $"Text-Transfer-{DateTime.Now:dd_MM_yyyy-HH_mm_ss}.txt",
+                text ?? throw new NullReferenceException("Text was null")
+            );
         }
     }
 
