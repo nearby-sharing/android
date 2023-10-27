@@ -161,6 +161,12 @@ internal sealed class NearShareApp : CdpAppBase
         if (blobSize > PartitionSize) // ToDo: position > _bytesToSend
             throw new CdpSecurityException("Device tried to send too much data!");
 
+        if (_fileTransferToken.CancellationToken.IsCancellationRequested)
+        {
+            OnCancel();
+            return;
+        }
+
         // PlatformHandler.Log(0, $"BlobPosition: {position}; ({newPosition * 100 / bytesToSend}%)");
         lock (_fileTransferToken)
         {

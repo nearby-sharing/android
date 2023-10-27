@@ -55,9 +55,6 @@ public sealed class FileTransferToken : TransferToken, IEnumerable<FileShareInfo
         _promise.SetResult(fileStream);
     }
 
-    public void Cancel()
-        => _promise.TrySetCanceled();
-
     internal Stream GetStream(uint contentId)
     {
         for (int i = 0; i < Files.Count; i++)
@@ -67,6 +64,18 @@ public sealed class FileTransferToken : TransferToken, IEnumerable<FileShareInfo
         }
 
         throw new ArgumentOutOfRangeException(nameof(contentId));
+    }
+    #endregion
+
+
+    #region Cancellation
+    readonly CancellationTokenSource _cancellationSource = new();
+
+    public CancellationToken CancellationToken => _cancellationSource.Token;
+    public void Cancel()
+    {
+        _promise.TrySetCanceled();
+        _cancellationSource.Cancel();
     }
     #endregion
 
