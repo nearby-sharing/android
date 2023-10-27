@@ -4,7 +4,7 @@
 	<string name="app_titlebar_title_default">传输数据到您的 Windows 10 / 11 电脑</string>
 	<string name="app_titlebar_title_receive">从您的 Windows 10 / 11 电脑接收数据</string>
 	<string name="app_titlebar_title_receive_setup">设置与信息</string>
-	
+
 	<string name="assets_prefix">zh</string>
 
 	<!-- #region generic -->
@@ -14,7 +14,7 @@
 
 	<string name="generic_send">发送</string>
 	<string name="generic_receive">接收</string>
-	
+
 	<string name="generic_status_template">状态: {0}</string>
 	<string name="generic_error_template">错误: {0}</string>
 
@@ -50,8 +50,6 @@
 	<string name="open_faq_title">帮助</string>
 	<string name="open_faq_summary">打开常见问题手册</string>
 
-
-	<string name="category_device_info">设备信息</string>
 
 	<string name="goto_mac_address_title">指定Mac地址</string>
 	<string name="goto_mac_address_summary">指定此设备的Mac地址</string>
