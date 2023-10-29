@@ -36,6 +36,14 @@
                 android:text="@string/visible_as_template"
                 android:paddingBottom="10dp" />
 
+            <Button
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:id="@+id/openFAQButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/open_faq_title"
+                app:icon="@drawable/ic_fluent_question_circle_24_regular" />
+
             <TextView
                 style="@style/TextAppearance.AppCompat.Title"
                 android:layout_width="match_parent"
@@ -50,21 +58,6 @@
                 android:layout_height="wrap_content"
                 android:paddingTop="10dp"
                 android:paddingBottom="10dp"/>
-
-            <TextView
-                style="@style/TextAppearance.AppCompat.Title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="3dp"
-                android:text="@string/debug_log" />
-
-            <TextView
-                android:id="@+id/debugLogTextView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp" />
 
         </LinearLayout>
 

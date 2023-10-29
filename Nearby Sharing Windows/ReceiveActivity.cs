@@ -27,8 +27,6 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
 {
     BluetoothAdapter? _btAdapter;
 
-    [AllowNull] TextView debugLogTextView;
-
     [AllowNull] AdapterDescriptor<TransferToken> adapterDescriptor;
     [AllowNull] RecyclerView notificationsRecyclerView;
     readonly List<TransferToken> _notifications = new();
@@ -54,8 +52,7 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
         notificationsRecyclerView = FindViewById<RecyclerView>(Resource.Id.notificationsRecyclerView)!;
         notificationsRecyclerView.SetLayoutManager(new LinearLayoutManager(this));
 
-        debugLogTextView = FindViewById<TextView>(Resource.Id.debugLogTextView)!;
-        debugLogTextView.SetTextIsSelectable(true);
+        FindViewById<Button>(Resource.Id.openFAQButton)!.Click += (s, e) => UIHelper.OpenFAQ(this);
 
         adapterDescriptor = new(
             Resource.Layout.item_transfer_notification,
