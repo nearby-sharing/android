@@ -12,5 +12,6 @@ public enum MessageType : byte
     Control,
     Session,
     Ack,
-    ReliabilityResponse
+    ReliabilityResponse,
+    Disconnect
 }
