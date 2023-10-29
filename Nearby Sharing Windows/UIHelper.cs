@@ -114,21 +114,31 @@ internal static class UIHelper
     public static void RequestSendPermissions(Activity activity)
         => ActivityCompat.RequestPermissions(activity, _sendPermissions, 0);
 
-    private static readonly string[] _receivePermissions = new[]
-    {
+    private static readonly string[] _receivePermissions = [
         ManifestPermission.AccessFineLocation,
         ManifestPermission.AccessCoarseLocation,
         ManifestPermission.AccessWifiState,
         ManifestPermission.Bluetooth,
+        // ManifestPermission.AccessBackgroundLocation, See #109 and #41 // Api 29
+        ManifestPermission.ReadExternalStorage,
+        ManifestPermission.WriteExternalStorage
+    ];
+    private static readonly string[] _receivePermissionsApi31 = [
+        .. _receivePermissions,
         ManifestPermission.BluetoothScan,
         ManifestPermission.BluetoothConnect,
         ManifestPermission.BluetoothAdvertise,
-        // ManifestPermission.AccessBackgroundLocation, See #109 and #41
-        ManifestPermission.ReadExternalStorage,
-        ManifestPermission.WriteExternalStorage
-    };
+    ];
     public static void RequestReceivePermissions(Activity activity)
-        => ActivityCompat.RequestPermissions(activity, _receivePermissions, 0);
+    {
+        if (OperatingSystem.IsAndroidVersionAtLeast(31))
+        {
+            ActivityCompat.RequestPermissions(activity, _receivePermissionsApi31, 0);
+            return;
+        }
+
+        ActivityCompat.RequestPermissions(activity, _receivePermissions, 0);
+    }
     #endregion
 
     public static ISpanned LoadHtmlAsset(Activity activity, string assetPath)

@@ -103,9 +103,11 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
     public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
     {
         if (grantResults.Contains(Android.Content.PM.Permission.Denied))
+        {
             Snackbar.Make(Window!.DecorView, GetString(Resource.String.send_missing_permissions), Snackbar.LengthLong).Show();
-        else
-            RunOnUiThread(() => InitializePlatform());
+        }
+
+        RunOnUiThread(() => InitializePlatform());
     }
 
     #region Initialization

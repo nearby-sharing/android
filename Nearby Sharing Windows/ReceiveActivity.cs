@@ -188,7 +188,7 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
 
     public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
     {
-        if (grantResults.Any((x) => x == Permission.Denied))
+        if (grantResults.Contains(Permission.Denied))
         {
             Toast.MakeText(this, this.Localize(Resource.String.receive_missing_permissions), ToastLength.Long)!.Show();
         }
