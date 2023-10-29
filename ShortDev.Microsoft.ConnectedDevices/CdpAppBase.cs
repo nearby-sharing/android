@@ -1,8 +1,6 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Messages;
-using ShortDev.Microsoft.ConnectedDevices.Messages.Control;
 using ShortDev.Microsoft.ConnectedDevices.Serialization;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading.Channels;
 
 namespace ShortDev.Microsoft.ConnectedDevices;
 

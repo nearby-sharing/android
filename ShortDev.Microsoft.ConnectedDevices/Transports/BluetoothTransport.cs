@@ -6,15 +6,11 @@ using System.Threading.Tasks;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Transports;
 
-public sealed class BluetoothTransport : ICdpTransport, ICdpDiscoverableTransport
+public sealed class BluetoothTransport(IBluetoothHandler handler) : ICdpTransport, ICdpDiscoverableTransport
 {
     public CdpTransportType TransportType { get; } = CdpTransportType.Rfcomm;
 
-    public IBluetoothHandler Handler { get; }
-    public BluetoothTransport(IBluetoothHandler handler)
-    {
-        Handler = handler;
-    }
+    public IBluetoothHandler Handler { get; } = handler;
 
     public event DeviceConnectedEventHandler? DeviceConnected;
     public void Listen(CancellationToken cancellationToken)

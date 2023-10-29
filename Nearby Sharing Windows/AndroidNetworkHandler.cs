@@ -1,22 +1,14 @@
 ﻿using Android.Content;
 using Android.Net;
 using Android.Net.Wifi;
-using ShortDev.Microsoft.ConnectedDevices.Platforms;
 using ShortDev.Microsoft.ConnectedDevices.Platforms.Network;
 using System.Net;
 
 namespace Nearby_Sharing_Windows;
 
-internal sealed class AndroidNetworkHandler : INetworkHandler
+internal sealed class AndroidNetworkHandler(Context context) : INetworkHandler
 {
-    public Context Context { get; }
-    public ICdpPlatformHandler PlatformHandler { get; }
-
-    public AndroidNetworkHandler(ICdpPlatformHandler handler, Context context)
-    {
-        PlatformHandler = handler;
-        Context = context;
-    }
+    public Context Context { get; } = context;
 
     public IPAddress GetLocalIp()
     {

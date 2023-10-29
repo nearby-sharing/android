@@ -161,13 +161,13 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
             OemModelName = Build.Model ?? string.Empty,
             OemManufacturerName = Build.Manufacturer ?? string.Empty,
             DeviceCertificate = ConnectedDevicesPlatform.CreateDeviceCertificate(CdpEncryptionParams.Default),
-            LoggerFactory = ConnectedDevicesPlatform.CreateLoggerFactory(Log, this.GetLogFilePattern())
+            LoggerFactory = ConnectedDevicesPlatform.CreateLoggerFactory(this.GetLogFilePattern())
         });
 
-        IBluetoothHandler bluetoothHandler = new AndroidBluetoothHandler(this, _btAdapter, btAddress);
+        IBluetoothHandler bluetoothHandler = new AndroidBluetoothHandler(_btAdapter, btAddress);
         _cdp.AddTransport<BluetoothTransport>(new(bluetoothHandler));
 
-        INetworkHandler networkHandler = new AndroidNetworkHandler(this, this);
+        INetworkHandler networkHandler = new AndroidNetworkHandler(this);
         _cdp.AddTransport<NetworkTransport>(new(networkHandler));
 
         _cdp.Listen(_cancellationTokenSource.Token);
@@ -208,14 +208,6 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
         _cdp?.Dispose();
         NearShareReceiver.Stop();
         base.Finish();
-    }
-
-    public void Log(string message)
-    {
-        RunOnUiThread(() =>
-        {
-            debugLogTextView.Text += "\n" + $"[{DateTime.Now:HH:mm:ss}]: {message}";
-        });
     }
 
     void UpdateUI()

@@ -5,7 +5,7 @@ using System.Net.Sockets;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Platforms.Network;
 
-public interface INetworkHandler : ICdpPlatformHandler
+public interface INetworkHandler
 {
     IPAddress GetLocalIp();
 

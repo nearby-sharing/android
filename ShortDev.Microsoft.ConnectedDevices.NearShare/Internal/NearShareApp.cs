@@ -72,7 +72,7 @@ internal sealed class NearShareApp : CdpAppBase
                     }
                     _fileTransferToken = new()
                     {
-                        DeviceName = Channel.Session.Device.Name ?? "UNKNOWN",
+                        DeviceName = Channel.Session.Device.Name,
                         TotalBytesToSend = bytesToSend,
                         TotalFilesToSend = (uint)fileNames.Count,
                         Files = files
@@ -91,7 +91,7 @@ internal sealed class NearShareApp : CdpAppBase
                     );
                     PlatformHandler.OnReceivedUri(new()
                     {
-                        DeviceName = Channel.Session.Device.Name ?? "UNKNOWN",
+                        DeviceName = Channel.Session.Device.Name,
                         Uri = uri
                     });
 

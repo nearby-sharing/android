@@ -13,15 +13,11 @@ using System.Threading.Tasks;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Transports;
 
-public sealed class NetworkTransport : ICdpTransport, ICdpDiscoverableTransport
+public sealed class NetworkTransport(INetworkHandler handler) : ICdpTransport, ICdpDiscoverableTransport
 {
     public CdpTransportType TransportType { get; } = CdpTransportType.Tcp;
 
-    public INetworkHandler Handler { get; }
-    public NetworkTransport(INetworkHandler handler)
-    {
-        Handler = handler;
-    }
+    public INetworkHandler Handler { get; } = handler;
 
     readonly TcpListener _listener = new(IPAddress.Any, Constants.TcpPort);
 
@@ -44,7 +40,7 @@ public sealed class NetworkTransport : ICdpTransport, ICdpDiscoverableTransport
                     InputStream = stream,
                     OutputStream = stream,
                     RemoteDevice = new(
-                        null, // ToDo: ToDo!!
+                        Name: "UNKNOWN", // ToDo: Find device name
                         DeviceType.Invalid,
                         new EndpointInfo(
                             TransportType,

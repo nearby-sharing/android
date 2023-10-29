@@ -19,8 +19,8 @@ public static class Extensions
 
     public static Task AwaitCancellation(this CancellationToken @this)
     {
-        TaskCompletionSource<bool> promise = new();
-        @this.Register(() => promise.SetResult(true));
+        TaskCompletionSource promise = new();
+        @this.Register(() => promise.TrySetResult());
         return promise.Task;
     }
 
@@ -29,13 +29,6 @@ public static class Extensions
         if (await Task.WhenAny(task, Task.Delay(timeout)) == task)
             return task.Result;
         return default;
-    }
-
-    public static ECDsa ToECDsa(this ECDiffieHellman @this)
-    {
-        ECDsa result = ECDsa.Create();
-        result.ImportParameters(@this.ExportParameters(true));
-        return result;
     }
 
     public static string ToStringFormatted(this PhysicalAddress @this)
@@ -64,21 +57,11 @@ public static class Extensions
             throw new AggregateException(exceptions);
     }
 
-    public readonly struct ArrayPoolToken<T> : IDisposable
+    public readonly struct ArrayPoolToken<T>(ArrayPool<T> pool, int capacity) : IDisposable
     {
-        private readonly ArrayPool<T>? _pool;
-        private readonly T[] _array;
-        private readonly int _capacity;
-
-        private ArrayPoolToken(ArrayPool<T> pool, int capacity)
-        {
-            _pool = pool;
-            _capacity = capacity;
-            _array = pool.Rent(capacity);
-        }
-
-        public static ArrayPoolToken<T> Create(ArrayPool<T> pool, int capacity)
-            => new(pool, capacity);
+        private readonly ArrayPool<T>? _pool = pool;
+        private readonly int _capacity = capacity;
+        private readonly T[] _array = pool.Rent(capacity);
 
         public Memory<T> Memory => _array.AsMemory()[0.._capacity];
         public Span<T> Span => Memory.Span;
@@ -88,5 +71,5 @@ public static class Extensions
     }
 
     public static ArrayPoolToken<T> RentToken<T>(this ArrayPool<T> pool, int capacity)
-        => ArrayPoolToken<T>.Create(pool, capacity);
+        => new(pool, capacity);
 }

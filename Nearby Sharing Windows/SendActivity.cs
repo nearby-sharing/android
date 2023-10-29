@@ -23,7 +23,7 @@ namespace Nearby_Sharing_Windows;
 [IntentFilter(new[] { Intent.ActionSend, Intent.ActionSendMultiple }, Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable }, DataMimeType = "*/*", Label = "@string/share_file")]
 [IntentFilter(new[] { Intent.ActionSend }, Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable }, DataMimeType = "text/plain", Label = "@string/share_url")]
 [Activity(Label = "@string/app_name", Exported = true, Theme = "@style/AppTheme.TranslucentOverlay", ConfigurationChanges = UIHelper.ConfigChangesFlags)]
-public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsListener, ICdpPlatformHandler
+public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsListener
 {
     [AllowNull] NearShareSender NearShareSender;
 
@@ -125,13 +125,13 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
             OemModelName = Build.Model ?? string.Empty,
             OemManufacturerName = Build.Manufacturer ?? string.Empty,
             DeviceCertificate = ConnectedDevicesPlatform.CreateDeviceCertificate(CdpEncryptionParams.Default),
-            LoggerFactory = ConnectedDevicesPlatform.CreateLoggerFactory(msg => System.Diagnostics.Debug.Print(msg), this.GetLogFilePattern())
+            LoggerFactory = ConnectedDevicesPlatform.CreateLoggerFactory(this.GetLogFilePattern())
         });
 
-        AndroidBluetoothHandler bluetoothHandler = new(this, adapter, PhysicalAddress.None);
+        AndroidBluetoothHandler bluetoothHandler = new(adapter, PhysicalAddress.None);
         Platform.AddTransport<BluetoothTransport>(new(bluetoothHandler));
 
-        AndroidNetworkHandler networkHandler = new(this, this);
+        AndroidNetworkHandler networkHandler = new(this);
         Platform.AddTransport<NetworkTransport>(new(networkHandler));
 
         Platform.DeviceDiscovered += Platform_DeviceDiscovered;

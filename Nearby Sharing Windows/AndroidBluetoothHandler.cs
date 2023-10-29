@@ -10,19 +10,11 @@ using System.Net.NetworkInformation;
 
 namespace Nearby_Sharing_Windows;
 
-public sealed class AndroidBluetoothHandler : IBluetoothHandler
+public sealed class AndroidBluetoothHandler(BluetoothAdapter adapter, PhysicalAddress macAddress) : IBluetoothHandler
 {
-    public BluetoothAdapter Adapter { get; }
-    public ICdpPlatformHandler PlatformHandler { get; }
+    public BluetoothAdapter Adapter { get; } = adapter;
 
-    public PhysicalAddress MacAddress { get; }
-
-    public AndroidBluetoothHandler(ICdpPlatformHandler handler, BluetoothAdapter adapter, PhysicalAddress macAddress)
-    {
-        PlatformHandler = handler;
-        Adapter = adapter;
-        MacAddress = macAddress;
-    }
+    public PhysicalAddress MacAddress { get; } = macAddress;
 
     #region BLe Scan
     public async Task ScanBLeAsync(ScanOptions scanOptions, CancellationToken cancellationToken = default)
