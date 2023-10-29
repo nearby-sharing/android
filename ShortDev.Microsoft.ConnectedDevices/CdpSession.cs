@@ -250,8 +250,7 @@ public sealed class CdpSession : IDisposable
         public void HandleConnect(CdpSocket socket, CommonHeader header, ref EndianReader reader)
         {
             ConnectionHeader connectionHeader = ConnectionHeader.Parse(ref reader);
-            _logger.LogDebug("Received {headerType} message {messageType} from session {sessionId:X} via {transportType}",
-                header.Type,
+            _logger.ReceivedConnectMessage(
                 connectionHeader.MessageType,
                 header.SessionId,
                 socket.TransportType
@@ -438,7 +437,7 @@ public sealed class CdpSession : IDisposable
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, "Upgrade failed");
+                        _logger.UpgradeFailed(ex);
                     }
                 }
 
@@ -519,8 +518,7 @@ public sealed class CdpSession : IDisposable
             throw UnexpectedMessage("Encryption");
 
         var controlHeader = ControlHeader.Parse(ref reader);
-        _logger.LogDebug("Received {headerType} message {messageType} from session {sessionId:X} via {transportType}",
-            header.Type,
+        _logger.ReceivedControlMessage(
             controlHeader.MessageType,
             header.SessionId,
             socket.TransportType

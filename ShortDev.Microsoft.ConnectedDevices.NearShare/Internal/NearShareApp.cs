@@ -55,8 +55,8 @@ internal sealed class NearShareApp : CdpAppBase
                 {
                     var fileNames = payload.Get<List<string>>("FileNames");
 
-                    _logger.LogInformation("Receiving file \"{fileNames}\" from session {sessionId:X} via {transportType}",
-                        string.Join(", ", fileNames),
+                    _logger.LogInformation("Receiving file {FileNames} from session {SessionId:X} via {TransportType}",
+                        fileNames,
                         msg.Header.SessionId,
                         Channel.Socket.TransportType
                     );
@@ -85,9 +85,10 @@ internal sealed class NearShareApp : CdpAppBase
             case DataKind.Uri:
                 {
                     var uri = payload.Get<string>("Uri");
-                    _logger.LogInformation("Received uri \"{uri}\" from session {sessionId:X}",
+                    _logger.LogInformation("Received uri {Uri} from session {SessionId:X} via {TransportType}",
                         uri,
-                        msg.Header.SessionId
+                        msg.Header.SessionId,
+                        Channel.Socket.TransportType
                     );
                     PlatformHandler.OnReceivedUri(new()
                     {

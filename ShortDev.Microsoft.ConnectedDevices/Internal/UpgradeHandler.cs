@@ -101,7 +101,7 @@ internal sealed class UpgradeHandler
             allowed = true;
         }
 
-        _logger.LogInformation("Transport upgrade {upgradeId} {upgradeStatus}",
+        _logger.UpgradeTransportRequest(
             msg.UpgradeId,
             allowed ? "succeeded" : "failed"
         );
@@ -125,9 +125,9 @@ internal sealed class UpgradeHandler
     void HandleUpgradeRequest(CdpSocket socket, ref EndianReader reader)
     {
         var msg = UpgradeRequest.Parse(ref reader);
-        _logger.LogInformation("Upgrade request {upgradeId} to {upgradeTypes}",
+        _logger.UpgradeRequest(
             msg.UpgradeId,
-            string.Join(',', msg.Endpoints.Select((x) => x.Type.ToString()))
+            msg.Endpoints.Select((x) => x.Type)
         );
 
         CommonHeader header = new()
@@ -180,8 +180,8 @@ internal sealed class UpgradeHandler
     void HandleUpgradeFinalization(CdpSocket socket, ref EndianReader reader)
     {
         var msg = EndpointMetadata.ParseArray(ref reader);
-        _logger.LogInformation("Transport upgrade to {upgradeTypes}",
-            string.Join(',', msg.Select((x) => x.Type.ToString()))
+        _logger.UpgradeFinalization(
+            msg.Select((x) => x.Type)
         );
 
         CommonHeader header = new()
@@ -204,9 +204,9 @@ internal sealed class UpgradeHandler
     {
         var msg = HResultPayload.Parse(ref reader);
 
-        var errorMsg = $"Transport upgrade failed with HResult {msg.HResult} (hresult: {HResultPayload.HResultToString(msg.HResult)}, errorCode: {HResultPayload.ErrorCodeToString(msg.HResult)})";
-        _logger.LogWarning(errorMsg);
-        _currentUpgrade?.Promise.TrySetException(new Exception(errorMsg));
+        _currentUpgrade?.Promise.TrySetException(
+            new Exception($"Transport upgrade failed with HResult {msg.HResult} (hresult: {HResultPayload.HResultToString(msg.HResult)}, errorCode: {HResultPayload.ErrorCodeToString(msg.HResult)})")
+        );
     }
 
     #region Client
