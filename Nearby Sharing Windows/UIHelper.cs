@@ -54,7 +54,7 @@ internal static class UIHelper
         => DisplayWebSite(activity, "https://nearshare.shortdev.de/CREDITS");
 
     public static void OpenGitHub(Activity activity)
-        => DisplayWebSite(activity, "https://github.com/ShortDevelopment/Nearby-Sharing-Windows/");
+        => DisplayWebSite(activity, "https://github.com/nearby-sharing/android/");
 
     public static void DisplayWebSite(Activity activity, string url)
     {
