@@ -1,6 +1,5 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Exceptions;
 using ShortDev.Networking;
-using System.IO;
 using System.Text.Json;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages.Connection.DeviceInfo;

@@ -498,6 +498,7 @@ public sealed class CdpSession : IDisposable
         void HandleDeviceInfoMessage(CommonHeader header, ref EndianReader reader, CdpSocket socket)
         {
             var msg = DeviceInfoMessage.Parse(ref reader);
+            _logger.ReceivedDeviceInfo(msg.DeviceInfo);
 
             header.Flags = 0;
             _session.SendMessage(socket, header, (writer) =>

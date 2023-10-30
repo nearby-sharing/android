@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection;
+using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.DeviceInfo;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.TransportUpgrade;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Control;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
@@ -40,6 +41,9 @@ internal static partial class CdpLog
 
     [LoggerMessage(EventId = 204, Level = LogLevel.Debug, Message = "Received control message {ControlMessageType} from session {SessionId:X} via {TransportType}")]
     public static partial void ReceivedControlMessage(this ILogger logger, ControlMessageType controlMessageType, ulong sessionId, CdpTransportType transportType);
+
+    [LoggerMessage(EventId = 205, Level = LogLevel.Debug, Message = "Received device info: {DeviceInfo}")]
+    public static partial void ReceivedDeviceInfo(this ILogger logger, CdpDeviceInfo deviceInfo);
 
 
     [LoggerMessage(EventId = 301, Level = LogLevel.Debug, Message = "Upgrade request {UpgradeId} to {UpgradeTypes}")]
