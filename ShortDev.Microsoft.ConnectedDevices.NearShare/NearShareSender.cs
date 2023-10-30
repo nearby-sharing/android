@@ -8,42 +8,32 @@ using ShortDev.Microsoft.ConnectedDevices.Serialization;
 
 namespace ShortDev.Microsoft.ConnectedDevices.NearShare;
 
-public sealed class NearShareSender
+public sealed class NearShareSender(ConnectedDevicesPlatform platform)
 {
-    public ConnectedDevicesPlatform Platform { get; }
-    public NearShareSender(ConnectedDevicesPlatform platform)
-    {
-        Platform = platform;
-    }
+    public ConnectedDevicesPlatform Platform { get; } = platform;
 
-    async Task<SenderStateMachine> PrepareTransferInternalAsync(CdpDevice device)
+    async Task<SenderStateMachine> PrepareTransferInternalAsync(CdpDevice device, CancellationToken cancellationToken)
     {
         var session = await Platform.ConnectAsync(device);
 
         Guid operationId = Guid.NewGuid();
 
-        HandshakeHandler handshake = new();
-        using var handShakeChannel = await session.StartClientChannelAsync(NearShareHandshakeApp.Id, NearShareHandshakeApp.Name, handshake);
+        HandshakeHandler handshake = new(Platform);
+        using var handShakeChannel = await session.StartClientChannelAsync(NearShareHandshakeApp.Id, NearShareHandshakeApp.Name, handshake, cancellationToken);
         var handshakeResultMsg = await handshake.Execute(operationId);
 
         // ToDo: CorrelationVector
         // var cv = handshakeResultMsg.Header.TryGetCorrelationVector() ?? throw new InvalidDataException("No Correlation Vector");
 
-        SenderStateMachine senderStateMachine = new();
-        var channel = await session.StartClientChannelAsync(operationId.ToString("D").ToUpper(), NearShareApp.Name, senderStateMachine, handShakeChannel.Socket);
+        SenderStateMachine senderStateMachine = new(Platform);
+        var channel = await session.StartClientChannelAsync(operationId.ToString("D").ToUpper(), NearShareApp.Name, senderStateMachine, handShakeChannel.Socket, cancellationToken);
         return senderStateMachine;
     }
 
-    static void DisposeApp(CdpAppBase app)
+    public async Task SendUriAsync(CdpDevice device, Uri uri, CancellationToken cancellationToken = default)
     {
-        app.Channel.Dispose(closeSession: true, closeSocket: true);
-    }
-
-    public async Task SendUriAsync(CdpDevice device, Uri uri)
-    {
-        var senderStateMachine = await PrepareTransferInternalAsync(device);
+        using var senderStateMachine = await PrepareTransferInternalAsync(device, cancellationToken);
         await senderStateMachine.SendUriAsync(uri);
-        DisposeApp(senderStateMachine);
     }
 
     public async Task SendFileAsync(CdpDevice device, CdpFileProvider file, IProgress<NearShareProgress> progress, CancellationToken cancellationToken = default)
@@ -51,12 +41,11 @@ public sealed class NearShareSender
 
     public async Task SendFilesAsync(CdpDevice device, IReadOnlyList<CdpFileProvider> files, IProgress<NearShareProgress> progress, CancellationToken cancellationToken = default)
     {
-        var senderStateMachine = await PrepareTransferInternalAsync(device);
+        using var senderStateMachine = await PrepareTransferInternalAsync(device, cancellationToken);
         await senderStateMachine.SendFilesAsync(files, progress, cancellationToken);
-        DisposeApp(senderStateMachine);
     }
 
-    sealed class HandshakeHandler : CdpAppBase
+    sealed class HandshakeHandler(ConnectedDevicesPlatform cdp) : CdpAppBase(cdp)
     {
         readonly TaskCompletionSource<CdpMessage> _promise = new();
 
@@ -84,7 +73,7 @@ public sealed class NearShareSender
         }
     }
 
-    sealed class SenderStateMachine : CdpAppBase
+    sealed class SenderStateMachine(ConnectedDevicesPlatform cdp) : CdpAppBase(cdp)
     {
         readonly TaskCompletionSource _promise = new();
         public async Task SendUriAsync(Uri uri)

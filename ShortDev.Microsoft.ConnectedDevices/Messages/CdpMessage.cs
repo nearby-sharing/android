@@ -2,11 +2,10 @@
 using ShortDev.Microsoft.ConnectedDevices.Serialization;
 using ShortDev.Networking;
 using System;
-using System.IO;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages;
 
-public sealed class CdpMessage : IDisposable
+public sealed class CdpMessage
 {
     readonly EndianBuffer _buffer;
 
@@ -70,9 +69,5 @@ public sealed class CdpMessage : IDisposable
     {
         if (!IsComplete)
             throw new InvalidOperationException("Wait for completion");
-    }
-
-    public void Dispose()
-    {
     }
 }

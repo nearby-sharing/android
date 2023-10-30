@@ -31,7 +31,7 @@ public sealed class CdpSession : IDisposable
     public PeerCapabilities ClientCapabilities { get; private set; } = 0;
 
     public ConnectedDevicesPlatform Platform { get; }
-    public CdpDevice Device { get; internal set; }
+    public CdpDevice Device { get; private set; }
 
     readonly ILogger<CdpSession> _logger;
     readonly UpgradeHandler _upgradeHandler;
@@ -548,7 +548,7 @@ public sealed class CdpSession : IDisposable
         ));
         header.RequestID = 0;
 
-        InitializeHostChannel(request, socket, out var channelId);
+        _channelRegistry.Create(channelId => CdpChannel.CreateServerChannel(this, channelId, socket, request), out var channelId);
 
         header.Flags = 0;
         SendMessage(socket, header, (writer) =>
@@ -566,7 +566,7 @@ public sealed class CdpSession : IDisposable
     }
 
     event Action<CommonHeader, StartChannelResponse>? OnStartChannelResponseInternal;
-    Task<StartChannelResponse> WaitForChannelResponse(ulong requestId)
+    Task<StartChannelResponse> WaitForChannelResponse(ulong requestId, CancellationToken cancellationToken)
     {
         TaskCompletionSource<StartChannelResponse> promise = new();
         void callback(CommonHeader header, StartChannelResponse response)
@@ -577,6 +577,13 @@ public sealed class CdpSession : IDisposable
             OnStartChannelResponseInternal -= callback;
         }
         OnStartChannelResponseInternal += callback;
+
+        cancellationToken.Register(() =>
+        {
+            OnStartChannelResponseInternal -= callback;
+            promise.TrySetCanceled();
+        });
+
         return promise.Task;
     }
 
@@ -593,19 +600,18 @@ public sealed class CdpSession : IDisposable
             throw UnexpectedMessage("Encryption");
 
         CdpMessage msg = GetOrCreateMessage(header);
-        msg.AddFragment(reader.ReadToEnd());
+        msg.AddFragment(reader.ReadToEnd()); // ToDo: Reduce allocations
 
         if (msg.IsComplete)
         {
             try
             {
-                _channelRegistry.Get(header.ChannelId)
-                    .HandleMessageAsync(msg);
+                var app = _channelRegistry.Get(header.ChannelId).App ?? throw new InvalidOperationException($"No app for channel {header.ChannelId}");
+                app.HandleMessage(msg);
             }
             finally
             {
                 _msgRegistry.Remove(msg.Id, out _);
-                msg.Dispose();
             }
         }
     }
@@ -613,11 +619,11 @@ public sealed class CdpSession : IDisposable
 
     #region IDs
     uint _sequenceNumber = 0;
-    internal uint SequenceNumber()
+    uint SequenceNumber()
         => Interlocked.Increment(ref _sequenceNumber);
 
     ulong _requestId = 0;
-    internal ulong RequestId()
+    ulong RequestId()
         => Interlocked.Increment(ref _requestId);
     #endregion
 
@@ -630,30 +636,16 @@ public sealed class CdpSession : IDisposable
     #region Channels
     readonly AutoKeyRegistry<ulong, CdpChannel> _channelRegistry = new();
 
-    void InitializeHostChannel(StartChannelRequest request, CdpSocket socket, out ulong channelId)
-    {
-        if (!IsHost)
-            throw new InvalidOperationException("Session is not a host");
-
-        _channelRegistry.Create(channelId =>
-        {
-            var app = CdpAppRegistration.InstantiateApp(request.Id, request.Name);
-            CdpChannel channel = new(this, channelId, app, socket);
-            app.Channel = channel;
-            return channel;
-        }, out channelId);
-    }
-
-    public async Task<CdpChannel> StartClientChannelAsync(string appId, string appName, CdpAppBase handler)
+    public async Task<CdpChannel> StartClientChannelAsync(string appId, string appName, CdpAppBase handler, CancellationToken cancellationToken = default)
     {
         if (IsHost)
             throw new InvalidOperationException("Session is not a client");
 
         var socket = await Platform.CreateSocketAsync(Device);
-        return await StartClientChannelAsync(appId, appName, handler, socket);
+        return await StartClientChannelAsync(appId, appName, handler, socket, cancellationToken);
     }
 
-    public async Task<CdpChannel> StartClientChannelAsync(string appId, string appName, CdpAppBase handler, CdpSocket socket)
+    public async Task<CdpChannel> StartClientChannelAsync(string appId, string appName, CdpAppBase handler, CdpSocket socket, CancellationToken cancellationToken = default)
     {
         if (IsHost)
             throw new InvalidOperationException("Session is not a client");
@@ -679,12 +671,12 @@ public sealed class CdpSession : IDisposable
             supplyRequestId: true
         );
 
-        var response = await WaitForChannelResponse(header.RequestID);
+        var response = await WaitForChannelResponse(header.RequestID, cancellationToken);
         response.ThrowOnError();
 
-        CdpChannel channel = new(this, response.ChannelId, handler, socket);
-        handler.Channel = channel;
+        var channel = CdpChannel.CreateClientChannel(this, socket, response, handler);
         _channelRegistry.Add(channel.ChannelId, channel);
+
         return channel;
     }
 
@@ -724,8 +716,6 @@ public sealed class CdpSession : IDisposable
             channel.Dispose();
         _channelRegistry.Clear();
 
-        foreach (var msg in _msgRegistry.Values)
-            msg.Dispose();
         _msgRegistry.Clear();
     }
     #endregion

@@ -4,24 +4,18 @@ using ShortDev.Microsoft.ConnectedDevices.Messages;
 using ShortDev.Microsoft.ConnectedDevices.NearShare.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Serialization;
 using System.Collections;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 namespace ShortDev.Microsoft.ConnectedDevices.NearShare.Internal;
 
-internal sealed class NearShareApp : CdpAppBase
+internal sealed class NearShareApp(ConnectedDevicesPlatform cdp) : CdpAppBase(cdp)
 {
     const uint PartitionSize = 102400u; // 131072u
     public static string Name { get; } = "NearSharePlatform";
 
-    public required INearSharePlatformHandler PlatformHandler { get; init; }
-    public required string Id { get; init; }
+    readonly ILogger<NearShareApp> _logger = cdp.DeviceInfo.LoggerFactory.CreateLogger<NearShareApp>();
 
-    [AllowNull] ILogger<NearShareApp> _logger;
-    protected override void OnInitialized(CdpChannel channel)
-    {
-        _logger = channel.Session.Platform.DeviceInfo.LoggerFactory.CreateLogger<NearShareApp>();
-    }
+    public required string Id { get; init; }
 
     uint _messageId = 0;
     public override void HandleMessage(CdpMessage msg)
@@ -79,7 +73,7 @@ internal sealed class NearShareApp : CdpAppBase
                     };
                     HandleFileTransferToken(_fileTransferToken);
 
-                    PlatformHandler.OnFileTransfer(_fileTransferToken);
+                    NearShareReceiver.OnFileTransfer(_fileTransferToken);
                     return;
                 }
             case DataKind.Uri:
@@ -90,7 +84,7 @@ internal sealed class NearShareApp : CdpAppBase
                         msg.Header.SessionId,
                         Channel.Socket.TransportType
                     );
-                    PlatformHandler.OnReceivedUri(new()
+                    NearShareReceiver.OnReceivedUri(new()
                     {
                         DeviceName = Channel.Session.Device.Name,
                         Uri = uri
@@ -195,7 +189,7 @@ internal sealed class NearShareApp : CdpAppBase
         request.Add("ControlMessage", (uint)NearShareControlMsgType.CancelTransfer);
         SendValueSet(request, _messageId);
 
-        CloseChannel();
+        Dispose();
     }
 
     void OnCompleted()
@@ -204,12 +198,12 @@ internal sealed class NearShareApp : CdpAppBase
         request.Add("ControlMessage", (uint)NearShareControlMsgType.CompleteTransfer);
         SendValueSet(request, _messageId);
 
-        CloseChannel();
+        Dispose();
     }
 
-    protected override void CloseChannel()
+    public override void Dispose()
     {
-        base.CloseChannel();
+        base.Dispose();
         CdpAppRegistration.TryUnregisterApp(Id);
     }
 }

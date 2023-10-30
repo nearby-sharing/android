@@ -23,7 +23,7 @@ using SystemDebug = System.Diagnostics.Debug;
 namespace Nearby_Sharing_Windows;
 
 [Activity(Label = "@string/app_name", Theme = "@style/AppTheme", ConfigurationChanges = UIHelper.ConfigChangesFlags)]
-public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandler
+public sealed class ReceiveActivity : AppCompatActivity
 {
     BluetoothAdapter? _btAdapter;
 
@@ -170,7 +170,9 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
         _cdp.Listen(_cancellationTokenSource.Token);
         _cdp.Advertise(_cancellationTokenSource.Token);
 
-        NearShareReceiver.Start(_cdp, this);
+        NearShareReceiver.Register(_cdp);
+        NearShareReceiver.ReceivedUri += OnReceivedUri;
+        NearShareReceiver.FileTransfer += OnFileTransfer;
 
         FindViewById<TextView>(Resource.Id.deviceInfoTextView)!.Text = this.Localize(
             Resource.String.visible_as_template,
@@ -203,7 +205,7 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
     {
         _cancellationTokenSource?.Cancel();
         _cdp?.Dispose();
-        NearShareReceiver.Stop();
+        NearShareReceiver.Unregister();
         base.Finish();
     }
 

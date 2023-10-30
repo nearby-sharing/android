@@ -3,13 +3,11 @@ using ShortDev.Microsoft.ConnectedDevices.Serialization;
 
 namespace ShortDev.Microsoft.ConnectedDevices.NearShare.Internal;
 
-public class NearShareHandshakeApp : CdpAppBase, ICdpAppId
+public class NearShareHandshakeApp(ConnectedDevicesPlatform cdp) : CdpAppBase(cdp), ICdpAppId
 {
     public static string Id { get; } = "0D472C30-80B5-4722-A279-0F3B97F0DCF2";
 
     public static string Name { get; } = "NearSharePlatform";
-
-    public required INearSharePlatformHandler PlatformHandler { get; init; }
 
     public override void HandleMessage(CdpMessage msg)
     {
@@ -19,10 +17,9 @@ public class NearShareHandshakeApp : CdpAppBase, ICdpAppId
         CdpAppRegistration.RegisterApp(
             id,
             NearShareApp.Name,
-            () => new NearShareApp()
+            cdp => new NearShareApp(cdp)
             {
-                Id = id,
-                PlatformHandler = PlatformHandler
+                Id = id
             }
         );
 
@@ -31,6 +28,6 @@ public class NearShareHandshakeApp : CdpAppBase, ICdpAppId
         response.Add("VersionHandShakeResult", 1u);
         SendValueSet(response, msgId: 0);
 
-        Channel.Dispose();
+        Channel.Dispose(closeSession: false, closeSocket: false);
     }
 }
