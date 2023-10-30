@@ -3,7 +3,7 @@ using System.Buffers;
 
 namespace ShortDev.Networking;
 
-public readonly struct EndianBuffer
+public readonly struct EndianBuffer : IBufferWriter<byte>
 {
     readonly ArrayBufferWriter<byte> _writer;
 
@@ -46,4 +46,8 @@ public readonly struct EndianBuffer
 
     public void Clear()
         => _writer.Clear();
+
+    void IBufferWriter<byte>.Advance(int count) => _writer.Advance(count);
+    Memory<byte> IBufferWriter<byte>.GetMemory(int sizeHint) => _writer.GetMemory(sizeHint);
+    Span<byte> IBufferWriter<byte>.GetSpan(int sizeHint) => _writer.GetSpan(sizeHint);
 }
