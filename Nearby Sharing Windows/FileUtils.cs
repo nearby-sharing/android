@@ -26,7 +26,18 @@ internal static class FileUtils
 
     public static Stream CreateDownloadFile(this Activity activity, string fileName)
     {
-        var filePath = Path.Combine(activity.GetDownloadDirectory().FullName, fileName);
+        var downloadDir = activity.GetDownloadDirectory().FullName;
+
+        string filePath = Path.Combine(downloadDir, fileName);
+        if (!File.Exists(filePath))
+            return File.Create(filePath);
+
+        var fileNameCore = Path.GetFileNameWithoutExtension(fileName);
+        var extension = Path.GetExtension(fileName);
+        for (int i = 1; File.Exists(filePath); i++)
+        {
+            filePath = Path.Combine(downloadDir, $"{fileNameCore} ({i}){extension}");
+        }
         return File.Create(filePath);
     }
 
