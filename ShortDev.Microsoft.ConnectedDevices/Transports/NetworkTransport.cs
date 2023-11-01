@@ -87,10 +87,10 @@ public sealed class NetworkTransport(INetworkHandler handler) : ICdpTransport, I
     };
 
     bool _isAdvertising = false;
-    LocalDeviceInfo? _deviceInfo;
+    PresenceResponse? _presenceResponse;
     public void Advertise(LocalDeviceInfo deviceInfo, CancellationToken cancellationToken)
     {
-        _deviceInfo = deviceInfo;
+        _presenceResponse = PresenceResponse.Create(deviceInfo);
         _isAdvertising = true;
         EnsureListeningUdp(cancellationToken);
         cancellationToken.Register(() => _isAdvertising = false);
@@ -193,7 +193,7 @@ public sealed class NetworkTransport(INetworkHandler handler) : ICdpTransport, I
 
         void SendPresenceResponse(IPAddress device)
         {
-            if (_deviceInfo == null)
+            if (_presenceResponse == null)
                 return;
 
             EndianWriter writer = new(Endianness.BigEndian);
@@ -206,16 +206,10 @@ public sealed class NetworkTransport(INetworkHandler handler) : ICdpTransport, I
             {
                 Type = DiscoveryType.PresenceResponse
             }.Write(writer);
-            new PresenceResponse()
-            {
-                ConnectionMode = Messages.Connection.ConnectionMode.Proximal,
-                DeviceName = _deviceInfo.Name,
-                DeviceType = _deviceInfo.Type
-            }.Write(writer);
+            _presenceResponse.Write(writer);
 
             _udpclient.Send(writer.Buffer.AsSpan(), new IPEndPoint(device, Constants.UdpPort));
         }
     }
-
     #endregion
 }

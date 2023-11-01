@@ -1,6 +1,10 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Messages.Connection;
-using System.IO;
+using ShortDev.Microsoft.ConnectedDevices.Platforms;
 using ShortDev.Networking;
+using System;
+using System.IO;
+using System.Security.Cryptography;
+using System.Xml.Linq;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages.Discovery;
 
@@ -12,11 +16,9 @@ public class PresenceResponse : ICdpPayload<PresenceResponse>
 
     public required string DeviceName { get; init; }
 
-    public int DeviceIdSalt { get; init; }
+    public required int DeviceIdSalt { get; init; }
 
-    public int DeviceIdHash { get; init; }
-
-    public int PrincipalUserNameHash { get; init; }
+    public required byte[] DeviceIdHash { get; init; }
 
     public static PresenceResponse Parse(ref EndianReader reader)
         => new()
@@ -25,8 +27,7 @@ public class PresenceResponse : ICdpPayload<PresenceResponse>
             DeviceType = (DeviceType)reader.ReadInt16(),
             DeviceName = reader.ReadStringWithLength(),
             DeviceIdSalt = reader.ReadInt32(),
-            DeviceIdHash = reader.ReadInt32(),
-            PrincipalUserNameHash = reader.ReadInt32()
+            DeviceIdHash = reader.ReadBytes(32).ToArray()
         };
 
     public void Write(EndianWriter writer)
@@ -35,7 +36,31 @@ public class PresenceResponse : ICdpPayload<PresenceResponse>
         writer.Write((short)DeviceType);
         writer.WriteWithLength(DeviceName);
         writer.Write((int)DeviceIdSalt);
-        writer.Write((int)DeviceIdHash);
-        writer.Write((int)PrincipalUserNameHash);
+        writer.Write(DeviceIdHash);
+    }
+
+    static readonly HashAlgorithm _hashAlgorithm = SHA256.Create();
+    public static PresenceResponse Create(LocalDeviceInfo deviceInfo, ConnectionMode connectionMode = ConnectionMode.Proximal)
+    {
+        var salt = RandomNumberGenerator.GetInt32(int.MaxValue);
+
+        using MemoryStream stream = new();
+        EndianWriter writer = new(Endianness.LittleEndian);
+
+        // ToDo: Wrong
+        writer.Write(salt);
+        writer.Write(deviceInfo.GetDeduplicationHint());
+
+        writer.CopyTo(stream);
+        var hash = _hashAlgorithm.ComputeHash(stream);
+
+        return new()
+        {
+            ConnectionMode = connectionMode,
+            DeviceName = deviceInfo.Name,
+            DeviceType = deviceInfo.Type,
+            DeviceIdSalt = salt,
+            DeviceIdHash = hash
+        };
     }
 }
