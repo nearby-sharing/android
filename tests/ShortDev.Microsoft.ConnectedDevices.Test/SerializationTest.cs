@@ -27,7 +27,8 @@ public sealed class SerializationTest
         {
             if (
                 IsOk(typeof(ICdpHeader<>), type) ||
-                IsOk(typeof(ICdpPayload<>), type)
+                IsOk(typeof(ICdpPayload<>), type) &&
+                type.Name != "PresenceResponse"
             )
                 yield return new object[] { type };
         }

@@ -1,10 +1,8 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Messages.Connection;
 using ShortDev.Microsoft.ConnectedDevices.Platforms;
 using ShortDev.Networking;
-using System;
 using System.IO;
 using System.Security.Cryptography;
-using System.Xml.Linq;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages.Discovery;
 
