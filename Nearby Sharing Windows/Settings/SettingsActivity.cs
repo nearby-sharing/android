@@ -4,6 +4,7 @@ using Android.Service.QuickSettings;
 using Android.Views;
 using AndroidX.Activity;
 using AndroidX.AppCompat.App;
+using AndroidX.Preference;
 
 namespace Nearby_Sharing_Windows.Settings;
 
@@ -31,17 +32,11 @@ public sealed class SettingsActivity : AppCompatActivity, ISettingsNavigation
         OnBackPressedDispatcher.AddCallback(this, new BackPressedListener(this, SupportFragmentManager, OnBackPressedDispatcher, true));
     }
 
-    sealed class BackPressedListener : OnBackPressedCallback
+    sealed class BackPressedListener(ISettingsNavigation navigation, AndroidX.Fragment.App.FragmentManager fragmentManager, OnBackPressedDispatcher dispatcher, bool enabled) : OnBackPressedCallback(enabled)
     {
-        readonly ISettingsNavigation _navigation;
-        readonly AndroidX.Fragment.App.FragmentManager _fragmentManager;
-        readonly OnBackPressedDispatcher _dispatcher;
-        public BackPressedListener(ISettingsNavigation navigation, AndroidX.Fragment.App.FragmentManager fragmentManager, OnBackPressedDispatcher dispatcher, bool enabled) : base(enabled)
-        {
-            _navigation = navigation;
-            _fragmentManager = fragmentManager;
-            _dispatcher = dispatcher;
-        }
+        readonly ISettingsNavigation _navigation = navigation;
+        readonly AndroidX.Fragment.App.FragmentManager _fragmentManager = fragmentManager;
+        readonly OnBackPressedDispatcher _dispatcher = dispatcher;
 
         public override void HandleOnBackPressed()
         {
@@ -125,8 +120,10 @@ sealed class CdpScreenFragment : SettingsFragment
         PreferenceScreen!.FindPreference("request_permissions_receive")!.PreferenceClick +=
             (s, e) => UIHelper.RequestReceivePermissions(Activity!);
 
+        ((EditTextPreference)PreferenceScreen!.FindPreference("device_name")!).DialogLayoutResource = Resource.Layout.settingslib_preference_dialog_edittext;
+
         PreferenceScreen!.FindPreference("goto_mac_address")!.PreferenceClick +=
-            (s, e) => StartActivity(new Android.Content.Intent(Activity!, typeof(ReceiveSetupActivity)));
+            (s, e) => StartActivity(new Intent(Activity!, typeof(ReceiveSetupActivity)));
         PreferenceScreen!.FindPreference("open_setup")!.PreferenceClick +=
             (s, e) => UIHelper.OpenSetup(Activity!);
     }
