@@ -20,7 +20,7 @@ internal sealed class UpgradeHandler
     public UpgradeHandler(CdpSession session, CdpDevice initalDevice)
     {
         _session = session;
-        _logger = session.Platform.DeviceInfo.LoggerFactory.CreateLogger<UpgradeHandler>();
+        _logger = session.Platform.CreateLogger<UpgradeHandler>();
 
         // Initial address is always allowed
         _allowedAddresses.Add(initalDevice.Endpoint.Address);

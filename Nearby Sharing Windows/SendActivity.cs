@@ -7,6 +7,7 @@ using AndroidX.AppCompat.App;
 using AndroidX.RecyclerView.Widget;
 using Google.Android.Material.ProgressIndicator;
 using Google.Android.Material.Snackbar;
+using Microsoft.Extensions.Logging;
 using Nearby_Sharing_Windows.Settings;
 using ShortDev.Android.UI;
 using ShortDev.Microsoft.ConnectedDevices;
@@ -31,6 +32,9 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
     [AllowNull] TextView StatusTextView;
     [AllowNull] FrameLayout bottomSheetFrame;
     [AllowNull] Button cancelButton;
+
+    ILogger<SendActivity> _logger = null!;
+    ILoggerFactory _loggerFactory = null!;
     protected override void OnCreate(Bundle? savedInstanceState)
     {
         base.OnCreate(savedInstanceState);
@@ -69,6 +73,9 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
 
         cancelButton.Click += CancelButton_Click;
 
+        _loggerFactory = ConnectedDevicesPlatform.CreateLoggerFactory(this.GetLogFilePattern());
+        _logger = _loggerFactory.CreateLogger<SendActivity>();
+
         UIHelper.RequestSendPermissions(this);
     }
 
@@ -102,6 +109,8 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
 
     public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
     {
+        _logger.RequestPermissionResult(requestCode, permissions, grantResults);
+
         if (grantResults.Contains(Android.Content.PM.Permission.Denied))
         {
             Snackbar.Make(Window!.DecorView, GetString(Resource.String.send_missing_permissions), Snackbar.LengthLong).Show();
@@ -124,9 +133,8 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
             Name = SettingsFragment.GetDeviceName(this, adapter),
             OemModelName = Build.Model ?? string.Empty,
             OemManufacturerName = Build.Manufacturer ?? string.Empty,
-            DeviceCertificate = ConnectedDevicesPlatform.CreateDeviceCertificate(CdpEncryptionParams.Default),
-            LoggerFactory = ConnectedDevicesPlatform.CreateLoggerFactory(this.GetLogFilePattern())
-        });
+            DeviceCertificate = ConnectedDevicesPlatform.CreateDeviceCertificate(CdpEncryptionParams.Default)
+        }, _loggerFactory);
 
         AndroidBluetoothHandler bluetoothHandler = new(adapter, PhysicalAddress.None);
         Platform.AddTransport<BluetoothTransport>(new(bluetoothHandler));

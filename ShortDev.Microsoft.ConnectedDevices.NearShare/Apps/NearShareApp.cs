@@ -6,14 +6,14 @@ using ShortDev.Microsoft.ConnectedDevices.Serialization;
 using System.Collections;
 using System.Runtime.InteropServices;
 
-namespace ShortDev.Microsoft.ConnectedDevices.NearShare.Internal;
+namespace ShortDev.Microsoft.ConnectedDevices.NearShare.Apps;
 
 internal sealed class NearShareApp(ConnectedDevicesPlatform cdp) : CdpAppBase(cdp)
 {
     const uint PartitionSize = 102400u; // 131072u
     public static string Name { get; } = "NearSharePlatform";
 
-    readonly ILogger<NearShareApp> _logger = cdp.DeviceInfo.LoggerFactory.CreateLogger<NearShareApp>();
+    readonly ILogger<NearShareApp> _logger = cdp.CreateLogger<NearShareApp>();
 
     public required string Id { get; init; }
 
@@ -49,7 +49,7 @@ internal sealed class NearShareApp(ConnectedDevicesPlatform cdp) : CdpAppBase(cd
                 {
                     var fileNames = payload.Get<List<string>>("FileNames");
 
-                    _logger.LogInformation("Receiving file {FileNames} from session {SessionId:X} via {TransportType}",
+                    _logger.ReceivingFile(
                         fileNames,
                         msg.Header.SessionId,
                         Channel.Socket.TransportType
@@ -79,7 +79,7 @@ internal sealed class NearShareApp(ConnectedDevicesPlatform cdp) : CdpAppBase(cd
             case DataKind.Uri:
                 {
                     var uri = payload.Get<string>("Uri");
-                    _logger.LogInformation("Received uri {Uri} from session {SessionId:X} via {TransportType}",
+                    _logger.ReceivedUrl(
                         uri,
                         msg.Header.SessionId,
                         Channel.Socket.TransportType
@@ -162,7 +162,6 @@ internal sealed class NearShareApp(ConnectedDevicesPlatform cdp) : CdpAppBase(cd
             return;
         }
 
-        // PlatformHandler.Log(0, $"BlobPosition: {position}; ({newPosition * 100 / bytesToSend}%)");
         lock (_fileTransferToken)
         {
             var stream = _fileTransferToken.GetStream(contentId);

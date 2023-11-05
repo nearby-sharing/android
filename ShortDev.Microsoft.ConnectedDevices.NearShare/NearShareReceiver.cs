@@ -1,4 +1,4 @@
-﻿using ShortDev.Microsoft.ConnectedDevices.NearShare.Internal;
+﻿using ShortDev.Microsoft.ConnectedDevices.NearShare.Apps;
 
 namespace ShortDev.Microsoft.ConnectedDevices.NearShare;
 

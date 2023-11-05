@@ -42,7 +42,7 @@ public sealed class CdpSession : IDisposable
         Device = device;
         SessionId = sessionId;
 
-        _logger = platform.DeviceInfo.LoggerFactory.CreateLogger<CdpSession>();
+        _logger = platform.CreateLogger<CdpSession>();
         _upgradeHandler = new(this, device);
         _connectHandler = new(this, _upgradeHandler);
     }
@@ -201,7 +201,7 @@ public sealed class CdpSession : IDisposable
     CdpEncryptionInfo? _remoteEncryption = null;
     sealed class ConnectHandler(CdpSession session, UpgradeHandler upgradeHandler)
     {
-        readonly ILogger<ConnectHandler> _logger = session.Platform.DeviceInfo.LoggerFactory.CreateLogger<ConnectHandler>();
+        readonly ILogger<ConnectHandler> _logger = session.Platform.CreateLogger<ConnectHandler>();
         readonly CdpSession _session = session;
         readonly UpgradeHandler _upgradeHandler = upgradeHandler;
 

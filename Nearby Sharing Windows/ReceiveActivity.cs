@@ -7,6 +7,7 @@ using AndroidX.AppCompat.App;
 using AndroidX.RecyclerView.Widget;
 using Google.Android.Material.Dialog;
 using Google.Android.Material.ProgressIndicator;
+using Microsoft.Extensions.Logging;
 using Nearby_Sharing_Windows.Settings;
 using ShortDev.Android.UI;
 using ShortDev.Microsoft.ConnectedDevices;
@@ -33,6 +34,9 @@ public sealed class ReceiveActivity : AppCompatActivity
     readonly List<TransferToken> _notifications = new();
 
     PhysicalAddress? btAddress = null;
+
+    ILogger<ReceiveActivity> _logger = null!;
+    ILoggerFactory _loggerFactory = null!;
     protected override void OnCreate(Bundle? savedInstanceState)
     {
         base.OnCreate(savedInstanceState);
@@ -47,7 +51,6 @@ public sealed class ReceiveActivity : AppCompatActivity
 
         SetContentView(Resource.Layout.activity_receive);
 
-        UIHelper.RequestReceivePermissions(this);
         UIHelper.SetupToolBar(this, GetString(Resource.String.app_titlebar_title_receive));
 
         notificationsRecyclerView = FindViewById<RecyclerView>(Resource.Id.notificationsRecyclerView)!;
@@ -56,6 +59,11 @@ public sealed class ReceiveActivity : AppCompatActivity
         FindViewById<Button>(Resource.Id.openFAQButton)!.Click += (s, e) => UIHelper.OpenFAQ(this);
 
         adapterDescriptor = new(Resource.Layout.item_transfer_notification, OnInflateNotification);
+
+        _loggerFactory = ConnectedDevicesPlatform.CreateLoggerFactory(this.GetLogFilePattern());
+        _logger = _loggerFactory.CreateLogger<ReceiveActivity>();
+
+        UIHelper.RequestReceivePermissions(this);
     }
 
     void OnInflateNotification(View view, TransferToken transfer)
@@ -187,9 +195,8 @@ public sealed class ReceiveActivity : AppCompatActivity
             Name = deviceName,
             OemModelName = Build.Model ?? string.Empty,
             OemManufacturerName = Build.Manufacturer ?? string.Empty,
-            DeviceCertificate = ConnectedDevicesPlatform.CreateDeviceCertificate(CdpEncryptionParams.Default),
-            LoggerFactory = ConnectedDevicesPlatform.CreateLoggerFactory(this.GetLogFilePattern())
-        });
+            DeviceCertificate = ConnectedDevicesPlatform.CreateDeviceCertificate(CdpEncryptionParams.Default)
+        }, _loggerFactory);
 
         IBluetoothHandler bluetoothHandler = new AndroidBluetoothHandler(_btAdapter, btAddress);
         _cdp.AddTransport<BluetoothTransport>(new(bluetoothHandler));
@@ -214,6 +221,8 @@ public sealed class ReceiveActivity : AppCompatActivity
 
     public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
     {
+        _logger.RequestPermissionResult(requestCode, permissions, grantResults);
+
         if (grantResults.Contains(Permission.Denied))
         {
             Toast.MakeText(this, this.Localize(Resource.String.receive_missing_permissions), ToastLength.Long)!.Show();

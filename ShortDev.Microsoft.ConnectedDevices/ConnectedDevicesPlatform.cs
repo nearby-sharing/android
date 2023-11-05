@@ -21,11 +21,11 @@ using System.Threading.Tasks;
 
 namespace ShortDev.Microsoft.ConnectedDevices;
 
-public sealed class ConnectedDevicesPlatform(LocalDeviceInfo deviceInfo) : IDisposable
+public sealed class ConnectedDevicesPlatform(LocalDeviceInfo deviceInfo, ILoggerFactory loggerFactory) : IDisposable
 {
     public LocalDeviceInfo DeviceInfo { get; } = deviceInfo;
 
-    readonly ILogger<ConnectedDevicesPlatform> _logger = deviceInfo.LoggerFactory.CreateLogger<ConnectedDevicesPlatform>();
+    readonly ILogger<ConnectedDevicesPlatform> _logger = loggerFactory.CreateLogger<ConnectedDevicesPlatform>();
 
     #region Transport
     readonly ConcurrentDictionary<Type, ICdpTransport> _transports = new();
@@ -260,6 +260,9 @@ public sealed class ConnectedDevicesPlatform(LocalDeviceInfo deviceInfo) : IDisp
         }
         return DeviceInfo.ToCdpDeviceInfo(endpoints);
     }
+
+    public ILogger<T> CreateLogger<T>()
+        => loggerFactory.CreateLogger<T>();
 
     public void Dispose()
     {

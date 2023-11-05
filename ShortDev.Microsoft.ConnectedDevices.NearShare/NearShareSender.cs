@@ -1,7 +1,7 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Exceptions;
 using ShortDev.Microsoft.ConnectedDevices.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Session;
-using ShortDev.Microsoft.ConnectedDevices.NearShare.Internal;
+using ShortDev.Microsoft.ConnectedDevices.NearShare.Apps;
 using ShortDev.Microsoft.ConnectedDevices.NearShare.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Platforms;
 using ShortDev.Microsoft.ConnectedDevices.Serialization;
