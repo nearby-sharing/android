@@ -20,9 +20,9 @@ using System.Net.NetworkInformation;
 
 namespace Nearby_Sharing_Windows;
 
-[IntentFilter(new[] { Intent.ActionProcessText }, Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable }, DataMimeType = "text/plain", Label = "@string/share_text")]
-[IntentFilter(new[] { Intent.ActionSend, Intent.ActionSendMultiple }, Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable }, DataMimeType = "*/*", Label = "@string/share_file")]
-[IntentFilter(new[] { Intent.ActionSend }, Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable }, DataMimeType = "text/plain", Label = "@string/share_url")]
+[IntentFilter([Intent.ActionProcessText], Categories = [Intent.CategoryDefault, Intent.CategoryBrowsable], DataMimeType = "text/plain", Label = "@string/share_text")]
+[IntentFilter([Intent.ActionSend, Intent.ActionSendMultiple], Categories = [Intent.CategoryDefault, Intent.CategoryBrowsable], DataMimeType = "*/*", Label = "@string/share_file")]
+[IntentFilter([Intent.ActionSend], Categories = [Intent.CategoryDefault, Intent.CategoryBrowsable], DataMimeType = "text/plain", Label = "@string/share_url")]
 [Activity(Label = "@string/app_name", Exported = true, Theme = "@style/AppTheme.TranslucentOverlay", ConfigurationChanges = UIHelper.ConfigChangesFlags)]
 public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsListener
 {
@@ -67,8 +67,8 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
                 (int)WindowInsetsControllerAppearance.LightNavigationBars,
                 (int)WindowInsetsControllerAppearance.LightNavigationBars
             );
-        else
-            Window!.DecorView.SystemUiVisibility = (StatusBarVisibility)SystemUiFlags.LightNavigationBar;
+        else if (OperatingSystem.IsAndroidVersionAtLeast(26))
+            Window!.DecorView.SystemUiFlags = SystemUiFlags.LightNavigationBar;
         Window!.DecorView.SetOnApplyWindowInsetsListener(this);
 
         cancelButton.Click += CancelButton_Click;
@@ -148,7 +148,7 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
         NearShareSender = new NearShareSender(Platform);
     }
 
-    readonly List<CdpDevice> RemoteSystems = new();
+    readonly List<CdpDevice> RemoteSystems = [];
     private void Platform_DeviceDiscovered(ICdpTransport sender, CdpDevice device, BLeBeacon advertisement)
     {
         if (!RemoteSystems.Contains(device))
@@ -266,7 +266,7 @@ public sealed class SendActivity : AppCompatActivity, View.IOnApplyWindowInsetsL
     {
         ArgumentNullException.ThrowIfNull(Intent);
 
-        if (Intent.Action == Intent.ActionProcessText)
+        if (Intent.Action == Intent.ActionProcessText && OperatingSystem.IsAndroidVersionAtLeast(23))
         {
             return (
                 files: new[] { SendText(Intent.GetStringExtra(Intent.ExtraProcessText)) },

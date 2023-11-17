@@ -7,6 +7,7 @@ using AndroidX.Browser.CustomTabs;
 using AndroidX.Core.App;
 using Google.Android.Material.Dialog;
 using Nearby_Sharing_Windows.Settings;
+using System.Runtime.Versioning;
 using CompatToolbar = AndroidX.AppCompat.Widget.Toolbar;
 
 namespace Nearby_Sharing_Windows;
@@ -103,16 +104,22 @@ internal static class UIHelper
     }
 
     #region Permissions
-    private static readonly string[] _sendPermissions = new[]
-    {
+    private static readonly string[] _sendPermissions = [
         ManifestPermission.AccessFineLocation,
-        ManifestPermission.AccessCoarseLocation,
-        // Api level 31
+        ManifestPermission.AccessCoarseLocation
+    ];
+    [SupportedOSPlatform("android31.0")]
+    private static readonly string[] _sendPermissionsApi31 = [
+        .. _sendPermissions,
         ManifestPermission.BluetoothScan,
         ManifestPermission.BluetoothConnect
-    };
+    ];
     public static void RequestSendPermissions(Activity activity)
-        => ActivityCompat.RequestPermissions(activity, _sendPermissions, 0);
+        => ActivityCompat.RequestPermissions(
+                activity,
+                OperatingSystem.IsAndroidVersionAtLeast(31) ? _sendPermissionsApi31 : _sendPermissions,
+                0
+            );
 
     private static readonly string[] _receivePermissions = [
         ManifestPermission.AccessFineLocation,
@@ -123,6 +130,7 @@ internal static class UIHelper
         ManifestPermission.ReadExternalStorage,
         ManifestPermission.WriteExternalStorage
     ];
+    [SupportedOSPlatform("android31.0")]
     private static readonly string[] _receivePermissionsApi31 = [
         .. _receivePermissions,
         ManifestPermission.BluetoothScan,
@@ -130,15 +138,11 @@ internal static class UIHelper
         ManifestPermission.BluetoothAdvertise,
     ];
     public static void RequestReceivePermissions(Activity activity)
-    {
-        if (OperatingSystem.IsAndroidVersionAtLeast(31))
-        {
-            ActivityCompat.RequestPermissions(activity, _receivePermissionsApi31, 0);
-            return;
-        }
-
-        ActivityCompat.RequestPermissions(activity, _receivePermissions, 0);
-    }
+        => ActivityCompat.RequestPermissions(
+                activity,
+                OperatingSystem.IsAndroidVersionAtLeast(31) ? _receivePermissionsApi31 : _receivePermissions,
+                0
+            );
     #endregion
 
     public static ISpanned LoadHtmlAsset(Activity activity, string assetPath)

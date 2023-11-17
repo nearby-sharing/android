@@ -136,7 +136,7 @@ public sealed class CdpCryptor : IDisposable
 
         var encryptedPayload = reader.ReadBytes(payloadSize);
 
-        scoped Span<byte> hmac = Span<byte>.Empty;
+        scoped Span<byte> hmac = [];
         if (header.HasFlag(MessageFlags.HasHMAC))
         {
             hmac = stackalloc byte[Constants.HMacSize];

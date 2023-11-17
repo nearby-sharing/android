@@ -4,7 +4,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Internal;
 
 internal sealed class ConcurrentList<T>
 {
-    readonly List<T> _data = new();
+    readonly List<T> _data = [];
 
     public void Add(T item)
     {

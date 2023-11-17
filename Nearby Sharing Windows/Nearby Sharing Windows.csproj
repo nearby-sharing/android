@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net7.0-android33.0</TargetFramework>
+		<TargetFramework>net8.0-android34.0</TargetFramework>
 		<OutputType>Exe</OutputType>
 		<SupportedOSPlatformVersion>21</SupportedOSPlatformVersion>
 		<LangVersion>preview</LangVersion>
@@ -18,11 +18,11 @@
 		<AndroidPackageFormat>aab</AndroidPackageFormat>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Sentry" Version="3.31.0" />
+		<PackageReference Include="Sentry" Version="3.41.0" />
 		<PackageReference Include="ShortDev.Android.FluentIcons" Version="1.1.203" />
-		<PackageReference Include="Xamarin.AndroidX.AppCompat" Version="1.6.1.1" />
-		<PackageReference Include="Xamarin.Google.Android.Material" Version="1.8.0.1" />
-		<PackageReference Include="Xamarin.Essentials" Version="1.7.5" />
+		<PackageReference Include="Xamarin.AndroidX.AppCompat" Version="1.6.1.5" />
+		<PackageReference Include="Xamarin.Google.Android.Material" Version="1.10.0.1" />
+		<PackageReference Include="Xamarin.Essentials" Version="1.8.0" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\lib\ShortDev.Android.Preferences\ShortDev.Android.Preferences.csproj" />

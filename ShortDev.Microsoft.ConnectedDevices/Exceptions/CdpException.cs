@@ -2,7 +2,6 @@
 
 namespace ShortDev.Microsoft.ConnectedDevices.Exceptions;
 
-public class CdpException : Exception
+public class CdpException(string msg) : Exception(msg)
 {
-    public CdpException(string msg) : base(msg) { }
 }
