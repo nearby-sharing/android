@@ -1,6 +1,5 @@
 ﻿namespace ShortDev.Microsoft.ConnectedDevices.Exceptions;
 
-public sealed class CdpSecurityException : CdpException
+public sealed class CdpSecurityException(string msg) : CdpException(msg)
 {
-    public CdpSecurityException(string msg) : base(msg) { }
 }

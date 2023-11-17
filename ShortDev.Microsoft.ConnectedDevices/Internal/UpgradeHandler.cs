@@ -165,14 +165,14 @@ internal sealed class UpgradeHandler
             }.Write(writer);
             new UpgradeResponse()
             {
-                Endpoints = new[]
-                {
+                Endpoints =
+                [
                     EndpointInfo.FromTcp(localIp)
-                },
-                MetaData = new[]
-                {
+                ],
+                MetaData =
+                [
                     EndpointMetadata.Tcp
-                }
+                ]
             }.Write(writer);
         });
     }
@@ -245,10 +245,10 @@ internal sealed class UpgradeHandler
                 new UpgradeRequest()
                 {
                     UpgradeId = upgradeId,
-                    Endpoints = new[]
-                    {
+                    Endpoints =
+                    [
                         EndpointMetadata.Tcp
-                    }
+                    ]
                 }.Write(writer);
             });
         }
@@ -295,10 +295,10 @@ internal sealed class UpgradeHandler
                     ConnectionMode = ConnectionMode.Proximal,
                     MessageType = ConnectionType.UpgradeFinalization
                 }.Write(writer);
-                EndpointMetadata.WriteArray(writer, new[]
-                {
+                EndpointMetadata.WriteArray(writer,
+                [
                     EndpointMetadata.Tcp
-                });
+                ]);
             });
 
             // Cancel after timeout if upgrade has not finished yet

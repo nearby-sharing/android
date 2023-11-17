@@ -39,7 +39,7 @@ public static class Extensions
 
     public static void DisposeAll<T>(this IEnumerable<T> disposables) where T : IDisposable
     {
-        List<Exception> exceptions = new();
+        List<Exception> exceptions = [];
 
         foreach (var disposable in disposables)
         {

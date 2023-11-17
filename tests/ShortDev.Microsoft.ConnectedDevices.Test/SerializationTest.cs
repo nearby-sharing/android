@@ -6,19 +6,14 @@ using Xunit.Abstractions;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Test;
 
-public sealed class SerializationTest
+public sealed class SerializationTest(ITestOutputHelper output)
 {
     static SerializationTest()
     {
         TestValueGenerator.TryRegisterTypeFactory(() => ConnectedDevicesPlatform.CreateDeviceCertificate(CdpEncryptionParams.Default));
     }
 
-    private readonly ITestOutputHelper _output;
-
-    public SerializationTest(ITestOutputHelper output)
-    {
-        _output = output;
-    }
+    private readonly ITestOutputHelper _output = output;
 
     public static IEnumerable<object[]> GenerateMsgTypes()
     {

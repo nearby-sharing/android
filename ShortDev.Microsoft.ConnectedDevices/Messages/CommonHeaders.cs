@@ -50,7 +50,7 @@ public sealed class CommonHeader : ICdpHeader<CommonHeader>
 
         AdditionalHeaderType nextHeaderType;
         byte nextHeaderSize;
-        List<AdditionalHeader> additionalHeaders = new();
+        List<AdditionalHeader> additionalHeaders = [];
         while (true)
         {
             nextHeaderType = (AdditionalHeaderType)reader.ReadByte();
@@ -151,7 +151,7 @@ public sealed class CommonHeader : ICdpHeader<CommonHeader>
     /// If an additional header record is included, this value indicates the type. <br/>
     /// Some values are implementation-specific.
     /// </summary>
-    public List<AdditionalHeader> AdditionalHeaders { get; set; } = new();
+    public List<AdditionalHeader> AdditionalHeaders { get; set; } = [];
 
 
     /// <summary>

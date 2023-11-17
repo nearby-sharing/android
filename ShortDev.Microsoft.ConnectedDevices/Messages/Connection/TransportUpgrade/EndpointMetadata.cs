@@ -1,13 +1,12 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Transports;
 using ShortDev.Networking;
-using System;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages.Connection.TransportUpgrade;
 
 public record class EndpointMetadata(CdpTransportType Type, byte[] Data) : ICdpPayload<EndpointMetadata>, ICdpArraySerializable<EndpointMetadata>
 {
-    public static EndpointMetadata Tcp { get; } = new(CdpTransportType.Tcp, Array.Empty<byte>());
-    public static EndpointMetadata WifiDirect { get; } = new(CdpTransportType.WifiDirect, Array.Empty<byte>());
+    public static EndpointMetadata Tcp { get; } = new(CdpTransportType.Tcp, []);
+    public static EndpointMetadata WifiDirect { get; } = new(CdpTransportType.WifiDirect, []);
 
     public static EndpointMetadata Parse(ref EndianReader reader)
     {

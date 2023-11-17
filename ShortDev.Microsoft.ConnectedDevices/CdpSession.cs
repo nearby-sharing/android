@@ -48,7 +48,7 @@ public sealed class CdpSession : IDisposable
     }
 
     #region Registration
-    static readonly AutoKeyRegistry<uint, CdpSession> _sessionRegistry = new();
+    static readonly AutoKeyRegistry<uint, CdpSession> _sessionRegistry = [];
     internal static CdpSession GetOrCreate(ConnectedDevicesPlatform platform, CdpDevice device, CommonHeader header)
     {
         ArgumentNullException.ThrowIfNull(device);
@@ -635,7 +635,7 @@ public sealed class CdpSession : IDisposable
     #endregion
 
     #region Channels
-    readonly AutoKeyRegistry<ulong, CdpChannel> _channelRegistry = new();
+    readonly AutoKeyRegistry<ulong, CdpChannel> _channelRegistry = [];
 
     public async Task<CdpChannel> StartClientChannelAsync(string appId, string appName, CdpAppBase handler, CancellationToken cancellationToken = default)
     {
@@ -700,10 +700,7 @@ public sealed class CdpSession : IDisposable
     public bool IsDisposed { get; private set; } = false;
 
     private void ThrowIfDisposed()
-    {
-        if (IsDisposed)
-            throw new ObjectDisposedException(nameof(CdpSession));
-    }
+        => ObjectDisposedException.ThrowIf(IsDisposed, this);
 
     public void Dispose()
     {

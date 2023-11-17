@@ -19,7 +19,7 @@ internal static class FileUtils
 
     public static string QueryContentName(this ContentResolver resolver, AndroidUri contentUri)
     {
-        using var returnCursor = resolver.Query(contentUri, new[] { IOpenableColumns.DisplayName }, null, null, null) ?? throw new InvalidOperationException("Could not open content cursor");
+        using var returnCursor = resolver.Query(contentUri, [IOpenableColumns.DisplayName], null, null, null) ?? throw new InvalidOperationException("Could not open content cursor");
         returnCursor.MoveToFirst();
         return returnCursor.GetString(0) ?? throw new IOException("Could not query content name");
     }

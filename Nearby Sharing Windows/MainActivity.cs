@@ -73,7 +73,7 @@ public sealed class MainActivity : AppCompatActivity
             {
                 intent.SetAction(Intent.ActionSendMultiple);
 
-                List<IParcelable> uriList = new();
+                List<IParcelable> uriList = [];
                 for (int i = 0; i < clipData.ItemCount; i++)
                 {
                     var item = clipData.GetItemAt(i);

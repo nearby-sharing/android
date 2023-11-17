@@ -248,7 +248,7 @@ public sealed class ConnectedDevicesPlatform(LocalDeviceInfo deviceInfo, ILogger
 
     public CdpDeviceInfo GetCdpDeviceInfo()
     {
-        List<EndpointInfo> endpoints = new();
+        List<EndpointInfo> endpoints = [];
         foreach (var (_, transport) in _transports)
         {
             try
