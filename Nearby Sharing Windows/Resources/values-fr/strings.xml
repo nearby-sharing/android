@@ -64,7 +64,7 @@
 	<string name="share_url">Partager un lien</string>
 
 	<string name="send_missing_permissions">Des permissions requises sont manquantes !</string>
-	<string name="wait_for_acceptance">En attente d’acceptation...</string>
-	<string name="sending_template">Envoi en cours... {0}/{1} fichiers... {2}%</string>
+	<string name="wait_for_acceptance">En attente d’acceptation</string>
+	<string name="sending_template">Envoi en cours {0} fichiers</string>
 	<!-- #endregion -->
 </resources>

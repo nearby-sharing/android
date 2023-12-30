@@ -14,13 +14,10 @@
 	</style>
 
 	<style name="AppTheme.TranslucentOverlay" parent="AppTheme">
+		<item name="android:windowBackground">#80000000</item>
 		<item name="android:windowIsTranslucent">true</item>
-		<item name="android:windowBackground">@android:color/transparent</item>
-		<item name="android:backgroundDimEnabled">true</item>
-		<item name="windowActionBar">false</item>
-		<item name="windowNoTitle">true</item>
 		<item name="android:windowTranslucentStatus">true</item>
-		<item name="android:windowTranslucentNavigation">true</item>
+		<item name="android:statusBarColor">@android:color/transparent</item>
 	</style>
 
 </resources>

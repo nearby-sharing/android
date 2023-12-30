@@ -90,7 +90,7 @@
 <string name="share_url">Compartir URL</string>
 
 <string name="send_missing_permissions">Falten alguns permisos necessaris!</string>
-<string name="wait_for_acceptance">Esperant reposta...</string>
-<string name="sending_template">Enviant ... {0}/{1} arxius... {2}%</string>
+<string name="wait_for_acceptance">Esperant reposta</string>
+<string name="sending_template">Enviant {0} arxius</string>
 <!-- #endregion -->
 </resources>

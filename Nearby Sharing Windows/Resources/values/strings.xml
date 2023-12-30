@@ -91,7 +91,9 @@
 	<string name="share_text">Share Text</string>
 
 	<string name="send_missing_permissions">Missing permission!</string>
-	<string name="wait_for_acceptance">Waiting for acceptance...</string>
-	<string name="sending_template">Sending ... {0}/{1} files ... {2}%</string>
+	<string name="wait_for_acceptance">Waiting for acceptance</string>
+	<string name="status_cancelled">Cancelled</string>
+	<string name="status_done">Done</string>
+	<string name="sending_template">Sending {0} files</string>
 	<!-- #endregion -->
 </resources>

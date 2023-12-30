@@ -64,7 +64,7 @@
 	<string name="share_url">分享网址</string>
 
 	<string name="send_missing_permissions">缺失必要的权限!</string>
-	<string name="wait_for_acceptance">等待接受中...</string>
-	<string name="sending_template">正在发送 ... {0}/{1} 个文件 ... {2}%</string>
+	<string name="wait_for_acceptance">等待接受中</string>
+	<string name="sending_template">正在发送 {0} 个文件</string>
 	<!-- #endregion -->
 </resources>

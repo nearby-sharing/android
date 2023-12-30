@@ -51,14 +51,17 @@ public sealed class BluetoothTransport(IBluetoothHandler handler) : ICdpTranspor
     {
         _ = Handler.ScanBLeAsync(new()
         {
-            OnDeviceDiscovered = (advertisement) =>
+            OnDeviceDiscovered = (advertisement, rssi) =>
             {
                 CdpDevice device = new(
                     advertisement.DeviceName,
                     advertisement.DeviceType,
                     EndpointInfo.FromRfcommDevice(advertisement.MacAddress)
-                );
-                DeviceDiscovered?.Invoke(this, device, advertisement);
+                )
+                {
+                    Rssi = rssi
+                };
+                DeviceDiscovered?.Invoke(this, device);
             }
         }, cancellationToken);
     }

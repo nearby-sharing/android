@@ -63,7 +63,7 @@
 	<string name="share_url">Поделиться ссылкой</string>
 
 	<string name="send_missing_permissions">Недостаточно разрешений!</string>
-	<string name="wait_for_acceptance">Ожидаем принятия файла получателем...</string>
-	<string name="sending_template">Отправка ... {0}/{1} файл(а/ов) ... {2}%</string>
+	<string name="wait_for_acceptance">Ожидаем принятия файла получателем</string>
+	<string name="sending_template">Отправка {0} файл(а/ов)</string>
 	<!-- #endregion -->
 </resources>

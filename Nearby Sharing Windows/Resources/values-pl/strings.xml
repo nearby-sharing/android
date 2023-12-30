@@ -64,7 +64,7 @@
 	<string name="share_url">Udostępnij Url</string>
 
 	<string name="send_missing_permissions">Brakujące uprawnienia!</string>
-	<string name="wait_for_acceptance">Oczekiwanie na akceptacje...</string>
-	<string name="sending_template">Wysyłanie ... {0}/{1} plików ... {2}%</string>
+	<string name="wait_for_acceptance">Oczekiwanie na akceptacje</string>
+	<string name="sending_template">Wysyłanie {0} plików</string>
 	<!-- #endregion -->
 </resources>
