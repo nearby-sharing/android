@@ -1,11 +1,10 @@
-﻿using Microsoft.CorrelationVector;
-using ShortDev.Networking;
+﻿using ShortDev.Networking;
 using System;
 using System.Buffers.Binary;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages;
 
@@ -17,11 +16,11 @@ public sealed class CommonHeader : ICdpHeader<CommonHeader>
     public static CommonHeader Parse(ref EndianReader reader)
     {
         if (!TryParse(ref reader, out var result, out var ex))
-            throw ex ?? new NullReferenceException("No exception");
-        return result ?? throw new NullReferenceException("No result");
+            throw ex;
+        return result;
     }
 
-    public static bool TryParse(ref EndianReader reader, out CommonHeader? result, out Exception? ex)
+    public static bool TryParse(ref EndianReader reader, [MaybeNullWhen(false)] out CommonHeader result, [MaybeNullWhen(true)] out Exception ex)
     {
         result = new();
         var sig = reader.ReadUInt16();
@@ -56,13 +55,11 @@ public sealed class CommonHeader : ICdpHeader<CommonHeader>
             nextHeaderType = (AdditionalHeaderType)reader.ReadByte();
             nextHeaderSize = reader.ReadByte();
 
-            if (nextHeaderType != AdditionalHeaderType.None)
-            {
-                var value = reader.ReadBytes(nextHeaderSize);
-                additionalHeaders.Add(new(nextHeaderType, value.ToArray()));
-            }
-            else
+            if (nextHeaderType == AdditionalHeaderType.None)
                 break;
+
+            var value = reader.ReadBytes(nextHeaderSize);
+            additionalHeaders.Add(new(nextHeaderType, value.ToArray()));
         }
 
         if (nextHeaderSize != 0)
