@@ -26,10 +26,9 @@ public sealed class AndroidBluetoothHandler(BluetoothAdapter adapter, PhysicalAd
         {
             try
             {
-                var address = result.Device?.Address ?? throw new InvalidDataException("No address");
                 var beaconData = result.ScanRecord?.GetManufacturerSpecificData(Constants.BLeBeaconManufacturerId);
                 if (beaconData != null && BLeBeacon.TryParse(beaconData, out var data))
-                    scanOptions.OnDeviceDiscovered?.Invoke(data);
+                    scanOptions.OnDeviceDiscovered?.Invoke(data, result.Rssi);
             }
             catch (InvalidDataException) { }
         };

@@ -1,6 +1,8 @@
-﻿using Android.Content;
+﻿using Android.Animation;
+using Android.Content;
 using Android.Content.PM;
 using Android.Text;
+using Android.Util;
 using Android.Views;
 using AndroidX.AppCompat.App;
 using AndroidX.Browser.CustomTabs;
@@ -8,6 +10,7 @@ using AndroidX.Core.App;
 using Google.Android.Material.Dialog;
 using Nearby_Sharing_Windows.Settings;
 using System.Runtime.Versioning;
+using AlertDialog = AndroidX.AppCompat.App.AlertDialog;
 using CompatToolbar = AndroidX.AppCompat.Widget.Toolbar;
 
 namespace Nearby_Sharing_Windows;
@@ -165,4 +168,31 @@ internal static class UIHelper
 
     public static string Localize(this Activity activity, int resId, params object[] args)
         => string.Format(activity.GetString(resId), args);
+
+    public static void EnableLayoutTransition(this ViewGroup view, bool animateParentHierarchy = false)
+    {
+        LayoutTransition transition = new();
+        transition.SetAnimateParentHierarchy(animateParentHierarchy);
+        view.LayoutTransition = transition;
+    }
+
+    public static int GetColorAttr(this Context context, int attr)
+    {
+        var theme = context.Theme ?? throw new NullReferenceException("Empty theme");
+
+        TypedValue result = new();
+        if (!theme.ResolveAttribute(attr, result, resolveRefs: true))
+            throw new InvalidOperationException($"Could not resolve attribute {attr}");
+
+        return result.Data;
+    }
+
+    public static AlertDialog? ShowErrorDialog(this Context context, Exception ex)
+    {
+        MaterialAlertDialogBuilder errorDialogBuilder = new(context);
+        errorDialogBuilder.SetTitle(ex.GetType().Name);
+        errorDialogBuilder.SetMessage(ex.Message);
+        errorDialogBuilder.SetNeutralButton("Ok", (s, e) => { });
+        return errorDialogBuilder.Show();
+    }
 }

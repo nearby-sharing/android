@@ -64,7 +64,7 @@
 	<string name="share_url">Trimite link</string>
 
 	<string name="send_missing_permissions">Permisiunea lipsește!</string>
-	<string name="wait_for_acceptance">Se așteaptă confirmarea...</string>
-	<string name="sending_template">Se trimit ... {0}/{1} fișiere ... {2}%</string>
+	<string name="wait_for_acceptance">Se așteaptă confirmarea</string>
+	<string name="sending_template">Se trimit {0} fișiere</string>
 	<!-- #endregion -->
 </resources>

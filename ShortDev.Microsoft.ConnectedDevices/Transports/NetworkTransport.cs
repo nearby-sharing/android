@@ -163,31 +163,27 @@ public sealed class NetworkTransport(INetworkHandler handler) : ICdpTransport, I
         void HandleMsg(UdpReceiveResult result)
         {
             EndianReader reader = new(Endianness.BigEndian, result.Buffer);
-            if (
-                CommonHeader.TryParse(ref reader, out var headers, out _) &&
-                headers != null &&
-                headers.Type == MessageType.Discovery
-            )
+            if (!CommonHeader.TryParse(ref reader, out var headers, out _) || headers.Type != MessageType.Discovery)
+                return;
+
+            DiscoveryHeader discoveryHeaders = DiscoveryHeader.Parse(ref reader);
+            if (_isAdvertising && discoveryHeaders.Type == DiscoveryType.PresenceRequest)
             {
-                DiscoveryHeader discoveryHeaders = DiscoveryHeader.Parse(ref reader);
-                if (_isAdvertising && discoveryHeaders.Type == DiscoveryType.PresenceRequest)
-                    SendPresenceResponse(result.RemoteEndPoint.Address);
-                else if (_isDiscovering && discoveryHeaders.Type == DiscoveryType.PresenceResponse)
-                {
-                    var response = PresenceResponse.Parse(ref reader);
-                    DeviceDiscovered?.Invoke(this,
-                        new CdpDevice(
-                            response.DeviceName,
-                            response.DeviceType,
-                            EndpointInfo.FromTcp(result.RemoteEndPoint)
-                        ),
-                        new BLeBeacon(
-                            response.DeviceType,
-                            null!, // ToDo: 
-                            response.DeviceName
-                        )
-                    );
-                }
+                SendPresenceResponse(result.RemoteEndPoint.Address);
+                return;
+            }
+
+            if (_isDiscovering && discoveryHeaders.Type == DiscoveryType.PresenceResponse)
+            {
+                var response = PresenceResponse.Parse(ref reader);
+                DeviceDiscovered?.Invoke(
+                    this,
+                    new CdpDevice(
+                        response.DeviceName,
+                        response.DeviceType,
+                        EndpointInfo.FromTcp(result.RemoteEndPoint)
+                    )
+                );
             }
         }
 

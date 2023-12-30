@@ -88,7 +88,9 @@
 	<string name="share_text">Text teilen</string>
 
 	<string name="send_missing_permissions">Fehlende Berechtigungen!</string>
-	<string name="wait_for_acceptance">Warte auf Akzeptierung...</string>
-	<string name="sending_template">Sende ... {0}/{1} Dateien ... {2}%</string>
+	<string name="wait_for_acceptance">Warte auf Akzeptierung</string>
+	<string name="status_cancelled">Abgebrochen</string>
+	<string name="status_done">Erledigt</string>
+	<string name="sending_template">Sende {0} Dateien</string>
 	<!-- #endregion -->
 </resources>
