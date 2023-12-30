@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string name="app_name">Partage de proximité (Windows)</string>
+	<string name="app_name">Partage de proximité</string>
 	<string name="app_titlebar_title_default">Envoyer des données vers Windows 10 / 11</string>
 	<string name="app_titlebar_title_receive">Recevoir des données depuis Windows 10 / 11</string>
 	<string name="app_titlebar_title_receive_setup">Configuration / Information</string>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string name="app_name">Nearby Sharing (Windows)</string>
+	<string name="app_name">Nearby Sharing</string>
 	<string name="app_titlebar_title_default">Send data to Windows 10 / 11</string>
 	<string name="app_titlebar_title_receive">Receive data from Windows 10 / 11</string>
 	<string name="app_titlebar_title_receive_setup">Setup / Information</string>

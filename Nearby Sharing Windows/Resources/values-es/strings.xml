@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string name="app_name">Uso compartido en proximidad (Windows)</string>
+	<string name="app_name">Uso compartido en proximidad</string>
 	<string name="app_titlebar_title_default">Enviar a Windows 10 / 11</string>
 	<string name="app_titlebar_title_receive">Recibir de Windows 10 / 11</string>
 	<string name="app_titlebar_title_receive_setup">Configuración / Información</string>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string name="app_name">Partajare în apropiere (Windows)</string>
+	<string name="app_name">Partajare în apropiere</string>
 	<string name="app_titlebar_title_default">Trimite date pe Windows 10 / 11</string>
 	<string name="app_titlebar_title_receive">Primește date de pe Windows 10 / 11</string>
 	<string name="app_titlebar_title_receive_setup">Configurare / Informații</string>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string name="app_name">Windows就近共享</string>
+	<string name="app_name">就近共享</string>
 	<string name="app_titlebar_title_default">传输数据到您的 Windows 10 / 11 电脑</string>
 	<string name="app_titlebar_title_receive">从您的 Windows 10 / 11 电脑接收数据</string>
 	<string name="app_titlebar_title_receive_setup">设置与信息</string>
