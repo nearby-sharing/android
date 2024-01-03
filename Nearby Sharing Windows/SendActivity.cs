@@ -158,6 +158,7 @@ public sealed class SendActivity : AppCompatActivity
 
                 RemoteSystems.Insert(newIndex, device);
                 _dialog.FindViewById<View>(Resource.Id.emptyDeviceListView)!.Visibility = ViewStates.Gone;
+                this.PlaySound(Resource.Raw.pop);
             }
         });
 
@@ -260,7 +261,7 @@ public sealed class SendActivity : AppCompatActivity
             ]);
 
             StatusTextView.Text = this.Localize(Resource.String.status_done);
-            readyButton.Visibility = ViewStates.Visible;
+            this.PlaySound(Resource.Raw.ding);
         }
         catch (TaskCanceledException)
         {
