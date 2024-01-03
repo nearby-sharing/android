@@ -1,6 +1,9 @@
 # Credits
 ## Contributions
  - Lukas Kurz (@ShortDevelopment)
+
+## Audio Design
+ - @Apates
  
 ## Translations
  - Guille (@Sappstal) (Spanish) & (Catalan (Valencian))

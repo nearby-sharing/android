@@ -1,6 +1,7 @@
 ﻿using Android.Animation;
 using Android.Content;
 using Android.Content.PM;
+using Android.Media;
 using Android.Text;
 using Android.Util;
 using Android.Views;
@@ -194,5 +195,11 @@ internal static class UIHelper
         errorDialogBuilder.SetMessage(ex.Message);
         errorDialogBuilder.SetNeutralButton("Ok", (s, e) => { });
         return errorDialogBuilder.Show();
+    }
+
+    public static void PlaySound(this Context context, int soundId)
+    {
+        MediaPlayer player = MediaPlayer.Create(context, soundId) ?? throw new NullReferenceException("Could not create MediaPlayer");
+        player.Start();
     }
 }
