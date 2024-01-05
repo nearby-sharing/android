@@ -13,7 +13,7 @@ namespace Nearby_Sharing_Windows;
 public sealed class AndroidBluetoothHandler(BluetoothAdapter adapter, PhysicalAddress macAddress) : IBluetoothHandler
 {
     public BluetoothAdapter Adapter { get; } = adapter;
-
+    public bool IsEnabled => Adapter.IsEnabled;
     public PhysicalAddress MacAddress { get; } = macAddress;
 
     #region BLe Scan

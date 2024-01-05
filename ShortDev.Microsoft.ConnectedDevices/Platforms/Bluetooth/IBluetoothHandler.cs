@@ -13,4 +13,5 @@ public interface IBluetoothHandler
     Task ListenRfcommAsync(RfcommOptions options, CancellationToken cancellationToken = default);
 
     PhysicalAddress MacAddress { get; }
+    bool IsEnabled => true;
 }
