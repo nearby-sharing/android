@@ -272,6 +272,9 @@ public sealed class SendActivity : AppCompatActivity
             ]);
 
             StatusTextView.Text = this.Localize(Resource.String.status_done);
+            StatusTextView.PerformHapticFeedback(
+                OperatingSystem.IsAndroidVersionAtLeast(30) ? FeedbackConstants.Confirm : FeedbackConstants.LongPress
+            , FeedbackFlags.IgnoreGlobalSetting);
             this.PlaySound(Resource.Raw.ding);
         }
         catch (TaskCanceledException)
@@ -287,6 +290,8 @@ public sealed class SendActivity : AppCompatActivity
                 this.GetColorAttr(Resource.Attribute.colorError)
             ]);
             StatusTextView.Text = ex.GetType().Name;
+            if (OperatingSystem.IsAndroidVersionAtLeast(30))
+                StatusTextView.PerformHapticFeedback(FeedbackConstants.Reject, FeedbackFlags.IgnoreGlobalSetting);
         }
         finally
         {
