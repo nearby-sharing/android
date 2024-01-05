@@ -205,6 +205,13 @@ public sealed class SendActivity : AppCompatActivity
         StatusTextView.Text = GetString(Resource.String.wait_for_acceptance);
         try
         {
+            if (remoteSystem.Endpoint.TransportType == CdpTransportType.Rfcomm &&
+                _cdp.TryGetTransport<BluetoothTransport>()?.Handler.IsEnabled == false)
+            {
+                StartActivityForResult(new Intent(BluetoothAdapter.ActionRequestEnable), 42);
+                throw new TaskCanceledException("Bluetooth is disabled");
+            }
+
             Progress<NearShareProgress>? progress = null;
 
             Task? transferPromise = null;
