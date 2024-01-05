@@ -186,6 +186,17 @@ public sealed class SendActivity : AppCompatActivity
         var sendingDataLayout = _dialog.FindViewById<View>(Resource.Id.sendingDataLayout)!;
         sendingDataLayout.Visibility = ViewStates.Visible;
 
+        sendingDataLayout.FindViewById<ImageView>(Resource.Id.deviceTypeImageView)!.SetImageResource(
+            remoteSystem.Type.IsMobile() ? Resource.Drawable.ic_fluent_phone_24_regular : Resource.Drawable.ic_fluent_desktop_24_regular
+        );
+        sendingDataLayout.FindViewById<ImageView>(Resource.Id.transportTypeImageView)!.SetImageResource(remoteSystem.Endpoint.TransportType switch
+        {
+            CdpTransportType.Tcp => Resource.Drawable.ic_fluent_wifi_1_20_regular,
+            CdpTransportType.Rfcomm => Resource.Drawable.ic_fluent_bluetooth_20_regular,
+            CdpTransportType.WifiDirect => Resource.Drawable.ic_fluent_live_20_regular,
+            _ => Resource.Drawable.ic_fluent_question_circle_20_regular
+        });
+
         var deviceNameTextView = sendingDataLayout.FindViewById<TextView>(Resource.Id.deviceNameTextView)!;
         var progressIndicator = sendingDataLayout.FindViewById<CircularProgressIndicator>(Resource.Id.sendProgressIndicator)!;
         progressIndicator.SetProgressCompat(0, animated: false);
