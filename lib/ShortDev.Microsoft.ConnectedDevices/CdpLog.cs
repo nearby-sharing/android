@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection;
+using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.TransportUpgrade;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Control;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
 
@@ -71,4 +72,10 @@ internal static partial class CdpLog
 
     [LoggerMessage(EventId = 304, Level = LogLevel.Warning, Message = "Upgrade failed")]
     public static partial void UpgradeFailed(this ILogger logger, Exception ex);
+
+    [LoggerMessage(EventId = 305, Level = LogLevel.Debug, Message = "Sending upgrade request {UpgradeId} to {UpgradeTypes}")]
+    public static partial void SendingUpgradeRequest(this ILogger logger, Guid upgradeId, IEnumerable<EndpointMetadata> upgradeTypes);
+
+    [LoggerMessage(EventId = 306, Level = LogLevel.Debug, Message = "Upgrade response {UpgradeId} to {Endpoints}")]
+    public static partial void UpgradeResponse(this ILogger logger, Guid upgradeId, IEnumerable<EndpointInfo> endpoints);
 }

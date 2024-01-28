@@ -1,4 +1,5 @@
-﻿using ShortDev.Microsoft.ConnectedDevices.Messages;
+﻿using Microsoft.Extensions.Logging;
+using ShortDev.Microsoft.ConnectedDevices.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.TransportUpgrade;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
@@ -8,6 +9,8 @@ using System.Runtime.CompilerServices;
 namespace ShortDev.Microsoft.ConnectedDevices.Session.Upgrade;
 internal sealed class ClientUpgradeHandler(CdpSession session, EndpointInfo initialEndpoint) : UpgradeHandler(session, initialEndpoint)
 {
+    private readonly ILogger _logger = session.Platform.CreateLogger<ClientUpgradeHandler>();
+
     protected override bool TryHandleConnectInternal(CdpSocket socket, ConnectionHeader connectionHeader, ref EndianReader reader)
     {
         if (!IsSocketAllowed(socket))
@@ -34,6 +37,8 @@ internal sealed class ClientUpgradeHandler(CdpSession session, EndpointInfo init
         return false;
     }
 
+    static readonly IReadOnlyList<EndpointMetadata> UpgradeEndpoints = [EndpointMetadata.Tcp];
+
     UpgradeInstance? _currentUpgrade;
     public async ValueTask<CdpSocket> RequestUpgradeAsync(CdpSocket oldSocket)
     {
@@ -43,7 +48,8 @@ internal sealed class ClientUpgradeHandler(CdpSession session, EndpointInfo init
         _currentUpgrade = new();
         try
         {
-            SendUpgradeRequest(oldSocket, _currentUpgrade.Id);
+            _logger.SendingUpgradeRequest(_currentUpgrade.Id, UpgradeEndpoints);
+            SendUpgradeRequest(oldSocket, _currentUpgrade.Id, UpgradeEndpoints);
             return await _currentUpgrade.Promise.Task;
         }
         finally
@@ -51,7 +57,7 @@ internal sealed class ClientUpgradeHandler(CdpSession session, EndpointInfo init
             _currentUpgrade = null;
         }
 
-        void SendUpgradeRequest(CdpSocket socket, Guid upgradeId)
+        void SendUpgradeRequest(CdpSocket socket, Guid upgradeId, IReadOnlyList<EndpointMetadata> endpoints)
         {
             CommonHeader header = new()
             {
@@ -68,10 +74,7 @@ internal sealed class ClientUpgradeHandler(CdpSession session, EndpointInfo init
             new UpgradeRequest()
             {
                 UpgradeId = upgradeId,
-                Endpoints =
-                [
-                    EndpointMetadata.Tcp
-                ]
+                Endpoints = endpoints
             }.Write(writer);
 
             _session.SendMessage(socket, header, writer);
@@ -84,6 +87,8 @@ internal sealed class ClientUpgradeHandler(CdpSession session, EndpointInfo init
             return;
 
         var msg = UpgradeResponse.Parse(ref reader);
+        _logger.UpgradeResponse(_currentUpgrade.Id, msg.Endpoints);
+
         FindNewEndpoint();
 
         async void FindNewEndpoint()
