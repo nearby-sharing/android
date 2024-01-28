@@ -15,7 +15,7 @@ public record class EndpointMetadata(CdpTransportType Type, byte[] Data) : ICdpP
         return new(type, data.ToArray());
     }
 
-    public static EndpointMetadata[] ParseArray(ref EndianReader reader)
+    public static IReadOnlyList<EndpointMetadata> ParseArray(ref EndianReader reader)
     {
         var arrayLength = reader.ReadUInt16();
         var endpoints = new EndpointMetadata[arrayLength];
@@ -31,9 +31,9 @@ public record class EndpointMetadata(CdpTransportType Type, byte[] Data) : ICdpP
         writer.Write(Data);
     }
 
-    public static void WriteArray(EndianWriter writer, EndpointMetadata[] endpoints)
+    public static void WriteArray(EndianWriter writer, IReadOnlyList<EndpointMetadata> endpoints)
     {
-        writer.Write((ushort)endpoints.Length);
+        writer.Write((ushort)endpoints.Count);
         foreach (var endpoint in endpoints)
             endpoint.Write(writer);
     }

@@ -16,8 +16,8 @@ public interface ICdpSerializable<T> : ICdpWriteable where T : ICdpSerializable<
 
 public interface ICdpArraySerializable<T> where T : ICdpArraySerializable<T>
 {
-    static abstract T[] ParseArray(ref EndianReader reader);
-    static abstract void WriteArray(EndianWriter writer, T[] array);
+    static abstract IReadOnlyList<T> ParseArray(ref EndianReader reader);
+    static abstract void WriteArray(EndianWriter writer, IReadOnlyList<T> array);
 }
 
 public interface ICdpWriteable
