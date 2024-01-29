@@ -4,6 +4,7 @@ using ShortDev.Microsoft.ConnectedDevices.Messages;
 using ShortDev.Microsoft.ConnectedDevices.NearShare.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Serialization;
 using System.Collections;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace ShortDev.Microsoft.ConnectedDevices.NearShare.Apps;
@@ -67,8 +68,7 @@ internal sealed class NearShareApp(ConnectedDevicesPlatform cdp) : CdpAppBase(cd
                     _fileTransferToken = new()
                     {
                         DeviceName = Channel.Session.Device.Name,
-                        TotalBytesToSend = bytesToSend,
-                        TotalFilesToSend = (uint)fileNames.Count,
+                        TotalBytes = bytesToSend,
                         Files = files
                     };
                     HandleFileTransferToken(_fileTransferToken);
@@ -79,11 +79,13 @@ internal sealed class NearShareApp(ConnectedDevicesPlatform cdp) : CdpAppBase(cd
             case DataKind.Uri:
                 {
                     var uri = payload.Get<string>("Uri");
+
                     _logger.ReceivedUrl(
                         uri,
                         msg.Header.SessionId,
                         Channel.Socket.TransportType
                     );
+
                     NearShareReceiver.OnReceivedUri(new()
                     {
                         DeviceName = Channel.Session.Device.Name,
@@ -126,9 +128,6 @@ internal sealed class NearShareApp(ConnectedDevicesPlatform cdp) : CdpAppBase(cd
                     yield return null;
                 }
                 RequestBlob(requestedPosition, contentId, (uint)(bytesToSend - requestedPosition));
-
-                transferToken.FilesSent++;
-                transferToken.SendProgressEvent();
             }
 
             void RequestBlob(ulong requestedPosition, uint contentId, uint size = PartitionSize)
@@ -145,7 +144,7 @@ internal sealed class NearShareApp(ConnectedDevicesPlatform cdp) : CdpAppBase(cd
 
     void HandleFetchDataResponse(ValueSet payload)
     {
-        if (_fileTransferToken == null)
+        if (_fileTransferToken is null || _blobCursor is null)
             throw new CdpProtocolException("FileTransfer has not been initialized");
 
         var contentId = payload.Get<uint>("ContentId");
@@ -168,18 +167,15 @@ internal sealed class NearShareApp(ConnectedDevicesPlatform cdp) : CdpAppBase(cd
             stream.Position = (long)position;
             stream.Write(CollectionsMarshal.AsSpan(blob));
         }
+        _fileTransferToken.SendProgressEvent(blobSize);
 
-        _fileTransferToken.BytesSent += blobSize;
-        _fileTransferToken.SendProgressEvent();
-
-        var expectMessage = !_fileTransferToken.IsTransferComplete;
-        if (expectMessage)
-            _blobCursor?.MoveNext();
-        else
+        if (_fileTransferToken.IsTransferComplete)
         {
             OnCompleted();
-            _fileTransferToken.Close();
+            return;
         }
+
+        _blobCursor.MoveNext();
     }
 
     void OnCancel()
@@ -188,6 +184,7 @@ internal sealed class NearShareApp(ConnectedDevicesPlatform cdp) : CdpAppBase(cd
         request.Add("ControlMessage", (uint)NearShareControlMsgType.CancelTransfer);
         SendValueSet(request, _messageId);
 
+        _fileTransferToken?.OnFinish();
         Dispose();
     }
 
@@ -197,12 +194,14 @@ internal sealed class NearShareApp(ConnectedDevicesPlatform cdp) : CdpAppBase(cd
         request.Add("ControlMessage", (uint)NearShareControlMsgType.CompleteTransfer);
         SendValueSet(request, _messageId);
 
+        _fileTransferToken?.OnFinish();
         Dispose();
     }
 
     public override void Dispose()
     {
-        base.Dispose();
         CdpAppRegistration.TryUnregisterApp(Id);
+
+        base.Dispose();
     }
 }

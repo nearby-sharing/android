@@ -1,7 +1,7 @@
 ﻿using Android.Content;
 using Android.Provider;
+using Microsoft.Win32.SafeHandles;
 using ShortDev.Microsoft.ConnectedDevices.NearShare;
-using Environment = Android.OS.Environment;
 
 namespace Nearby_Sharing_Windows;
 
@@ -24,31 +24,20 @@ internal static class FileUtils
         return returnCursor.GetString(0) ?? throw new IOException("Could not query content name");
     }
 
-    public static Stream CreateDownloadFile(this Activity activity, string fileName)
+    public static Stream CreateMediaStoreStream(this ContentResolver resolver, string fileName)
     {
-        var downloadDir = activity.GetDownloadDirectory().FullName;
+        ContentValues contentValues = new();
+        contentValues.Put(MediaStore.IMediaColumns.DisplayName, fileName);
+        if (OperatingSystem.IsAndroidVersionAtLeast(29))
+            contentValues.Put(MediaStore.IMediaColumns.RelativePath, "Download/Nearby Sharing/");
 
-        string filePath = Path.Combine(downloadDir, fileName);
-        if (!File.Exists(filePath))
-            return File.Create(filePath);
+        var mediaUri = resolver.Insert(
+            MediaStore.Files.GetContentUri("external") ?? throw new InvalidOperationException("Could not get external content uri"),
+            contentValues) ?? throw new InvalidOperationException("Could not insert into MediaStore");
 
-        var fileNameCore = Path.GetFileNameWithoutExtension(fileName);
-        var extension = Path.GetExtension(fileName);
-        for (int i = 1; File.Exists(filePath); i++)
-        {
-            filePath = Path.Combine(downloadDir, $"{fileNameCore} ({i}){extension}");
-        }
-        return File.Create(filePath);
-    }
-
-    public static DirectoryInfo GetDownloadDirectory(this Activity activity)
-    {
-        var publicDownloadDir = Environment.GetExternalStoragePublicDirectory(Environment.DirectoryDownloads)?.AbsolutePath;
-        DirectoryInfo downloadDir = new(publicDownloadDir ?? Path.Combine(activity.GetExternalMediaDirs()?.FirstOrDefault()?.AbsolutePath ?? "/sdcard/", "Download"));
-        if (!downloadDir.Exists)
-            downloadDir.Create();
-
-        return downloadDir;
+        var fileDescriptor = resolver.OpenFileDescriptor(mediaUri, "rwt") ?? throw new InvalidOperationException("Could not file");
+        SafeFileHandle handle = new(fileDescriptor.Fd, ownsHandle: true);
+        return new FileStream(handle, FileAccess.ReadWrite);
     }
 
     public static string GetLogFilePattern(this Activity activity)
