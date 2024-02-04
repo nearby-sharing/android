@@ -40,6 +40,10 @@
 
 	<!-- #region preferences.xml -->
 	<string name="category_general">常规</string>
+	<string name="category_links">帮助与链接</string>
+	<string name="category_permissions">权限</string>
+	<string name="category_setup">配置</string>
+	<string name="category_about">关于</string>
 
 	<string name="request_permissions_title">请求权限</string>
 	<string name="request_permissions_summary">同意必要权限以使用本应用</string>
@@ -49,10 +53,32 @@
 
 	<string name="open_faq_title">帮助</string>
 	<string name="open_faq_summary">打开常见问题手册</string>
+	
+	<string name="open_discord_title">Discord</string>
+	<string name="open_discord_summary">加入 Discord 服务器</string>
+	
+	<string name="preference_appearance_title">界面</string>
+	<string name="preference_appearance_summary">语言、深色模式</string>
+	
+	<string name="force_dark_mode_title">深色模式</string>
+	<string name="force_dark_mode_summary">强制深色模式</string>
 
+	<string name="switch_language_title">语言</string>
+	<string name="switch_language_summary">更改 App 的显示语言</string>
 
+	<string name="preference_cdp_title">连接</string>
+	<string name="preference_cdp_summary">配置发送和接收</string>
+
+	<string name="open_setup_title">PC端设置</string>
+	<string name="open_setup_summary">PC端设置教程</string>
+	
 	<string name="goto_mac_address_title">指定Mac地址</string>
 	<string name="goto_mac_address_summary">指定此设备的Mac地址</string>
+	
+	<string name="device_name_title">设备名称</string>
+	<string name="device_name_summary">修改对外显示的设备名</string>
+
+	<string name="show_credits_title">贡献者名单</string>
 	<!-- #endregion -->
 
 	<!-- #region ReceiveActivity.cs -->
@@ -62,9 +88,12 @@
 	<!-- #region ReceiveActivity.cs -->
 	<string name="share_file">分享文件</string>
 	<string name="share_url">分享网址</string>
+	<string name="share_text">分享文本</string>
 
 	<string name="send_missing_permissions">缺失必要的权限!</string>
 	<string name="wait_for_acceptance">等待接受中</string>
+	<string name="status_cancelled">已取消</string>
+	<string name="status_done">已完成</string>
 	<string name="sending_template">正在发送 {0} 个文件</string>
 	<!-- #endregion -->
 </resources>
