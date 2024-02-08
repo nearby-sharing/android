@@ -49,9 +49,9 @@ internal static class FileUtils
 
     public static FileStream OpenFileStream(this ContentResolver resolver, AndroidUri mediaUri)
     {
-        var fileDescriptor = resolver.OpenFileDescriptor(mediaUri, "rwt") ?? throw new InvalidOperationException("Could not open file descriptor");
-
-        SafeFileHandle handle = new(fileDescriptor.Fd, ownsHandle: false);
+        using var fileDescriptor = resolver.OpenFileDescriptor(mediaUri, "rwt") ?? throw new InvalidOperationException("Could not open file descriptor");
+        
+        SafeFileHandle handle = new(fileDescriptor.DetachFd(), ownsHandle: true);
         return new(handle, FileAccess.ReadWrite);
     }
 
