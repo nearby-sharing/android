@@ -93,12 +93,11 @@ public sealed class FileTransferToken : TransferToken, IEnumerable<FileShareInfo
     ulong _transferedBytes = 0;
     internal void SendProgressEvent(ulong byteTransferDelta)
     {
-        _transferedBytes += byteTransferDelta;
         NearShareProgress progress = new()
         {
-            TransferedBytes = _transferedBytes,
+            TransferedBytes = Interlocked.Add(ref _transferedBytes, byteTransferDelta),
             TotalBytes = TotalBytes,
-            TotalFiles = TotalFiles,
+            TotalFiles = TotalFiles
         };
         IsTransferComplete = progress.TransferedBytes >= progress.TotalBytes;
         _ = Task.Run(() => Progress?.Invoke(progress));
@@ -106,8 +105,16 @@ public sealed class FileTransferToken : TransferToken, IEnumerable<FileShareInfo
     #endregion
 
     public event Action? Finished;
-    internal void OnFinish()
+    internal async void OnFinish()
     {
-        _ = Task.Run(() => Finished?.Invoke());
+        await Task.WhenAll(_acceptPromise.Task.Result.Select(async stream =>
+        {
+            await stream.FlushAsync();
+
+            stream.Close();
+            stream.Dispose();
+        })).ConfigureAwait(continueOnCapturedContext: false);
+
+        Finished?.Invoke();
     }
 }
