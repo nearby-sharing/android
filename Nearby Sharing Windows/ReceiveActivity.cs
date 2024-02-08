@@ -131,7 +131,7 @@ public sealed class ReceiveActivity : AppCompatActivity
 
             try
             {
-                var streams = fileTransfer.Select(file => ContentResolver!.CreateMediaStoreStream(file.Name)).ToArray();
+                var streams = fileTransfer.Select(file => ContentResolver!.CreateMediaStoreStream(file.Name).stream).ToArray();
                 fileTransfer.Accept(streams);
 
                 fileTransfer.Finished += () =>
