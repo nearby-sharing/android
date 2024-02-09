@@ -251,14 +251,14 @@ public sealed class SendActivity : AppCompatActivity
                         {
 #endif
                         progressIndicator.Indeterminate = false;
-                        progressIndicator.Max = (int)args.TotalBytesToSend;
-                        progressIndicator.SetProgressCompat((int)args.BytesSent, animated: true);
+                        progressIndicator.Max = (int)args.TotalBytes;
+                        progressIndicator.SetProgressCompat((int)args.TransferedBytes, animated: true);
 
-                        if (args.TotalFilesToSend != 0 && args.TotalBytesToSend != 0)
+                        if (args.TotalFiles != 0 && args.TotalBytes != 0)
                         {
                             StatusTextView.Text = this.Localize(
                                 Resource.String.sending_template,
-                                args.TotalFilesToSend
+                                args.TotalFiles
                             );
                         }
 #if !DEBUG

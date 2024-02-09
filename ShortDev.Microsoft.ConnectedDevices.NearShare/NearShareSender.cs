@@ -181,10 +181,9 @@ public sealed class NearShareSender(ConnectedDevicesPlatform platform)
 
             _fileProgress?.Report(new()
             {
-                BytesSent = Interlocked.Add(ref _bytesSent, length),
-                FilesSent = contentId + 1, // ToDo: How to calculate?
-                TotalBytesToSend = _bytesToSend,
-                TotalFilesToSend = (uint)_files.Count
+                TransferedBytes = Interlocked.Add(ref _bytesSent, length),
+                TotalBytes = _bytesToSend,
+                TotalFiles = (uint)_files.Count
             });
 
             ValueSet response = new();
