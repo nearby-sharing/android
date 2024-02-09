@@ -2,13 +2,12 @@
 using Android.Bluetooth.LE;
 using Android.Runtime;
 using ShortDev.Microsoft.ConnectedDevices;
-using BLeScanResult = Android.Bluetooth.LE.ScanResult;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
-using System.Net.NetworkInformation;
 using ShortDev.Microsoft.ConnectedDevices.Transports.Bluetooth;
+using System.Net.NetworkInformation;
+using BLeScanResult = Android.Bluetooth.LE.ScanResult;
 
-namespace NearShare.Droid;
-
+namespace NearShare.Droid.Service;
 public sealed class AndroidBluetoothHandler(BluetoothAdapter adapter, PhysicalAddress macAddress) : IBluetoothHandler
 {
     public BluetoothAdapter Adapter { get; } = adapter;

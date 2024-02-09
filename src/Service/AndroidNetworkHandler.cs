@@ -4,8 +4,7 @@ using Android.Net.Wifi;
 using ShortDev.Microsoft.ConnectedDevices.Transports.Network;
 using System.Net;
 
-namespace NearShare.Droid;
-
+namespace NearShare.Droid.Service;
 internal sealed class AndroidNetworkHandler(Context context) : INetworkHandler
 {
     public Context Context { get; } = context;
