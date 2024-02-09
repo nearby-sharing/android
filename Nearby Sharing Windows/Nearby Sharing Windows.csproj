@@ -11,7 +11,6 @@
 		<ApplicationDisplayVersion>1.7.0</ApplicationDisplayVersion>
 		<UseAndroidCrypto>true</UseAndroidCrypto>
 		<AndroidErrorOnCustomJavaObject>false</AndroidErrorOnCustomJavaObject>
-		<EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 		<RunAOTCompilation>False</RunAOTCompilation>
