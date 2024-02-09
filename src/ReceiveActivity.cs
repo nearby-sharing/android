@@ -38,7 +38,7 @@ public sealed class ReceiveActivity : AppCompatActivity
     {
         base.OnCreate(savedInstanceState);
 
-        if (ReceiveSetupActivity.IsSetupRequired(this) || !ReceiveSetupActivity.TryGetBtAddress(this, out btAddress) || btAddress == null)
+        if (ReceiveSetupActivity.IsSetupRequired(this) || !ReceiveSetupActivity.TryGetBtAddress(this, out btAddress))
         {
             StartActivity(new Intent(this, typeof(ReceiveSetupActivity)));
 
