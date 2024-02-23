@@ -14,7 +14,7 @@
 
 	<string name="generic_send">Envoyer</string>
 	<string name="generic_receive">Recevoir</string>
-	
+
 	<string name="generic_status_template">Status: {0}</string>
 	<string name="generic_error_template">Erreur: {0}</string>
 
@@ -45,7 +45,7 @@
 	<string name="category_setup">Configuration</string>
 	<string name="category_about">À propos</string>
 
-	<string name="request_permissions_title">Permissions requisses</string>
+	<string name="request_permissions_title">Permissions de l’application</string>
 	<string name="request_permissions_summary">Accorder les permissions nécessaires à l’application</string>
 
 	<string name="open_sponsor_title">Supporter</string>
@@ -66,8 +66,8 @@
 	<string name="switch_language_title">Langue</string>
 	<string name="switch_language_summary">Changer la langue de l'appli</string>
 
-<string name="preference_cdp_title">Connectivité</string>
-<string name="preference_cdp_summary">Configuration pour l'envoi et la réception</string>
+	<string name="preference_cdp_title">Connectivité</string>
+	<string name="preference_cdp_summary">Configuration pour l'envoi et la réception</string>
 
 	<string name="open_setup_title">Configuration PC</string>
 	<string name="open_setup_summary">Voir les réglages requis pour PC</string>
