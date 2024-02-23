@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Buffers;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ShortDev.Networking;
 
-public readonly struct EndianBuffer
+public readonly struct EndianBuffer : IBufferWriter<byte>
 {
     readonly ArrayBufferWriter<byte> _writer;
 
@@ -19,6 +20,7 @@ public readonly struct EndianBuffer
         _writer.Write(data);
     }
 
+    [SuppressMessage("Style", "IDE0302:Simplify collection initialization", Justification = "Seems like this allocates a new array instead of using stackalloc!")]
     public void Write(byte value)
     {
         Span<byte> buffer = stackalloc byte[1];
@@ -46,4 +48,8 @@ public readonly struct EndianBuffer
 
     public void Clear()
         => _writer.Clear();
+
+    void IBufferWriter<byte>.Advance(int count) => _writer.Advance(count);
+    Memory<byte> IBufferWriter<byte>.GetMemory(int sizeHint) => _writer.GetMemory(sizeHint);
+    Span<byte> IBufferWriter<byte>.GetSpan(int sizeHint) => _writer.GetSpan(sizeHint);
 }

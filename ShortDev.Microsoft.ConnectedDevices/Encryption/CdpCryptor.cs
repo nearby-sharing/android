@@ -55,24 +55,17 @@ public sealed class CdpCryptor : IDisposable
         Debug.Assert(bytesWritten == destination.Length);
     }
 
-    public byte[] DecryptMessage(CommonHeader header, ReadOnlySpan<byte> payload, ReadOnlySpan<byte> hmac)
+    public ReadOnlyMemory<byte> DecryptMessage(CommonHeader header, ReadOnlySpan<byte> payload, ReadOnlySpan<byte> hmac)
     {
+        VerifyHMac(header, payload, hmac);
+
         Span<byte> iv = stackalloc byte[Constants.IVSize];
         GenerateIV(header, iv);
 
-        byte[] decryptedPayload;
-        try
-        {
-            decryptedPayload = _aes.DecryptCbc(payload, iv);
-        }
-        catch
-        {
-            // ToDo: Better way without try...catch!!
-            // If payload size is an exact multiple of block length (16 bytes) no padding is applied
-            decryptedPayload = _aes.DecryptCbc(payload, iv, PaddingMode.None);
-        }
+        byte[] decryptedPayload = _aes.DecryptCbc(payload, iv, PaddingMode.None);
 
-        VerifyHMac(header, payload, hmac);
+        if (HasPadding(decryptedPayload, out var paddingSize))
+            return decryptedPayload.AsMemory()[0..^paddingSize];
 
         return decryptedPayload;
     }
@@ -143,21 +136,19 @@ public sealed class CdpCryptor : IDisposable
 
         var encryptedPayload = reader.ReadBytes(payloadSize);
 
-        scoped Span<byte> hmac = Span<byte>.Empty;
+        scoped Span<byte> hmac = [];
         if (header.HasFlag(MessageFlags.HasHMAC))
         {
             hmac = stackalloc byte[Constants.HMacSize];
             reader.ReadBytes(hmac);
         }
 
-        byte[] decryptedPayload = DecryptMessage(header, encryptedPayload, hmac);
-        EndianReader payloadReader = new(Endianness.BigEndian, decryptedPayload);
+        var decryptedPayload = DecryptMessage(header, encryptedPayload, hmac);
+        reader = new(Endianness.BigEndian, decryptedPayload.Span);
 
-        var payloadLength = payloadReader.ReadUInt32();
+        var payloadLength = reader.ReadUInt32();
         if (payloadLength != decryptedPayload.Length - sizeof(Int32))
             throw new CdpSecurityException($"Expected payload to be {payloadLength} bytes long");
-
-        reader = payloadReader;
     }
 
     public void Dispose()
@@ -165,5 +156,16 @@ public sealed class CdpCryptor : IDisposable
         _ivAes.Dispose();
         _aes.Dispose();
         _hmac.Dispose();
+    }
+
+    static bool HasPadding(ReadOnlySpan<byte> buffer, out byte paddingSize)
+    {
+        paddingSize = buffer[^1];
+        for (int i = buffer.Length - paddingSize; i < buffer.Length; i++)
+        {
+            if (paddingSize != buffer[i])
+                return false;
+        }
+        return true;
     }
 }

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Platforms.Bluetooth;
 
-public interface IBluetoothHandler : ICdpPlatformHandler
+public interface IBluetoothHandler
 {
     Task ScanBLeAsync(ScanOptions scanOptions, CancellationToken cancellationToken = default);
     Task<CdpSocket> ConnectRfcommAsync(CdpDevice device, RfcommOptions options, CancellationToken cancellationToken = default);
@@ -13,4 +13,5 @@ public interface IBluetoothHandler : ICdpPlatformHandler
     Task ListenRfcommAsync(RfcommOptions options, CancellationToken cancellationToken = default);
 
     PhysicalAddress MacAddress { get; }
+    bool IsEnabled => true;
 }

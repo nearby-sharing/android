@@ -1,12 +1,17 @@
-﻿using Android.Content;
+﻿using Android.Animation;
+using Android.Content;
 using Android.Content.PM;
+using Android.Media;
 using Android.Text;
+using Android.Util;
 using Android.Views;
 using AndroidX.AppCompat.App;
 using AndroidX.Browser.CustomTabs;
 using AndroidX.Core.App;
 using Google.Android.Material.Dialog;
 using Nearby_Sharing_Windows.Settings;
+using System.Runtime.Versioning;
+using AlertDialog = AndroidX.AppCompat.App.AlertDialog;
 using CompatToolbar = AndroidX.AppCompat.Widget.Toolbar;
 
 namespace Nearby_Sharing_Windows;
@@ -54,7 +59,7 @@ internal static class UIHelper
         => DisplayWebSite(activity, "https://nearshare.shortdev.de/CREDITS");
 
     public static void OpenGitHub(Activity activity)
-        => DisplayWebSite(activity, "https://github.com/ShortDevelopment/Nearby-Sharing-Windows/");
+        => DisplayWebSite(activity, "https://github.com/nearby-sharing/android/");
 
     public static void DisplayWebSite(Activity activity, string url)
     {
@@ -103,32 +108,45 @@ internal static class UIHelper
     }
 
     #region Permissions
-    private static readonly string[] _sendPermissions = new[]
-    {
+    private static readonly string[] _sendPermissions = [
         ManifestPermission.AccessFineLocation,
-        ManifestPermission.AccessCoarseLocation,
-        // Api level 31
+        ManifestPermission.AccessCoarseLocation
+    ];
+    [SupportedOSPlatform("android31.0")]
+    private static readonly string[] _sendPermissionsApi31 = [
+        .. _sendPermissions,
         ManifestPermission.BluetoothScan,
         ManifestPermission.BluetoothConnect
-    };
+    ];
     public static void RequestSendPermissions(Activity activity)
-        => ActivityCompat.RequestPermissions(activity, _sendPermissions, 0);
+        => ActivityCompat.RequestPermissions(
+                activity,
+                OperatingSystem.IsAndroidVersionAtLeast(31) ? _sendPermissionsApi31 : _sendPermissions,
+                0
+            );
 
-    private static readonly string[] _receivePermissions = new[]
-    {
+    private static readonly string[] _receivePermissions = [
         ManifestPermission.AccessFineLocation,
         ManifestPermission.AccessCoarseLocation,
         ManifestPermission.AccessWifiState,
         ManifestPermission.Bluetooth,
+        // ManifestPermission.AccessBackgroundLocation, See #109 and #41 // Api 29
+        ManifestPermission.ReadExternalStorage,
+        ManifestPermission.WriteExternalStorage
+    ];
+    [SupportedOSPlatform("android31.0")]
+    private static readonly string[] _receivePermissionsApi31 = [
+        .. _receivePermissions,
         ManifestPermission.BluetoothScan,
         ManifestPermission.BluetoothConnect,
         ManifestPermission.BluetoothAdvertise,
-        // ManifestPermission.AccessBackgroundLocation, See #109 and #41
-        ManifestPermission.ReadExternalStorage,
-        ManifestPermission.WriteExternalStorage
-    };
+    ];
     public static void RequestReceivePermissions(Activity activity)
-        => ActivityCompat.RequestPermissions(activity, _receivePermissions, 0);
+        => ActivityCompat.RequestPermissions(
+                activity,
+                OperatingSystem.IsAndroidVersionAtLeast(31) ? _receivePermissionsApi31 : _receivePermissions,
+                0
+            );
     #endregion
 
     public static ISpanned LoadHtmlAsset(Activity activity, string assetPath)
@@ -151,4 +169,37 @@ internal static class UIHelper
 
     public static string Localize(this Activity activity, int resId, params object[] args)
         => string.Format(activity.GetString(resId), args);
+
+    public static void EnableLayoutTransition(this ViewGroup view, bool animateParentHierarchy = false)
+    {
+        LayoutTransition transition = new();
+        transition.SetAnimateParentHierarchy(animateParentHierarchy);
+        view.LayoutTransition = transition;
+    }
+
+    public static int GetColorAttr(this Context context, int attr)
+    {
+        var theme = context.Theme ?? throw new NullReferenceException("Empty theme");
+
+        TypedValue result = new();
+        if (!theme.ResolveAttribute(attr, result, resolveRefs: true))
+            throw new InvalidOperationException($"Could not resolve attribute {attr}");
+
+        return result.Data;
+    }
+
+    public static AlertDialog? ShowErrorDialog(this Context context, Exception ex)
+    {
+        MaterialAlertDialogBuilder errorDialogBuilder = new(context);
+        errorDialogBuilder.SetTitle(ex.GetType().Name);
+        errorDialogBuilder.SetMessage(ex.Message);
+        errorDialogBuilder.SetNeutralButton("Ok", (s, e) => { });
+        return errorDialogBuilder.Show();
+    }
+
+    public static void PlaySound(this Context context, int soundId)
+    {
+        MediaPlayer player = MediaPlayer.Create(context, soundId) ?? throw new NullReferenceException("Could not create MediaPlayer");
+        player.Start();
+    }
 }

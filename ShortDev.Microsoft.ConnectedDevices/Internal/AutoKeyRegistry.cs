@@ -1,61 +1,49 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Numerics;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Internal;
 
-internal sealed class AutoKeyRegistry<TValue> : IEnumerable<TValue>
+internal sealed class AutoKeyRegistry<TKey, TValue> : IEnumerable<TValue> where TKey : IUnsignedNumber<TKey>
 {
-    readonly Dictionary<ulong, TValue> _registry = new();
+    readonly ConcurrentDictionary<TKey, TValue> _registry = new();
 
-    ulong _nextKey;
+    TKey _nextKey = TKey.Zero;
     public AutoKeyRegistry()
         => Clear();
 
-    public TValue Get(ulong key)
+    public TValue Get(TKey key)
+        => _registry[key];
+
+    public void Add(TKey key, TValue value)
     {
-        lock (this)
-            return _registry[key];
+        if (!_registry.TryAdd(key, value))
+            throw new ArgumentException("Key already exists");
     }
 
-    public void Add(ulong key, TValue value)
-    {
-        lock (this)
-        {
-            if (_registry.ContainsKey(key))
-                throw new ArgumentException("Key already exists");
-
-            _registry.Add(key, value);
-        }
-    }
-
-    public TValue Create(Func<ulong, TValue> factory, out ulong key)
+    public TValue Create(Func<TKey, TValue> factory, out TKey key)
     {
         lock (this)
         {
             key = _nextKey++;
-
-            var value = factory(key);
-            _registry.Add(key, value);
-            return value;
         }
+
+        var value = factory(key);
+        Add(key, value);
+        return value;
     }
 
-    public void Remove(ulong key)
+    public void Remove(TKey key)
     {
-        lock (this)
-        {
-            _registry.Remove(key);
-        }
+        _registry.Remove(key, out _);
     }
 
     public void Clear()
     {
-        lock (this)
-        {
-            _registry.Clear();
-            _nextKey = 0xe;
-        }
+        _registry.Clear();
+        _nextKey = TKey.One; // 0xe
     }
 
     IEnumerator IEnumerable.GetEnumerator()

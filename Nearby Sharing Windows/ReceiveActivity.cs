@@ -1,11 +1,14 @@
 ﻿using Android.Bluetooth;
+using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using AndroidX.AppCompat.App;
 using AndroidX.RecyclerView.Widget;
+using Google.Android.Material.Dialog;
 using Google.Android.Material.ProgressIndicator;
+using Microsoft.Extensions.Logging;
 using Nearby_Sharing_Windows.Settings;
 using ShortDev.Android.UI;
 using ShortDev.Microsoft.ConnectedDevices;
@@ -15,32 +18,30 @@ using ShortDev.Microsoft.ConnectedDevices.Platforms;
 using ShortDev.Microsoft.ConnectedDevices.Platforms.Bluetooth;
 using ShortDev.Microsoft.ConnectedDevices.Platforms.Network;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Net.NetworkInformation;
 using SystemDebug = System.Diagnostics.Debug;
 
 namespace Nearby_Sharing_Windows;
 
 [Activity(Label = "@string/app_name", Theme = "@style/AppTheme", ConfigurationChanges = UIHelper.ConfigChangesFlags)]
-public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandler
+public sealed class ReceiveActivity : AppCompatActivity
 {
-    BluetoothAdapter? _btAdapter;
-
-    [AllowNull] TextView debugLogTextView;
-
-    [AllowNull] AdapterDescriptor<TransferToken> adapterDescriptor;
-    [AllowNull] RecyclerView notificationsRecyclerView;
-    readonly List<TransferToken> _notifications = new();
+    RecyclerView notificationsRecyclerView = null!;
+    readonly ObservableCollection<TransferToken> _notifications = [];
 
     PhysicalAddress? btAddress = null;
+
+    ILogger<ReceiveActivity> _logger = null!;
+    ILoggerFactory _loggerFactory = null!;
     protected override void OnCreate(Bundle? savedInstanceState)
     {
         base.OnCreate(savedInstanceState);
 
         if (ReceiveSetupActivity.IsSetupRequired(this) || !ReceiveSetupActivity.TryGetBtAddress(this, out btAddress) || btAddress == null)
         {
-            StartActivity(new Android.Content.Intent(this, typeof(ReceiveSetupActivity)));
+            StartActivity(new Intent(this, typeof(ReceiveSetupActivity)));
 
             Finish();
             return;
@@ -48,93 +49,117 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
 
         SetContentView(Resource.Layout.activity_receive);
 
-        UIHelper.RequestReceivePermissions(this);
         UIHelper.SetupToolBar(this, GetString(Resource.String.app_titlebar_title_receive));
 
         notificationsRecyclerView = FindViewById<RecyclerView>(Resource.Id.notificationsRecyclerView)!;
         notificationsRecyclerView.SetLayoutManager(new LinearLayoutManager(this));
-
-        debugLogTextView = FindViewById<TextView>(Resource.Id.debugLogTextView)!;
-        debugLogTextView.SetTextIsSelectable(true);
-
-        adapterDescriptor = new(
-            Resource.Layout.item_transfer_notification,
-            (view, transfer) =>
-            {
-                var acceptButton = view.FindViewById<Button>(Resource.Id.acceptButton)!;
-                var openButton = view.FindViewById<Button>(Resource.Id.openButton)!;
-                var fileNameTextView = view.FindViewById<TextView>(Resource.Id.fileNameTextView)!;
-                var detailsTextView = view.FindViewById<TextView>(Resource.Id.detailsTextView)!;
-
-                if (transfer is FileTransferToken fileTransfer)
-                {
-                    fileNameTextView.Text = string.Join(", ", fileTransfer.Files.Select(x => x.Name));
-                    detailsTextView.Text = $"{fileTransfer.DeviceName} • {FileTransferToken.FormatFileSize(fileTransfer.TotalBytesToSend)}";
-
-                    var loadingProgressIndicator = view.FindViewById<CircularProgressIndicator>(Resource.Id.loadingProgressIndicator)!;
-                    void onCompleted()
-                    {
-                        acceptButton.Visibility = ViewStates.Gone;
-                        loadingProgressIndicator.Visibility = ViewStates.Gone;
-                        openButton.Visibility = ViewStates.Visible;
-                        openButton.Click += (_, _) => this.ViewDownloads();
-                    }
-                    if (fileTransfer.IsTransferComplete)
-                        onCompleted();
-                    else
-                    {
-                        void onAccept()
-                        {
-                            if (!fileTransfer.IsAccepted)
-                                fileTransfer.Accept(CreateFiles(fileTransfer));
-
-                            acceptButton.Visibility = ViewStates.Gone;
-                            loadingProgressIndicator.Visibility = ViewStates.Visible;
-
-                            loadingProgressIndicator.Progress = 0;
-                            void onProgress(NearShareProgress progress, bool animate)
-                            {
-                                loadingProgressIndicator.Indeterminate = false;
-
-                                int progressInt = Math.Min((int)(progress.BytesSent * 100 / progress.TotalBytesToSend), 100);
-                                if (OperatingSystem.IsAndroidVersionAtLeast(24))
-                                    loadingProgressIndicator.SetProgress(progressInt, animate);
-                                else
-                                    loadingProgressIndicator.Progress = progressInt;
-
-                                if (fileTransfer.IsTransferComplete)
-                                    onCompleted();
-                            }
-                            fileTransfer.Progress += progress => RunOnUiThread(() => onProgress(progress, animate: true));
-                            loadingProgressIndicator.Indeterminate = true;
-                        }
-                        if (fileTransfer.IsAccepted)
-                            onAccept();
-                        else
-                            acceptButton.SetOnClickListener(new DelegateClickListener((s, e) => onAccept()));
-                    }
-                }
-                else if (transfer is UriTransferToken uriTranfer)
-                {
-                    fileNameTextView.Text = uriTranfer.Uri;
-                    detailsTextView.Text = uriTranfer.DeviceName;
-
-                    acceptButton.Visibility = ViewStates.Gone;
-                    openButton.Visibility = ViewStates.Visible;
-
-                    openButton.SetOnClickListener(new DelegateClickListener((s, e) => UIHelper.DisplayWebSite(this, uriTranfer.Uri)));
-                }
-
-                view.FindViewById<Button>(Resource.Id.cancelButton)!.SetOnClickListener(new DelegateClickListener((s, e) =>
-                {
-                    _notifications.Remove(transfer);
-                    UpdateUI();
-
-                    if (transfer is FileTransferToken fileTransfer)
-                        fileTransfer.Cancel();
-                }));
-            }
+        notificationsRecyclerView.SetAdapter(
+            new AdapterDescriptor<TransferToken>(
+                Resource.Layout.item_transfer_notification,
+                OnInflateNotification
+            ).CreateRecyclerViewAdapter(_notifications)
         );
+
+        FindViewById<Button>(Resource.Id.openFAQButton)!.Click += (s, e) => UIHelper.OpenFAQ(this);
+
+        _loggerFactory = ConnectedDevicesPlatform.CreateLoggerFactory(this.GetLogFilePattern());
+        _logger = _loggerFactory.CreateLogger<ReceiveActivity>();
+
+        UIHelper.RequestReceivePermissions(this);
+    }
+
+    void OnInflateNotification(View view, TransferToken transfer)
+    {
+        var acceptButton = view.FindViewById<Button>(Resource.Id.acceptButton)!;
+        var openButton = view.FindViewById<Button>(Resource.Id.openButton)!;
+        var fileNameTextView = view.FindViewById<TextView>(Resource.Id.fileNameTextView)!;
+        var detailsTextView = view.FindViewById<TextView>(Resource.Id.detailsTextView)!;
+        var loadingProgressIndicator = view.FindViewById<CircularProgressIndicator>(Resource.Id.loadingProgressIndicator)!;
+
+        view.FindViewById<Button>(Resource.Id.cancelButton)!.Click += (s, e) =>
+        {
+            if (transfer is FileTransferToken fileTransfer)
+                fileTransfer.Cancel();
+
+            _notifications.Remove(transfer);
+        };
+
+        if (transfer is UriTransferToken uriTranfer)
+        {
+            fileNameTextView.Text = uriTranfer.Uri;
+            detailsTextView.Text = uriTranfer.DeviceName;
+
+            acceptButton.Visibility = ViewStates.Gone;
+            openButton.Visibility = ViewStates.Visible;
+
+            openButton.Click += (s, e) => UIHelper.DisplayWebSite(this, uriTranfer.Uri);
+
+            return;
+        }
+
+        if (transfer is not FileTransferToken fileTransfer)
+            throw new UnreachableException();
+
+        fileNameTextView.Text = string.Join(", ", fileTransfer.Files.Select(x => x.Name));
+        detailsTextView.Text = $"{fileTransfer.DeviceName} • {FileTransferToken.FormatFileSize(fileTransfer.TotalBytes)}";
+
+        acceptButton.Click += OnAccept;
+
+        fileTransfer.Progress += progress => RunOnUiThread(() => OnProgress(progress));
+        loadingProgressIndicator.Indeterminate = true;
+
+        openButton.Click += (_, _) =>
+        {
+            this.ViewDownloads();
+
+            // ToDo: View single file
+            // if (fileTransfer.Files.Count == 1)
+        };
+
+        UpdateUI();
+
+        void OnAccept(object? sender, EventArgs e)
+        {
+            try
+            {
+                var streams = fileTransfer.Select(file => ContentResolver!.CreateMediaStoreStream(file.Name).stream).ToArray();
+                fileTransfer.Accept(streams);
+
+                fileTransfer.Finished += () =>
+                {
+                    // ToDo: Delete failed transfers
+                };
+            }
+            catch (Exception ex)
+            {
+                new MaterialAlertDialogBuilder(this)
+                    .SetTitle(ex.GetType().Name)!
+                    .SetMessage(ex.Message)!
+                    .Show();
+            }
+
+            UpdateUI();
+        }
+
+        void OnProgress(NearShareProgress progress)
+        {
+            loadingProgressIndicator.Indeterminate = false;
+
+            int progressInt = progress.TotalBytes == 0 ? 0 : Math.Min((int)(progress.TransferedBytes * 100 / progress.TotalBytes), 100);
+            if (OperatingSystem.IsAndroidVersionAtLeast(24))
+                loadingProgressIndicator.SetProgress(progressInt, animate: true);
+            else
+                loadingProgressIndicator.Progress = progressInt;
+
+            UpdateUI();
+        }
+
+        void UpdateUI()
+        {
+            acceptButton.Visibility = !fileTransfer.IsTransferComplete && !fileTransfer.IsAccepted ? ViewStates.Visible : ViewStates.Gone;
+            loadingProgressIndicator.Visibility = !fileTransfer.IsTransferComplete && fileTransfer.IsAccepted ? ViewStates.Visible : ViewStates.Gone;
+            openButton.Visibility = fileTransfer.IsTransferComplete ? ViewStates.Visible : ViewStates.Gone;
+        }
     }
 
     CancellationTokenSource? _cancellationTokenSource;
@@ -148,9 +173,9 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
         _cancellationTokenSource = new();
 
         var service = (BluetoothManager)GetSystemService(BluetoothService)!;
-        _btAdapter = service.Adapter!;
+        var btAdapter = service.Adapter!;
 
-        var deviceName = SettingsFragment.GetDeviceName(this, _btAdapter);
+        var deviceName = SettingsFragment.GetDeviceName(this, btAdapter);
 
         SystemDebug.Assert(_cdp == null);
 
@@ -160,38 +185,35 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
             Name = deviceName,
             OemModelName = Build.Model ?? string.Empty,
             OemManufacturerName = Build.Manufacturer ?? string.Empty,
-            DeviceCertificate = ConnectedDevicesPlatform.CreateDeviceCertificate(CdpEncryptionParams.Default),
-            LoggerFactory = ConnectedDevicesPlatform.CreateLoggerFactory(Log, this.GetLogFilePattern())
-        });
+            DeviceCertificate = ConnectedDevicesPlatform.CreateDeviceCertificate(CdpEncryptionParams.Default)
+        }, _loggerFactory);
 
-        IBluetoothHandler bluetoothHandler = new AndroidBluetoothHandler(this, _btAdapter, btAddress);
+        IBluetoothHandler bluetoothHandler = new AndroidBluetoothHandler(btAdapter, btAddress);
         _cdp.AddTransport<BluetoothTransport>(new(bluetoothHandler));
 
-        INetworkHandler networkHandler = new AndroidNetworkHandler(this, this);
+        INetworkHandler networkHandler = new AndroidNetworkHandler(this);
         _cdp.AddTransport<NetworkTransport>(new(networkHandler));
 
         _cdp.Listen(_cancellationTokenSource.Token);
         _cdp.Advertise(_cancellationTokenSource.Token);
 
-        NearShareReceiver.Start(_cdp, this);
+        NearShareReceiver.Register(_cdp);
+        NearShareReceiver.ReceivedUri += OnTransfer;
+        NearShareReceiver.FileTransfer += OnTransfer;
 
         FindViewById<TextView>(Resource.Id.deviceInfoTextView)!.Text = this.Localize(
             Resource.String.visible_as_template,
-            $"\"{deviceName}\".\n" +
-            $"Address: {btAddress.ToStringFormatted()}\n" +
-            $"IP-Address: {networkHandler.TryGetLocalIp()?.ToString() ?? "null"}"
+            $"""
+            "{deviceName}"
+            Address: {btAddress.ToStringFormatted()}
+            IP-Address: {networkHandler.TryGetLocalIp()?.ToString() ?? "null"}
+            """
         );
     }
 
-    IReadOnlyList<Stream> CreateFiles(FileTransferToken token)
-        => token.Select(file => this.CreateDownloadFile(file.Name)).ToArray();
-
     public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
     {
-        if (grantResults.Any((x) => x == Permission.Denied))
-        {
-            Toast.MakeText(this, this.Localize(Resource.String.receive_missing_permissions), ToastLength.Long)!.Show();
-        }
+        _logger.RequestPermissionResult(requestCode, permissions, grantResults);
 
         InitializeCDP();
     }
@@ -206,37 +228,12 @@ public sealed class ReceiveActivity : AppCompatActivity, INearSharePlatformHandl
     {
         _cancellationTokenSource?.Cancel();
         _cdp?.Dispose();
-        NearShareReceiver.Stop();
+        NearShareReceiver.Unregister();
         base.Finish();
     }
 
-    public void Log(string message)
-    {
-        RunOnUiThread(() =>
-        {
-            debugLogTextView.Text += "\n" + $"[{DateTime.Now:HH:mm:ss}]: {message}";
-        });
-    }
-
-    void UpdateUI()
-    {
-        RunOnUiThread(() =>
-        {
-            notificationsRecyclerView.SetAdapter(adapterDescriptor.CreateRecyclerViewAdapter(_notifications));
-        });
-    }
-
-    public void OnReceivedUri(UriTransferToken transfer)
-    {
-        _notifications.Add(transfer);
-        UpdateUI();
-    }
-
-    public void OnFileTransfer(FileTransferToken transfer)
-    {
-        _notifications.Add(transfer);
-        UpdateUI();
-    }
+    void OnTransfer(TransferToken transfer)
+        => RunOnUiThread(() => _notifications.Add(transfer));
 }
 
 static class Extensions

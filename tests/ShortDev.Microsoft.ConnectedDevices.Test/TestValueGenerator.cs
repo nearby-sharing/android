@@ -12,7 +12,7 @@ internal static class TestValueGenerator
     public static object RandomValue(Type type)
         => RandomValueInternal(type, depth: 0);
 
-    static readonly Dictionary<Type, Func<object>> _factories = new();
+    static readonly Dictionary<Type, Func<object>> _factories = [];
     public static bool TryRegisterTypeFactory<T>(Func<T> factory)
     {
         var type = typeof(T);

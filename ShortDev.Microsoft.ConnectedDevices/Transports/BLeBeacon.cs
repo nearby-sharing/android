@@ -38,7 +38,8 @@ public sealed record BLeBeacon(DeviceType DeviceType, PhysicalAddress MacAddress
         if ((int)flags >= 2)
             return false; // wrong flags
 
-        var deviceStatus = (ExtendedDeviceStatus)reader.ReadByte();
+        /* deviceStatus */
+        _ = (ExtendedDeviceStatus)reader.ReadByte();
 
         if (flags != BeaconFlags.Public)
             return false;

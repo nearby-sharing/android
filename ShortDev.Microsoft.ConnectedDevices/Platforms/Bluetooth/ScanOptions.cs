@@ -1,9 +1,10 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Transports;
-using System;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Platforms.Bluetooth;
 
 public sealed class ScanOptions
 {
-    public Action<BLeBeacon>? OnDeviceDiscovered { get; set; }
+    public DeviceDiscovered? OnDeviceDiscovered { get; set; }
+
+    public delegate void DeviceDiscovered(BLeBeacon beacon, double rssi = double.NegativeInfinity);
 }

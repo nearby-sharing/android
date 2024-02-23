@@ -4,24 +4,19 @@ using ShortDev.Microsoft.ConnectedDevices.Messages;
 using ShortDev.Microsoft.ConnectedDevices.NearShare.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Serialization;
 using System.Collections;
-using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace ShortDev.Microsoft.ConnectedDevices.NearShare.Internal;
+namespace ShortDev.Microsoft.ConnectedDevices.NearShare.Apps;
 
-internal sealed class NearShareApp : CdpAppBase
+internal sealed class NearShareApp(ConnectedDevicesPlatform cdp) : CdpAppBase(cdp)
 {
     const uint PartitionSize = 102400u; // 131072u
     public static string Name { get; } = "NearSharePlatform";
 
-    public required INearSharePlatformHandler PlatformHandler { get; init; }
-    public required string Id { get; init; }
+    readonly ILogger<NearShareApp> _logger = cdp.CreateLogger<NearShareApp>();
 
-    [AllowNull] ILogger<NearShareApp> _logger;
-    protected override void OnInitialized(CdpChannel channel)
-    {
-        _logger = channel.Session.Platform.DeviceInfo.LoggerFactory.CreateLogger<NearShareApp>();
-    }
+    public required string Id { get; init; }
 
     uint _messageId = 0;
     public override void HandleMessage(CdpMessage msg)
@@ -55,8 +50,8 @@ internal sealed class NearShareApp : CdpAppBase
                 {
                     var fileNames = payload.Get<List<string>>("FileNames");
 
-                    _logger.LogInformation("Receiving file \"{fileNames}\" from session {sessionId:X} via {transportType}",
-                        string.Join(", ", fileNames),
+                    _logger.ReceivingFile(
+                        fileNames,
                         msg.Header.SessionId,
                         Channel.Socket.TransportType
                     );
@@ -72,26 +67,28 @@ internal sealed class NearShareApp : CdpAppBase
                     }
                     _fileTransferToken = new()
                     {
-                        DeviceName = Channel.Session.Device.Name ?? "UNKNOWN",
-                        TotalBytesToSend = bytesToSend,
-                        TotalFilesToSend = (uint)fileNames.Count,
+                        DeviceName = Channel.Session.Device.Name,
+                        TotalBytes = bytesToSend,
                         Files = files
                     };
                     HandleFileTransferToken(_fileTransferToken);
 
-                    PlatformHandler.OnFileTransfer(_fileTransferToken);
+                    NearShareReceiver.OnFileTransfer(_fileTransferToken);
                     return;
                 }
             case DataKind.Uri:
                 {
                     var uri = payload.Get<string>("Uri");
-                    _logger.LogInformation("Received uri \"{uri}\" from session {sessionId:X}",
+
+                    _logger.ReceivedUrl(
                         uri,
-                        msg.Header.SessionId
+                        msg.Header.SessionId,
+                        Channel.Socket.TransportType
                     );
-                    PlatformHandler.OnReceivedUri(new()
+
+                    NearShareReceiver.OnReceivedUri(new()
                     {
-                        DeviceName = Channel.Session.Device.Name ?? "UNKNOWN",
+                        DeviceName = Channel.Session.Device.Name,
                         Uri = uri
                     });
 
@@ -131,9 +128,6 @@ internal sealed class NearShareApp : CdpAppBase
                     yield return null;
                 }
                 RequestBlob(requestedPosition, contentId, (uint)(bytesToSend - requestedPosition));
-
-                transferToken.FilesSent++;
-                transferToken.SendProgressEvent();
             }
 
             void RequestBlob(ulong requestedPosition, uint contentId, uint size = PartitionSize)
@@ -150,7 +144,7 @@ internal sealed class NearShareApp : CdpAppBase
 
     void HandleFetchDataResponse(ValueSet payload)
     {
-        if (_fileTransferToken == null)
+        if (_fileTransferToken is null || _blobCursor is null)
             throw new CdpProtocolException("FileTransfer has not been initialized");
 
         var contentId = payload.Get<uint>("ContentId");
@@ -161,25 +155,27 @@ internal sealed class NearShareApp : CdpAppBase
         if (blobSize > PartitionSize) // ToDo: position > _bytesToSend
             throw new CdpSecurityException("Device tried to send too much data!");
 
-        // PlatformHandler.Log(0, $"BlobPosition: {position}; ({newPosition * 100 / bytesToSend}%)");
+        if (_fileTransferToken.CancellationToken.IsCancellationRequested)
+        {
+            OnCancel();
+            return;
+        }
+
         lock (_fileTransferToken)
         {
             var stream = _fileTransferToken.GetStream(contentId);
             stream.Position = (long)position;
             stream.Write(CollectionsMarshal.AsSpan(blob));
         }
+        _fileTransferToken.SendProgressEvent(blobSize);
 
-        _fileTransferToken.BytesSent += blobSize;
-        _fileTransferToken.SendProgressEvent();
-
-        var expectMessage = !_fileTransferToken.IsTransferComplete;
-        if (expectMessage)
-            _blobCursor?.MoveNext();
-        else
+        if (_fileTransferToken.IsTransferComplete)
         {
             OnCompleted();
-            _fileTransferToken.Close();
+            return;
         }
+
+        _blobCursor.MoveNext();
     }
 
     void OnCancel()
@@ -188,7 +184,8 @@ internal sealed class NearShareApp : CdpAppBase
         request.Add("ControlMessage", (uint)NearShareControlMsgType.CancelTransfer);
         SendValueSet(request, _messageId);
 
-        CloseChannel();
+        _fileTransferToken?.OnFinish();
+        Dispose();
     }
 
     void OnCompleted()
@@ -197,12 +194,14 @@ internal sealed class NearShareApp : CdpAppBase
         request.Add("ControlMessage", (uint)NearShareControlMsgType.CompleteTransfer);
         SendValueSet(request, _messageId);
 
-        CloseChannel();
+        _fileTransferToken?.OnFinish();
+        Dispose();
     }
 
-    protected override void CloseChannel()
+    public override void Dispose()
     {
-        base.CloseChannel();
         CdpAppRegistration.TryUnregisterApp(Id);
+
+        base.Dispose();
     }
 }

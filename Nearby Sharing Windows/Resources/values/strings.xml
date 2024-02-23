@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string name="app_name">Nearby Sharing (Windows)</string>
+	<string name="app_name">Nearby Sharing</string>
 	<string name="app_titlebar_title_default">Send data to Windows 10 / 11</string>
 	<string name="app_titlebar_title_receive">Receive data from Windows 10 / 11</string>
 	<string name="app_titlebar_title_receive_setup">Setup / Information</string>
@@ -88,9 +88,12 @@
 	<!-- #region ReceiveActivity.cs -->
 	<string name="share_file">Share File</string>
 	<string name="share_url">Share Url</string>
+	<string name="share_text">Share Text</string>
 
 	<string name="send_missing_permissions">Missing permission!</string>
-	<string name="wait_for_acceptance">Waiting for acceptance...</string>
-	<string name="sending_template">Sending ... {0}/{1} files ... {2}%</string>
+	<string name="wait_for_acceptance">Waiting for acceptance</string>
+	<string name="status_cancelled">Cancelled</string>
+	<string name="status_done">Done</string>
+	<string name="sending_template">Sending {0} files</string>
 	<!-- #endregion -->
 </resources>

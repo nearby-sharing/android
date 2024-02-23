@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.DeviceInfo;
+﻿using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.DeviceInfo;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.TransportUpgrade;
 using System;
 using System.Collections.Generic;
@@ -16,8 +15,6 @@ public sealed class LocalDeviceInfo
     public required string Name { get; init; }
 
     public required X509Certificate2 DeviceCertificate { get; init; }
-
-    public required ILoggerFactory LoggerFactory { get; init; }
 
     public required string OemManufacturerName { get; init; }
     public required string OemModelName { get; init; }

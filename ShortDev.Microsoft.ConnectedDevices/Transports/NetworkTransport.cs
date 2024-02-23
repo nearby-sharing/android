@@ -13,15 +13,11 @@ using System.Threading.Tasks;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Transports;
 
-public sealed class NetworkTransport : ICdpTransport, ICdpDiscoverableTransport
+public sealed class NetworkTransport(INetworkHandler handler) : ICdpTransport, ICdpDiscoverableTransport
 {
     public CdpTransportType TransportType { get; } = CdpTransportType.Tcp;
 
-    public INetworkHandler Handler { get; }
-    public NetworkTransport(INetworkHandler handler)
-    {
-        Handler = handler;
-    }
+    public INetworkHandler Handler { get; } = handler;
 
     readonly TcpListener _listener = new(IPAddress.Any, Constants.TcpPort);
 
@@ -44,7 +40,7 @@ public sealed class NetworkTransport : ICdpTransport, ICdpDiscoverableTransport
                     InputStream = stream,
                     OutputStream = stream,
                     RemoteDevice = new(
-                        null, // ToDo: ToDo!!
+                        Name: "UNKNOWN", // ToDo: Find device name
                         DeviceType.Invalid,
                         new EndpointInfo(
                             TransportType,
@@ -91,10 +87,10 @@ public sealed class NetworkTransport : ICdpTransport, ICdpDiscoverableTransport
     };
 
     bool _isAdvertising = false;
-    LocalDeviceInfo? _deviceInfo;
+    PresenceResponse? _presenceResponse;
     public void Advertise(LocalDeviceInfo deviceInfo, CancellationToken cancellationToken)
     {
-        _deviceInfo = deviceInfo;
+        _presenceResponse = PresenceResponse.Create(deviceInfo);
         _isAdvertising = true;
         EnsureListeningUdp(cancellationToken);
         cancellationToken.Register(() => _isAdvertising = false);
@@ -167,37 +163,33 @@ public sealed class NetworkTransport : ICdpTransport, ICdpDiscoverableTransport
         void HandleMsg(UdpReceiveResult result)
         {
             EndianReader reader = new(Endianness.BigEndian, result.Buffer);
-            if (
-                CommonHeader.TryParse(ref reader, out var headers, out _) &&
-                headers != null &&
-                headers.Type == MessageType.Discovery
-            )
+            if (!CommonHeader.TryParse(ref reader, out var headers, out _) || headers.Type != MessageType.Discovery)
+                return;
+
+            DiscoveryHeader discoveryHeaders = DiscoveryHeader.Parse(ref reader);
+            if (_isAdvertising && discoveryHeaders.Type == DiscoveryType.PresenceRequest)
             {
-                DiscoveryHeader discoveryHeaders = DiscoveryHeader.Parse(ref reader);
-                if (_isAdvertising && discoveryHeaders.Type == DiscoveryType.PresenceRequest)
-                    SendPresenceResponse(result.RemoteEndPoint.Address);
-                else if (_isDiscovering && discoveryHeaders.Type == DiscoveryType.PresenceResponse)
-                {
-                    var response = PresenceResponse.Parse(ref reader);
-                    DeviceDiscovered?.Invoke(this,
-                        new CdpDevice(
-                            response.DeviceName,
-                            response.DeviceType,
-                            EndpointInfo.FromTcp(result.RemoteEndPoint)
-                        ),
-                        new BLeBeacon(
-                            response.DeviceType,
-                            null!, // ToDo: 
-                            response.DeviceName
-                        )
-                    );
-                }
+                SendPresenceResponse(result.RemoteEndPoint.Address);
+                return;
+            }
+
+            if (_isDiscovering && discoveryHeaders.Type == DiscoveryType.PresenceResponse)
+            {
+                var response = PresenceResponse.Parse(ref reader);
+                DeviceDiscovered?.Invoke(
+                    this,
+                    new CdpDevice(
+                        response.DeviceName,
+                        response.DeviceType,
+                        EndpointInfo.FromTcp(result.RemoteEndPoint)
+                    )
+                );
             }
         }
 
         void SendPresenceResponse(IPAddress device)
         {
-            if (_deviceInfo == null)
+            if (_presenceResponse == null)
                 return;
 
             EndianWriter writer = new(Endianness.BigEndian);
@@ -210,16 +202,10 @@ public sealed class NetworkTransport : ICdpTransport, ICdpDiscoverableTransport
             {
                 Type = DiscoveryType.PresenceResponse
             }.Write(writer);
-            new PresenceResponse()
-            {
-                ConnectionMode = Messages.Connection.ConnectionMode.Proximal,
-                DeviceName = _deviceInfo.Name,
-                DeviceType = _deviceInfo.Type
-            }.Write(writer);
+            _presenceResponse.Write(writer);
 
             _udpclient.Send(writer.Buffer.AsSpan(), new IPEndPoint(device, Constants.UdpPort));
         }
     }
-
     #endregion
 }

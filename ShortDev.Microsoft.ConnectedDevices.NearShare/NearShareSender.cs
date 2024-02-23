@@ -1,62 +1,51 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Exceptions;
 using ShortDev.Microsoft.ConnectedDevices.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Session;
-using ShortDev.Microsoft.ConnectedDevices.NearShare.Internal;
+using ShortDev.Microsoft.ConnectedDevices.NearShare.Apps;
 using ShortDev.Microsoft.ConnectedDevices.NearShare.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Platforms;
 using ShortDev.Microsoft.ConnectedDevices.Serialization;
 
 namespace ShortDev.Microsoft.ConnectedDevices.NearShare;
 
-public sealed class NearShareSender
+public sealed class NearShareSender(ConnectedDevicesPlatform platform)
 {
-    public ConnectedDevicesPlatform Platform { get; }
-    public NearShareSender(ConnectedDevicesPlatform platform)
-    {
-        Platform = platform;
-    }
+    public ConnectedDevicesPlatform Platform { get; } = platform;
 
-    async Task<SenderStateMachine> PrepareTransferInternalAsync(CdpDevice device)
+    async Task<SenderStateMachine> PrepareTransferInternalAsync(CdpDevice device, CancellationToken cancellationToken)
     {
         var session = await Platform.ConnectAsync(device);
 
         Guid operationId = Guid.NewGuid();
 
-        HandshakeHandler handshake = new();
-        using var handShakeChannel = await session.StartClientChannelAsync(NearShareHandshakeApp.Id, NearShareHandshakeApp.Name, handshake);
+        HandshakeHandler handshake = new(Platform);
+        using var handShakeChannel = await session.StartClientChannelAsync(NearShareHandshakeApp.Id, NearShareHandshakeApp.Name, handshake, cancellationToken);
         var handshakeResultMsg = await handshake.Execute(operationId);
 
         // ToDo: CorrelationVector
         // var cv = handshakeResultMsg.Header.TryGetCorrelationVector() ?? throw new InvalidDataException("No Correlation Vector");
 
-        SenderStateMachine senderStateMachine = new();
-        var channel = await session.StartClientChannelAsync(operationId.ToString("D").ToUpper(), NearShareApp.Name, senderStateMachine, handShakeChannel.Socket);
+        SenderStateMachine senderStateMachine = new(Platform);
+        var channel = await session.StartClientChannelAsync(operationId.ToString("D").ToUpper(), NearShareApp.Name, senderStateMachine, handShakeChannel.Socket, cancellationToken);
         return senderStateMachine;
     }
 
-    static void DisposeApp(CdpAppBase app)
+    public async Task SendUriAsync(CdpDevice device, Uri uri, CancellationToken cancellationToken = default)
     {
-        app.Channel.Dispose(closeSession: true, closeSocket: true);
-    }
-
-    public async Task SendUriAsync(CdpDevice device, Uri uri)
-    {
-        var senderStateMachine = await PrepareTransferInternalAsync(device);
+        using var senderStateMachine = await PrepareTransferInternalAsync(device, cancellationToken);
         await senderStateMachine.SendUriAsync(uri);
-        DisposeApp(senderStateMachine);
     }
 
     public async Task SendFileAsync(CdpDevice device, CdpFileProvider file, IProgress<NearShareProgress> progress, CancellationToken cancellationToken = default)
         => await SendFilesAsync(device, new[] { file }, progress, cancellationToken);
 
-    public async Task SendFilesAsync(CdpDevice device, CdpFileProvider[] files, IProgress<NearShareProgress> progress, CancellationToken cancellationToken = default)
+    public async Task SendFilesAsync(CdpDevice device, IReadOnlyList<CdpFileProvider> files, IProgress<NearShareProgress> progress, CancellationToken cancellationToken = default)
     {
-        var senderStateMachine = await PrepareTransferInternalAsync(device);
+        using var senderStateMachine = await PrepareTransferInternalAsync(device, cancellationToken);
         await senderStateMachine.SendFilesAsync(files, progress, cancellationToken);
-        DisposeApp(senderStateMachine);
     }
 
-    sealed class HandshakeHandler : CdpAppBase
+    sealed class HandshakeHandler(ConnectedDevicesPlatform cdp) : CdpAppBase(cdp)
     {
         readonly TaskCompletionSource<CdpMessage> _promise = new();
 
@@ -84,7 +73,7 @@ public sealed class NearShareSender
         }
     }
 
-    sealed class SenderStateMachine : CdpAppBase
+    sealed class SenderStateMachine(ConnectedDevicesPlatform cdp) : CdpAppBase(cdp)
     {
         readonly TaskCompletionSource _promise = new();
         public async Task SendUriAsync(Uri uri)
@@ -100,17 +89,17 @@ public sealed class NearShareSender
             await _promise.Task;
         }
 
-        CdpFileProvider[]? _files;
+        IReadOnlyList<CdpFileProvider>? _files;
         IProgress<NearShareProgress>? _fileProgress;
         CancellationToken? _fileCancellationToken;
         ulong _bytesToSend;
-        public async Task SendFilesAsync(CdpFileProvider[] files, IProgress<NearShareProgress> progress, CancellationToken cancellationToken)
+        public async Task SendFilesAsync(IReadOnlyList<CdpFileProvider> files, IProgress<NearShareProgress> progress, CancellationToken cancellationToken)
         {
             _files = files;
             _fileProgress = progress;
             _fileCancellationToken = cancellationToken;
 
-            uint fileCount = (uint)files.Length;
+            uint fileCount = (uint)files.Count;
             _bytesToSend = CalcBytesToSend(files);
 
             ValueSet valueSet = new();
@@ -142,10 +131,10 @@ public sealed class NearShareSender
             return ids;
         }
 
-        static ulong CalcBytesToSend(CdpFileProvider[] files)
+        static ulong CalcBytesToSend(IReadOnlyList<CdpFileProvider> files)
         {
             ulong sum = 0;
-            for (int i = 0; i < files.Length; i++)
+            for (int i = 0; i < files.Count; i++)
                 sum += files[i].FileSize;
             return sum;
         }
@@ -187,15 +176,14 @@ public sealed class NearShareSender
             var start = payload.Get<ulong>("BlobPosition");
             var length = payload.Get<uint>("BlobSize");
 
-            var fileProvider = _files?[contentId] ?? throw new NullReferenceException("Could not access files to transfer");
+            var fileProvider = _files?[(int)contentId] ?? throw new NullReferenceException("Could not access files to transfer");
             var blob = fileProvider.ReadBlob(start, length);
 
             _fileProgress?.Report(new()
             {
-                BytesSent = Interlocked.Add(ref _bytesSent, length),
-                FilesSent = contentId + 1, // ToDo: How to calculate?
-                TotalBytesToSend = _bytesToSend,
-                TotalFilesToSend = (uint)_files.Length
+                TransferedBytes = Interlocked.Add(ref _bytesSent, length),
+                TotalBytes = _bytesToSend,
+                TotalFiles = (uint)_files.Count
             });
 
             ValueSet response = new();

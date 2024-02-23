@@ -1,9 +1,5 @@
-﻿using ShortDev.Microsoft.ConnectedDevices.Messages;
-using ShortDev.Microsoft.ConnectedDevices.Messages.Control;
-using ShortDev.Microsoft.ConnectedDevices.Serialization;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
-using System.Diagnostics.CodeAnalysis;
 
 namespace ShortDev.Microsoft.ConnectedDevices;
 
@@ -16,7 +12,7 @@ public static class CdpAppRegistration
     /// <summary>
     /// Signature of a <see cref="CdpAppBase"/> factory.
     /// </summary>
-    public delegate T CdpAppFactory<out T>() where T : CdpAppBase;
+    public delegate T CdpAppFactory<out T>(ConnectedDevicesPlatform cdp) where T : CdpAppBase;
 
     record AppId(string Id, string Name, CdpAppFactory<CdpAppBase> Factory);
 
@@ -42,12 +38,12 @@ public static class CdpAppRegistration
         return _registration.TryRemove(id, out _);
     }
 
-    internal static CdpAppBase InstantiateApp(string id, string name)
+    internal static CdpAppBase InstantiateApp(string id, string name, ConnectedDevicesPlatform cdp)
     {
         ArgumentException.ThrowIfNullOrEmpty(id);
         ArgumentException.ThrowIfNullOrEmpty(name);
 
         id = id.ToLower();
-        return _registration[id].Factory();
+        return _registration[id].Factory(cdp);
     }
 }

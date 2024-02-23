@@ -12,13 +12,16 @@ public sealed class UriTransferToken : TransferToken
     public required string Uri { get; init; }
 }
 
-public record struct FileShareInfo(uint Id, string Name, ulong Size);
+public readonly record struct FileShareInfo(uint Id, string Name, ulong Size);
 
 public sealed class FileTransferToken : TransferToken, IEnumerable<FileShareInfo>
 {
-    public required uint TotalFilesToSend { get; init; }
-    public required ulong TotalBytesToSend { get; init; }
+    public uint TotalFiles => (uint)Files.Count;
+    public required ulong TotalBytes { get; init; }
     public required IReadOnlyList<FileShareInfo> Files { get; init; }
+
+    public IEnumerator<FileShareInfo> GetEnumerator() => Files.GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     #region Formatting
     public static string FormatFileSize(ulong fileSize)
@@ -40,30 +43,29 @@ public sealed class FileTransferToken : TransferToken, IEnumerable<FileShareInfo
     #endregion
 
     #region Acceptance
-    readonly TaskCompletionSource<IReadOnlyList<Stream>> _promise = new();
+    readonly TaskCompletionSource<IReadOnlyList<Stream>> _acceptPromise = new();
     internal async ValueTask AwaitAcceptance()
-        => await _promise.Task;
+        => await _acceptPromise.Task;
 
     public bool IsAccepted
-        => _promise.Task.IsCompletedSuccessfully;
+        => _acceptPromise.Task.IsCompletedSuccessfully;
 
-    public void Accept(IReadOnlyList<Stream> fileStream)
+    public void Accept(IReadOnlyList<Stream> streams)
     {
-        if (fileStream.Count != TotalFilesToSend)
-            throw new ArgumentException("Invalid number of streams", nameof(fileStream));
+        if (streams.Count != TotalFiles)
+            throw new ArgumentException("Invalid number of streams", nameof(streams));
 
-        _promise.SetResult(fileStream);
+        _acceptPromise.SetResult(streams);
     }
-
-    public void Cancel()
-        => _promise.TrySetCanceled();
 
     internal Stream GetStream(uint contentId)
     {
         for (int i = 0; i < Files.Count; i++)
         {
-            if (Files[i].Id == contentId)
-                return _promise.Task.Result[i];
+            if (Files[i].Id != contentId)
+                continue;
+
+            return _acceptPromise.Task.Result[i];
         }
 
         throw new ArgumentOutOfRangeException(nameof(contentId));
@@ -71,43 +73,48 @@ public sealed class FileTransferToken : TransferToken, IEnumerable<FileShareInfo
     #endregion
 
 
+    #region Cancellation
+    readonly CancellationTokenSource _cancellationSource = new();
+
+    public CancellationToken CancellationToken => _cancellationSource.Token;
+    public void Cancel()
+    {
+        _acceptPromise.TrySetCanceled();
+        _cancellationSource.Cancel();
+    }
+    #endregion
+
+
     #region Progress
-    public bool IsTransferComplete { get; internal set; }
+    public bool IsTransferComplete { get; private set; }
 
     public event Action<NearShareProgress>? Progress;
 
-    internal ulong BytesSent { get; set; }
-    internal uint FilesSent { get; set; }
-
-    internal void SendProgressEvent()
+    ulong _transferedBytes = 0;
+    internal void SendProgressEvent(ulong byteTransferDelta)
     {
         NearShareProgress progress = new()
         {
-            BytesSent = BytesSent,
-            FilesSent = FilesSent,
-            TotalBytesToSend = TotalBytesToSend,
-            TotalFilesToSend = TotalFilesToSend,
+            TransferedBytes = Interlocked.Add(ref _transferedBytes, byteTransferDelta),
+            TotalBytes = TotalBytes,
+            TotalFiles = TotalFiles
         };
-        IsTransferComplete = progress.BytesSent >= progress.TotalBytesToSend;
+        IsTransferComplete = progress.TransferedBytes >= progress.TotalBytes;
         _ = Task.Run(() => Progress?.Invoke(progress));
     }
     #endregion
 
-    #region Info
-    public IEnumerator<FileShareInfo> GetEnumerator()
-        => Files.GetEnumerator();
-
-    IEnumerator IEnumerable.GetEnumerator()
-        => GetEnumerator();
-    #endregion
-
-    internal void Close()
+    public event Action? Finished;
+    internal async void OnFinish()
     {
-        foreach (var stream in _promise.Task.Result)
+        await Task.WhenAll(_acceptPromise.Task.Result.Select(async stream =>
         {
-            stream.Flush();
+            await stream.FlushAsync();
+
             stream.Close();
             stream.Dispose();
-        }
+        })).ConfigureAwait(continueOnCapturedContext: false);
+
+        Finished?.Invoke();
     }
 }

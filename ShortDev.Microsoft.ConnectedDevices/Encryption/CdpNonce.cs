@@ -3,15 +3,10 @@ using System.Security.Cryptography;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Encryption;
 
-public readonly struct CdpNonce
+public readonly record struct CdpNonce(ulong Value)
 {
-    public readonly ulong Value;
-
     public override string ToString()
         => Value.ToString();
-
-    public CdpNonce(ulong value)
-        => Value = value;
 
     public static unsafe CdpNonce Create()
     {

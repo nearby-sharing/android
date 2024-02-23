@@ -10,30 +10,20 @@ public partial class PropertyValue
 {
     internal object Get()
     {
-        switch (Type)
+        return Type switch
         {
-            case PropertyType.PropertyType_Empty:
-                throw new NullReferenceException();
-            case PropertyType.PropertyType_UInt8Array:
-                return UInt8ArrayValue;
-            case PropertyType.PropertyType_Int32:
-                return Int32Value;
-            case PropertyType.PropertyType_UInt32:
-                return UInt32Value;
-            case PropertyType.PropertyType_UInt32Array:
-                return UInt32ArrayValue;
-            case PropertyType.PropertyType_UInt64:
-                return UInt64Value;
-            case PropertyType.PropertyType_UInt64Array:
-                return UInt64ArrayValue;
-            case PropertyType.PropertyType_String:
-                return StringValue;
-            case PropertyType.PropertyType_StringArray:
-                return StringArrayValue;
-            case PropertyType.PropertyType_GuidArray:
-                return GuidArrayValue;
-        }
-        throw new NotImplementedException();
+            PropertyType.PropertyType_Empty => throw new NullReferenceException(),
+            PropertyType.PropertyType_UInt8Array => UInt8ArrayValue,
+            PropertyType.PropertyType_Int32 => Int32Value,
+            PropertyType.PropertyType_UInt32 => UInt32Value,
+            PropertyType.PropertyType_UInt32Array => UInt32ArrayValue,
+            PropertyType.PropertyType_UInt64 => UInt64Value,
+            PropertyType.PropertyType_UInt64Array => UInt64ArrayValue,
+            PropertyType.PropertyType_String => StringValue,
+            PropertyType.PropertyType_StringArray => StringArrayValue,
+            PropertyType.PropertyType_GuidArray => GuidArrayValue,
+            _ => throw new NotImplementedException(),
+        };
     }
 
     public T Get<T>()

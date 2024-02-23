@@ -3,20 +3,18 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/selectDeviceLayout"
-    android:animateLayoutChanges="true">
+    android:layout_height="wrap_content">
     <androidx.recyclerview.widget.RecyclerView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:id="@+id/deviceSelector"
-        android:background="?android:attr/colorBackground"
-        android:scrollbars="vertical" />
+        android:scrollbars="horizontal"
+        android:layout_centerInParent="true" />
     <ImageView
         android:id="@+id/emptyDeviceListView"
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:layout_centerInParent="true"
         android:src="@drawable/ic_fluent_search_24_regular"
-        android:tint="?attr/colorOnSurfaceVariant" />
+        android:tint="?attr/colorOnSurface" />
 </RelativeLayout>

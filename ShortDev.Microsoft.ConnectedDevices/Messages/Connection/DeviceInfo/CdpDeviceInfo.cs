@@ -4,22 +4,22 @@ using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.TransportUpgrade;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages.Connection.DeviceInfo;
 
-public sealed class CdpDeviceInfo
+public sealed record CdpDeviceInfo
 {
-    public byte[]? DeduplicationHint { get; set; }
+    public required byte[] DeduplicationHint { get; init; }
 
     [JsonPropertyName("connectionModes")]
-    public ConnectionMode ConnectionModes { get; set; }
+    public required ConnectionMode ConnectionModes { get; init; }
 
     [JsonPropertyName("deviceId")]
-    public byte[]? DeviceId { get; set; }
+    public required byte[] DeviceId { get; init; }
 
     [JsonPropertyName("endpoints")]
-    public IReadOnlyList<EndpointInfo>? Endpoints { get; set; }
+    public required IReadOnlyList<EndpointInfo> Endpoints { get; init; }
 
     [JsonPropertyName("name")]
-    public string? Name { get; set; }
+    public required string Name { get; init; }
 
     [JsonPropertyName("type")]
-    public DeviceType Type { get; set; }
+    public required DeviceType Type { get; init; }
 }

@@ -1,4 +1,5 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Messages;
+using ShortDev.Microsoft.ConnectedDevices.Messages.Control;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Session;
 using ShortDev.Microsoft.ConnectedDevices.Platforms;
 using System;
@@ -11,12 +12,12 @@ namespace ShortDev.Microsoft.ConnectedDevices;
 /// </summary>
 public sealed class CdpChannel : IDisposable
 {
-    internal CdpChannel(CdpSession session, ulong channelId, CdpAppBase handler, CdpSocket socket)
+    private CdpChannel(CdpSession session, ulong channelId, CdpSocket socket, CdpAppBase app)
     {
         Session = session;
         ChannelId = channelId;
-        MessageHandler = handler;
         Socket = socket;
+        App = app;
     }
 
     /// <summary>
@@ -38,16 +39,13 @@ public sealed class CdpChannel : IDisposable
     /// <br/>
     /// <inheritdoc cref="CdpAppBase"/>
     /// </summary>
-    public CdpAppBase MessageHandler { get; }
+    public CdpAppBase App { get; private set; }
 
     /// <summary>
     /// Get's the unique id for the channel. <br/>
     /// The id is unique as long as the channel is active.
     /// </summary>
     public ulong ChannelId { get; }
-
-    public void HandleMessageAsync(CdpMessage msg)
-        => MessageHandler.HandleMessage(msg);
 
     public void SendBinaryMessage(BodyCallback bodyCallback, uint msgId, List<AdditionalHeader>? headers = null)
     {
@@ -77,8 +75,23 @@ public sealed class CdpChannel : IDisposable
     {
         Session.UnregisterChannel(this);
         if (closeSocket)
-            Socket.Dispose();
+            Socket.Dispose(); // ToDo: Heartbeat!
         if (closeSession)
-            Session.Dispose();
+            Session.Dispose(); // ToDo: Heartbeat!
+    }
+
+    internal static CdpChannel CreateServerChannel(CdpSession session, ulong channelId, CdpSocket socket, StartChannelRequest request)
+    {
+        var app = CdpAppRegistration.InstantiateApp(request.Id, request.Name, session.Platform);
+        CdpChannel channel = new(session, channelId, socket, app);
+        app.Initialize(channel);
+        return channel;
+    }
+
+    internal static CdpChannel CreateClientChannel(CdpSession session, CdpSocket socket, StartChannelResponse response, CdpAppBase app)
+    {
+        CdpChannel channel = new(session, response.ChannelId, socket, app);
+        app.Initialize(channel);
+        return channel;
     }
 }

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string name="app_name">Partajare în apropiere (Windows)</string>
+	<string name="app_name">Partajare în apropiere</string>
 	<string name="app_titlebar_title_default">Trimite date pe Windows 10 / 11</string>
 	<string name="app_titlebar_title_receive">Primește date de pe Windows 10 / 11</string>
 	<string name="app_titlebar_title_receive_setup">Configurare / Informații</string>
-	
+
 	<string name="assets_prefix">ro</string>
 
 	<!-- #region generic -->
@@ -14,7 +14,7 @@
 
 	<string name="generic_send">Trimite</string>
 	<string name="generic_receive">Primește</string>
-	
+
 	<string name="generic_status_template">Stare: {0}</string>
 	<string name="generic_error_template">Eroare: {0}</string>
 
@@ -51,8 +51,6 @@
 	<string name="open_faq_summary">Deschide secțiunea de întrebări frecvente</string>
 
 
-	<string name="category_device_info">Informații despre dispozitiv</string>
-
 	<string name="goto_mac_address_title">Specifică adresa Mac</string>
 	<string name="goto_mac_address_summary">Specifică adresa mac a acestui dispozitiv</string>
 	<!-- #endregion -->
@@ -66,7 +64,7 @@
 	<string name="share_url">Trimite link</string>
 
 	<string name="send_missing_permissions">Permisiunea lipsește!</string>
-	<string name="wait_for_acceptance">Se așteaptă confirmarea...</string>
-	<string name="sending_template">Se trimit ... {0}/{1} fișiere ... {2}%</string>
+	<string name="wait_for_acceptance">Se așteaptă confirmarea</string>
+	<string name="sending_template">Se trimit {0} fișiere</string>
 	<!-- #endregion -->
 </resources>

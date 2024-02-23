@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string name="app_name">Uso compartido en proximidad (Windows)</string>
+	<string name="app_name">Uso compartido en proximidad</string>
 	<string name="app_titlebar_title_default">Enviar a Windows 10 / 11</string>
 	<string name="app_titlebar_title_receive">Recibir de Windows 10 / 11</string>
 	<string name="app_titlebar_title_receive_setup">Configuración / Información</string>
@@ -90,7 +90,7 @@
 	<string name="share_url">Compartir URL</string>
 
 	<string name="send_missing_permissions">¡Faltan algunos permisos necesarios!</string>
-	<string name="wait_for_acceptance">Esperando respuesta...</string>
-	<string name="sending_template">Enviando ... {0}/{1} archivos ... {2}%</string>
+	<string name="wait_for_acceptance">Esperando respuesta</string>
+	<string name="sending_template">Enviando {0} archivos</string>
 	<!-- #endregion -->
 </resources>

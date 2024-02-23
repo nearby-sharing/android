@@ -21,16 +21,11 @@ using System.Threading.Tasks;
 
 namespace ShortDev.Microsoft.ConnectedDevices;
 
-public sealed class ConnectedDevicesPlatform : IDisposable
+public sealed class ConnectedDevicesPlatform(LocalDeviceInfo deviceInfo, ILoggerFactory loggerFactory) : IDisposable
 {
-    public LocalDeviceInfo DeviceInfo { get; }
+    public LocalDeviceInfo DeviceInfo { get; } = deviceInfo;
 
-    readonly ILogger<ConnectedDevicesPlatform> _logger;
-    public ConnectedDevicesPlatform(LocalDeviceInfo deviceInfo)
-    {
-        DeviceInfo = deviceInfo;
-        _logger = deviceInfo.LoggerFactory.CreateLogger<ConnectedDevicesPlatform>();
-    }
+    readonly ILogger<ConnectedDevicesPlatform> _logger = loggerFactory.CreateLogger<ConnectedDevicesPlatform>();
 
     #region Transport
     readonly ConcurrentDictionary<Type, ICdpTransport> _transports = new();
@@ -52,44 +47,34 @@ public sealed class ConnectedDevicesPlatform : IDisposable
 
     #region Host
     #region Advertise
-    public bool IsAdvertising { get; private set; } = false;
-    public void Advertise(CancellationToken cancellationToken)
+    public GuardFlag IsAdvertising { get; } = new();
+    public async void Advertise(CancellationToken cancellationToken)
     {
-        lock (this)
-        {
-            if (IsAdvertising)
-                return;
+        using var isAdvertising = IsAdvertising.Lock();
 
-            IsAdvertising = true;
-        }
-
-        _logger.LogDebug("Startet advertising");
+        _logger.AdvertisingStarted();
 
         foreach (var (_, transport) in _transports)
-            if (transport is ICdpDiscoverableTransport discoverableTransport)
-                discoverableTransport.Advertise(DeviceInfo, cancellationToken);
-
-        cancellationToken.Register(() =>
         {
-            lock (this)
-                IsAdvertising = false;
-        });
+            if (transport is not ICdpDiscoverableTransport discoverableTransport)
+                continue;
+
+            discoverableTransport.Advertise(DeviceInfo, cancellationToken);
+        }
+
+        await cancellationToken.AwaitCancellation();
+
+        _logger.AdvertisingStopped();
     }
     #endregion
 
     #region Listen
-    public bool IsListening { get; private set; } = false;
-    public void Listen(CancellationToken cancellationToken)
+    public GuardFlag IsListening { get; } = new();
+    public async void Listen(CancellationToken cancellationToken)
     {
-        lock (this)
-        {
-            if (IsListening)
-                return;
+        using var isListening = IsListening.Lock();
 
-            IsListening = true;
-        }
-
-        _logger.LogDebug("Startet listening");
+        _logger.ListeningStarted();
 
         foreach (var (_, transport) in _transports)
         {
@@ -97,35 +82,51 @@ public sealed class ConnectedDevicesPlatform : IDisposable
             transport.DeviceConnected += OnDeviceConnected;
         }
 
-        cancellationToken.Register(() =>
+        await cancellationToken.AwaitCancellation();
+
+        foreach (var (_, transport) in _transports)
         {
-            lock (this)
-                IsListening = false;
-        });
+            transport.DeviceConnected -= OnDeviceConnected;
+        }
+
+        _logger.ListeningStopped();
     }
 
     private void OnDeviceConnected(ICdpTransport sender, CdpSocket socket)
     {
-        _logger.Log(LogLevel.Information, "Device {deviceName} ({deviceAddress}) connected via {transportType}", socket.RemoteDevice.Name, socket.RemoteDevice.Endpoint.Address, socket.TransportType);
+        _logger.DeviceConnected(socket.RemoteDevice.Name, socket.RemoteDevice.Endpoint);
         ReceiveLoop(socket);
     }
     #endregion
     #endregion
 
     #region Client
-    public void Discover(CancellationToken cancellationToken)
+    public event DeviceDiscoveredEventHandler? DeviceDiscovered;
+
+    public GuardFlag IsDiscovering { get; } = new();
+    public async void Discover(CancellationToken cancellationToken)
     {
+        using var isDiscovering = IsDiscovering.Lock();
+
         foreach (var (_, transport) in _transports)
         {
-            if (transport is ICdpDiscoverableTransport discoverableTransport)
-            {
-                discoverableTransport.Discover(cancellationToken);
-                discoverableTransport.DeviceDiscovered += DeviceDiscovered;
-            }
+            if (transport is not ICdpDiscoverableTransport discoverableTransport)
+                continue;
+
+            discoverableTransport.Discover(cancellationToken);
+            discoverableTransport.DeviceDiscovered += DeviceDiscovered;
+        }
+
+        await cancellationToken.AwaitCancellation();
+
+        foreach (var (_, transport) in _transports)
+        {
+            if (transport is not ICdpDiscoverableTransport discoverableTransport)
+                continue;
+
+            discoverableTransport.DeviceDiscovered -= DeviceDiscovered;
         }
     }
-
-    public event DeviceDiscoveredEventHandler? DeviceDiscovered;
 
     public async Task<CdpSession> ConnectAsync(CdpDevice device)
     {
@@ -201,11 +202,11 @@ public sealed class ConnectedDevicesPlatform : IDisposable
                         if (socket.IsClosed)
                             return;
 
-                        _logger.Log(LogLevel.Warning, "{exceptionTypeName} in session {sessionId} \n {exception}",
-                            ex.GetType().Name,
-                            session?.LocalSessionId.ToString() ?? "null",
-                            ex
-                        );
+                        if (session != null)
+                            _logger.ExceptionInSession(ex, session.SessionId.AsNumber());
+                        else
+                            _logger.ExceptionInReceiveLoop(ex, socket.TransportType);
+
                         break;
                     }
                 } while (!socket.IsClosed);
@@ -247,7 +248,7 @@ public sealed class ConnectedDevicesPlatform : IDisposable
 
     public CdpDeviceInfo GetCdpDeviceInfo()
     {
-        List<EndpointInfo> endpoints = new();
+        List<EndpointInfo> endpoints = [];
         foreach (var (_, transport) in _transports)
         {
             try
@@ -259,6 +260,9 @@ public sealed class ConnectedDevicesPlatform : IDisposable
         }
         return DeviceInfo.ToCdpDeviceInfo(endpoints);
     }
+
+    public ILogger<T> CreateLogger<T>()
+        => loggerFactory.CreateLogger<T>();
 
     public void Dispose()
     {
@@ -277,20 +281,13 @@ public sealed class ConnectedDevicesPlatform : IDisposable
         return certRequest.CreateSelfSigned(DateTimeOffset.Now, DateTimeOffset.Now.AddYears(5));
     }
 
-    public static ILoggerFactory CreateLoggerFactory(Action<string> messageCallback, string? filePattern = null)
+    public static ILoggerFactory CreateLoggerFactory(string filePattern, LogLevel logLevel = LogLevel.Debug)
         => LoggerFactory.Create(builder =>
         {
             builder.ClearProviders();
 
-            BasicLoggingProvider provider = new();
-            provider.MessageReceived += messageCallback;
-            builder.AddProvider(provider);
+            builder.SetMinimumLevel(logLevel);
 
-            builder.SetMinimumLevel(LogLevel.Debug);
-
-            if (!string.IsNullOrEmpty(filePattern))
-            {
-                builder.AddFile(filePattern, LogLevel.Debug);
-            }
+            builder.AddFile(filePattern, logLevel);
         });
 }

@@ -10,19 +10,11 @@ using System.Net.NetworkInformation;
 
 namespace Nearby_Sharing_Windows;
 
-public sealed class AndroidBluetoothHandler : IBluetoothHandler
+public sealed class AndroidBluetoothHandler(BluetoothAdapter adapter, PhysicalAddress macAddress) : IBluetoothHandler
 {
-    public BluetoothAdapter Adapter { get; }
-    public ICdpPlatformHandler PlatformHandler { get; }
-
-    public PhysicalAddress MacAddress { get; }
-
-    public AndroidBluetoothHandler(ICdpPlatformHandler handler, BluetoothAdapter adapter, PhysicalAddress macAddress)
-    {
-        PlatformHandler = handler;
-        Adapter = adapter;
-        MacAddress = macAddress;
-    }
+    public BluetoothAdapter Adapter { get; } = adapter;
+    public bool IsEnabled => Adapter.IsEnabled;
+    public PhysicalAddress MacAddress { get; } = macAddress;
 
     #region BLe Scan
     public async Task ScanBLeAsync(ScanOptions scanOptions, CancellationToken cancellationToken = default)
@@ -34,10 +26,9 @@ public sealed class AndroidBluetoothHandler : IBluetoothHandler
         {
             try
             {
-                var address = result.Device?.Address ?? throw new InvalidDataException("No address");
                 var beaconData = result.ScanRecord?.GetManufacturerSpecificData(Constants.BLeBeaconManufacturerId);
                 if (beaconData != null && BLeBeacon.TryParse(beaconData, out var data))
-                    scanOptions.OnDeviceDiscovered?.Invoke(data);
+                    scanOptions.OnDeviceDiscovered?.Invoke(data, result.Rssi);
             }
             catch (InvalidDataException) { }
         };

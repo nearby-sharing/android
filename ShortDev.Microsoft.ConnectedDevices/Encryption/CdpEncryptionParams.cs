@@ -6,8 +6,8 @@ namespace ShortDev.Microsoft.ConnectedDevices.Encryption;
 
 public sealed class CdpEncryptionParams
 {
-    public static readonly byte[] SecretPrepend = new byte[] { 0x0D6, 0x37, 0x0F1, 0x0AA, 0x0E2, 0x0F0, 0x41, 0x8C };
-    public static readonly byte[] SecretAppend = new byte[] { 0x0A8, 0x0F8, 0x1A, 0x57, 0x4E, 0x22, 0x8A, 0x0B7 };
+    public static readonly byte[] SecretPrepend = [0x0D6, 0x37, 0x0F1, 0x0AA, 0x0E2, 0x0F0, 0x41, 0x8C];
+    public static readonly byte[] SecretAppend = [0x0A8, 0x0F8, 0x1A, 0x57, 0x4E, 0x22, 0x8A, 0x0B7];
 
     public static CdpEncryptionParams Default { get; } = new();
     public static CdpEncryptionParams FromCurveType(CurveType curveType)

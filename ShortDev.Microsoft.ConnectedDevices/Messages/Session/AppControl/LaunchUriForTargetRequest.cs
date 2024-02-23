@@ -54,7 +54,7 @@ public sealed class LaunchUriForTargetRequest : ICdpPayload<LaunchUriForTargetRe
     /// BOND.NET serialized data that is passed as a value set to the app launched by the call. <br/>
     /// (Optional)
     /// </summary>
-    public byte[] InputData { get; init; } = Array.Empty<byte>();
+    public byte[] InputData { get; init; } = [];
 
     public void Write(EndianWriter writer)
     {

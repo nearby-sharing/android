@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string name="app_name">Partage de proximité (Windows)</string>
+	<string name="app_name">Partage de proximité</string>
 	<string name="app_titlebar_title_default">Envoyer des données vers Windows 10 / 11</string>
 	<string name="app_titlebar_title_receive">Recevoir des données depuis Windows 10 / 11</string>
 	<string name="app_titlebar_title_receive_setup">Configuration / Information</string>
-	
+
 	<string name="assets_prefix">fr</string>
 
 	<!-- #region generic -->
@@ -14,7 +14,7 @@
 
 	<string name="generic_send">Envoyer</string>
 	<string name="generic_receive">Recevoir</string>
-	
+
 	<string name="generic_status_template">Status: {0}</string>
 	<string name="generic_error_template">Erreur: {0}</string>
 
@@ -51,8 +51,6 @@
 	<string name="open_faq_summary">Ouvrir la FAQ</string>
 
 
-	<string name="category_device_info">Informations de l’appareil</string>
-
 	<string name="goto_mac_address_title">Définir l’adresse Mac</string>
 	<string name="goto_mac_address_summary">Définissez l’adresse Mac de l’appareil</string>
 	<!-- #endregion -->
@@ -66,7 +64,7 @@
 	<string name="share_url">Partager un lien</string>
 
 	<string name="send_missing_permissions">Des permissions requises sont manquantes !</string>
-	<string name="wait_for_acceptance">En attente d’acceptation...</string>
-	<string name="sending_template">Envoi en cours... {0}/{1} fichiers... {2}%</string>
+	<string name="wait_for_acceptance">En attente d’acceptation</string>
+	<string name="sending_template">Envoi en cours {0} fichiers</string>
 	<!-- #endregion -->
 </resources>

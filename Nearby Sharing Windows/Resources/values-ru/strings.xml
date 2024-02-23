@@ -3,7 +3,7 @@
 	<string name="app_titlebar_title_default">Отправка файлов на Windows 10 / 11</string>
 	<string name="app_titlebar_title_receive">Получение файлов с Windows 10 / 11</string>
 	<string name="app_titlebar_title_receive_setup">Настройка / Информация</string>
-	
+
 	<string name="assets_prefix">ru</string>
 
 	<!-- #region generic -->
@@ -13,7 +13,7 @@
 
 	<string name="generic_send">Отправить</string>
 	<string name="generic_receive">Получить</string>
-	
+
 	<string name="generic_status_template">Статус: {0}</string>
 	<string name="generic_error_template">Ошибка: {0}</string>
 
@@ -50,8 +50,6 @@
 	<string name="open_faq_summary">Открыть FAQ</string>
 
 
-	<string name="category_device_info">Информация об устройстве</string>
-
 	<string name="goto_mac_address_title">Указать MAC-Адрес</string>
 	<string name="goto_mac_address_summary">Укажите MAC-Адрес этого устройства</string>
 	<!-- #endregion -->
@@ -65,7 +63,7 @@
 	<string name="share_url">Поделиться ссылкой</string>
 
 	<string name="send_missing_permissions">Недостаточно разрешений!</string>
-	<string name="wait_for_acceptance">Ожидаем принятия файла получателем...</string>
-	<string name="sending_template">Отправка ... {0}/{1} файл(а/ов) ... {2}%</string>
+	<string name="wait_for_acceptance">Ожидаем принятия файла получателем</string>
+	<string name="sending_template">Отправка {0} файл(а/ов)</string>
 	<!-- #endregion -->
 </resources>
