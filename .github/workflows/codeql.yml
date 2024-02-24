@@ -51,7 +51,7 @@ jobs:
         dotnet workload install android --ignore-failed-sources
         
     - name: Build
-      run: dotnet build "Nearby Sharing Windows" -c Debug --interactive /p:EnforceCodeStyleInBuild=true /p:AnalysisLevel=latest-all
+      run: dotnet build src -c Debug --interactive /p:EnforceCodeStyleInBuild=true /p:AnalysisLevel=latest-all
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
