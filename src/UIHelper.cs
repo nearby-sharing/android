@@ -65,7 +65,7 @@ internal static class UIHelper
     {
         CustomTabsIntent intent = new CustomTabsIntent.Builder()
             .Build();
-        intent.LaunchUrl(activity, AndroidUri.Parse(url));
+        intent.LaunchUrl(activity, AndroidUri.Parse(url) ?? throw new ArgumentException("Invalid url", nameof(url)));
     }
 
     public static void OpenLocaleSettings(Activity activity)

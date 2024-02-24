@@ -8,7 +8,7 @@ using AndroidX.Preference;
 
 namespace NearShare.Droid.Settings;
 
-[IntentFilter(new[] { TileService.ActionQsTilePreferences })]
+[IntentFilter([TileService.ActionQsTilePreferences])]
 [Activity(Label = "@string/app_name", Exported = true, Theme = "@style/AppTheme", ConfigurationChanges = UIHelper.ConfigChangesFlags)]
 public sealed class SettingsActivity : AppCompatActivity, ISettingsNavigation
 {

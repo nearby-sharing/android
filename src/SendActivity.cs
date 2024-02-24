@@ -317,7 +317,7 @@ public sealed class SendActivity : AppCompatActivity
         if (Intent.Action == Intent.ActionProcessText && OperatingSystem.IsAndroidVersionAtLeast(23))
         {
             return (
-                files: new[] { SendText(Intent.GetStringExtra(Intent.ExtraProcessText)) },
+                files: [SendText(Intent.GetStringExtra(Intent.ExtraProcessText))],
                 null
             );
         }
@@ -353,7 +353,7 @@ public sealed class SendActivity : AppCompatActivity
             }
 
             return (
-                files: new[] { SendText(text) },
+                files: [SendText(text)],
                 null
             );
         }

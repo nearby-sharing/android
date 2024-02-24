@@ -13,7 +13,11 @@ public sealed class ReceiveTileService : TileService
         Intent intent = new(this, typeof(ReceiveActivity));
         intent.AddFlags(ActivityFlags.NewTask);
 
-        if (OperatingSystem.IsAndroidVersionAtLeast(24))
+        if (OperatingSystem.IsAndroidVersionAtLeast(34))
+            StartActivityAndCollapse(
+                PendingIntent.GetActivity(this, 0, intent, PendingIntentFlags.Immutable) ?? throw new InvalidOperationException("Could not create PendingIntent")
+            );
+        else if (OperatingSystem.IsAndroidVersionAtLeast(24))
             StartActivityAndCollapse(intent);
         else
             StartActivity(intent);

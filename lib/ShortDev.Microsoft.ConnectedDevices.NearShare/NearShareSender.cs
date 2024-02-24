@@ -37,7 +37,7 @@ public sealed class NearShareSender(ConnectedDevicesPlatform platform)
     }
 
     public async Task SendFileAsync(CdpDevice device, CdpFileProvider file, IProgress<NearShareProgress> progress, CancellationToken cancellationToken = default)
-        => await SendFilesAsync(device, new[] { file }, progress, cancellationToken);
+        => await SendFilesAsync(device, [file], progress, cancellationToken);
 
     public async Task SendFilesAsync(CdpDevice device, IReadOnlyList<CdpFileProvider> files, IProgress<NearShareProgress> progress, CancellationToken cancellationToken = default)
     {
