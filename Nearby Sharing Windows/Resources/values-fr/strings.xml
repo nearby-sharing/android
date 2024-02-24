@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string name="app_name">Partage de proximité (Windows)</string>
+	<string name="app_name">Partage de proximité</string>
 	<string name="app_titlebar_title_default">Envoyer des données vers Windows 10 / 11</string>
 	<string name="app_titlebar_title_receive">Recevoir des données depuis Windows 10 / 11</string>
 	<string name="app_titlebar_title_receive_setup">Configuration / Information</string>
@@ -64,10 +64,10 @@
 	<string name="force_dark_mode_summary">Forcer le thème sombre</string>
 
 	<string name="switch_language_title">Langue</string>
-	<string name="switch_language_summary">Changer la langue de l'appli</string>
+	<string name="switch_language_summary">Changer la langue de l’appli</string>
 
 	<string name="preference_cdp_title">Connectivité</string>
-	<string name="preference_cdp_summary">Configuration pour l'envoi et la réception</string>
+	<string name="preference_cdp_summary">Configuration pour l’envoi et la réception</string>
 
 	<string name="open_setup_title">Configuration PC</string>
 	<string name="open_setup_summary">Voir les réglages requis pour PC</string>
@@ -92,8 +92,8 @@
 
 	<string name="send_missing_permissions">Des permissions requises sont manquantes !</string>
 	<string name="wait_for_acceptance">En attente d’acceptation...</string>
-	<string name="wait_for_acceptance">Annulé</string>
-	<string name="wait_for_acceptance">Terminé</string>
+	<string name="status_cancelled">Annulé</string>
+	<string name="status_done">Terminé</string>
 	<string name="sending_template">Envoi de {0} fichiers</string>
 	<!-- #endregion -->
 </resources>
