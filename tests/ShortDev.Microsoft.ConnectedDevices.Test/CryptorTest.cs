@@ -1,7 +1,5 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Encryption;
 using ShortDev.Microsoft.ConnectedDevices.Messages;
-using ShortDev.Networking;
-using System.Linq;
 using System.Security.Cryptography;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Test;

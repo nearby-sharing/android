@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net8.0-android34.0</TargetFramework>
+		<OutputType>Exe</OutputType>
+		<SupportedOSPlatformVersion>21</SupportedOSPlatformVersion>
+		<ApplicationId>de.shortdev.nearby_sharing_windows</ApplicationId>
+		<ApplicationVersion>26</ApplicationVersion>
+		<ApplicationDisplayVersion>1.7.1</ApplicationDisplayVersion>
+		<UseAndroidCrypto>true</UseAndroidCrypto>
+		<AndroidErrorOnCustomJavaObject>false</AndroidErrorOnCustomJavaObject>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<RunAOTCompilation>False</RunAOTCompilation>
+		<PublishTrimmed>false</PublishTrimmed>
+		<AndroidPackageFormat>aab</AndroidPackageFormat>
+	</PropertyGroup>
+	<ItemGroup Label="Nuget">
+		<PackageReference Include="Sentry" Version="3.41.0" />
+		<PackageReference Include="ShortDev.Android.FluentIcons" Version="1.1.203" />
+		<PackageReference Include="Xamarin.AndroidX.AppCompat" Version="1.6.1.6" />
+		<PackageReference Include="Xamarin.AndroidX.Browser" Version="1.7.0.1" />
+		<PackageReference Include="Xamarin.Google.Android.Material" Version="1.10.0.2" />
+	</ItemGroup>
+	<ItemGroup Label="Project References">
+		<ProjectReference Include="..\lib\ShortDev.Android.Preferences\ShortDev.Android.Preferences.csproj" />
+		<ProjectReference Include="..\lib\ShortDev.Android\ShortDev.Android.csproj" />
+		<ProjectReference Include="..\lib\ShortDev.Microsoft.ConnectedDevices.NearShare\ShortDev.Microsoft.ConnectedDevices.NearShare.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<AndroidAsset Include="../Credits.md" Link="Assets/Credits.md" />
+		<None Include="../README.md" />
+	</ItemGroup>
+</Project>

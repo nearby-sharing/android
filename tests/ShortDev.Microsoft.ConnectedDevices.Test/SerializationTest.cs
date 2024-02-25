@@ -1,7 +1,5 @@
 using ShortDev.Microsoft.ConnectedDevices.Encryption;
 using ShortDev.Microsoft.ConnectedDevices.Messages;
-using ShortDev.Networking;
-using System.Security.Cryptography.X509Certificates;
 using Xunit.Abstractions;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Test;
@@ -47,8 +45,8 @@ public sealed class SerializationTest(ITestOutputHelper output)
         var genericDefinition = testMsg.Method.GetGenericMethodDefinition();
         var genericMethod = genericDefinition.MakeGenericMethod(type);
 
-        genericMethod.Invoke(null, new object[] { Endianness.LittleEndian });
-        genericMethod.Invoke(null, new object[] { Endianness.BigEndian });
+        genericMethod.Invoke(null, [Endianness.LittleEndian]);
+        genericMethod.Invoke(null, [Endianness.BigEndian]);
 
         static void TestRun<T>(Endianness endianness) where T : ICdpSerializable<T>
         {

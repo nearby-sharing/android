@@ -1,7 +1,0 @@
-﻿BCryptSecretAgreement
-BCryptDeriveKey
-BCryptDecrypt
-BCryptEncrypt
-BCryptDestroySecret
-BCryptImportKeyPair
-BCryptOpenAlgorithmProvider
