@@ -2,7 +2,7 @@ name: "CodeQL C#"
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "main" ]
     paths: ["**.cs", "**.xml"]
   pull_request:
     paths: ["**.cs", "**.xml"]
