@@ -14,6 +14,8 @@ public enum PeerCapabilities : ulong
 [Flags]
 public enum Header129Values : ulong
 {
+    // LowByte: ConnectFlags
+
     Default = 0x30000001,
     All = 0x70000003
 }
@@ -25,6 +27,18 @@ public enum ConnectFlags
     Rfcomm = 2,
     WiFiDirect = 4,
     Udp = 8,
-    Tcp = 16,
-    BLeGatt = 32
+    Tcp = 0x10,
+    BLeGatt = 0x20
+}
+
+public enum EndpointType
+{
+    Unknown,
+    Udp,
+    Tcp,
+    Cloud,
+    Ble,
+    Rfcomm,
+    WifiDirect,
+    BleGatt
 }
