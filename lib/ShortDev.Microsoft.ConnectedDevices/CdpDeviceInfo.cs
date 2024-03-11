@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using ShortDev.Microsoft.ConnectedDevices.Messages.Connection;
 using System.Text.Json.Serialization;
-using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.TransportUpgrade;
 
-namespace ShortDev.Microsoft.ConnectedDevices.Messages.Connection.DeviceInfo;
+namespace ShortDev.Microsoft.ConnectedDevices;
 
 public sealed record CdpDeviceInfo
 {

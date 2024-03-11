@@ -1,5 +1,4 @@
-﻿using ShortDev.Microsoft.ConnectedDevices.Platforms;
-using System.Threading;
+﻿using System.Threading;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Transports;
 

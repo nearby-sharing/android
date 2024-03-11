@@ -3,7 +3,6 @@ using ShortDev.Microsoft.ConnectedDevices.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Session;
 using ShortDev.Microsoft.ConnectedDevices.NearShare.Apps;
 using ShortDev.Microsoft.ConnectedDevices.NearShare.Messages;
-using ShortDev.Microsoft.ConnectedDevices.Platforms;
 using ShortDev.Microsoft.ConnectedDevices.Serialization;
 
 namespace ShortDev.Microsoft.ConnectedDevices.NearShare;
@@ -12,9 +11,9 @@ public sealed class NearShareSender(ConnectedDevicesPlatform platform)
 {
     public ConnectedDevicesPlatform Platform { get; } = platform;
 
-    async Task<SenderStateMachine> PrepareTransferInternalAsync(CdpDevice device, CancellationToken cancellationToken)
+    async Task<SenderStateMachine> PrepareTransferInternalAsync(EndpointInfo endpoint, CancellationToken cancellationToken)
     {
-        var session = await Platform.ConnectAsync(device);
+        var session = await Platform.ConnectAsync(endpoint);
 
         Guid operationId = Guid.NewGuid();
 
@@ -32,7 +31,7 @@ public sealed class NearShareSender(ConnectedDevicesPlatform platform)
 
     public async Task SendUriAsync(CdpDevice device, Uri uri, CancellationToken cancellationToken = default)
     {
-        using var senderStateMachine = await PrepareTransferInternalAsync(device, cancellationToken);
+        using var senderStateMachine = await PrepareTransferInternalAsync(device.Endpoint, cancellationToken);
         await senderStateMachine.SendUriAsync(uri);
     }
 
@@ -41,7 +40,7 @@ public sealed class NearShareSender(ConnectedDevicesPlatform platform)
 
     public async Task SendFilesAsync(CdpDevice device, IReadOnlyList<CdpFileProvider> files, IProgress<NearShareProgress> progress, CancellationToken cancellationToken = default)
     {
-        using var senderStateMachine = await PrepareTransferInternalAsync(device, cancellationToken);
+        using var senderStateMachine = await PrepareTransferInternalAsync(device.Endpoint, cancellationToken);
         await senderStateMachine.SendFilesAsync(files, progress, cancellationToken);
     }
 

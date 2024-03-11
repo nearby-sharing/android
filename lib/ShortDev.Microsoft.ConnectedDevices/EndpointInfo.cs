@@ -1,10 +1,9 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Transports;
-using System;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Text.Json.Serialization;
 
-namespace ShortDev.Microsoft.ConnectedDevices.Messages.Connection.TransportUpgrade;
+namespace ShortDev.Microsoft.ConnectedDevices;
 
 public record class EndpointInfo(
     [property: JsonPropertyName("endpointType")] CdpTransportType TransportType,

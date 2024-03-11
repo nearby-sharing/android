@@ -2,33 +2,26 @@
 using ShortDev.Microsoft.ConnectedDevices.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.TransportUpgrade;
-using ShortDev.Microsoft.ConnectedDevices.Platforms;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
+using ShortDev.Microsoft.ConnectedDevices.Transports.Network;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Internal;
 
-internal sealed class UpgradeHandler
+internal sealed class UpgradeHandler(CdpSession session, EndpointInfo initialEndpoint)
 {
-    readonly ILogger<UpgradeHandler> _logger;
-    readonly CdpSession _session;
-    public UpgradeHandler(CdpSession session, CdpDevice initalDevice)
-    {
-        _session = session;
-        _logger = session.Platform.CreateLogger<UpgradeHandler>();
+    readonly CdpSession _session = session;
+    readonly ILogger<UpgradeHandler> _logger = session.Platform.CreateLogger<UpgradeHandler>();
 
-        // Initial address is always allowed
-        _allowedAddresses.Add(initalDevice.Endpoint.Address);
-    }
+    // Initial address is always allowed
+    readonly SynchronizedList<string> _allowedAddresses = [initialEndpoint.Address];
+    public bool IsSocketAllowed(CdpSocket socket)
+        => _allowedAddresses.Contains(socket.Endpoint.Address);
 
     #region Policies
     public bool IsUpgradeSupported
         => (/* ToDo: header131Value & */ _session.ClientCapabilities & _session.HostCapabilities & PeerCapabilities.UpgradeSupport) != 0;
-
-    readonly ConcurrentList<string> _allowedAddresses = new();
-    public bool IsSocketAllowed(CdpSocket socket)
-        => _allowedAddresses.Contains(socket.RemoteDevice.Endpoint.Address);
     #endregion
 
     public bool TryHandleConnect(CdpSocket socket, ConnectionHeader connectionHeader, ref EndianReader reader)
@@ -80,7 +73,7 @@ internal sealed class UpgradeHandler
     }
 
     #region Host
-    readonly ConcurrentList<Guid> _upgradeIds = new();
+    readonly SynchronizedList<Guid> _upgradeIds = [];
     void HandleTransportRequest(CdpSocket socket, ref EndianReader reader)
     {
         var msg = UpgradeIdPayload.Parse(ref reader);
@@ -91,7 +84,7 @@ internal sealed class UpgradeHandler
         if (!allowed && _upgradeIds.Contains(msg.UpgradeId))
         {
             // No we have confirmed that this address belongs to the same device (different transport)
-            _allowedAddresses.Add(socket.RemoteDevice.Endpoint.Address);
+            _allowedAddresses.Add(socket.Endpoint.Address);
             _upgradeIds.Remove(msg.UpgradeId);
 
             allowed = true;
@@ -268,7 +261,7 @@ internal sealed class UpgradeHandler
                 if (!int.TryParse(endpoint.Service, out var port))
                     return null;
 
-                return await _session.Platform.TryCreateSocketAsync(_session.Device.WithEndpoint(endpoint), UpgradeInstance.Timeout);
+                return await _session.Platform.TryCreateSocketAsync(endpoint, UpgradeInstance.Timeout);
             }));
 
             if (_currentUpgrade == null)
@@ -314,7 +307,7 @@ internal sealed class UpgradeHandler
         Debug.Assert(_currentUpgrade.NewSocket != null);
 
         // Allow the new address
-        _allowedAddresses.Add(_currentUpgrade.NewSocket.RemoteDevice.Endpoint.Address);
+        _allowedAddresses.Add(_currentUpgrade.NewSocket.Endpoint.Address);
 
         // Request transport permission for new socket
         _session.SendMessage(_currentUpgrade.NewSocket, new()

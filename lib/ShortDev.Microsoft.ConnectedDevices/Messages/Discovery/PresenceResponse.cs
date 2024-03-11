@@ -1,5 +1,4 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Messages.Connection;
-using ShortDev.Microsoft.ConnectedDevices.Platforms;
 using System.Security.Cryptography;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages.Discovery;

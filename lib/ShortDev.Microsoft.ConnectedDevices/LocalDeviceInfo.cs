@@ -1,13 +1,11 @@
-﻿using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.DeviceInfo;
-using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.TransportUpgrade;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
-namespace ShortDev.Microsoft.ConnectedDevices.Platforms;
+namespace ShortDev.Microsoft.ConnectedDevices;
 
 public sealed class LocalDeviceInfo
 {

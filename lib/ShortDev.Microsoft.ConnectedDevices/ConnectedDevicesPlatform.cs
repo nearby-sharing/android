@@ -1,9 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using ShortDev.Microsoft.ConnectedDevices.Encryption;
 using ShortDev.Microsoft.ConnectedDevices.Messages;
-using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.DeviceInfo;
-using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.TransportUpgrade;
-using ShortDev.Microsoft.ConnectedDevices.Platforms;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
 using System.Buffers;
 using System.Collections.Concurrent;
@@ -87,7 +84,7 @@ public sealed class ConnectedDevicesPlatform(LocalDeviceInfo deviceInfo, ILogger
 
     private void OnDeviceConnected(ICdpTransport sender, CdpSocket socket)
     {
-        _logger.DeviceConnected(socket.RemoteDevice.Name, socket.RemoteDevice.Endpoint);
+        _logger.NewSocket(socket.Endpoint);
         ReceiveLoop(socket);
     }
     #endregion
@@ -121,33 +118,33 @@ public sealed class ConnectedDevicesPlatform(LocalDeviceInfo deviceInfo, ILogger
         }
     }
 
-    public async Task<CdpSession> ConnectAsync(CdpDevice device)
+    public async Task<CdpSession> ConnectAsync(EndpointInfo endpoint)
     {
-        var socket = await CreateSocketAsync(device);
+        var socket = await CreateSocketAsync(endpoint);
         return await CdpSession.CreateClientAndConnectAsync(this, socket);
     }
 
-    internal async Task<CdpSocket> CreateSocketAsync(CdpDevice device)
+    internal async Task<CdpSocket> CreateSocketAsync(EndpointInfo endpoint)
     {
-        if (TryGetKnownSocket(device.Endpoint, out var knownSocket))
+        if (TryGetKnownSocket(endpoint, out var knownSocket))
             return knownSocket;
 
-        var transport = TryGetTransport(device.Endpoint.TransportType) ?? throw new InvalidOperationException($"No single transport found for type {device.Endpoint.TransportType}");
-        var socket = await transport.ConnectAsync(device);
+        var transport = TryGetTransport(endpoint.TransportType) ?? throw new InvalidOperationException($"No single transport found for type {endpoint.TransportType}");
+        var socket = await transport.ConnectAsync(endpoint);
         ReceiveLoop(socket);
         return socket;
     }
 
-    internal async Task<CdpSocket?> TryCreateSocketAsync(CdpDevice device, TimeSpan connectTimeout)
+    internal async Task<CdpSocket?> TryCreateSocketAsync(EndpointInfo endpoint, TimeSpan connectTimeout)
     {
-        if (TryGetKnownSocket(device.Endpoint, out var knownSocket))
+        if (TryGetKnownSocket(endpoint, out var knownSocket))
             return knownSocket;
 
-        var transport = TryGetTransport(device.Endpoint.TransportType);
+        var transport = TryGetTransport(endpoint.TransportType);
         if (transport == null)
             return null;
 
-        var socket = await transport.TryConnectAsync(device, connectTimeout);
+        var socket = await transport.TryConnectAsync(endpoint, connectTimeout);
         if (socket == null)
             return null;
 
@@ -177,7 +174,7 @@ public sealed class ConnectedDevicesPlatform(LocalDeviceInfo deviceInfo, ILogger
 
                         session = CdpSession.GetOrCreate(
                             this,
-                            socket.RemoteDevice ?? throw new InvalidDataException(),
+                            socket.Endpoint,
                             header
                         );
 
@@ -215,11 +212,11 @@ public sealed class ConnectedDevicesPlatform(LocalDeviceInfo deviceInfo, ILogger
         socket.Disposed += OnSocketClosed;
         void OnSocketClosed()
         {
-            _knownSockets.TryRemove(socket.RemoteDevice.Endpoint, out _); // ToDo: We might remove a newer socket here!!
+            _knownSockets.TryRemove(socket.Endpoint, out _); // ToDo: We might remove a newer socket here!!
             socket.Disposed -= OnSocketClosed;
         }
 
-        _knownSockets.AddOrUpdate(socket.RemoteDevice.Endpoint, socket, (key, current) =>
+        _knownSockets.AddOrUpdate(socket.Endpoint, socket, (key, current) =>
         {
             // ToDo: Alive check
             return socket;

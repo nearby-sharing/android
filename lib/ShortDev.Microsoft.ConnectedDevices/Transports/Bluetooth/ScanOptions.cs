@@ -1,6 +1,4 @@
-﻿using ShortDev.Microsoft.ConnectedDevices.Transports;
-
-namespace ShortDev.Microsoft.ConnectedDevices.Platforms.Bluetooth;
+﻿namespace ShortDev.Microsoft.ConnectedDevices.Transports.Bluetooth;
 
 public sealed class ScanOptions
 {

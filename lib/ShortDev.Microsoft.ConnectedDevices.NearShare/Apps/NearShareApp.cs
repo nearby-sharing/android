@@ -67,7 +67,7 @@ internal sealed class NearShareApp(ConnectedDevicesPlatform cdp) : CdpAppBase(cd
                     }
                     _fileTransferToken = new()
                     {
-                        DeviceName = Channel.Session.Device.Name,
+                        DeviceName = Channel.Session.DeviceName,
                         TotalBytes = bytesToSend,
                         Files = files
                     };
@@ -88,7 +88,7 @@ internal sealed class NearShareApp(ConnectedDevicesPlatform cdp) : CdpAppBase(cd
 
                     NearShareReceiver.OnReceivedUri(new()
                     {
-                        DeviceName = Channel.Session.Device.Name,
+                        DeviceName = Channel.Session.DeviceName,
                         Uri = uri
                     });
 

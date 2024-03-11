@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ShortDev.Microsoft.ConnectedDevices.Platforms.Bluetooth;
+namespace ShortDev.Microsoft.ConnectedDevices.Transports.Bluetooth;
 
 public sealed class RfcommOptions
 {

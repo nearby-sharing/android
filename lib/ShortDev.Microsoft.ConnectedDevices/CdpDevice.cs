@@ -1,6 +1,4 @@
-﻿using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.TransportUpgrade;
-
-namespace ShortDev.Microsoft.ConnectedDevices.Platforms;
+﻿namespace ShortDev.Microsoft.ConnectedDevices;
 
 public record CdpDevice(string Name, DeviceType Type, EndpointInfo Endpoint)
 {

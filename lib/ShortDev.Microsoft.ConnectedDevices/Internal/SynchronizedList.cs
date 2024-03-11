@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Internal;
 
-internal sealed class ConcurrentList<T>
+internal sealed class SynchronizedList<T> : IEnumerable<T>
 {
     readonly List<T> _data = [];
 
@@ -23,4 +23,10 @@ internal sealed class ConcurrentList<T>
         lock (_data)
             return _data.Contains(item);
     }
+
+    public IEnumerator<T> GetEnumerator()
+        => _data.GetEnumerator();
+
+    IEnumerator IEnumerable.GetEnumerator()
+        => _data.GetEnumerator();
 }

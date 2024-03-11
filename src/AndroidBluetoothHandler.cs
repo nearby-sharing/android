@@ -1,12 +1,11 @@
 ﻿using Android.Bluetooth;
 using Android.Bluetooth.LE;
 using Android.Runtime;
-using ShortDev.Microsoft.ConnectedDevices.Platforms;
 using ShortDev.Microsoft.ConnectedDevices;
-using ShortDev.Microsoft.ConnectedDevices.Platforms.Bluetooth;
 using BLeScanResult = Android.Bluetooth.LE.ScanResult;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
 using System.Net.NetworkInformation;
+using ShortDev.Microsoft.ConnectedDevices.Transports.Bluetooth;
 
 namespace NearShare.Droid;
 
@@ -58,12 +57,12 @@ public sealed class AndroidBluetoothHandler(BluetoothAdapter adapter, PhysicalAd
         }
     }
 
-    public async Task<CdpSocket> ConnectRfcommAsync(CdpDevice device, RfcommOptions options, CancellationToken cancellationToken = default)
+    public async Task<CdpSocket> ConnectRfcommAsync(EndpointInfo endpoint, RfcommOptions options, CancellationToken cancellationToken = default)
     {
         if (Adapter == null)
             throw new InvalidOperationException($"{nameof(Adapter)} is not initialized!");
 
-        var btDevice = Adapter.GetRemoteDevice(device.Endpoint.Address) ?? throw new ArgumentException($"Could not find bt device with address \"{device.Endpoint.Address}\"");
+        var btDevice = Adapter.GetRemoteDevice(endpoint.Address) ?? throw new ArgumentException($"Could not find bt device with address \"{endpoint.Address}\"");
         var btSocket = btDevice.CreateInsecureRfcommSocketToServiceRecord(Java.Util.UUID.FromString(options.ServiceId)) ?? throw new ArgumentException("Could not create service socket");
         await btSocket.ConnectAsync();
         return btSocket.ToCdp();

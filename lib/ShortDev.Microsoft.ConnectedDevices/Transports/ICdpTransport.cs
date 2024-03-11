@@ -1,11 +1,4 @@
-﻿using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.TransportUpgrade;
-using ShortDev.Microsoft.ConnectedDevices.Platforms;
-using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace ShortDev.Microsoft.ConnectedDevices.Transports;
+﻿namespace ShortDev.Microsoft.ConnectedDevices.Transports;
 
 public interface ICdpTransport : IDisposable
 {
@@ -13,12 +6,12 @@ public interface ICdpTransport : IDisposable
 
     EndpointInfo GetEndpoint();
 
-    Task<CdpSocket> ConnectAsync(CdpDevice device);
-    async Task<CdpSocket?> TryConnectAsync(CdpDevice device, TimeSpan timeout)
+    Task<CdpSocket> ConnectAsync(EndpointInfo endpoint);
+    async Task<CdpSocket?> TryConnectAsync(EndpointInfo endpoint, TimeSpan timeout)
     {
         try
         {
-            return await ConnectAsync(device).WithTimeout(timeout);
+            return await ConnectAsync(endpoint).WithTimeout(timeout);
         }
         catch { }
         return null;
