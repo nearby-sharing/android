@@ -7,7 +7,7 @@ using ShortDev.Microsoft.ConnectedDevices.Messages.Connection;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.Authentication;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.DeviceInfo;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Control;
-using ShortDev.Microsoft.ConnectedDevices.Platforms;
+using ShortDev.Microsoft.ConnectedDevices.Transports;
 using System.Collections.Concurrent;
 
 namespace ShortDev.Microsoft.ConnectedDevices;
@@ -26,27 +26,29 @@ public sealed class CdpSession : IDisposable
     public PeerCapabilities ClientCapabilities { get; private set; } = 0;
 
     public ConnectedDevicesPlatform Platform { get; }
-    public CdpDevice Device { get; private set; }
+    public CdpDeviceInfo? DeviceInfo { get; private set; }
+    public string DeviceName => DeviceInfo?.Name ?? "UNKNOWN";
+    public EndpointInfo Endpoint { get; private set; }
 
     readonly ILogger<CdpSession> _logger;
     readonly UpgradeHandler _upgradeHandler;
     readonly ConnectHandler _connectHandler;
-    private CdpSession(ConnectedDevicesPlatform platform, CdpDevice device, SessionId sessionId)
+    private CdpSession(ConnectedDevicesPlatform platform, EndpointInfo initialEndpoint, SessionId sessionId)
     {
         Platform = platform;
-        Device = device;
+        Endpoint = initialEndpoint;
         SessionId = sessionId;
 
         _logger = platform.CreateLogger<CdpSession>();
-        _upgradeHandler = new(this, device);
+        _upgradeHandler = new(this, initialEndpoint);
         _connectHandler = new(this, _upgradeHandler);
     }
 
     #region Registration
     static readonly AutoKeyRegistry<uint, CdpSession> _sessionRegistry = [];
-    internal static CdpSession GetOrCreate(ConnectedDevicesPlatform platform, CdpDevice device, CommonHeader header)
+    internal static CdpSession GetOrCreate(ConnectedDevicesPlatform platform, EndpointInfo initialEndpoint, CommonHeader header)
     {
-        ArgumentNullException.ThrowIfNull(device);
+        ArgumentNullException.ThrowIfNull(initialEndpoint);
         ArgumentNullException.ThrowIfNull(header);
 
         var (_, localSessionId, remoteSessionId) = SessionId.Parse(header.SessionId);
@@ -74,7 +76,7 @@ public sealed class CdpSession : IDisposable
         // Create
         return _sessionRegistry.Create(localSessionId => new(
             platform,
-            device,
+            initialEndpoint,
             sessionId: new(IsHost: true, localSessionId, remoteSessionId)
         ), out _);
     }
@@ -83,7 +85,7 @@ public sealed class CdpSession : IDisposable
     {
         var session = _sessionRegistry.Create(localSessionId => new(
             platform,
-            socket.RemoteDevice,
+            socket.Endpoint,
             sessionId: new(IsHost: false, localSessionId)
         ), out _);
 
@@ -175,7 +177,7 @@ public sealed class CdpSession : IDisposable
         }
 
         if (!_upgradeHandler.IsSocketAllowed(socket))
-            throw UnexpectedMessage(socket.RemoteDevice.Endpoint.Address);
+            throw UnexpectedMessage(socket.Endpoint.Address);
 
         if (header.Type == MessageType.Control)
         {
@@ -255,7 +257,7 @@ public sealed class CdpSession : IDisposable
                 return;
 
             if (!_upgradeHandler.IsSocketAllowed(socket))
-                throw UnexpectedMessage(socket.RemoteDevice.Endpoint.Address);
+                throw UnexpectedMessage(socket.Endpoint.Address);
 
             if (connectionHeader.MessageType == ConnectionType.ConnectRequest)
             {
@@ -428,7 +430,7 @@ public sealed class CdpSession : IDisposable
                         socket = await _upgradeHandler.RequestUpgradeAsync(oldSocket);
                         oldSocket.Dispose();
 
-                        _session.Device = socket.RemoteDevice;
+                        _session.Endpoint = socket.Endpoint;
                     }
                     catch (Exception ex)
                     {
@@ -494,6 +496,8 @@ public sealed class CdpSession : IDisposable
         {
             var msg = DeviceInfoMessage.Parse(ref reader);
             _logger.ReceivedDeviceInfo(msg.DeviceInfo);
+
+            _session.DeviceInfo = msg.DeviceInfo;
 
             header.Flags = 0;
             _session.SendMessage(socket, header, (writer) =>
@@ -637,7 +641,7 @@ public sealed class CdpSession : IDisposable
         if (IsHost)
             throw new InvalidOperationException("Session is not a client");
 
-        var socket = await Platform.CreateSocketAsync(Device);
+        var socket = await Platform.CreateSocketAsync(Endpoint);
         return await StartClientChannelAsync(appId, appName, handler, socket, cancellationToken);
     }
 

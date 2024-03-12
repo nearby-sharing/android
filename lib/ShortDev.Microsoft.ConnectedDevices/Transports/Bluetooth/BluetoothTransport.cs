@@ -1,11 +1,4 @@
-﻿using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.TransportUpgrade;
-using ShortDev.Microsoft.ConnectedDevices.Platforms;
-using ShortDev.Microsoft.ConnectedDevices.Platforms.Bluetooth;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace ShortDev.Microsoft.ConnectedDevices.Transports;
-
+﻿namespace ShortDev.Microsoft.ConnectedDevices.Transports.Bluetooth;
 public sealed class BluetoothTransport(IBluetoothHandler handler) : ICdpTransport, ICdpDiscoverableTransport
 {
     public CdpTransportType TransportType { get; } = CdpTransportType.Rfcomm;
@@ -26,8 +19,8 @@ public sealed class BluetoothTransport(IBluetoothHandler handler) : ICdpTranspor
         );
     }
 
-    public async Task<CdpSocket> ConnectAsync(CdpDevice device)
-        => await Handler.ConnectRfcommAsync(device, new RfcommOptions()
+    public async Task<CdpSocket> ConnectAsync(EndpointInfo endpoint)
+        => await Handler.ConnectRfcommAsync(endpoint, new RfcommOptions()
         {
             ServiceId = Constants.RfcommServiceId,
             ServiceName = Constants.RfcommServiceName,

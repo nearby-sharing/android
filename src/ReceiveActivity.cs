@@ -14,10 +14,9 @@ using ShortDev.Android.UI;
 using ShortDev.Microsoft.ConnectedDevices;
 using ShortDev.Microsoft.ConnectedDevices.Encryption;
 using ShortDev.Microsoft.ConnectedDevices.NearShare;
-using ShortDev.Microsoft.ConnectedDevices.Platforms;
-using ShortDev.Microsoft.ConnectedDevices.Platforms.Bluetooth;
-using ShortDev.Microsoft.ConnectedDevices.Platforms.Network;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
+using ShortDev.Microsoft.ConnectedDevices.Transports.Bluetooth;
+using ShortDev.Microsoft.ConnectedDevices.Transports.Network;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Net.NetworkInformation;
@@ -238,24 +237,19 @@ public sealed class ReceiveActivity : AppCompatActivity
 
 static class Extensions
 {
-    public static CdpDevice ToCdp(this BluetoothDevice @this)
+    public static EndpointInfo ToCdp(this BluetoothDevice @this)
         => new(
-            @this.Name ?? throw new InvalidDataException("Empty name"),
-            DeviceType.Invalid,
-            new(
-                CdpTransportType.Rfcomm,
-                @this.Address ?? throw new InvalidDataException("Empty address"),
-                Constants.RfcommServiceId
-            )
+            CdpTransportType.Rfcomm,
+            @this.Address ?? throw new InvalidDataException("Empty address"),
+            Constants.RfcommServiceId
         );
 
     public static CdpSocket ToCdp(this BluetoothSocket @this)
         => new()
         {
-            TransportType = CdpTransportType.Rfcomm,
             InputStream = @this.InputStream ?? throw new NullReferenceException(),
             OutputStream = @this.OutputStream ?? throw new NullReferenceException(),
-            RemoteDevice = @this.RemoteDevice!.ToCdp(),
+            Endpoint = @this.RemoteDevice!.ToCdp(),
             Close = @this.Close
         };
 }

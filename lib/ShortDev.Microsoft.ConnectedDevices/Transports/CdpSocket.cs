@@ -1,13 +1,12 @@
-﻿using ShortDev.Microsoft.ConnectedDevices.Transports;
-
-namespace ShortDev.Microsoft.ConnectedDevices.Platforms;
+﻿namespace ShortDev.Microsoft.ConnectedDevices.Transports;
 
 /// <summary>
 /// Provides direct low-level access to inter-device communication.
 /// </summary>
 public sealed class CdpSocket : IDisposable
 {
-    public required CdpTransportType TransportType { get; init; }
+    public CdpTransportType TransportType => Endpoint.TransportType;
+    public required EndpointInfo Endpoint { get; init; }
     public required Stream InputStream { get; init; }
     public required Stream OutputStream { get; init; }
 
@@ -16,8 +15,6 @@ public sealed class CdpSocket : IDisposable
         lock (OutputStream)
             writer.CopyTo(OutputStream);
     }
-
-    public required CdpDevice RemoteDevice { get; init; }
 
     public bool IsClosed { get; private set; }
     public Action? Close { private get; set; }

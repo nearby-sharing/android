@@ -1,7 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection;
-using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.DeviceInfo;
-using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.TransportUpgrade;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Control;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
 using System;
@@ -25,8 +23,8 @@ internal static partial class CdpLog
     public static partial void ListeningStopped(this ILogger logger);
 
 
-    [LoggerMessage(EventId = 105, Level = LogLevel.Information, Message = "Device {DeviceName} connected with endpoint {Endpoint}")]
-    public static partial void DeviceConnected(this ILogger logger, string deviceName, EndpointInfo endpoint);
+    [LoggerMessage(EventId = 105, Level = LogLevel.Information, Message = "New socket from endpoint {Endpoint}")]
+    public static partial void NewSocket(this ILogger logger, EndpointInfo endpoint);
 
 
 

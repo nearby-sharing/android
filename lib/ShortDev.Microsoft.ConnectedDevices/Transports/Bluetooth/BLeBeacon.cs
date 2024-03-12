@@ -2,7 +2,7 @@
 using System.Net.NetworkInformation;
 using System.Text;
 
-namespace ShortDev.Microsoft.ConnectedDevices.Transports;
+namespace ShortDev.Microsoft.ConnectedDevices.Transports.Bluetooth;
 
 public sealed record BLeBeacon(DeviceType DeviceType, PhysicalAddress MacAddress, string DeviceName)
 {

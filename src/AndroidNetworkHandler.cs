@@ -1,7 +1,7 @@
 ﻿using Android.Content;
 using Android.Net;
 using Android.Net.Wifi;
-using ShortDev.Microsoft.ConnectedDevices.Platforms.Network;
+using ShortDev.Microsoft.ConnectedDevices.Transports.Network;
 using System.Net;
 
 namespace NearShare.Droid;

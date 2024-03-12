@@ -3,7 +3,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 
-namespace ShortDev.Microsoft.ConnectedDevices.Platforms.Network;
+namespace ShortDev.Microsoft.ConnectedDevices.Transports.Network;
 
 public interface INetworkHandler
 {
