@@ -2,8 +2,6 @@
 using ShortDev.Microsoft.ConnectedDevices.Messages.Control;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Session;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
-using System;
-using System.Collections.Generic;
 
 namespace ShortDev.Microsoft.ConnectedDevices;
 
@@ -58,14 +56,14 @@ public sealed class CdpChannel : IDisposable
         if (headers != null)
             header.AdditionalHeaders = headers;
 
-        Session.SendMessage(Socket, header, writer =>
+        EndianWriter writer = new(Endianness.BigEndian);
+        new BinaryMsgHeader()
         {
-            new BinaryMsgHeader()
-            {
-                MessageId = msgId
-            }.Write(writer);
-            bodyCallback(writer);
-        });
+            MessageId = msgId
+        }.Write(writer);
+        bodyCallback(writer);
+
+        Session.SendMessage(Socket, header, writer);
     }
 
     void IDisposable.Dispose()

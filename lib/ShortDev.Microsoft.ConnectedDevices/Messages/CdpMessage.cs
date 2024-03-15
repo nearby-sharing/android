@@ -1,5 +1,6 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Messages.Session;
 using ShortDev.Microsoft.ConnectedDevices.Serialization;
+using ShortDev.Microsoft.ConnectedDevices.Transports;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages;
 
@@ -10,7 +11,7 @@ public sealed class CdpMessage
     public CdpMessage(CommonHeader header)
     {
         Header = header;
-        _buffer = new(header.FragmentCount * Constants.DefaultMessageFragmentSize);
+        _buffer = new(header.FragmentCount * MessageFragmenter.DefaultMessageFragmentSize);
     }
 
     public CdpMessage(CommonHeader header, byte[] payload)
