@@ -48,7 +48,8 @@ jobs:
         
     - name: Install Workloads
       run: |
-        dotnet workload restore src --ignore-failed-sources
+        cd src
+        dotnet workload restore --ignore-failed-sources
         
     - name: Build
       run: dotnet build src -c Debug --interactive /p:EnforceCodeStyleInBuild=true /p:AnalysisLevel=latest-all
