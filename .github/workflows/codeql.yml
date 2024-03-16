@@ -48,7 +48,7 @@ jobs:
         
     - name: Install Workloads
       run: |
-        dotnet workload install android --ignore-failed-sources
+        dotnet workload restore src --ignore-failed-sources
         
     - name: Build
       run: dotnet build src -c Debug --interactive /p:EnforceCodeStyleInBuild=true /p:AnalysisLevel=latest-all
