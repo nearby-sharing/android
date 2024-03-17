@@ -51,7 +51,7 @@ jobs:
         dotnet workload restore --ignore-failed-sources
         
     - name: Build
-      run: dotnet build src -c Debug --interactive /p:EnforceCodeStyleInBuild=true /p:AnalysisLevel=latest-all
+      run: dotnet build src -c Debug --interactive /p:EnforceCodeStyleInBuild=true /p:AnalysisLevel=latest-all /p:AndroidSdkDirectory=$ANDROID_SDK_ROOT
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
