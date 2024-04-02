@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Numerics;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Internal;
-
 internal sealed class AutoKeyRegistry<TKey, TValue> : IEnumerable<TValue> where TKey : IUnsignedNumber<TKey>
 {
     readonly ConcurrentDictionary<TKey, TValue> _registry = new();
@@ -25,7 +22,7 @@ internal sealed class AutoKeyRegistry<TKey, TValue> : IEnumerable<TValue> where 
 
     public TValue Create(Func<TKey, TValue> factory, out TKey key)
     {
-        lock (this)
+        lock (_registry)
         {
             key = _nextKey++;
         }
