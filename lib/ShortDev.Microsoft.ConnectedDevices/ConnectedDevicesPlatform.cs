@@ -121,7 +121,7 @@ public sealed class ConnectedDevicesPlatform(LocalDeviceInfo deviceInfo, ILogger
     public async Task<CdpSession> ConnectAsync(EndpointInfo endpoint)
     {
         var socket = await CreateSocketAsync(endpoint);
-        return await CdpSession.CreateClientAndConnectAsync(this, socket);
+        return await CdpSession.ConnectClientAsync(this, socket);
     }
 
     internal async Task<CdpSocket> CreateSocketAsync(EndpointInfo endpoint)

@@ -25,7 +25,7 @@ public sealed class NearShareSender(ConnectedDevicesPlatform platform)
         // var cv = handshakeResultMsg.Header.TryGetCorrelationVector() ?? throw new InvalidDataException("No Correlation Vector");
 
         SenderStateMachine senderStateMachine = new(Platform);
-        var channel = await session.StartClientChannelAsync(operationId.ToString("D").ToUpper(), NearShareApp.Name, senderStateMachine, handShakeChannel.Socket, cancellationToken);
+        var channel = await session.StartClientChannelAsync(operationId.ToString("D").ToUpper(), NearShareApp.Name, senderStateMachine, cancellationToken);
         return senderStateMachine;
     }
 
