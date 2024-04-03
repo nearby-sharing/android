@@ -1,14 +1,8 @@
-﻿using System;
-using System.Buffers;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Buffers;
+using System.Diagnostics.CodeAnalysis;
 using System.Net.NetworkInformation;
-using System.Security.Cryptography;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace ShortDev.Microsoft.ConnectedDevices;
-
 public static class Extensions
 {
     public static uint HighValue(this ulong value)
@@ -26,8 +20,8 @@ public static class Extensions
 
     public static async Task<T?> WithTimeout<T>(this Task<T> task, TimeSpan timeout)
     {
-        if (await Task.WhenAny(task, Task.Delay(timeout)) == task)
-            return task.Result;
+        if (await Task.WhenAny(task, Task.Delay(timeout)).ConfigureAwait(false) == task)
+            return task!.Result;
         return default;
     }
 
@@ -37,7 +31,7 @@ public static class Extensions
     public static void DisposeAll(params IEnumerable<IDisposable>[] disposables)
         => disposables.SelectMany(x => x).DisposeAll();
 
-    public static void DisposeAll<T>(this IEnumerable<T> disposables) where T : IDisposable
+    public static void DisposeAll<T>([NotNull] this IEnumerable<T> disposables) where T : IDisposable
     {
         List<Exception> exceptions = [];
 

@@ -11,12 +11,12 @@ public interface ICdpTransport : IDisposable
     {
         try
         {
-            return await ConnectAsync(endpoint).WithTimeout(timeout);
+            return await ConnectAsync(endpoint).WithTimeout(timeout).ConfigureAwait(false);
         }
         catch { }
         return null;
     }
 
     public event DeviceConnectedEventHandler? DeviceConnected;
-    void Listen(CancellationToken cancellationToken);
+    Task Listen(CancellationToken cancellationToken);
 }

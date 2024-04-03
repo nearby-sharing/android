@@ -2,30 +2,46 @@
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Control;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
-using System;
-using System.Collections.Generic;
 
 namespace ShortDev.Microsoft.ConnectedDevices;
 
 internal static partial class CdpLog
 {
+    #region Advertising
     [LoggerMessage(EventId = 101, Level = LogLevel.Information, Message = "Advertising started")]
     public static partial void AdvertisingStarted(this ILogger logger);
 
     [LoggerMessage(EventId = 102, Level = LogLevel.Information, Message = "Advertising stopped")]
     public static partial void AdvertisingStopped(this ILogger logger);
 
+    [LoggerMessage(EventId = 106, Level = LogLevel.Information, Message = "Error while advertising")]
+    public static partial void AdvertisingError(this ILogger logger, Exception ex);
+    #endregion
 
+    #region Listening
     [LoggerMessage(EventId = 103, Level = LogLevel.Information, Message = "Listening started")]
     public static partial void ListeningStarted(this ILogger logger);
 
     [LoggerMessage(EventId = 104, Level = LogLevel.Information, Message = "Listening stopped")]
     public static partial void ListeningStopped(this ILogger logger);
 
+    [LoggerMessage(EventId = 107, Level = LogLevel.Information, Message = "Error while listening")]
+    public static partial void ListeningError(this ILogger logger, Exception ex);
+    #endregion
+
+    #region Discovery
+    [LoggerMessage(EventId = 108, Level = LogLevel.Information, Message = "Discovery started on {TransportTypes}")]
+    public static partial void DiscoveryStarted(this ILogger logger, IEnumerable<CdpTransportType> transportTypes);
+
+    [LoggerMessage(EventId = 109, Level = LogLevel.Information, Message = "Discovery stopped")]
+    public static partial void DiscoveryStopped(this ILogger logger);
+
+    [LoggerMessage(EventId = 110, Level = LogLevel.Information, Message = "Error during discovery")]
+    public static partial void DiscoveryError(this ILogger logger, Exception ex);
+    #endregion
 
     [LoggerMessage(EventId = 105, Level = LogLevel.Information, Message = "New socket from endpoint {Endpoint}")]
     public static partial void NewSocket(this ILogger logger, EndpointInfo endpoint);
-
 
 
     [LoggerMessage(EventId = 201, Level = LogLevel.Error, Message = "Exception in session {SessionId:X}")]

@@ -18,10 +18,10 @@ public sealed class ConnectedDevicesPlatform(LocalDeviceInfo deviceInfo, ILogger
     readonly ILogger<ConnectedDevicesPlatform> _logger = loggerFactory.CreateLogger<ConnectedDevicesPlatform>();
 
     #region Transport
-    readonly ConcurrentDictionary<Type, ICdpTransport> _transports = new();
+    readonly ConcurrentDictionary<Type, ICdpTransport> _transportMap = new();
     public void AddTransport<T>(T transport) where T : ICdpTransport
     {
-        _transports.AddOrUpdate(typeof(T), transport, (_, old) =>
+        _transportMap.AddOrUpdate(typeof(T), transport, (_, old) =>
         {
             old.Dispose();
             return transport;
@@ -29,10 +29,10 @@ public sealed class ConnectedDevicesPlatform(LocalDeviceInfo deviceInfo, ILogger
     }
 
     public T? TryGetTransport<T>() where T : ICdpTransport
-        => (T?)_transports.GetValueOrDefault(typeof(T));
+        => (T?)_transportMap.GetValueOrDefault(typeof(T));
 
     public ICdpTransport? TryGetTransport(CdpTransportType transportType)
-        => _transports.Values.SingleOrDefault(transport => transport.TransportType == transportType);
+        => _transportMap.Values.SingleOrDefault(transport => transport.TransportType == transportType);
     #endregion
 
     #region Host
@@ -43,18 +43,21 @@ public sealed class ConnectedDevicesPlatform(LocalDeviceInfo deviceInfo, ILogger
         using var isAdvertising = IsAdvertising.Lock();
 
         _logger.AdvertisingStarted();
-
-        foreach (var (_, transport) in _transports)
+        try
         {
-            if (transport is not ICdpDiscoverableTransport discoverableTransport)
-                continue;
-
-            discoverableTransport.Advertise(DeviceInfo, cancellationToken);
+            await Task.WhenAll(_transportMap.Values
+                .OfType<ICdpDiscoverableTransport>()
+                .Select(x => x.Advertise(DeviceInfo, cancellationToken))
+            ).ConfigureAwait(false);
         }
-
-        await cancellationToken.AwaitCancellation();
-
-        _logger.AdvertisingStopped();
+        catch (Exception ex)
+        {
+            _logger.AdvertisingError(ex);
+        }
+        finally
+        {
+            _logger.AdvertisingStopped();
+        }
     }
     #endregion
 
@@ -65,21 +68,31 @@ public sealed class ConnectedDevicesPlatform(LocalDeviceInfo deviceInfo, ILogger
         using var isListening = IsListening.Lock();
 
         _logger.ListeningStarted();
-
-        foreach (var (_, transport) in _transports)
+        try
         {
-            transport.Listen(cancellationToken);
-            transport.DeviceConnected += OnDeviceConnected;
+            await Task.WhenAll(_transportMap.Values
+                .Select(async transport =>
+                {
+                    transport.DeviceConnected += OnDeviceConnected;
+                    try
+                    {
+                        await transport.Listen(cancellationToken).ConfigureAwait(false);
+                    }
+                    finally
+                    {
+                        transport.DeviceConnected -= OnDeviceConnected;
+                    }
+                })
+            ).ConfigureAwait(false);
         }
-
-        await cancellationToken.AwaitCancellation();
-
-        foreach (var (_, transport) in _transports)
+        catch (Exception ex)
         {
-            transport.DeviceConnected -= OnDeviceConnected;
+            _logger.ListeningError(ex);
         }
-
-        _logger.ListeningStopped();
+        finally
+        {
+            _logger.ListeningStopped();
+        }
     }
 
     private void OnDeviceConnected(ICdpTransport sender, CdpSocket socket)
@@ -98,30 +111,39 @@ public sealed class ConnectedDevicesPlatform(LocalDeviceInfo deviceInfo, ILogger
     {
         using var isDiscovering = IsDiscovering.Lock();
 
-        foreach (var (_, transport) in _transports)
+        _logger.DiscoveryStarted(_transportMap.Values.Select(x => x.TransportType));
+        try
         {
-            if (transport is not ICdpDiscoverableTransport discoverableTransport)
-                continue;
-
-            discoverableTransport.Discover(cancellationToken);
-            discoverableTransport.DeviceDiscovered += DeviceDiscovered;
+            await Task.WhenAll(_transportMap.Values
+                .OfType<ICdpDiscoverableTransport>()
+                .Select(async transport =>
+                {
+                    transport.DeviceDiscovered += DeviceDiscovered;
+                    try
+                    {
+                        await transport.Discover(cancellationToken).ConfigureAwait(false);
+                    }
+                    finally
+                    {
+                        transport.DeviceDiscovered -= DeviceDiscovered;
+                    }
+                })
+            ).ConfigureAwait(false);
         }
-
-        await cancellationToken.AwaitCancellation();
-
-        foreach (var (_, transport) in _transports)
+        catch (Exception ex)
         {
-            if (transport is not ICdpDiscoverableTransport discoverableTransport)
-                continue;
-
-            discoverableTransport.DeviceDiscovered -= DeviceDiscovered;
+            _logger.DiscoveryError(ex);
+        }
+        finally
+        {
+            _logger.DiscoveryStopped();
         }
     }
 
-    public async Task<CdpSession> ConnectAsync(EndpointInfo endpoint)
+    public async Task<CdpSession> ConnectAsync([NotNull] EndpointInfo endpoint)
     {
-        var socket = await CreateSocketAsync(endpoint);
-        return await CdpSession.CreateClientAndConnectAsync(this, socket);
+        var socket = await CreateSocketAsync(endpoint).ConfigureAwait(false);
+        return await CdpSession.ConnectClientAsync(this, socket).ConfigureAwait(false);
     }
 
     internal async Task<CdpSocket> CreateSocketAsync(EndpointInfo endpoint)
@@ -130,7 +152,7 @@ public sealed class ConnectedDevicesPlatform(LocalDeviceInfo deviceInfo, ILogger
             return knownSocket;
 
         var transport = TryGetTransport(endpoint.TransportType) ?? throw new InvalidOperationException($"No single transport found for type {endpoint.TransportType}");
-        var socket = await transport.ConnectAsync(endpoint);
+        var socket = await transport.ConnectAsync(endpoint).ConfigureAwait(false);
         ReceiveLoop(socket);
         return socket;
     }
@@ -144,7 +166,7 @@ public sealed class ConnectedDevicesPlatform(LocalDeviceInfo deviceInfo, ILogger
         if (transport == null)
             return null;
 
-        var socket = await transport.TryConnectAsync(endpoint, connectTimeout);
+        var socket = await transport.TryConnectAsync(endpoint, connectTimeout).ConfigureAwait(false);
         if (socket == null)
             return null;
 
@@ -239,7 +261,7 @@ public sealed class ConnectedDevicesPlatform(LocalDeviceInfo deviceInfo, ILogger
     public CdpDeviceInfo GetCdpDeviceInfo()
     {
         List<EndpointInfo> endpoints = [];
-        foreach (var (_, transport) in _transports)
+        foreach (var (_, transport) in _transportMap)
         {
             try
             {
@@ -257,17 +279,18 @@ public sealed class ConnectedDevicesPlatform(LocalDeviceInfo deviceInfo, ILogger
     public void Dispose()
     {
         Extensions.DisposeAll(
-            _transports.Select(x => x.Value),
+            _transportMap.Select(x => x.Value),
             _knownSockets.Select(x => x.Value)
         );
 
-        _transports.Clear();
+        _transportMap.Clear();
         _knownSockets.Clear();
     }
 
-    public static X509Certificate2 CreateDeviceCertificate(CdpEncryptionParams encryptionParams)
+    public static X509Certificate2 CreateDeviceCertificate([NotNull] CdpEncryptionParams encryptionParams)
     {
-        CertificateRequest certRequest = new("CN=Ms-Cdp", ECDsa.Create(encryptionParams.Curve), HashAlgorithmName.SHA256);
+        using var key = ECDsa.Create(encryptionParams.Curve);
+        CertificateRequest certRequest = new("CN=Ms-Cdp", key, HashAlgorithmName.SHA256);
         return certRequest.CreateSelfSigned(DateTimeOffset.Now, DateTimeOffset.Now.AddYears(5));
     }
 
