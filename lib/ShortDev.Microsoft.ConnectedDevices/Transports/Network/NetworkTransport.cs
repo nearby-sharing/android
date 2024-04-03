@@ -1,5 +1,6 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Discovery;
+using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
 
@@ -12,10 +13,10 @@ public sealed class NetworkTransport(INetworkHandler handler) : ICdpTransport, I
 
     public CdpTransportType TransportType { get; } = CdpTransportType.Tcp;
     public EndpointInfo GetEndpoint()
-        => new(TransportType, Handler.GetLocalIp().ToString(), Constants.TcpPort.ToString());
+        => new(TransportType, Handler.GetLocalIp().ToString(), Constants.TcpPort.ToString(CultureInfo.InvariantCulture));
 
     public event DeviceConnectedEventHandler? DeviceConnected;
-    public async void Listen(CancellationToken cancellationToken)
+    public async Task Listen(CancellationToken cancellationToken)
     {
         _listener.Start();
 
@@ -23,7 +24,7 @@ public sealed class NetworkTransport(INetworkHandler handler) : ICdpTransport, I
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                var client = await _listener.AcceptTcpClientAsync(cancellationToken);
+                var client = await _listener.AcceptTcpClientAsync(cancellationToken).ConfigureAwait(false);
 
                 if (client.Client.RemoteEndPoint is not IPEndPoint endPoint)
                     return;
@@ -37,19 +38,20 @@ public sealed class NetworkTransport(INetworkHandler handler) : ICdpTransport, I
                     Endpoint = new EndpointInfo(
                         TransportType,
                         endPoint.Address.ToString(),
-                        Constants.TcpPort.ToString()
+                        Constants.TcpPort.ToString(CultureInfo.InvariantCulture)
                     )
                 });
             }
         }
         catch (OperationCanceledException) { }
+        catch (ObjectDisposedException) { }
     }
 
     public async Task<CdpSocket> ConnectAsync(EndpointInfo endpoint)
     {
         // ToDo: If the windows machine tries to connect back it uses the port assigned here not 5040!!
         TcpClient client = new();
-        await client.ConnectAsync(endpoint.ToIPEndPoint());
+        await client.ConnectAsync(endpoint.ToIPEndPoint()).ConfigureAwait(false);
         return new()
         {
             Endpoint = endpoint,
@@ -66,13 +68,19 @@ public sealed class NetworkTransport(INetworkHandler handler) : ICdpTransport, I
         EnableBroadcast = true
     };
 
-    public void Advertise(LocalDeviceInfo deviceInfo, CancellationToken cancellationToken)
+    public async Task Advertise(LocalDeviceInfo deviceInfo, CancellationToken cancellationToken)
     {
         var presenceResponse = PresenceResponse.Create(deviceInfo);
 
         DiscoveryMessageReceived += OnMessage;
-        cancellationToken.Register(() => DiscoveryMessageReceived -= OnMessage);
-        EnsureListeningUdp(cancellationToken);
+        try
+        {
+            await EnsureListeningUdp(cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            DiscoveryMessageReceived -= OnMessage;
+        }
 
         void OnMessage(IPEndPoint remoteEndPoint, DiscoveryHeader header, EndianReader reader)
         {
@@ -84,24 +92,30 @@ public sealed class NetworkTransport(INetworkHandler handler) : ICdpTransport, I
     }
 
     public event DeviceDiscoveredEventHandler? DeviceDiscovered;
-    public async void Discover(CancellationToken cancellationToken)
+    public async Task Discover(CancellationToken cancellationToken)
     {
         DiscoveryMessageReceived += OnMessage;
-        EnsureListeningUdp(cancellationToken);
-
         try
         {
-            while (!cancellationToken.IsCancellationRequested)
-            {
-                SendPresenceRequest();
-                await Task.Delay(500, cancellationToken);
-            }
+            await Task.WhenAll(
+                EnsureListeningUdp(cancellationToken),
+                RunPresenceSendLoop()
+            ).ConfigureAwait(false);
         }
         catch (OperationCanceledException) { }
         catch (ObjectDisposedException) { }
         finally
         {
             DiscoveryMessageReceived -= OnMessage;
+        }
+
+        async Task RunPresenceSendLoop()
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                SendPresenceRequest();
+                await Task.Delay(500, cancellationToken).ConfigureAwait(false);
+            }
         }
 
         void OnMessage(IPEndPoint remoteEndPoint, DiscoveryHeader header, EndianReader reader)
@@ -124,8 +138,8 @@ public sealed class NetworkTransport(INetworkHandler handler) : ICdpTransport, I
     delegate void DiscoveryMessageReceivedHandler(IPEndPoint remoteEndPoint, DiscoveryHeader header, EndianReader reader);
     event DiscoveryMessageReceivedHandler? DiscoveryMessageReceived;
 
-    bool _isListening = false;
-    async void EnsureListeningUdp(CancellationToken cancellationToken)
+    bool _isListening;
+    async Task EnsureListeningUdp(CancellationToken cancellationToken)
     {
         if (_isListening)
             return;
@@ -137,10 +151,10 @@ public sealed class NetworkTransport(INetworkHandler handler) : ICdpTransport, I
             {
                 while (!cancellationToken.IsCancellationRequested)
                 {
-                    var result = await _udpclient.ReceiveAsync();
+                    var result = await _udpclient.ReceiveAsync().ConfigureAwait(false);
                     HandleMsg(result);
                 }
-            }, cancellationToken);
+            }, cancellationToken).ConfigureAwait(false);
         }
         catch (ObjectDisposedException) { }
         catch (SocketException ex)
@@ -212,7 +226,7 @@ public sealed class NetworkTransport(INetworkHandler handler) : ICdpTransport, I
         DeviceDiscovered = null;
         DiscoveryMessageReceived = null;
 
-        _listener.Stop();
+        _listener.Dispose();
         _udpclient.Dispose();
     }
 }
