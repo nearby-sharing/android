@@ -62,6 +62,7 @@
                 android:id="@+id/btMacAddressTextInputLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:inputType="textNoSuggestions"
                 android:hint="@string/bt_mac_address">
 
                 <com.google.android.material.textfield.TextInputEditText
