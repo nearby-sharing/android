@@ -1,10 +1,7 @@
-﻿using System.Threading;
-
-namespace ShortDev.Microsoft.ConnectedDevices.Transports;
-
+﻿namespace ShortDev.Microsoft.ConnectedDevices.Transports;
 public interface ICdpDiscoverableTransport : ICdpTransport
 {
-    void Advertise(LocalDeviceInfo deviceInfo, CancellationToken cancellationToken);
+    Task Advertise(LocalDeviceInfo deviceInfo, CancellationToken cancellationToken);
     event DeviceDiscoveredEventHandler? DeviceDiscovered;
-    void Discover(CancellationToken cancellationToken);
+    Task Discover(CancellationToken cancellationToken);
 }

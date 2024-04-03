@@ -6,9 +6,9 @@ public sealed class BluetoothTransport(IBluetoothHandler handler) : ICdpTranspor
     public IBluetoothHandler Handler { get; } = handler;
 
     public event DeviceConnectedEventHandler? DeviceConnected;
-    public void Listen(CancellationToken cancellationToken)
+    public async Task Listen(CancellationToken cancellationToken)
     {
-        _ = Handler.ListenRfcommAsync(
+        await Handler.ListenRfcommAsync(
             new RfcommOptions()
             {
                 ServiceId = Constants.RfcommServiceId,
@@ -27,9 +27,9 @@ public sealed class BluetoothTransport(IBluetoothHandler handler) : ICdpTranspor
             SocketConnected = (socket) => DeviceConnected?.Invoke(this, socket)
         });
 
-    public void Advertise(LocalDeviceInfo deviceInfo, CancellationToken cancellationToken)
+    public async Task Advertise(LocalDeviceInfo deviceInfo, CancellationToken cancellationToken)
     {
-        _ = Handler.AdvertiseBLeBeaconAsync(
+        await Handler.AdvertiseBLeBeaconAsync(
             new AdvertiseOptions()
             {
                 ManufacturerId = Constants.BLeBeaconManufacturerId,
@@ -40,9 +40,9 @@ public sealed class BluetoothTransport(IBluetoothHandler handler) : ICdpTranspor
     }
 
     public event DeviceDiscoveredEventHandler? DeviceDiscovered;
-    public void Discover(CancellationToken cancellationToken)
+    public async Task Discover(CancellationToken cancellationToken)
     {
-        _ = Handler.ScanBLeAsync(new()
+        await Handler.ScanBLeAsync(new()
         {
             OnDeviceDiscovered = (advertisement, rssi) =>
             {
