@@ -1,6 +1,7 @@
 # Credits
 ## Contributions
  - Lukas Kurz (@ShortDevelopment)
+ - Clay Sweetser (@Varriount)
 
 ## Audio Design
  - @Apates
