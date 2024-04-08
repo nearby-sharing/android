@@ -18,11 +18,23 @@ public static class Extensions
         return promise.Task;
     }
 
-    public static async Task<T?> WithTimeout<T>(this Task<T> task, TimeSpan timeout)
+    public static async Task<T?> AwaitWithTimeout<T>(this Task<T> task, TimeSpan timeout)
     {
-        if (await Task.WhenAny(task, Task.Delay(timeout)).ConfigureAwait(false) == task)
-            return task!.Result;
-        return default;
+        var timeoutTask = Task.Delay(timeout);
+        if (task == await Task.WhenAny(task, timeoutTask).ConfigureAwait(false))
+            return task.GetAwaiter().GetResult();
+
+        Forget(task);
+        throw new TaskCanceledException();
+
+        static async void Forget(Task task)
+        {
+            try
+            {
+                await task;
+            }
+            catch { }
+        }
     }
 
     public static string ToStringFormatted(this PhysicalAddress @this)
