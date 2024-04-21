@@ -11,7 +11,7 @@ public interface ICdpTransport : IDisposable
     {
         try
         {
-            return await ConnectAsync(endpoint).WithTimeout(timeout).ConfigureAwait(false);
+            return await ConnectAsync(endpoint).AwaitWithTimeout(timeout).ConfigureAwait(false);
         }
         catch { }
         return null;
