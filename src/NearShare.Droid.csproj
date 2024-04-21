@@ -4,8 +4,8 @@
 		<OutputType>Exe</OutputType>
 		<SupportedOSPlatformVersion>21</SupportedOSPlatformVersion>
 		<ApplicationId>de.shortdev.nearby_sharing_windows</ApplicationId>
-		<ApplicationVersion>28</ApplicationVersion>
-		<ApplicationDisplayVersion>1.7.3</ApplicationDisplayVersion>
+		<ApplicationVersion>29</ApplicationVersion>
+		<ApplicationDisplayVersion>1.7.4</ApplicationDisplayVersion>
 		<UseAndroidCrypto>true</UseAndroidCrypto>
 		<AndroidErrorOnCustomJavaObject>false</AndroidErrorOnCustomJavaObject>
 	</PropertyGroup>
