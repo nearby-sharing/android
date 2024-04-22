@@ -15,4 +15,4 @@
  - Clément Fresse (@MaisClement) (French)
  - Andrei Muntean (@andreimuntean1) (Romanian)
  - Franciszek (@pigluz) (Polish)
- - ɴᴇᴋᴏ (@NeKoOuO) (Chinese (Traditional))
+ - ɴᴇᴋᴏ (@NeKoOuO) (Taiwanese Chinese)
