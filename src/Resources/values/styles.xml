@@ -1,0 +1,23 @@
+<resources>
+	<style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
+		<item name="dynamicColorThemeOverlay">@style/ThemeOverlay.Material3.DynamicColors.DayNight</item>
+		<item name="actionBarTheme">@style/ThemeOverlay.Material3.Dark.ActionBar</item>
+		<item name="preferenceTheme">@style/App.Preferences</item>
+		<item name="android:windowTranslucentStatus">true</item>
+		<item name="switchStyle">@style/Widget.Material3.CompoundButton.MaterialSwitch</item>
+	</style>
+
+	<style name="App.Preferences" parent="@style/PreferenceTheme.SettingsLib">
+		<item name="preferenceCategoryTitleTextAppearance">?attr/textAppearanceTitleSmall</item>
+		<item name="preferenceCategoryTitleTextColor">?attr/colorSecondary</item>
+		<item name="android:tint">?attr/colorPrimary</item>
+	</style>
+
+	<style name="AppTheme.TranslucentOverlay" parent="AppTheme">
+		<item name="android:windowBackground">#80000000</item>
+		<item name="android:windowIsTranslucent">true</item>
+		<item name="android:windowTranslucentStatus">true</item>
+		<item name="android:statusBarColor">@android:color/transparent</item>
+	</style>
+
+</resources>

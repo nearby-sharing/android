@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+	<item>
+		<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+			<solid android:color="#3A59C8" />
+		</shape>
+	</item>
+	<item>
+		<inset
+			android:drawable="@drawable/ic_fluent_checkmark_24_regular"
+			android:tint="#eee"
+			android:insetTop="4dp"
+			android:insetLeft="4dp"
+			android:insetRight="4dp"
+			android:insetBottom="4dp" />
+	</item>
+</layer-list>

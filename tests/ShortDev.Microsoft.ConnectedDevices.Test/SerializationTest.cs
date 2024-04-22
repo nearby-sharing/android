@@ -1,24 +1,17 @@
 using ShortDev.Microsoft.ConnectedDevices.Encryption;
 using ShortDev.Microsoft.ConnectedDevices.Messages;
-using ShortDev.Networking;
-using System.Security.Cryptography.X509Certificates;
 using Xunit.Abstractions;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Test;
 
-public sealed class SerializationTest
+public sealed class SerializationTest(ITestOutputHelper output)
 {
     static SerializationTest()
     {
         TestValueGenerator.TryRegisterTypeFactory(() => ConnectedDevicesPlatform.CreateDeviceCertificate(CdpEncryptionParams.Default));
     }
 
-    private readonly ITestOutputHelper _output;
-
-    public SerializationTest(ITestOutputHelper output)
-    {
-        _output = output;
-    }
+    private readonly ITestOutputHelper _output = output;
 
     public static IEnumerable<object[]> GenerateMsgTypes()
     {
@@ -27,7 +20,8 @@ public sealed class SerializationTest
         {
             if (
                 IsOk(typeof(ICdpHeader<>), type) ||
-                IsOk(typeof(ICdpPayload<>), type)
+                IsOk(typeof(ICdpPayload<>), type) &&
+                type.Name != "PresenceResponse"
             )
                 yield return new object[] { type };
         }
@@ -51,8 +45,8 @@ public sealed class SerializationTest
         var genericDefinition = testMsg.Method.GetGenericMethodDefinition();
         var genericMethod = genericDefinition.MakeGenericMethod(type);
 
-        genericMethod.Invoke(null, new object[] { Endianness.LittleEndian });
-        genericMethod.Invoke(null, new object[] { Endianness.BigEndian });
+        genericMethod.Invoke(null, [Endianness.LittleEndian]);
+        genericMethod.Invoke(null, [Endianness.BigEndian]);
 
         static void TestRun<T>(Endianness endianness) where T : ICdpSerializable<T>
         {

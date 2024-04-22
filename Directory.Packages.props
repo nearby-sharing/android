@@ -1,0 +1,11 @@
+<Project>
+	<ItemGroup Label="Global Dependencies">
+		<PackageReference Include="ShortDev.IO" Version="0.1.3" />
+	</ItemGroup>
+
+	<ItemGroup Label="Global Usings">
+		<Using Include="ShortDev.IO" />
+		<Using Include="ShortDev.IO.Input" />
+		<Using Include="ShortDev.IO.Output" />
+	</ItemGroup>
+</Project>

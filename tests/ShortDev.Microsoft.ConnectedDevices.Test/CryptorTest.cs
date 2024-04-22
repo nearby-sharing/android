@@ -1,7 +1,5 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Encryption;
 using ShortDev.Microsoft.ConnectedDevices.Messages;
-using ShortDev.Networking;
-using System.Linq;
 using System.Security.Cryptography;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Test;
@@ -17,7 +15,7 @@ public sealed class CryptorTest
         CdpCryptor cryptor = CreateCryptor();
 
         var header = TestValueGenerator.RandomValue<CommonHeader>();
-        var payload = TestValueGenerator.RandomValue<byte[]>();
+        ReadOnlySpan<byte> payload = TestValueGenerator.RandomValue<byte[]>();
 
         EndianWriter writer = new(Endianness.BigEndian);
         cryptor.EncryptMessage(writer, header, payload);
@@ -30,7 +28,7 @@ public sealed class CryptorTest
         var encryptedPayload = readerContent[..^Constants.HMacSize];
         var hmac = readerContent[^Constants.HMacSize..];
 
-        var decrypted = cryptor.DecryptMessage(header, encryptedPayload, hmac);
+        var decrypted = cryptor.DecryptMessage(header, encryptedPayload, hmac).Span;
 
         Assert.True(payload.SequenceEqual(decrypted[sizeof(uint)..]));
     }
