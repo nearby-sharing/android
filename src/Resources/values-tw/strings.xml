@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="app_name">就近共享</string>
+	<string name="app_titlebar_title_default">傳輸資料到您的 Windows 10 / 11 電腦</string>
+	<string name="app_titlebar_title_receive">從您的 Windows 10 / 11 電腦接收資料</string>
+	<string name="app_titlebar_title_receive_setup">設定與資訊</string>
+
+	<string name="assets_prefix">zh</string>
+
+	<!-- #region generic -->
+	<string name="generic_back">返回</string>
+	<string name="generic_next">下一項</string>
+	<string name="generic_cancel">取消</string>
+
+	<string name="generic_send">傳送</string>
+	<string name="generic_receive">接收</string>
+
+	<string name="generic_status_template">狀態: {0}</string>
+	<string name="generic_error_template">錯誤: {0}</string>
+
+	<string name="generic_important">重要</string>
+	<string name="generic_notifications">通知</string>
+	<string name="generic_settings">設定</string>
+	<string name="device_name">裝置名稱</string>
+	<!-- #endregion -->
+
+	<!-- #region activity_mac_address.xml -->
+	<string name="launch_settings">開啟設定</string>
+	<string name="bt_mac_address">藍芽Mac地址</string>
+	<!-- #endregion -->
+
+	<!-- #region activity_receive.xml -->
+	<string name="visible_as_template">可被視為 {0}</string>
+	<string name="debug_log">除錯日誌</string>
+	<!-- #endregion -->
+
+	<!-- #region activity_share.xml -->
+	<string name="scanning">掃描中...</string>
+	<!-- #endregion -->
+
+	<!-- #region preferences.xml -->
+	<string name="category_general">常規</string>
+	<string name="category_links">幫助與連結</string>
+	<string name="category_permissions">許可權</string>
+	<string name="category_setup">配置</string>
+	<string name="category_about">關於</string>
+
+	<string name="request_permissions_title">請求許可權</string>
+	<string name="request_permissions_summary">同意必要許可權以使用本應用</string>
+
+	<string name="open_sponsor_title">贊助</string>
+	<string name="open_sponsor_summary">贊助此應用的開發者</string>
+
+	<string name="open_faq_title">幫助</string>
+	<string name="open_faq_summary">開啟常見問題手冊</string>
+	
+	<string name="open_discord_title">Discord</string>
+	<string name="open_discord_summary">加入 Discord 伺服器</string>
+	
+	<string name="preference_appearance_title">介面</string>
+	<string name="preference_appearance_summary">語言、深色模式</string>
+	
+	<string name="force_dark_mode_title">深色模式</string>
+	<string name="force_dark_mode_summary">強制深色模式</string>
+
+	<string name="switch_language_title">語言</string>
+	<string name="switch_language_summary">更改 App 的顯示語言</string>
+
+	<string name="preference_cdp_title">連線</string>
+	<string name="preference_cdp_summary">配置傳送和接收</string>
+
+	<string name="open_setup_title">PC端設定</string>
+	<string name="open_setup_summary">PC端設定教程</string>
+	
+	<string name="goto_mac_address_title">指定Mac地址</string>
+	<string name="goto_mac_address_summary">指定此裝置的Mac地址</string>
+	
+	<string name="device_name_title">裝置名稱</string>
+	<string name="device_name_summary">修改對外顯示的裝置名</string>
+
+	<string name="show_credits_title">貢獻者名單</string>
+	<!-- #endregion -->
+
+	<!-- #region ReceiveActivity.cs -->
+	<string name="receive_missing_permissions">您必須同意此應用的許可權以接收檔案!</string>
+	<!-- #endregion -->
+
+	<!-- #region ReceiveActivity.cs -->
+	<string name="share_file">分享檔案</string>
+	<string name="share_url">分享網址</string>
+	<string name="share_text">分享文字</string>
+
+	<string name="send_missing_permissions">缺失必要的許可權!</string>
+	<string name="wait_for_acceptance">等待接受中</string>
+	<string name="status_cancelled">已取消</string>
+	<string name="status_done">已完成</string>
+	<string name="sending_template">正在傳送 {0} 個檔案</string>
+	<!-- #endregion -->
+</resources>
