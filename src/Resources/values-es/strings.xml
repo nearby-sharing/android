@@ -88,9 +88,12 @@
 	<!-- #region ReceiveActivity.cs -->
 	<string name="share_file">Compartir archivo</string>
 	<string name="share_url">Compartir URL</string>
+	<string name="share_text">Compartir texto</string>
 
 	<string name="send_missing_permissions">¡Faltan algunos permisos necesarios!</string>
 	<string name="wait_for_acceptance">Esperando respuesta</string>
+	<string name="status_cancelled">Cancelado</string>
+	<string name="status_done">Hecho</string>
 	<string name="sending_template">Enviando {0} archivos</string>
 	<!-- #endregion -->
 </resources>
