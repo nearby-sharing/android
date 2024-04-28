@@ -4,92 +4,68 @@
 	<string name="app_titlebar_title_default">Envoyer des données vers Windows 10 / 11</string>
 	<string name="app_titlebar_title_receive">Recevoir des données depuis Windows 10 / 11</string>
 	<string name="app_titlebar_title_receive_setup">Configuration / Information</string>
-
 	<string name="assets_prefix">fr</string>
-
 	<!-- #region generic -->
 	<string name="generic_back">Retour</string>
 	<string name="generic_next">Suivant</string>
 	<string name="generic_cancel">Annuler</string>
-
 	<string name="generic_send">Envoyer</string>
 	<string name="generic_receive">Recevoir</string>
-
 	<string name="generic_status_template">Status: {0}</string>
 	<string name="generic_error_template">Erreur: {0}</string>
-
 	<string name="generic_important">Important</string>
 	<string name="generic_notifications">Notifications</string>
 	<string name="generic_settings">Paramètres</string>
 	<string name="device_name">Nom de l’appareil</string>
 	<!-- #endregion -->
-
 	<!-- #region activity_mac_address.xml -->
 	<string name="launch_settings">Ouvrir les paramètres</string>
 	<string name="bt_mac_address">Adresse Mac du Bluetooth</string>
 	<!-- #endregion -->
-
 	<!-- #region activity_receive.xml -->
 	<string name="visible_as_template">Visible en tant que {0}</string>
 	<string name="debug_log">Journal de débogage</string>
 	<!-- #endregion -->
-
 	<!-- #region activity_share.xml -->
 	<string name="scanning">Recherche...</string>
 	<!-- #endregion -->
-
 	<!-- #region preferences.xml -->
 	<string name="category_general">Général</string>
 	<string name="category_links">Liens / Aide</string>
 	<string name="category_permissions">Permissions</string>
 	<string name="category_setup">Configuration</string>
 	<string name="category_about">À propos</string>
-
 	<string name="request_permissions_title">Permissions de l’application</string>
 	<string name="request_permissions_summary">Accorder les permissions nécessaires à l’application</string>
-
 	<string name="open_sponsor_title">Supporter</string>
 	<string name="open_sponsor_summary">Supporter le créateur de l’application</string>
-
 	<string name="open_faq_title">Aide</string>
 	<string name="open_faq_summary">Ouvrir la FAQ</string>
-
 	<string name="open_discord_title">Discord</string>
 	<string name="open_discord_summary">Rejoindre le serveur Discord</string>
-
 	<string name="preference_appearance_title">Interface et apparence</string>
 	<string name="preference_appearance_summary">Langage, Thème sombre</string>
-
 	<string name="force_dark_mode_title">Thème sombre</string>
 	<string name="force_dark_mode_summary">Forcer le thème sombre</string>
-
 	<string name="switch_language_title">Langue</string>
 	<string name="switch_language_summary">Changer la langue de l’appli</string>
-
 	<string name="preference_cdp_title">Connectivité</string>
 	<string name="preference_cdp_summary">Configuration pour l’envoi et la réception</string>
-
 	<string name="open_setup_title">Configuration PC</string>
 	<string name="open_setup_summary">Voir les réglages requis pour PC</string>
-
 	<string name="goto_mac_address_title">Définir l’adresse Mac</string>
 	<string name="goto_mac_address_summary">Définissez l’adresse Mac de l’appareil</string>
-	
 	<string name="device_name_title">Nom de l’appareil</string>
 	<string name="device_name_summary">Modifier comment vous apparaissez pour les autres</string>
-
 	<string name="show_credits_title">Voir les contributeurs</string>
 	<!-- #endregion -->
-
 	<!-- #region ReceiveActivity.cs -->
 	<string name="receive_missing_permissions">Impossible de recevoir sans les permissions requises !</string>
 	<!-- #endregion -->
-
 	<!-- #region ReceiveActivity.cs -->
 	<string name="share_file">Partager un fichier</string>
 	<string name="share_url">Partager un lien</string>
 	<string name="share_text">Partager du text</string>
-
 	<string name="send_missing_permissions">Des permissions requises sont manquantes !</string>
 	<string name="wait_for_acceptance">En attente d’acceptation...</string>
 	<string name="status_cancelled">Annulé</string>
