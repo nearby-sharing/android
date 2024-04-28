@@ -1,69 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+	<string name="app_name">Nearby Sharing</string>
 	<string name="app_titlebar_title_default">Отправка файлов на Windows 10 / 11</string>
 	<string name="app_titlebar_title_receive">Получение файлов с Windows 10 / 11</string>
 	<string name="app_titlebar_title_receive_setup">Настройка / Информация</string>
-
 	<string name="assets_prefix">ru</string>
-
 	<!-- #region generic -->
 	<string name="generic_back">Назад</string>
 	<string name="generic_next">Дальше</string>
 	<string name="generic_cancel">Отмена</string>
-
 	<string name="generic_send">Отправить</string>
 	<string name="generic_receive">Получить</string>
-
 	<string name="generic_status_template">Статус: {0}</string>
 	<string name="generic_error_template">Ошибка: {0}</string>
-
 	<string name="generic_important">Важно</string>
 	<string name="generic_notifications">Уведомления</string>
 	<string name="generic_settings">Настройки</string>
 	<string name="device_name">Имя устройства</string>
 	<!-- #endregion -->
-
 	<!-- #region activity_mac_address.xml -->
 	<string name="launch_settings">Открыть настройки</string>
 	<string name="bt_mac_address">MAC-Адрес Bluetooth</string>
 	<!-- #endregion -->
-
 	<!-- #region activity_receive.xml -->
 	<string name="visible_as_template">Видимый как {0}</string>
 	<string name="debug_log">Журнал отладки</string>
 	<!-- #endregion -->
-
 	<!-- #region activity_share.xml -->
 	<string name="scanning">Сканирование ...</string>
 	<!-- #endregion -->
-
 	<!-- #region preferences.xml -->
 	<string name="category_general">Основное</string>
-
+	<string name="category_links">Links / Help</string>
+	<string name="category_permissions">Permissions</string>
+	<string name="category_setup">Setup</string>
+	<string name="category_about">About</string>
 	<string name="request_permissions_title">Запросить разрешения</string>
 	<string name="request_permissions_summary">Предоставьте необходимые разрешения приложению</string>
-
 	<string name="open_sponsor_title">Спонсор</string>
 	<string name="open_sponsor_summary">Поддержите разработчика приложения</string>
-
 	<string name="open_faq_title">Помощь</string>
 	<string name="open_faq_summary">Открыть FAQ</string>
-
-
+	<string name="open_discord_title">Discord</string>
+	<string name="open_discord_summary">Join Discord-Server</string>
+	<string name="preference_appearance_title">UI / Design</string>
+	<string name="preference_appearance_summary">Language, Dark Mode</string>
+	<string name="force_dark_mode_title">Dark Mode</string>
+	<string name="force_dark_mode_summary">Force Dark Mode</string>
+	<string name="switch_language_title">App Language</string>
+	<string name="switch_language_summary">Change app display language</string>
+	<string name="preference_cdp_title">Connected Devices Platform</string>
+	<string name="preference_cdp_summary">Setup sending and receiving</string>
+	<string name="open_setup_title">PC Setup</string>
+	<string name="open_setup_summary">Tutorial about the necessary PC Settings</string>
 	<string name="goto_mac_address_title">Указать MAC-Адрес</string>
 	<string name="goto_mac_address_summary">Укажите MAC-Адрес этого устройства</string>
+	<string name="device_name_title">Device Name</string>
+	<string name="device_name_summary">Change how others see you</string>
+	<string name="show_credits_title">Show credits</string>
 	<!-- #endregion -->
-
 	<!-- #region ReceiveActivity.cs -->
 	<string name="receive_missing_permissions">Невозможно получить файл без разрешений.</string>
 	<!-- #endregion -->
-
 	<!-- #region ReceiveActivity.cs -->
 	<string name="share_file">Поделиться файлом</string>
 	<string name="share_url">Поделиться ссылкой</string>
-
+	<string name="share_text">Share Text</string>
 	<string name="send_missing_permissions">Недостаточно разрешений!</string>
 	<string name="wait_for_acceptance">Ожидаем принятия файла получателем</string>
+	<string name="status_cancelled">Cancelled</string>
+	<string name="status_done">Done</string>
 	<string name="sending_template">Отправка {0} файл(а/ов)</string>
 	<!-- #endregion -->
 </resources>
