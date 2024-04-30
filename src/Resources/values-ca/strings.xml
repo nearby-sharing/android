@@ -46,10 +46,10 @@
 <string name="category_about">Sobre</string>
 
 <string name="request_permissions_title">Sol·licitar  permisos necesaris</string>
-<string name="request_permissions_summary">Dona-li els permisos necessaris a l \' aplicació </string>
+<string name="request_permissions_summary">Dona-li els permisos necessaris a l \'aplicació </string>
 
 <string name="open_sponsor_title">Patrocinar</string>
-<string name="open_sponsor_summary">Patrocina al creador de l \' aplicació</string>
+<string name="open_sponsor_summary">Patrocina al creador de l \'aplicació</string>
 
 <string name="open_faq_title">Ajuda</string>
 <string name="open_faq_summary">Obrir les Preguntes Freqüents</string>
@@ -63,17 +63,17 @@
 <string name="force_dark_mode_title">Tema fosc</string>
 <string name="force_dark_mode_summary">Forçar el tema fosc</string>
 
-<string name="switch_language_title">Idioma de l\' aplicació</string>
-<string name="switch_language_summary">Cambiar l \' idioma de l \'aplicació</string>
+<string name="switch_language_title">Idioma de l\'aplicació</string>
+<string name="switch_language_summary">Cambiar l \'idioma de l \'aplicació</string>
 
 <string name="preference_cdp_title">Plataforma de dispositius conectats</string>
-<string name="preference_cdp_summary">Configurar l\' enviament i la recepció </string>
+<string name="preference_cdp_summary">Configurar l\'enviament i la recepció </string>
 
 <string name="open_setup_title">Configuración del PC</string>
 <string name="open_setup_summary">Tutorial sobre los ajustes del PC necesarios</string>
 
 <string name="goto_mac_address_title">Indica la direcció MAC</string>
-<string name="goto_mac_address_summary">Indica la direcció MAC d \' aquest dispositiu </string>
+<string name="goto_mac_address_summary">Indica la direcció MAC d \'aquest dispositiu </string>
 
 <string name="device_name_title">Nom del dispositiu</string>
 <string name="device_name_summary">Canvia com et veu la resta</string>
@@ -86,11 +86,14 @@
 <!-- #endregion -->
 	
 <!-- #region ReceiveActivity.cs -->
-<string name="share_file">Compartir arxiu</string>
-<string name="share_url">Compartir URL</string>
+<string name="share_file">Comparteix arxiu</string>
+<string name="share_url">Comparteix URL</string>
+<string name="share_text">Comparteix text</string>
 
 <string name="send_missing_permissions">Falten alguns permisos necessaris!</string>
 <string name="wait_for_acceptance">Esperant reposta</string>
+<string name="status_cancelled">Cancel·lat</string>
+<string name="status_done">Fet</string>
 <string name="sending_template">Enviant {0} arxius</string>
 <!-- #endregion -->
 </resources>
