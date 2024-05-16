@@ -30,12 +30,6 @@ internal static class UIHelper
     {
         switch (item.ItemId)
         {
-            case Resource.Id.action_help:
-                OpenFAQ(activity);
-                return true;
-            case Resource.Id.action_sponsor:
-                OpenSponsor(activity);
-                return true;
             case Resource.Id.action_settings:
                 activity.StartActivity(new Intent(activity, typeof(SettingsActivity)));
                 return true;
@@ -100,11 +94,12 @@ internal static class UIHelper
         activity.StartActivity(intent);
     }
 
-    public static void SetupToolBar(AppCompatActivity activity, string? subtitle = null)
+    public static void SetupToolBar(AppCompatActivity activity, string? title = null)
     {
         var toolbar = activity.FindViewById<CompatToolbar>(Resource.Id.toolbar)!;
         activity.SetSupportActionBar(toolbar);
-        activity.SupportActionBar!.Subtitle = subtitle;
+        if (title is not null)
+            activity.SupportActionBar!.Title = title;
     }
 
     #region Permissions

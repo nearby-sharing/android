@@ -15,11 +15,12 @@
 		<AndroidPackageFormat>aab</AndroidPackageFormat>
 	</PropertyGroup>
 	<ItemGroup Label="Nuget">
-		<PackageReference Include="Sentry" Version="3.41.0" />
+		<PackageReference Include="Rive.Android" Version="1.0.0" />
+		<PackageReference Include="Sentry" Version="4.6.2" />
 		<PackageReference Include="ShortDev.Android.FluentIcons" Version="1.1.203" />
-		<PackageReference Include="Xamarin.AndroidX.AppCompat" Version="1.6.1.6" />
-		<PackageReference Include="Xamarin.AndroidX.Browser" Version="1.7.0.1" />
-		<PackageReference Include="Xamarin.Google.Android.Material" Version="1.10.0.2" />
+		<PackageReference Include="Xamarin.AndroidX.AppCompat" Version="1.6.1.8" />
+		<PackageReference Include="Xamarin.AndroidX.Browser" Version="1.8.0.1" />
+		<PackageReference Include="Xamarin.Google.Android.Material" Version="1.10.0.4" />
 	</ItemGroup>
 	<ItemGroup Label="Project References">
 		<ProjectReference Include="..\lib\ShortDev.Android.Preferences\ShortDev.Android.Preferences.csproj" />

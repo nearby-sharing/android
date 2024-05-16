@@ -2,18 +2,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 	<item
-        android:id="@+id/action_help"
-		android:icon="@drawable/ic_fluent_question_circle_24_regular"
-        android:title="@string/open_faq_title"
-		android:showAsAction="ifRoom" />
-	<item
-        android:id="@+id/action_sponsor"
-		android:icon="@drawable/ic_fluent_handshake_24_selector"
-        android:title="@string/open_sponsor_title"
-		android:showAsAction="ifRoom" />
-	<item
         android:id="@+id/action_settings"
-        android:icon="@drawable/ic_fluent_settings_24_selector"
+        android:icon="@drawable/ic_fluent_settings_24_regular"
+		app:iconTint="?attr/colorOnSurface"
         android:title="@string/generic_settings"
-		android:showAsAction="ifRoom" />
+		app:showAsAction="always" />
 </menu>
