@@ -1,9 +1,10 @@
-﻿using Android.Content;
+﻿using Android.Bluetooth;
+using Android.Content;
 using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using AndroidX.AppCompat.App;
-using Google.Android.Material.FloatingActionButton;
+using Google.Android.Material.Card;
 
 namespace NearShare.Droid;
 
@@ -15,17 +16,7 @@ public sealed class MainActivity : AppCompatActivity
         base.OnCreate(savedInstanceState);
         SetContentView(Resource.Layout.activity_main);
 
-        //FloatingActionButton openNearbySharingFab = FindViewById<FloatingActionButton>(Resource.Id.open_nearby_share_android_fab);
-        //openNearbySharingFab.Click += delegate
-        //{
-        //    Intent intent = new Intent("com.google.android.gms.SHARE_NEARBY");
-        //    intent.SetPackage("com.google.android.gms");
-        //    StartActivity(intent);
-        //};
-
-        UIHelper.SetupToolBar(this, GetString(Resource.String.app_titlebar_title_default));
-
-        FindViewById<TextView>(Resource.Id.infoTextView)!.TextFormatted = UIHelper.LoadHtmlAsset(this, "Welcome");
+        UIHelper.SetupToolBar(this);
 
         Button sendButton = FindViewById<Button>(Resource.Id.sendButton)!;
         sendButton.Click += SendButton_Click;
@@ -33,8 +24,9 @@ public sealed class MainActivity : AppCompatActivity
         Button receiveButton = FindViewById<Button>(Resource.Id.receiveButton)!;
         receiveButton.Click += ReceiveButton_Click;
 
-        FloatingActionButton floatingReceiveButton = FindViewById<FloatingActionButton>(Resource.Id.floating_receive_button)!;
-        floatingReceiveButton.Click += ReceiveButton_Click;
+        FindViewById<MaterialCardView>(Resource.Id.enableBluetoothButton)!.Click += (_, _) => StartActivity(new Intent(BluetoothAdapter.ActionRequestEnable));
+        FindViewById<MaterialCardView>(Resource.Id.setupWindowButton)!.Click += (_, _) => UIHelper.OpenSetup(this);
+        FindViewById<MaterialCardView>(Resource.Id.openFAQButton)!.Click += (_, _) => UIHelper.OpenFAQ(this);
     }
 
     private void ReceiveButton_Click(object? sender, EventArgs e)

@@ -47,6 +47,8 @@
 	<string name="request_permissions_title">Berechtigungen anfragen</string>
 	<string name="request_permissions_summary">Notwendige Berechtigungen erlauben</string>
 
+	<string name="request_enable_bluetooth">Bluetooth aktivieren</string>
+
 	<string name="open_sponsor_title">Sponsor</string>
 	<string name="open_sponsor_summary">Sponsor the app creator</string>
 
