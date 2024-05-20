@@ -5,17 +5,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:liftOnScroll="true"
     android:fitsSystemWindows="true">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
+        style="@style/Widget.Material3.Toolbar.Surface"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        app:title="Nearby Sharing"
-        app:titleCentered="true"
-        app:subtitle="@string/app_titlebar_title_default"
-        app:subtitleCentered="true"
-        app:menu="@menu/menu_main" />
+        app:title="@string/app_name" />
 
 </com.google.android.material.appbar.AppBarLayout>

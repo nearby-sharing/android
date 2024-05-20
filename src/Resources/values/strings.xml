@@ -48,6 +48,8 @@
 	<string name="request_permissions_title">Request Permissions</string>
 	<string name="request_permissions_summary">Grant necessary permissions to app</string>
 
+	<string name="request_enable_bluetooth">Enable Bluetooth</string>
+
 	<string name="open_sponsor_title">Sponsor</string>
 	<string name="open_sponsor_summary">Sponsor the app creator</string>
 
@@ -69,6 +71,7 @@
 	<string name="preference_cdp_title">Connected Devices Platform</string>
 	<string name="preference_cdp_summary">Setup sending and receiving</string>
 
+	<string name="open_setup">Setup Windows PC</string>
 	<string name="open_setup_title">PC Setup</string>
 	<string name="open_setup_summary">Tutorial about the necessary PC Settings</string>
 

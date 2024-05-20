@@ -2,7 +2,6 @@
 using AndroidX.AppCompat.App;
 using Google.Android.Material.Color;
 using NearShare.Droid.Settings;
-using Sentry;
 
 [assembly: UsesPermission(ManifestPermission.Bluetooth)]
 [assembly: UsesPermission(ManifestPermission.BluetoothAdmin)]
