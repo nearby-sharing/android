@@ -3,8 +3,10 @@ using ShortDev.Microsoft.ConnectedDevices.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.TransportUpgrade;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
+using ShortDev.Microsoft.ConnectedDevices.Transports.WiFiDirect;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Session.Upgrade;
 internal sealed class ClientUpgradeHandler(CdpSession session, EndpointInfo initialEndpoint) : UpgradeHandler(session, initialEndpoint)
@@ -37,8 +39,6 @@ internal sealed class ClientUpgradeHandler(CdpSession session, EndpointInfo init
         return false;
     }
 
-    static readonly IReadOnlyList<EndpointMetadata> UpgradeEndpoints = [EndpointMetadata.Tcp];
-
     UpgradeInstance? _currentUpgrade;
     public async ValueTask<CdpSocket> RequestUpgradeAsync(CdpSocket oldSocket)
     {
@@ -48,8 +48,7 @@ internal sealed class ClientUpgradeHandler(CdpSession session, EndpointInfo init
         _currentUpgrade = new();
         try
         {
-            _logger.SendingUpgradeRequest(_currentUpgrade.Id, UpgradeEndpoints);
-            SendUpgradeRequest(oldSocket, _currentUpgrade.Id, UpgradeEndpoints);
+            SendUpgradeRequest(oldSocket, _currentUpgrade.Id);
             return await _currentUpgrade.Promise.Task;
         }
         finally
@@ -57,7 +56,7 @@ internal sealed class ClientUpgradeHandler(CdpSession session, EndpointInfo init
             _currentUpgrade = null;
         }
 
-        void SendUpgradeRequest(CdpSocket socket, Guid upgradeId, IReadOnlyList<EndpointMetadata> endpoints)
+        void SendUpgradeRequest(CdpSocket socket, Guid upgradeId)
         {
             CommonHeader header = new()
             {
@@ -71,6 +70,11 @@ internal sealed class ClientUpgradeHandler(CdpSession session, EndpointInfo init
                 MessageType = ConnectionType.UpgradeRequest
             }.Write(writer);
 
+            EndpointMetadata[] endpoints = [
+                EndpointMetadata.Tcp,
+                WiFiDirectMetaData.GetUpgradeRequest(new(RandomNumberGenerator.GetBytes(6)))
+            ];
+            _logger.SendingUpgradeRequest(_currentUpgrade.Id, endpoints);
             new UpgradeRequest()
             {
                 UpgradeId = upgradeId,
