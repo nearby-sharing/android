@@ -2,8 +2,10 @@
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.TransportUpgrade;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
+using ShortDev.Microsoft.ConnectedDevices.Transports.WiFiDirect;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Session.Upgrade;
 internal sealed class ClientUpgradeHandler(CdpSession session, EndpointInfo initialEndpoint) : UpgradeHandler(session, initialEndpoint)
@@ -70,7 +72,8 @@ internal sealed class ClientUpgradeHandler(CdpSession session, EndpointInfo init
                 UpgradeId = upgradeId,
                 Endpoints =
                 [
-                    EndpointMetadata.Tcp
+                    EndpointMetadata.Tcp,
+                    WiFiDirectMetaData.GetUpgradeRequest(new(RandomNumberGenerator.GetBytes(6)))
                 ]
             }.Write(writer);
 
