@@ -40,14 +40,27 @@ internal static class WiFiDirectMetaData
         ]);
     }
 
-    static void ReadHeader(ref EndianReader reader, out MessageType messageType, out PhysicalAddress deviceAddress)
+    static void ReadHeader(ref EndianReader reader, MessageType expectedMessageType, out PhysicalAddress deviceAddress)
     {
         byte version = reader.ReadByte();
         if (version != Version)
             throw new InvalidOperationException($"Unexpected version {version}");
 
-        messageType = (MessageType)reader.ReadByte();
-        deviceAddress = new(reader.ReadBytesWithLength().ToArray());
+        var messageType = (MessageType)reader.ReadByte();
+        if (messageType != expectedMessageType)
+            throw new InvalidOperationException($"Expected {expectedMessageType}");
+
+        ReadField(ref reader, MessageValueType.DeviceAddress, out var deviceAddressRaw);
+        deviceAddress = new(deviceAddressRaw.ToArray());
+    }
+
+    static void ReadField(ref EndianReader reader, MessageValueType expectedType, out ReadOnlySpan<byte> data)
+    {
+        var type = (MessageValueType)reader.ReadByte();
+        if (type != expectedType)
+            throw new InvalidOperationException($"Unexpected {type}");
+
+        data = reader.ReadBytesWithLength();
     }
 
     enum MessageType : byte
