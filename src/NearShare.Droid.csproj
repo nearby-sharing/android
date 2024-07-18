@@ -6,12 +6,8 @@
 		<ApplicationId>de.shortdev.nearby_sharing_windows</ApplicationId>
 		<ApplicationVersion>31</ApplicationVersion>
 		<ApplicationDisplayVersion>1.8.1</ApplicationDisplayVersion>
-		<UseAndroidCrypto>true</UseAndroidCrypto>
-		<AndroidErrorOnCustomJavaObject>false</AndroidErrorOnCustomJavaObject>
 	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-		<RunAOTCompilation>False</RunAOTCompilation>
-		<PublishTrimmed>false</PublishTrimmed>
+	<PropertyGroup Condition="'$(Configuration)'=='Release'">
 		<AndroidPackageFormat>aab</AndroidPackageFormat>
 	</PropertyGroup>
 	<ItemGroup Label="Nuget">
