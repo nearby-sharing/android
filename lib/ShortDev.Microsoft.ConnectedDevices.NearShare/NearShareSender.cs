@@ -185,12 +185,10 @@ public sealed class NearShareSender(ConnectedDevicesPlatform platform)
                 TotalFiles = (uint)_files.Count
             });
 
-            ValueSet response = new();
-            response.Add("ControlMessage", (uint)NearShareControlMsgType.FetchDataResponse);
-            response.Add("ContentId", contentId);
-            response.Add("BlobPosition", start);
-            response.Add("DataBlob", blob.ToArray().ToList()); // ToDo: Remove allocation
-            SendValueSet(response, header.MessageId);
+            Channel.SendBinaryMessage(writer =>
+            {
+                FetchDataResponse.Write(writer, contentId, start, blob.Span);
+            }, header.MessageId);
         }
     }
 }
