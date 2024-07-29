@@ -4,11 +4,11 @@
 /// cdp.dll!cdp::BinaryFragmenter::GetMessageFragments <br/>
 /// <see cref="AdditionalHeaderType.UserMessageRequestId"/>
 /// </summary>
-public sealed class BinaryMsgHeader : ICdpHeader<BinaryMsgHeader>
+public readonly struct BinaryMsgHeader() : ICdpHeader<BinaryMsgHeader>
 {
-    public uint FragmentCount { get; set; } = 1;
-    public uint FragmentIndex { get; set; } = 0;
-    public required uint MessageId { get; set; }
+    public uint FragmentCount { get; init; } = 1;
+    public uint FragmentIndex { get; init; } = 0;
+    public required uint MessageId { get; init; }
 
     public static BinaryMsgHeader Parse(ref EndianReader reader)
         => new()
