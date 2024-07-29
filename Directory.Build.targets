@@ -8,4 +8,8 @@
 		<Using Include="ShortDev.IO.Input" />
 		<Using Include="ShortDev.IO.Output" />
 	</ItemGroup>
+
+	<ItemGroup Label="Tests">
+		<InternalsVisibleTo Include="ShortDev.Microsoft.ConnectedDevices.Test" />
+	</ItemGroup>
 </Project>

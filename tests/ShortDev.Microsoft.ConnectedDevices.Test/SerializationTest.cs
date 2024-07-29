@@ -1,5 +1,8 @@
 using ShortDev.Microsoft.ConnectedDevices.Encryption;
 using ShortDev.Microsoft.ConnectedDevices.Messages;
+using ShortDev.Microsoft.ConnectedDevices.NearShare.Messages;
+using ShortDev.Microsoft.ConnectedDevices.Serialization;
+using System.Diagnostics;
 using Xunit.Abstractions;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Test;
@@ -72,5 +75,23 @@ public sealed class SerializationTest(ITestOutputHelper output)
             // assert
             Assert.True(writtenMemory1.Span.SequenceEqual(writtenMemory2.Span));
         }
+    }
+
+    [Fact]
+    public void ValueSet()
+    {
+        ValueSet response = new();
+        response.Add("ControlMessage", (uint)NearShareControlMsgType.FetchDataResponse);
+        response.Add("ContentId", (uint)1);
+        response.Add("BlobPosition", (ulong)2);
+        response.Add("DataBlob", (List<byte>)[42]);
+
+        EndianWriter writer1 = new(Endianness.BigEndian);
+        response.Write(writer1);
+
+        EndianWriter writer2 = new(Endianness.BigEndian);
+        FetchDataResponse.Write(writer2, 1, 2, [42]);
+
+        Assert.Equal(writer1.Buffer.ToArray(), writer2.Buffer.ToArray());
     }
 }
