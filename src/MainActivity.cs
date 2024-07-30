@@ -4,6 +4,7 @@ using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using AndroidX.AppCompat.App;
+using AndroidX.Core.App;
 using Google.Android.Material.Card;
 
 namespace NearShare.Droid;
@@ -24,7 +25,7 @@ public sealed class MainActivity : AppCompatActivity
         Button receiveButton = FindViewById<Button>(Resource.Id.receiveButton)!;
         receiveButton.Click += ReceiveButton_Click;
 
-        FindViewById<MaterialCardView>(Resource.Id.enableBluetoothButton)!.Click += (_, _) => StartActivity(new Intent(BluetoothAdapter.ActionRequestEnable));
+        FindViewById<MaterialCardView>(Resource.Id.enableBluetoothButton)!.Click += (_, _) => EnableBluetooth();
         FindViewById<MaterialCardView>(Resource.Id.setupWindowButton)!.Click += (_, _) => UIHelper.OpenSetup(this);
         FindViewById<MaterialCardView>(Resource.Id.openFAQButton)!.Click += (_, _) => UIHelper.OpenFAQ(this);
     }
@@ -89,4 +90,21 @@ public sealed class MainActivity : AppCompatActivity
 
     public override bool OnOptionsItemSelected(IMenuItem item)
         => UIHelper.OnOptionsItemSelected(this, item);
+
+    private void EnableBluetooth()
+    {
+        if (OperatingSystem.IsAndroidVersionAtLeast(31))
+            ActivityCompat.RequestPermissions(this, [ManifestPermission.BluetoothConnect], EnableBluetoothCode);
+        else
+            StartActivity(new Intent(BluetoothAdapter.ActionRequestEnable));
+    }
+
+    const int EnableBluetoothCode = 0x2;
+    public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
+    {
+        if (requestCode != EnableBluetoothCode || grantResults.Any(x => x != Android.Content.PM.Permission.Granted))
+            return;
+
+        StartActivity(new Intent(BluetoothAdapter.ActionRequestEnable));
+    }
 }
