@@ -4,6 +4,7 @@ using ShortDev.Microsoft.ConnectedDevices.Messages.Session;
 using ShortDev.Microsoft.ConnectedDevices.NearShare.Apps;
 using ShortDev.Microsoft.ConnectedDevices.NearShare.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Serialization;
+using System.Buffers;
 
 namespace ShortDev.Microsoft.ConnectedDevices.NearShare;
 
@@ -168,6 +169,8 @@ public sealed class NearShareSender(ConnectedDevicesPlatform platform)
             }
         }
 
+        static readonly ArrayPool<byte> BufferPool = ArrayPool<byte>.Create();
+
         ulong _bytesSent = 0;
         void HandleDataRequest(BinaryMsgHeader header, ValueSet payload)
         {
@@ -176,7 +179,12 @@ public sealed class NearShareSender(ConnectedDevicesPlatform platform)
             var length = payload.Get<uint>("BlobSize");
 
             var fileProvider = _files?[(int)contentId] ?? throw new NullReferenceException("Could not access files to transfer");
-            var blob = fileProvider.ReadBlob(start, length);
+            using var blob = fileProvider.ReadBlob(start, length, BufferPool);
+
+            Channel.SendBinaryMessage(writer =>
+            {
+                FetchDataResponse.Write(writer, contentId, start, blob.Span);
+            }, header.MessageId);
 
             _fileProgress?.Report(new()
             {
@@ -184,11 +192,6 @@ public sealed class NearShareSender(ConnectedDevicesPlatform platform)
                 TotalBytes = _bytesToSend,
                 TotalFiles = (uint)_files.Count
             });
-
-            Channel.SendBinaryMessage(writer =>
-            {
-                FetchDataResponse.Write(writer, contentId, start, blob.Span);
-            }, header.MessageId);
         }
     }
 }

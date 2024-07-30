@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Buffers;
+using System.Text;
 
 namespace ShortDev.Microsoft.ConnectedDevices.NearShare;
 
@@ -42,12 +43,14 @@ public sealed class CdpFileProvider : IDisposable
     public ulong FileSize
         => (ulong)_buffer.Length;
 
-    public ReadOnlyMemory<byte> ReadBlob(ulong start, uint length)
+    public Extensions.ArrayPoolToken<byte> ReadBlob(ulong start, uint length, ArrayPool<byte> pool)
     {
-        var buffer = new byte[length];
+        var token = pool.RentToken((int)length);
+
         _buffer.Position = (long)start;
-        _buffer.Read(buffer);
-        return buffer;
+        _buffer.Read(token.Span);
+
+        return token;
     }
 
     public void Dispose()
