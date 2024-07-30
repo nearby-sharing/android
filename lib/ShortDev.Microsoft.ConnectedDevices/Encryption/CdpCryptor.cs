@@ -128,11 +128,9 @@ public sealed class CdpCryptor : IDisposable
         Span<byte> iv = stackalloc byte[Constants.IVSize];
         GenerateIV(header, iv);
 
-        IBufferWriter<byte> bufferWriter = writer.Buffer;
-
         // Encrypt and write to msgWriter
-        _aes.EncryptCbc(buffer, iv, bufferWriter.GetSpan(encryptedPayloadLength), paddingMode);
-        bufferWriter.Advance(encryptedPayloadLength);
+        _aes.EncryptCbc(buffer, iv, writer.Buffer.GetSpan(encryptedPayloadLength), paddingMode);
+        writer.Buffer.Advance(encryptedPayloadLength);
 
         return writer;
     }
