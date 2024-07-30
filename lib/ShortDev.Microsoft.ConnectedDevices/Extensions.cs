@@ -69,6 +69,8 @@ public static class Extensions
         private readonly int _capacity = capacity;
         private readonly T[] _array = pool.Rent(capacity);
 
+        public T[] ArrayUnsafe => _array;
+
         public Memory<T> Memory => _array.AsMemory()[0.._capacity];
         public Span<T> Span => Memory.Span;
 

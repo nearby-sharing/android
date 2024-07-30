@@ -4,6 +4,8 @@ using ShortDev.Microsoft.ConnectedDevices.Messages.Session;
 using ShortDev.Microsoft.ConnectedDevices.NearShare.Apps;
 using ShortDev.Microsoft.ConnectedDevices.NearShare.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Serialization;
+using System.Buffers;
+using System.Diagnostics;
 
 namespace ShortDev.Microsoft.ConnectedDevices.NearShare;
 
@@ -176,7 +178,13 @@ public sealed class NearShareSender(ConnectedDevicesPlatform platform)
             var length = payload.Get<uint>("BlobSize");
 
             var fileProvider = _files?[(int)contentId] ?? throw new NullReferenceException("Could not access files to transfer");
-            var blob = fileProvider.ReadBlob(start, length);
+            Channel.SendBinaryMessage(writer =>
+            {
+                FetchDataResponse.Write(writer, contentId, start, (int)length, out var blob);
+                Debug.Assert(blob.Length == length);
+
+                fileProvider.ReadBlob(start, blob);
+            }, header.MessageId);
 
             _fileProgress?.Report(new()
             {
@@ -184,13 +192,6 @@ public sealed class NearShareSender(ConnectedDevicesPlatform platform)
                 TotalBytes = _bytesToSend,
                 TotalFiles = (uint)_files.Count
             });
-
-            ValueSet response = new();
-            response.Add("ControlMessage", (uint)NearShareControlMsgType.FetchDataResponse);
-            response.Add("ContentId", contentId);
-            response.Add("BlobPosition", start);
-            response.Add("DataBlob", blob.ToArray().ToList()); // ToDo: Remove allocation
-            SendValueSet(response, header.MessageId);
         }
     }
 }
