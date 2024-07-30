@@ -90,8 +90,10 @@ public sealed class SerializationTest(ITestOutputHelper output)
         response.Write(writer1);
 
         EndianWriter writer2 = new(Endianness.BigEndian);
-        FetchDataResponse.Write(writer2, 1, 2, [42]);
+        FetchDataResponse.Write(writer2, 1, 2, length: 1, out var blob);
+        blob[0] = 42;
 
+        Assert.Equal(1, blob.Length);
         Assert.Equal(writer1.Buffer.ToArray(), writer2.Buffer.ToArray());
     }
 }

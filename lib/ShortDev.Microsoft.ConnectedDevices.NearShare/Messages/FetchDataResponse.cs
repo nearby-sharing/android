@@ -3,7 +3,7 @@
 namespace ShortDev.Microsoft.ConnectedDevices.NearShare.Messages;
 internal static class FetchDataResponse
 {
-    public static void Write(EndianWriter writer, uint contentId, ulong start, ReadOnlySpan<byte> blob)
+    public static void Write(EndianWriter writer, uint contentId, ulong start, int length, out Span<byte> blob)
     {
         CompactBinaryBondWriter bondWriter = new(writer.Buffer);
 
@@ -27,8 +27,11 @@ internal static class FetchDataResponse
 
         WritePropertyBegin(ref bondWriter, "DataBlob", PropertyType.PropertyType_UInt8Array);
         bondWriter.WriteFieldBegin(Bond.BondDataType.BT_LIST, 200);
-        bondWriter.WriteContainerBegin(blob.Length, Bond.BondDataType.BT_UINT8);
-        bondWriter.WriteBytes(blob);
+        bondWriter.WriteContainerBegin(length, Bond.BondDataType.BT_UINT8);
+
+        blob = writer.Buffer.GetSpan(length)[..length];
+        writer.Buffer.Advance(length);
+
         bondWriter.WriteStructEnd();
 
         bondWriter.WriteStructEnd();
