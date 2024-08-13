@@ -11,7 +11,10 @@ public readonly record struct DeviceInfoMessage : IBinaryWritable, IBinaryParsab
     public static DeviceInfoMessage Parse<TReader>(ref TReader reader) where TReader : struct, IEndianReader, allows ref struct
         => new()
         {
-            DeviceInfo = JsonSerializer.Deserialize<CdpDeviceInfo>(reader.ReadStringWithLength()) ?? throw new CdpProtocolException("Invalid device info")
+            DeviceInfo = JsonSerializer.Deserialize(
+                reader.ReadStringWithLength(),
+                DeviceInfoJsonContext.Default.CdpDeviceInfo
+            ) ?? throw new CdpProtocolException("Invalid device info")
         };
 
     /// <summary>
@@ -21,6 +24,11 @@ public readonly record struct DeviceInfoMessage : IBinaryWritable, IBinaryParsab
 
     public void Write<TWriter>(ref TWriter writer) where TWriter : struct, IEndianWriter, allows ref struct
     {
-        writer.WriteWithLength(JsonSerializer.Serialize(DeviceInfo));
+        writer.WriteWithLength(
+            JsonSerializer.Serialize(
+                DeviceInfo,
+                DeviceInfoJsonContext.Default.CdpDeviceInfo
+            )
+        );
     }
 }
