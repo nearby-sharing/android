@@ -11,7 +11,10 @@ public sealed class DeviceInfoMessage : ICdpPayload<DeviceInfoMessage>
     public static DeviceInfoMessage Parse(ref EndianReader reader)
         => new()
         {
-            DeviceInfo = JsonSerializer.Deserialize<CdpDeviceInfo>(reader.ReadStringWithLength()) ?? throw new CdpProtocolException("Invalid device info")
+            DeviceInfo = JsonSerializer.Deserialize(
+                reader.ReadStringWithLength(),
+                DeviceInfoJsonContext.Default.CdpDeviceInfo
+            ) ?? throw new CdpProtocolException("Invalid device info")
         };
 
     /// <summary>
@@ -21,6 +24,11 @@ public sealed class DeviceInfoMessage : ICdpPayload<DeviceInfoMessage>
 
     public void Write(EndianWriter writer)
     {
-        writer.WriteWithLength(JsonSerializer.Serialize(DeviceInfo));
+        writer.WriteWithLength(
+            JsonSerializer.Serialize(
+                DeviceInfo,
+                DeviceInfoJsonContext.Default.CdpDeviceInfo
+            )
+        );
     }
 }
