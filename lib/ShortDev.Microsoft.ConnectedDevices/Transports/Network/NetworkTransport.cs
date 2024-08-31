@@ -29,6 +29,7 @@ public sealed class NetworkTransport(INetworkHandler handler) : ICdpTransport, I
                 if (client.Client.RemoteEndPoint is not IPEndPoint endPoint)
                     return;
 
+                client.NoDelay = true;
                 var stream = client.GetStream();
                 DeviceConnected?.Invoke(this, new()
                 {
@@ -52,6 +53,7 @@ public sealed class NetworkTransport(INetworkHandler handler) : ICdpTransport, I
         // ToDo: If the windows machine tries to connect back it uses the port assigned here not 5040!!
         TcpClient client = new();
         await client.ConnectAsync(endpoint.ToIPEndPoint()).ConfigureAwait(false);
+        client.NoDelay = true;
         return new()
         {
             Endpoint = endpoint,

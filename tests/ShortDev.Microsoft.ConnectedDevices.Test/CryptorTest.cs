@@ -1,5 +1,6 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Encryption;
 using ShortDev.Microsoft.ConnectedDevices.Messages;
+using ShortDev.Microsoft.ConnectedDevices.Transports;
 using System.Security.Cryptography;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Test;
@@ -17,10 +18,11 @@ public sealed class CryptorTest
         var header = TestValueGenerator.RandomValue<CommonHeader>();
         ReadOnlySpan<byte> payload = TestValueGenerator.RandomValue<byte[]>();
 
-        EndianWriter writer = new(Endianness.BigEndian);
-        cryptor.EncryptMessage(writer, header, payload);
+        FragmentSenderSpy fragmentSender = new();
+        cryptor.EncryptMessage(fragmentSender, header, payload);
+        Assert.NotNull(fragmentSender.Fragment);
 
-        EndianReader reader = new(Endianness.BigEndian, writer.Buffer.AsSpan());
+        EndianReader reader = new(Endianness.BigEndian, fragmentSender.Fragment.Value.Span);
 
         header = CommonHeader.Parse(ref reader);
         var readerContent = reader.ReadToEnd();
@@ -31,5 +33,16 @@ public sealed class CryptorTest
         var decrypted = cryptor.DecryptMessage(header, encryptedPayload, hmac).Span;
 
         Assert.True(payload.SequenceEqual(decrypted[sizeof(uint)..]));
+    }
+
+    sealed class FragmentSenderSpy : IFragmentSender
+    {
+        public ReadOnlyMemory<byte>? Fragment { get; private set; }
+        public void SendFragment(ReadOnlySpan<byte> fragment)
+        {
+            Assert.Null(Fragment);
+
+            Fragment = fragment.ToArray();
+        }
     }
 }
