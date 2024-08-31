@@ -35,7 +35,7 @@
 <!-- #endregion -->
 
 <!-- #region activity_share.xml -->
-<string name="scanning">Escaneant...</string>
+<string name="scanning">Escanejant...</string>
 <!-- #endregion -->
 
 <!-- #region preferences.xml -->
@@ -47,6 +47,8 @@
 
 <string name="request_permissions_title">Sol·licitar permisos necessaris</string>
 <string name="request_permissions_summary">Dona-li els permisos necessaris a l \'aplicació </string>
+
+<string name="request_enable_bluetooth">Activa el Bluetooth</string>
 
 <string name="open_sponsor_title">Patrocinar</string>
 <string name="open_sponsor_summary">Patrocina al desenvolupador de l \'aplicació</string>
