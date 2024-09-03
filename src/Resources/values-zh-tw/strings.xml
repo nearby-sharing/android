@@ -5,7 +5,7 @@
 	<string name="app_titlebar_title_receive">從您的 Windows 10 / 11 電腦接收資料</string>
 	<string name="app_titlebar_title_receive_setup">設定與資訊</string>
 
-	<string name="assets_prefix">zh-Hant-TW</string>
+	<string name="assets_prefix">zh-tw</string>
 
 	<!-- #region generic -->
 	<string name="generic_back">返回</string>
