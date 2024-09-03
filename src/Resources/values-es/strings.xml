@@ -48,6 +48,8 @@
 	<string name="request_permissions_title">Solicitar permisos necesarios</string>
 	<string name="request_permissions_summary">Concede los permisos necesarios a la aplicación</string>
 
+	<string name="request_enable_bluetooth">Activar Bluetooth</string>
+
 	<string name="open_sponsor_title">Patrocinar</string>
 	<string name="open_sponsor_summary">Patrocina al creador de la aplicación</string>
 
