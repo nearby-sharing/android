@@ -35,19 +35,18 @@ public static class MessageFragmenter
     {
         Debug.Assert(payload.Length <= DefaultMessageFragmentSize);
 
-        EndianWriter writer = new(Endianness.BigEndian);
         if (cryptor != null)
         {
-            cryptor.EncryptMessage(writer, header, payload);
+            cryptor.EncryptMessage(sender, header, payload);
         }
         else
         {
+            EndianWriter writer = new(Endianness.BigEndian);
             header.SetPayloadLength(payload.Length);
             header.Write(writer);
             writer.Write(payload);
+            sender.SendFragment(writer.Buffer.AsSpan());
         }
-
-        sender.SendFragment(writer.Buffer.AsSpan());
     }
 }
 

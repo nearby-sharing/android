@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\lib\ShortDev.Microsoft.ConnectedDevices.NearShare\ShortDev.Microsoft.ConnectedDevices.NearShare.csproj" />
     <ProjectReference Include="..\..\lib\ShortDev.Microsoft.ConnectedDevices\ShortDev.Microsoft.ConnectedDevices.csproj" />
   </ItemGroup>
 
