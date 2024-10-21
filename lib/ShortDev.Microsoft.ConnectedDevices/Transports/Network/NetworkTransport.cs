@@ -6,25 +6,32 @@ using System.Net.Sockets;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Transports.Network;
 
-public sealed class NetworkTransport(INetworkHandler handler) : ICdpTransport, ICdpDiscoverableTransport
+public sealed class NetworkTransport(
+    INetworkHandler handler,
+    int tcpPort = Constants.TcpPort, int udpPort = Constants.UdpPort
+) : ICdpTransport, ICdpDiscoverableTransport
 {
-    readonly TcpListener _listener = new(IPAddress.Any, Constants.TcpPort);
+    public int TcpPort { get; } = tcpPort;
+    public int UdpPort { get; } = udpPort;
+
+    TcpListener? _listener;
     public INetworkHandler Handler { get; } = handler;
 
     public CdpTransportType TransportType { get; } = CdpTransportType.Tcp;
     public EndpointInfo GetEndpoint()
-        => new(TransportType, Handler.GetLocalIp().ToString(), Constants.TcpPort.ToString(CultureInfo.InvariantCulture));
+        => new(TransportType, Handler.GetLocalIp().ToString(), TcpPort.ToString(CultureInfo.InvariantCulture));
 
     public event DeviceConnectedEventHandler? DeviceConnected;
     public async Task Listen(CancellationToken cancellationToken)
     {
-        _listener.Start();
+        var listener = _listener ??= new(IPAddress.Any, TcpPort);
+        listener.Start();
 
         try
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                var client = await _listener.AcceptTcpClientAsync(cancellationToken).ConfigureAwait(false);
+                var client = await listener.AcceptTcpClientAsync(cancellationToken).ConfigureAwait(false);
 
                 if (client.Client.RemoteEndPoint is not IPEndPoint endPoint)
                     return;
@@ -39,7 +46,7 @@ public sealed class NetworkTransport(INetworkHandler handler) : ICdpTransport, I
                     Endpoint = new EndpointInfo(
                         TransportType,
                         endPoint.Address.ToString(),
-                        Constants.TcpPort.ToString(CultureInfo.InvariantCulture)
+                        TcpPort.ToString(CultureInfo.InvariantCulture)
                     )
                 });
             }
@@ -65,10 +72,26 @@ public sealed class NetworkTransport(INetworkHandler handler) : ICdpTransport, I
 
     #region Discovery (Udp)
 
-    readonly UdpClient _udpclient = new(Constants.UdpPort)
+    readonly UdpClient _udpclient = CreateUdpClient(udpPort);
+
+    static UdpClient CreateUdpClient(int port)
     {
-        EnableBroadcast = true
-    };
+        UdpClient client = new()
+        {
+            EnableBroadcast = true
+        };
+
+        if (OperatingSystem.IsWindows())
+        {
+            const int SIO_UDP_CONNRESET = -1744830452;
+            client.Client.IOControl(SIO_UDP_CONNRESET, [0, 0, 0, 0], null);
+        }
+
+        client.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+        client.Client.Bind(new IPEndPoint(IPAddress.Any, port));
+
+        return client;
+    }
 
     public async Task Advertise(LocalDeviceInfo deviceInfo, CancellationToken cancellationToken)
     {
@@ -194,7 +217,7 @@ public sealed class NetworkTransport(INetworkHandler handler) : ICdpTransport, I
             Type = DiscoveryType.PresenceRequest
         }.Write(payloadWriter);
 
-        new UdpFragmentSender(_udpclient, new IPEndPoint(IPAddress.Broadcast, Constants.UdpPort))
+        new UdpFragmentSender(_udpclient, new IPEndPoint(IPAddress.Broadcast, UdpPort))
             .SendMessage(header, payloadWriter.Buffer.AsSpan());
     }
 
@@ -212,7 +235,7 @@ public sealed class NetworkTransport(INetworkHandler handler) : ICdpTransport, I
         }.Write(payloadWriter);
         response.Write(payloadWriter);
 
-        new UdpFragmentSender(_udpclient, new IPEndPoint(device, Constants.UdpPort))
+        new UdpFragmentSender(_udpclient, new IPEndPoint(device, UdpPort))
             .SendMessage(header, payloadWriter.Buffer.AsSpan());
     }
 
@@ -228,7 +251,7 @@ public sealed class NetworkTransport(INetworkHandler handler) : ICdpTransport, I
         DeviceDiscovered = null;
         DiscoveryMessageReceived = null;
 
-        _listener.Dispose();
+        _listener?.Dispose();
         _udpclient.Dispose();
     }
 }
