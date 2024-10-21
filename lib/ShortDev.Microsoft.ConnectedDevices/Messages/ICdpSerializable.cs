@@ -23,4 +23,11 @@ public interface ICdpArraySerializable<T> where T : ICdpArraySerializable<T>
 public interface ICdpWriteable
 {
     void Write(EndianWriter writer);
+
+    ReadOnlyMemory<byte> Write(Endianness endianness = Endianness.BigEndian)
+    {
+        EndianWriter writer = new(endianness);
+        Write(writer);
+        return writer.Buffer.AsMemory();
+    }
 }
