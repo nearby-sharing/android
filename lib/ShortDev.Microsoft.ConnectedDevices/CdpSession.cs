@@ -72,7 +72,7 @@ public sealed class CdpSession : IDisposable
         ), out _);
     }
 
-    internal static async Task<CdpSession> ConnectClientAsync(ConnectedDevicesPlatform platform, CdpSocket socket)
+    internal static async Task<CdpSession> ConnectClientAsync(ConnectedDevicesPlatform platform, CdpSocket socket, ConnectOptions? options = null)
     {
         var session = _sessionRegistry.Create(localSessionId => new(
             platform,
@@ -81,6 +81,10 @@ public sealed class CdpSession : IDisposable
         ), out _);
 
         var connectHandler = (ClientConnectHandler)session._connectHandler;
+
+        if (options is not null)
+            connectHandler.UpgradeHandler.Upgraded += options.TransportUpgraded;
+
         await connectHandler.ConnectAsync(socket);
 
         return session;

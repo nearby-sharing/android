@@ -13,7 +13,18 @@ internal abstract class UpgradeHandler(CdpSession session, EndpointInfo initialE
     public bool IsSocketAllowed(CdpSocket socket)
         => _allowedAddresses.Contains(socket.Endpoint.Address);
 
-    public EndpointInfo RemoteEndpoint { get; protected set; } = initialEndpoint;
+    public event EventHandler<CdpTransportType>? Upgraded;
+
+    EndpointInfo _remoteEndpoint = initialEndpoint;
+    public EndpointInfo RemoteEndpoint
+    {
+        get => _remoteEndpoint;
+        protected set
+        {
+            _remoteEndpoint = value;
+            Upgraded?.Invoke(this, value.TransportType);
+        }
+    }
 
     public bool IsUpgradeSupported
         => (/* ToDo: header131Value & */ _session.ClientCapabilities & _session.HostCapabilities & PeerCapabilities.UpgradeSupport) != 0;
