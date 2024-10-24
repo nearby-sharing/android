@@ -9,7 +9,7 @@ public sealed class UpgradeRequest : ICdpPayload<UpgradeRequest>
     /// A random GUID identifying this upgrade process across transports.
     /// </summary>
     public required Guid UpgradeId { get; init; }
-    public required EndpointMetadata[] Endpoints { get; init; }
+    public required IReadOnlyList<EndpointMetadata> Endpoints { get; init; }
 
     public static UpgradeRequest Parse(ref EndianReader reader)
         => new()

@@ -4,6 +4,7 @@ using ShortDev.Microsoft.ConnectedDevices.Messages.Session;
 using ShortDev.Microsoft.ConnectedDevices.NearShare.Apps;
 using ShortDev.Microsoft.ConnectedDevices.NearShare.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Serialization;
+using ShortDev.Microsoft.ConnectedDevices.Transports;
 using System.Buffers;
 using System.Diagnostics;
 
@@ -13,9 +14,11 @@ public sealed class NearShareSender(ConnectedDevicesPlatform platform)
 {
     public ConnectedDevicesPlatform Platform { get; } = platform;
 
+    public event EventHandler<CdpTransportType>? TransportUpgraded;
+
     async Task<SenderStateMachine> PrepareTransferInternalAsync(EndpointInfo endpoint, CancellationToken cancellationToken)
     {
-        var session = await Platform.ConnectAsync(endpoint);
+        var session = await Platform.ConnectAsync(endpoint, options: new() { TransportUpgraded = TransportUpgraded });
 
         Guid operationId = Guid.NewGuid();
 

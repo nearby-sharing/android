@@ -30,7 +30,7 @@ namespace NearShare.Droid;
 [Activity(Label = "@string/app_name", Exported = true, Theme = "@style/AppTheme.TranslucentOverlay", ConfigurationChanges = UIHelper.ConfigChangesFlags)]
 public sealed class SendActivity : AppCompatActivity
 {
-    NearShareSender NearShareSender = null!;
+    NearShareSender _nearShareSender = null!;
 
     BottomSheetDialog _dialog = null!;
     RecyclerView DeviceDiscoveryListView = null!;
@@ -78,13 +78,7 @@ public sealed class SendActivity : AppCompatActivity
                 view.FindViewById<ImageView>(Resource.Id.deviceTypeImageView)!.SetImageResource(
                     device.Type.IsMobile() ? Resource.Drawable.ic_fluent_phone_24_regular : Resource.Drawable.ic_fluent_desktop_24_regular
                 );
-                view.FindViewById<ImageView>(Resource.Id.transportTypeImageView)!.SetImageResource(device.Endpoint.TransportType switch
-                {
-                    CdpTransportType.Tcp => Resource.Drawable.ic_fluent_wifi_1_20_regular,
-                    CdpTransportType.Rfcomm => Resource.Drawable.ic_fluent_bluetooth_20_regular,
-                    CdpTransportType.WifiDirect => Resource.Drawable.ic_fluent_live_20_regular,
-                    _ => Resource.Drawable.ic_fluent_question_circle_20_regular
-                });
+                view.FindViewById<ImageView>(Resource.Id.transportTypeImageView)!.SetImageResource(GetTransportIcon(device.Endpoint.TransportType));
                 view.FindViewById<TextView>(Resource.Id.deviceNameTextView)!.Text = device.Name;
                 view.Click += (s, e) => SendData(device);
             }
@@ -137,7 +131,7 @@ public sealed class SendActivity : AppCompatActivity
         _cdp.DeviceDiscovered += Platform_DeviceDiscovered;
         _cdp.Discover(_discoverCancellationTokenSource.Token);
 
-        NearShareSender = new NearShareSender(_cdp);
+        _nearShareSender = new NearShareSender(_cdp);
     }
 
     readonly ObservableCollection<CdpDevice> RemoteSystems = [];
@@ -190,13 +184,10 @@ public sealed class SendActivity : AppCompatActivity
         sendingDataLayout.FindViewById<ImageView>(Resource.Id.deviceTypeImageView)!.SetImageResource(
             remoteSystem.Type.IsMobile() ? Resource.Drawable.ic_fluent_phone_24_regular : Resource.Drawable.ic_fluent_desktop_24_regular
         );
-        sendingDataLayout.FindViewById<ImageView>(Resource.Id.transportTypeImageView)!.SetImageResource(remoteSystem.Endpoint.TransportType switch
-        {
-            CdpTransportType.Tcp => Resource.Drawable.ic_fluent_wifi_1_20_regular,
-            CdpTransportType.Rfcomm => Resource.Drawable.ic_fluent_bluetooth_20_regular,
-            CdpTransportType.WifiDirect => Resource.Drawable.ic_fluent_live_20_regular,
-            _ => Resource.Drawable.ic_fluent_question_circle_20_regular
-        });
+
+        var transportTypeImage = sendingDataLayout.FindViewById<ImageView>(Resource.Id.transportTypeImageView)!;
+        transportTypeImage.SetImageResource(GetTransportIcon(remoteSystem.Endpoint.TransportType));
+        _nearShareSender.TransportUpgraded += OnTransportUpgrade;
 
         var deviceNameTextView = sendingDataLayout.FindViewById<TextView>(Resource.Id.deviceNameTextView)!;
         var progressIndicator = sendingDataLayout.FindViewById<CircularProgressIndicator>(Resource.Id.sendProgressIndicator)!;
@@ -220,7 +211,7 @@ public sealed class SendActivity : AppCompatActivity
             if (files != null)
             {
                 progress = new();
-                transferPromise = NearShareSender.SendFilesAsync(
+                transferPromise = _nearShareSender.SendFilesAsync(
                     remoteSystem,
                     files,
                     progress,
@@ -229,7 +220,7 @@ public sealed class SendActivity : AppCompatActivity
             }
             else if (uri != null)
             {
-                transferPromise = NearShareSender.SendUriAsync(
+                transferPromise = _nearShareSender.SendUriAsync(
                     remoteSystem,
                     uri
                 );
@@ -308,6 +299,15 @@ public sealed class SendActivity : AppCompatActivity
 
             progressIndicator.Indeterminate = false;
             progressIndicator.Progress = progressIndicator.Max;
+
+            _nearShareSender.TransportUpgraded -= OnTransportUpgrade;
+        }
+
+        void OnTransportUpgrade(object? sender, CdpTransportType transportType)
+        {
+            RunOnUiThread(() =>
+                transportTypeImage.SetImageResource(GetTransportIcon(transportType))
+            );
         }
     }
 
@@ -384,6 +384,17 @@ public sealed class SendActivity : AppCompatActivity
         base.Finish();
 
         _cdp?.Dispose();
+    }
+
+    static int GetTransportIcon(CdpTransportType transportType)
+    {
+        return transportType switch
+        {
+            CdpTransportType.Tcp => Resource.Drawable.ic_fluent_wifi_1_20_regular,
+            CdpTransportType.Rfcomm => Resource.Drawable.ic_fluent_bluetooth_20_regular,
+            CdpTransportType.WifiDirect => Resource.Drawable.ic_fluent_live_20_regular,
+            _ => Resource.Drawable.ic_fluent_question_circle_20_regular
+        };
     }
 
     sealed class FinishActivityBottomSheetCallback(Activity activity) : BottomSheetBehavior.BottomSheetCallback
