@@ -54,6 +54,59 @@
                     app:icon="@drawable/ic_fluent_mail_inbox_24_regular" />
             </LinearLayout>
 
+            <!-- Quick send actions -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="center">
+
+                <!-- Send File -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/sendFileCard"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:layout_margin="8dp"
+                    style="?attr/materialCardViewFilledStyle">
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="12dp"
+                        android:src="@drawable/ic_fluent_document_24_regular"/>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Send Clipboard -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/sendClipBoardCard"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:layout_margin="8dp"
+                    style="?attr/materialCardViewFilledStyle">
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="12dp"
+                        android:src="@drawable/ic_fluent_clipboard_24_regular"/>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Send Text -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/sendTextCard"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:layout_margin="8dp"
+                    style="?attr/materialCardViewFilledStyle">
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="12dp"
+                        android:src="@drawable/ic_fluent_text_description_24_regular"/>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+
             <!-- Enable Bluetooth -->
             <com.google.android.material.card.MaterialCardView
                 style="?attr/materialCardViewFilledStyle"
