@@ -12,6 +12,7 @@ using Google.Android.Material.Color;
 using Google.Android.Material.ProgressIndicator;
 using Microsoft.Extensions.Logging;
 using NearShare.Droid.Settings;
+using NearShare.Droid.Utils;
 using ShortDev.Android.UI;
 using ShortDev.Microsoft.ConnectedDevices;
 using ShortDev.Microsoft.ConnectedDevices.Encryption;
@@ -42,13 +43,13 @@ public sealed class SendActivity : AppCompatActivity
     ILoggerFactory _loggerFactory = null!;
     protected override void OnCreate(Bundle? savedInstanceState)
     {
+        this.EnableEdgeToEdge();
         base.OnCreate(savedInstanceState);
 
         SetContentView(new CoordinatorLayout(this)
         {
             LayoutParameters = new(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.MatchParent)
         });
-        Window!.SetFlags(WindowManagerFlags.LayoutNoLimits, WindowManagerFlags.LayoutNoLimits);
 
         _dialog = new(this);
         _dialog.SetContentView(Resource.Layout.activity_share);
