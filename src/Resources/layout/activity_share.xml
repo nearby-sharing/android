@@ -18,6 +18,18 @@
         android:layout_marginBottom="10dp"
         android:gravity="center" />
 
+    <com.google.android.material.card.MaterialCardView
+        style="@style/Widget.Material3.CardView.Outlined"
+        android:id="@+id/previewCard"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_margin="8dp">
+        <ImageView
+            android:id="@+id/previewImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </com.google.android.material.card.MaterialCardView>
+
     <include
         layout="@layout/activity_share__device_select"
         android:id="@+id/selectDeviceLayout" />

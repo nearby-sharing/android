@@ -71,6 +71,17 @@ public sealed class SendActivity : AppCompatActivity
         readyButton = _dialog.FindViewById<Button>(Resource.Id.readyButton)!;
         readyButton.Click += (s, e) => _dialog.Cancel();
 
+        if (OperatingSystem.IsAndroidVersionAtLeast(29) && Intent is { Action: Intent.ActionSend } && Intent.HasExtra(Intent.ExtraStream))
+        {
+            var previewBitmap = ContentResolver?.LoadThumbnail(Intent.GetParcelableExtra<AndroidUri>(Intent.ExtraStream)!, size: new(100, 100), signal: null);
+            var previewImage = FindViewById<ImageView>(Resource.Id.previewImage)!;
+            previewImage.SetImageBitmap(previewBitmap);
+        }
+        else
+        {
+            _dialog.FindViewById(Resource.Id.previewCard)!.Visibility = ViewStates.Gone;
+        }
+
         DeviceDiscoveryListView = _dialog.FindViewById<RecyclerView>(Resource.Id.deviceSelector)!;
         DeviceDiscoveryListView.SetLayoutManager(new LinearLayoutManager(this, (int)Orientation.Horizontal, reverseLayout: false));
         var adapterDescriptor = new AdapterDescriptor<CdpDevice>(
