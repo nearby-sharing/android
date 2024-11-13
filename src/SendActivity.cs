@@ -326,6 +326,16 @@ public sealed class SendActivity : AppCompatActivity
 
         if (Intent.Action == Intent.ActionSendMultiple)
         {
+            if (Intent.HasExtra(Intent.ExtraText))
+            {
+                return (
+                    files: (Intent.GetStringArrayListExtra(Intent.ExtraText) ?? throw new InvalidDataException("Could not get extra files from intent"))
+                        .Select(SendText)
+                        .ToArray(),
+                    null
+                );
+            }
+
             return (
                 files: (Intent.GetParcelableArrayListExtra<AndroidUri>(Intent.ExtraStream) ?? throw new InvalidDataException("Could not get extra files from intent"))
                     .Select(ContentResolver!.CreateNearShareFileFromContentUri)

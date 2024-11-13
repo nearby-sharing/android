@@ -6,6 +6,8 @@ using Android.Views;
 using AndroidX.AppCompat.App;
 using AndroidX.Core.App;
 using Google.Android.Material.Card;
+using Google.Android.Material.Dialog;
+using Google.Android.Material.TextField;
 
 namespace NearShare.Droid;
 
@@ -24,6 +26,10 @@ public sealed class MainActivity : AppCompatActivity
 
         Button receiveButton = FindViewById<Button>(Resource.Id.receiveButton)!;
         receiveButton.Click += ReceiveButton_Click;
+
+        FindViewById<MaterialCardView>(Resource.Id.sendFileCard)!.Click += SendButton_Click;
+        FindViewById<MaterialCardView>(Resource.Id.sendClipBoardCard)!.Click += SendClipBoard_Click;
+        FindViewById<MaterialCardView>(Resource.Id.sendTextCard)!.Click += SendText_Click;
 
         FindViewById<MaterialCardView>(Resource.Id.enableBluetoothButton)!.Click += (_, _) => EnableBluetooth();
         FindViewById<MaterialCardView>(Resource.Id.setupWindowButton)!.Click += (_, _) => UIHelper.OpenSetup(this);
@@ -45,6 +51,67 @@ public sealed class MainActivity : AppCompatActivity
                 .PutExtra(Intent.ExtraAllowMultiple, true),
             FilePickCode
         );
+    }
+
+    private void SendClipBoard_Click(object? sender, EventArgs e)
+    {
+        try
+        {
+            var clipboard = (ClipboardManager?)GetSystemService(ClipboardService);
+            if (clipboard is null)
+                return;
+
+            var clip = clipboard.PrimaryClip;
+            if (clip is null)
+                return;
+
+            List<string> values = [];
+            for (int i = 0; i < clip.ItemCount; i++)
+            {
+                var value = clip.GetItemAt(0)?.CoerceToText(this);
+                if (value is not null)
+                    values.Add(value);
+            }
+
+            if (values.Count == 0)
+                return;
+
+            Intent intent = new(this, typeof(SendActivity));
+            intent.SetAction(Intent.ActionSendMultiple);
+            intent.PutStringArrayListExtra(Intent.ExtraText, values);
+            StartActivity(intent);
+        }
+        catch (Exception ex)
+        {
+            this.ShowErrorDialog(ex);
+        }
+    }
+
+    private void SendText_Click(object? sender, EventArgs e)
+    {
+        try
+        {
+            TextInputEditText editText = new(this)
+            {
+                LayoutParameters = new(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.MatchParent)
+            };
+            new MaterialAlertDialogBuilder(this)
+                .SetTitle(Resource.String.share_text)!
+                .SetView(editText)!
+                .SetPositiveButton(Resource.String.generic_send, (s, e) =>
+                {
+                    Intent intent = new(this, typeof(SendActivity));
+                    intent.SetAction(Intent.ActionSend);
+                    intent.PutExtra(Intent.ExtraText, editText.Text);
+                    StartActivity(intent);
+                })
+                .SetNegativeButton(Resource.String.generic_cancel, (s, e) => { })
+                .Show();
+        }
+        catch (Exception ex)
+        {
+            this.ShowErrorDialog(ex);
+        }
     }
 
     protected override void OnActivityResult(int requestCode, [GeneratedEnum] Result resultCode, Intent? data)
