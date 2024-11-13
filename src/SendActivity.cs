@@ -59,6 +59,7 @@ public sealed class SendActivity : AppCompatActivity
         _dialog.Behavior.Draggable = false;
         _dialog.Behavior.AddBottomSheetCallback(new FinishActivityBottomSheetCallback(this));
         _dialog.Window?.ClearFlags(WindowManagerFlags.DimBehind);
+        _dialog.Show();
 
         _dialog.FindViewById<ViewGroup>(Resource.Id.rootLayout)!.EnableLayoutTransition();
 
@@ -98,7 +99,6 @@ public sealed class SendActivity : AppCompatActivity
         try
         {
             await Task.Run(InitializePlatform);
-            _dialog.Show();
         }
         catch (Exception ex)
         {
