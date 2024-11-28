@@ -11,6 +11,7 @@ using NearShare.Droid.Settings;
 
 [assembly: UsesPermission(ManifestPermission.Internet)]
 [assembly: UsesPermission(ManifestPermission.AccessNetworkState)]
+[assembly: UsesPermission(ManifestPermission.ChangeNetworkState)]
 [assembly: UsesPermission(ManifestPermission.AccessWifiState)]
 [assembly: UsesPermission(ManifestPermission.ChangeWifiState)]
 [assembly: UsesPermission(ManifestPermission.NearbyWifiDevices)]

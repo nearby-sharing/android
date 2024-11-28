@@ -105,7 +105,10 @@ internal static class UIHelper
     #region Permissions
     private static readonly string[] _sendPermissions = [
         ManifestPermission.AccessFineLocation,
-        ManifestPermission.AccessCoarseLocation
+        ManifestPermission.AccessCoarseLocation,
+        // WiFiDirect
+        ManifestPermission.AccessWifiState,
+        ManifestPermission.ChangeWifiState
     ];
     [SupportedOSPlatform("android31.0")]
     private static readonly string[] _sendPermissionsApi31 = [
@@ -113,10 +116,16 @@ internal static class UIHelper
         ManifestPermission.BluetoothScan,
         ManifestPermission.BluetoothConnect
     ];
+    [SupportedOSPlatform("android33.0")]
+    private static readonly string[] _sendPermissionsApi33 = [
+        .. _sendPermissionsApi31,
+        ManifestPermission.NearbyWifiDevices
+    ];
     public static void RequestSendPermissions(Activity activity)
         => ActivityCompat.RequestPermissions(
                 activity,
-                OperatingSystem.IsAndroidVersionAtLeast(31) ? _sendPermissionsApi31 : _sendPermissions,
+                OperatingSystem.IsAndroidVersionAtLeast(33) ? _sendPermissionsApi33 :
+                (OperatingSystem.IsAndroidVersionAtLeast(31) ? _sendPermissionsApi31 : _sendPermissions),
                 0
             );
 

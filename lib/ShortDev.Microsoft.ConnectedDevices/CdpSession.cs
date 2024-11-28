@@ -7,6 +7,7 @@ using ShortDev.Microsoft.ConnectedDevices.Session.Channels;
 using ShortDev.Microsoft.ConnectedDevices.Session.Connection;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 
 namespace ShortDev.Microsoft.ConnectedDevices;
 
@@ -124,6 +125,14 @@ public sealed class CdpSession : IDisposable
     internal void HandleMessage(CdpSocket socket, CommonHeader header, ref EndianReader reader)
     {
         ThrowIfDisposed();
+
+        if (header.AdditionalHeaders.Count > 0)
+        {
+            foreach (var additionalHeader in header.AdditionalHeaders)
+            {
+                Debug.Print($"Additional Header: {additionalHeader.Type} = {Convert.ToHexString(additionalHeader.Value.Span)}");
+            }
+        }
 
         Cryptor?.Read(ref reader, header);
         header.CorrectClientSessionBit();

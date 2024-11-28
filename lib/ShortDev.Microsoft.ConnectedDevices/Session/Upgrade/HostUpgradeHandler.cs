@@ -5,6 +5,8 @@ using ShortDev.Microsoft.ConnectedDevices.Messages.Connection;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.TransportUpgrade;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
 using ShortDev.Microsoft.ConnectedDevices.Transports.Network;
+using ShortDev.Microsoft.ConnectedDevices.Transports.WiFiDirect;
+using MessageType = ShortDev.Microsoft.ConnectedDevices.Messages.MessageType;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Session.Upgrade;
 internal sealed class HostUpgradeHandler(CdpSession session, EndpointInfo initialEndpoint) : UpgradeHandler(session, initialEndpoint)
@@ -113,6 +115,8 @@ internal sealed class HostUpgradeHandler(CdpSession session, EndpointInfo initia
             return;
         }
 
+        var wifiDirect = _session.Platform.TryGetTransport<WiFiDirectTransport>();
+
         _upgradeIds.Add(msg.UpgradeId);
 
         {
@@ -126,11 +130,13 @@ internal sealed class HostUpgradeHandler(CdpSession session, EndpointInfo initia
             {
                 Endpoints =
                 [
-                    EndpointInfo.FromTcp(localIp)
+                    EndpointInfo.FromTcp(localIp),
+                    wifiDirect!.GetEndpoint()
                 ],
                 MetaData =
                 [
-                    EndpointMetadata.Tcp
+                    EndpointMetadata.Tcp,
+                    wifiDirect.CreateUpgradeResponse()
                 ]
             }.Write(writer);
 
