@@ -21,7 +21,7 @@ public sealed class WiFiDirectTransport(IWiFiDirectHandler handler, NetworkTrans
 
         ParseHostResponse(metadata.Data, out var address, out var ssid, out var sharedKey);
 
-        var hostIp = await _handler.ConnectAsync(endpoint.Address, ssid, sharedKey);
+        var hostIp = await _handler.ConnectAsync(endpoint.Address, new(ssid, sharedKey));
         return await _networkTransport.ConnectAsync(new EndpointInfo(CdpTransportType.Tcp, hostIp.ToString(), "5160"));
     }
 
@@ -44,23 +44,17 @@ public sealed class WiFiDirectTransport(IWiFiDirectHandler handler, NetworkTrans
         return new(CdpTransportType.WifiDirect, writer.Buffer.ToArray());
     }
 
-    internal EndpointMetadata CreateUpgradeResponse()
+    internal async ValueTask<EndpointMetadata> CreateUpgradeResponse()
     {
         const GroupRole roleDecision = GroupRole.GroupOwner;
 
-        byte[] sharedKey = new byte[32];
-        RandomNumberGenerator.Fill(sharedKey);
-
-        // ToDo: This should be configurable
-        var ssid = "DIRECT-CDP";
-
-        _ = _handler.CreateGroupAutonomous(ssid, sharedKey);
+        var groupInfo = await _handler.CreateAutonomousGroup();
 
         EndianWriter writer = new(Endianness.BigEndian);
         WriteHeader(ref writer, MessageType.HostGetUpgradeEndpoints, _handler.MacAddress);
         WriteField(ref writer, MessageValueType.RoleDecision, [(byte)roleDecision]);
-        WriteField(ref writer, MessageValueType.GOPreSharedKey, sharedKey);
-        WriteField(ref writer, MessageValueType.GOSSID, Encoding.UTF8.GetBytes(ssid));
+        WriteField(ref writer, MessageValueType.GOPreSharedKey, groupInfo.PreSharedKey.Span);
+        WriteField(ref writer, MessageValueType.GOSSID, Encoding.UTF8.GetBytes(groupInfo.Ssid));
         return new(CdpTransportType.WifiDirect, writer.Buffer.ToArray());
     }
 

@@ -1,6 +1,6 @@
 ﻿using Android.Content;
 using Android.Net.Wifi.P2p;
-using System.Net;
+using ShortDev.Microsoft.ConnectedDevices.Transports.WiFiDirect;
 using System.Runtime.Versioning;
 using System.Security.Cryptography;
 using static Android.Net.Wifi.P2p.WifiP2pManager;
@@ -101,17 +101,24 @@ internal sealed class WiFiDirectContext(Context context, WifiP2pManager manager,
     }
     #endregion
 
+    static readonly ReadOnlyMemory<char> AlphabetWithDigits = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".AsMemory();
+
     [SupportedOSPlatform("android29.0")]
-    public async Task CreateGroupAsync(string ssid, ReadOnlyMemory<byte> passphrase)
+    public async Task<GroupInfo> CreateGroupAsync()
     {
+        var ssid = string.Concat("DIRECT-", Guid.NewGuid().ToString().AsSpan(0, 4));
+        var passphrase = RandomNumberGenerator.GetString(AlphabetWithDigits.Span, 63);
+
         WifiP2pConfig config = new WifiP2pConfig.Builder()
             .SetNetworkName(ssid)
-            .SetPassphrase(Convert.ToHexString(passphrase.Span))
+            .SetPassphrase(passphrase)
             .Build();
 
         ActionListener listener = new();
         Manager.CreateGroup(Channel, config, listener);
         await listener;
+
+        return GroupInfo.Create(ssid, passphrase);
     }
 
     public static WiFiDirectContext Create(Context context)

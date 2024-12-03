@@ -25,7 +25,7 @@ internal sealed class AndroidWiFiDirectHandler : IWiFiDirectHandler
 
     public PhysicalAddress MacAddress { get; } = PhysicalAddress.Parse("8c:b8:4a:5d:47:50");
 
-    public async Task<IPAddress> ConnectAsync(string address, string ssid, ReadOnlyMemory<byte> sharedKey, CancellationToken cancellationToken = default)
+    public async Task<IPAddress> ConnectAsync(string address, GroupInfo groupInfo, CancellationToken cancellationToken = default)
     {
         var wifiManager = (WifiManager)_context.Context.GetSystemService(Context.WifiService)!;
 
@@ -33,8 +33,8 @@ internal sealed class AndroidWiFiDirectHandler : IWiFiDirectHandler
         {
             WifiConfiguration wifiConfiguration = new()
             {
-                Ssid = $"\"{ssid}\"",
-                PreSharedKey = Convert.ToHexString(sharedKey.Span),
+                Ssid = $"\"{groupInfo.Ssid}\"",
+                PreSharedKey = Convert.ToHexString(groupInfo.PreSharedKey.Span),
             };
 
             wifiManager.AddNetwork(wifiConfiguration);
@@ -51,7 +51,7 @@ internal sealed class AndroidWiFiDirectHandler : IWiFiDirectHandler
         var connectivity = (ConnectivityManager)_context.Context.GetSystemService(Context.ConnectivityService)!;
 
         var specifier = new WifiNetworkSpecifier.Builder()
-            .SetSsid(ssid)
+            .SetSsid(groupInfo.Ssid)
             .SetWpa2Passphrase("ThisIsNotTheActualPassphrase")
             .Build();
 
@@ -62,7 +62,7 @@ internal sealed class AndroidWiFiDirectHandler : IWiFiDirectHandler
             .GetDeclaredField("wifiConfiguration")
             .Get(specifier)!;
 #pragma warning disable CA1422 // Validate platform compatibility
-        // config.PreSharedKey = Convert.ToHexString(sharedKey.Span);
+        config.PreSharedKey = Convert.ToHexString(groupInfo.PreSharedKey.Span);
 #pragma warning restore CA1422 // Validate platform compatibility
 
         var request = new NetworkRequest.Builder()
@@ -129,7 +129,7 @@ internal sealed class AndroidWiFiDirectHandler : IWiFiDirectHandler
             => _promise.Task.GetAwaiter();
     }
 
-    public async Task<IPAddress> ConnectAsync2(string address, string ssid, ReadOnlyMemory<byte> sharedKey, CancellationToken cancellationToken = default)
+    public async Task<IPAddress> ConnectAsync2(string address, GroupInfo groupInfo, CancellationToken cancellationToken = default)
     {
         var peers = await _context.DiscoverPeersAsync();
 
@@ -142,8 +142,8 @@ internal sealed class AndroidWiFiDirectHandler : IWiFiDirectHandler
             config = new WifiP2pConfig.Builder()
                 .EnablePersistentMode(persistent: true)
                 .SetDeviceAddress(Android.Net.MacAddress.FromString(peer.DeviceAddress!))
-                .SetNetworkName(ssid)
-                .SetPassphrase(Convert.ToHexString(sharedKey.Span))
+                .SetNetworkName(groupInfo.Ssid)
+                .SetPassphrase(Convert.ToHexString(groupInfo.PreSharedKey.Span))
                 .Build();
         }
         else
@@ -162,12 +162,12 @@ internal sealed class AndroidWiFiDirectHandler : IWiFiDirectHandler
         return IPAddress.Parse(info.GroupOwnerAddress!.HostAddress!);
     }
 
-    public async Task CreateGroupAutonomous(string ssid, ReadOnlyMemory<byte> passphrase)
+    public async Task<GroupInfo> CreateAutonomousGroup()
     {
         if (!OperatingSystem.IsAndroidVersionAtLeast(29))
             throw new InvalidOperationException("Not supported on OS < 29");
 
-        await _context.CreateGroupAsync(ssid, passphrase);
+        return await _context.CreateGroupAsync();
     }
 
     [SupportedOSPlatform("android34.0")]

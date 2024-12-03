@@ -85,63 +85,79 @@ internal sealed class HostUpgradeHandler(CdpSession session, EndpointInfo initia
     }
 
     void HandleUpgradeRequest(CdpSocket socket, ref EndianReader reader)
+        => HandleUpgradeRequest(socket, UpgradeRequest.Parse(ref reader));
+
+    async void HandleUpgradeRequest(CdpSocket socket, UpgradeRequest msg)
     {
-        var msg = UpgradeRequest.Parse(ref reader);
         _logger.UpgradeRequest(
             msg.UpgradeId,
             msg.Endpoints.Select((x) => x.Type)
         );
+        _upgradeIds.Add(msg.UpgradeId);
+
+        if (await TrySendUpgradeResponse(socket) == false)
+            SendUpgradeFailure(socket);
+    }
+
+    async Task<bool> TrySendUpgradeResponse(CdpSocket socket)
+    {
+        var localIp = _session.Platform.TryGetTransport<NetworkTransport>()?.Handler.TryGetLocalIp();
+        if (localIp is null)
+            return false;
+
+        var wifiDirect = _session.Platform.TryGetTransport<WiFiDirectTransport>();
+        if(wifiDirect is null)
+            return false;
+
+        var wfdUpgradeResponse = await wifiDirect.CreateUpgradeResponse();
+
+        EndianWriter writer = new(Endianness.BigEndian);
+        new ConnectionHeader()
+        {
+            ConnectionMode = ConnectionMode.Proximal,
+            MessageType = ConnectionType.UpgradeResponse
+        }.Write(writer);
+        new UpgradeResponse()
+        {
+            Endpoints =
+            [
+                EndpointInfo.FromTcp(localIp),
+                wifiDirect!.GetEndpoint()
+            ],
+            MetaData =
+            [
+                EndpointMetadata.Tcp,
+                wfdUpgradeResponse
+            ]
+        }.Write(writer);
 
         CommonHeader header = new()
         {
             Type = MessageType.Connect
         };
+        _session.SendMessage(socket, header, writer);
 
-        var localIp = _session.Platform.TryGetTransport<NetworkTransport>()?.Handler.TryGetLocalIp();
-        if (localIp == null)
+        return true;
+    }
+
+    void SendUpgradeFailure(CdpSocket socket)
+    {
+        EndianWriter writer = new(Endianness.BigEndian);
+        new ConnectionHeader()
         {
-            EndianWriter writer = new(Endianness.BigEndian);
-            new ConnectionHeader()
-            {
-                ConnectionMode = ConnectionMode.Proximal,
-                MessageType = ConnectionType.UpgradeFailure
-            }.Write(writer);
-            new HResultPayload()
-            {
-                HResult = -1
-            }.Write(writer);
-
-            _session.SendMessage(socket, header, writer);
-            return;
-        }
-
-        var wifiDirect = _session.Platform.TryGetTransport<WiFiDirectTransport>();
-
-        _upgradeIds.Add(msg.UpgradeId);
-
+            ConnectionMode = ConnectionMode.Proximal,
+            MessageType = ConnectionType.UpgradeFailure
+        }.Write(writer);
+        new HResultPayload()
         {
-            EndianWriter writer = new(Endianness.BigEndian);
-            new ConnectionHeader()
-            {
-                ConnectionMode = ConnectionMode.Proximal,
-                MessageType = ConnectionType.UpgradeResponse
-            }.Write(writer);
-            new UpgradeResponse()
-            {
-                Endpoints =
-                [
-                    EndpointInfo.FromTcp(localIp),
-                    wifiDirect!.GetEndpoint()
-                ],
-                MetaData =
-                [
-                    EndpointMetadata.Tcp,
-                    wifiDirect.CreateUpgradeResponse()
-                ]
-            }.Write(writer);
+            HResult = -1
+        }.Write(writer);
 
-            _session.SendMessage(socket, header, writer);
-        }
+        CommonHeader header = new()
+        {
+            Type = MessageType.Connect
+        };
+        _session.SendMessage(socket, header, writer);
     }
 
     void HandleUpgradeFinalization(CdpSocket socket, ref EndianReader reader)
