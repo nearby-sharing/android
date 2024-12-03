@@ -102,11 +102,11 @@ internal sealed class WiFiDirectContext(Context context, WifiP2pManager manager,
     #endregion
 
     [SupportedOSPlatform("android29.0")]
-    public async Task CreateGroupAsync(string ssid, string passphrase)
+    public async Task CreateGroupAsync(string ssid, ReadOnlyMemory<byte> passphrase)
     {
         WifiP2pConfig config = new WifiP2pConfig.Builder()
             .SetNetworkName(ssid)
-            .SetPassphrase(passphrase)
+            .SetPassphrase(Convert.ToHexString(passphrase.Span))
             .Build();
 
         ActionListener listener = new();

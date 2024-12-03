@@ -1,6 +1,5 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.TransportUpgrade;
 using ShortDev.Microsoft.ConnectedDevices.Transports.Network;
-using System.Net.NetworkInformation;
 using System.Security.Cryptography;
 using System.Text;
 using static ShortDev.Microsoft.ConnectedDevices.Transports.WiFiDirect.MetaDataWriter;
@@ -23,13 +22,12 @@ public sealed class WiFiDirectTransport(IWiFiDirectHandler handler, NetworkTrans
         ParseHostResponse(metadata.Data, out var address, out var ssid, out var sharedKey);
 
         var hostIp = await _handler.ConnectAsync(endpoint.Address, ssid, sharedKey);
-        return await _networkTransport.ConnectAsync(EndpointInfo.FromTcp(hostIp));
+        return await _networkTransport.ConnectAsync(new EndpointInfo(CdpTransportType.Tcp, hostIp.ToString(), "5160"));
     }
 
+    // ToDo: Cannot listen
     public Task Listen(CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
+        => Task.CompletedTask;
 
     public event DeviceConnectedEventHandler? DeviceConnected;
     public EndpointInfo GetEndpoint()
@@ -50,13 +48,13 @@ public sealed class WiFiDirectTransport(IWiFiDirectHandler handler, NetworkTrans
     {
         const GroupRole roleDecision = GroupRole.GroupOwner;
 
-        Span<byte> sharedKey = stackalloc byte[32];
+        byte[] sharedKey = new byte[32];
         RandomNumberGenerator.Fill(sharedKey);
 
+        // ToDo: This should be configurable
         var ssid = "DIRECT-CDP";
-        var passphrase = Convert.ToBase64String(sharedKey);
 
-        _ = _handler.CreateGroupAutonomous(ssid, passphrase);
+        _ = _handler.CreateGroupAutonomous(ssid, sharedKey);
 
         EndianWriter writer = new(Endianness.BigEndian);
         WriteHeader(ref writer, MessageType.HostGetUpgradeEndpoints, _handler.MacAddress);

@@ -25,7 +25,111 @@ internal sealed class AndroidWiFiDirectHandler : IWiFiDirectHandler
 
     public PhysicalAddress MacAddress { get; } = PhysicalAddress.Parse("8c:b8:4a:5d:47:50");
 
-    public async Task<IPAddress> ConnectAsync(string address, string ssid, string passphrase, CancellationToken cancellationToken = default)
+    public async Task<IPAddress> ConnectAsync(string address, string ssid, ReadOnlyMemory<byte> sharedKey, CancellationToken cancellationToken = default)
+    {
+        var wifiManager = (WifiManager)_context.Context.GetSystemService(Context.WifiService)!;
+
+        if (!OperatingSystem.IsAndroidVersionAtLeast(29))
+        {
+            WifiConfiguration wifiConfiguration = new()
+            {
+                Ssid = $"\"{ssid}\"",
+                PreSharedKey = Convert.ToHexString(sharedKey.Span),
+            };
+
+            wifiManager.AddNetwork(wifiConfiguration);
+            wifiManager.EnableNetwork(wifiConfiguration.NetworkId, true);
+            wifiManager.Reconnect();
+
+            // ToDo: Get GO IP address
+            return null;
+        }
+
+        // ToDo: Show info of disconnection
+        // wifiManager.IsStaConcurrencyForLocalOnlyConnectionsSupported
+
+        var connectivity = (ConnectivityManager)_context.Context.GetSystemService(Context.ConnectivityService)!;
+
+        var specifier = new WifiNetworkSpecifier.Builder()
+            .SetSsid(ssid)
+            .SetWpa2Passphrase("ThisIsNotTheActualPassphrase")
+            .Build();
+
+        var abc = wifiManager.ScanResults?.Where(x => x.Ssid?.StartsWith("DIRECT-") == true).ToArray() ?? [];
+        System.Diagnostics.Debug.Print(abc.ToString());
+
+        var config = (WifiConfiguration)specifier.Class
+            .GetDeclaredField("wifiConfiguration")
+            .Get(specifier)!;
+#pragma warning disable CA1422 // Validate platform compatibility
+        // config.PreSharedKey = Convert.ToHexString(sharedKey.Span);
+#pragma warning restore CA1422 // Validate platform compatibility
+
+        var request = new NetworkRequest.Builder()
+            .AddTransportType(TransportType.Wifi)!
+            .SetNetworkSpecifier(specifier)!
+            .RemoveCapability(NetCapability.Internet)!
+            .Build()!;
+
+        ConnectRequestCallback result = new(connectivity);
+        connectivity.RequestNetwork(request, result);
+        try
+        {
+            return await result;
+        }
+        finally
+        {
+            connectivity.UnregisterNetworkCallback(result);
+        }
+    }
+
+    [SupportedOSPlatform("android29.0")]
+    sealed class ConnectRequestCallback(ConnectivityManager connectivityManager) : ConnectivityManager.NetworkCallback
+    {
+        readonly TaskCompletionSource<IPAddress> _promise = new();
+        readonly ConnectivityManager _connectivityManager = connectivityManager;
+        public override void OnAvailable(Network network)
+        {
+            _connectivityManager.BindProcessToNetwork(network);
+
+            // ToDo: Get GO IP address
+            var linkProps = _connectivityManager.GetLinkProperties(network);
+
+        }
+
+        public override void OnBlockedStatusChanged(Network network, bool blocked)
+        {
+            base.OnBlockedStatusChanged(network, blocked);
+        }
+
+        public override void OnCapabilitiesChanged(Network network, NetworkCapabilities networkCapabilities)
+        {
+            base.OnCapabilitiesChanged(network, networkCapabilities);
+        }
+
+        public override void OnLinkPropertiesChanged(Network network, LinkProperties linkProperties)
+        {
+            base.OnLinkPropertiesChanged(network, linkProperties);
+        }
+
+        public override void OnLosing(Network network, int maxMsToLive)
+        {
+            base.OnLosing(network, maxMsToLive);
+        }
+
+        public override void OnLost(Network network)
+        {
+            base.OnLost(network);
+        }
+
+        public override void OnUnavailable()
+            => _promise.TrySetException(new InvalidOperationException("Network is unavailable"));
+
+        public TaskAwaiter<IPAddress> GetAwaiter()
+            => _promise.Task.GetAwaiter();
+    }
+
+    public async Task<IPAddress> ConnectAsync2(string address, string ssid, ReadOnlyMemory<byte> sharedKey, CancellationToken cancellationToken = default)
     {
         var peers = await _context.DiscoverPeersAsync();
 
@@ -39,7 +143,7 @@ internal sealed class AndroidWiFiDirectHandler : IWiFiDirectHandler
                 .EnablePersistentMode(persistent: true)
                 .SetDeviceAddress(Android.Net.MacAddress.FromString(peer.DeviceAddress!))
                 .SetNetworkName(ssid)
-                .SetPassphrase(passphrase)
+                .SetPassphrase(Convert.ToHexString(sharedKey.Span))
                 .Build();
         }
         else
@@ -58,7 +162,7 @@ internal sealed class AndroidWiFiDirectHandler : IWiFiDirectHandler
         return IPAddress.Parse(info.GroupOwnerAddress!.HostAddress!);
     }
 
-    public async Task CreateGroupAutonomous(string ssid, string passphrase)
+    public async Task CreateGroupAutonomous(string ssid, ReadOnlyMemory<byte> passphrase)
     {
         if (!OperatingSystem.IsAndroidVersionAtLeast(29))
             throw new InvalidOperationException("Not supported on OS < 29");

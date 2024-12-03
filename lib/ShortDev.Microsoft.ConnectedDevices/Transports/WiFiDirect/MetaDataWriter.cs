@@ -6,7 +6,7 @@ static class MetaDataWriter
 {
     const byte Version = 1;
 
-    public static void ParseHostResponse(byte[] data, out PhysicalAddress deviceAddress, out string ssid, out string sharedKey)
+    public static void ParseHostResponse(byte[] data, out PhysicalAddress deviceAddress, out string ssid, out ReadOnlyMemory<byte> sharedKey)
     {
         EndianReader reader = new(Endianness.BigEndian, data);
         ReadHeader(ref reader, MessageType.HostGetUpgradeEndpoints, out deviceAddress);
@@ -15,7 +15,7 @@ static class MetaDataWriter
             throw new InvalidOperationException("Expected GroupOwner role");
 
         ReadField(ref reader, MessageValueType.GOPreSharedKey, out var sharedKeySpan);
-        sharedKey = Convert.ToHexString(sharedKeySpan);
+        sharedKey = sharedKeySpan.ToArray();
 
         ReadField(ref reader, MessageValueType.GOSSID, out var ssidSpan);
         ssid = Encoding.UTF8.GetString(ssidSpan);
