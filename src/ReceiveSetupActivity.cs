@@ -33,7 +33,7 @@ public sealed class ReceiveSetupActivity : AppCompatActivity
         }
 
         FindViewById<TextView>(Resource.Id.infoTextView)!.TextFormatted = UIHelper.LoadHtmlAsset(this, "MacAddressInfo");
-        FindViewById<Button>(Resource.Id.launchSettingsButton)!.Click += (s, e) => StartActivity(new Intent(Android.Provider.Settings.ActionDeviceInfoSettings));
+        FindViewById<Button>(Resource.Id.launchSettingsButton)!.Click += (s, e) => StartActivity(new Intent(global::Android.Provider.Settings.ActionDeviceInfoSettings));
 
         var inputLayout = FindViewById<TextInputLayout>(Resource.Id.btMacAddressTextInputLayout)!;
         inputLayout.EditText!.Text = btAddress;

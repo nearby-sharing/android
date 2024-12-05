@@ -167,9 +167,9 @@ public sealed class MainActivity : AppCompatActivity
     }
 
     const int EnableBluetoothCode = 0x2;
-    public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
+    public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] PackagePermission[] grantResults)
     {
-        if (requestCode != EnableBluetoothCode || grantResults.Any(x => x != Android.Content.PM.Permission.Granted))
+        if (requestCode != EnableBluetoothCode || grantResults.Any(x => x != PackagePermission.Granted))
             return;
 
         StartActivity(new Intent(BluetoothAdapter.ActionRequestEnable));

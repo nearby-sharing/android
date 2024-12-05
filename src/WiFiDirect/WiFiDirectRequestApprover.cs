@@ -7,9 +7,9 @@ using System.Runtime.Versioning;
 namespace NearShare.Droid.WiFiDirect;
 
 [SupportedOSPlatform("android33.0")]
-sealed class WiFiDirectRequestApprover(ILogger<WiFiDirectRequestApprover> logger, WiFiDirectContext context) : Java.Lang.Object, IExternalApproverRequestListener
+sealed class WiFiDirectRequestApprover(ILogger<WiFiDirectRequestApprover>? logger, WiFiDirectContext context) : Java.Lang.Object, IExternalApproverRequestListener
 {
-    readonly ILogger<WiFiDirectRequestApprover> _logger = logger;
+    readonly ILogger<WiFiDirectRequestApprover>? _logger = logger;
     readonly WiFiDirectContext _context = context;
 
     readonly List<MacAddress> _addresses = [];
@@ -41,7 +41,7 @@ sealed class WiFiDirectRequestApprover(ILogger<WiFiDirectRequestApprover> logger
                 break;
         }
 
-        _logger.WiFiDirectApproveResult(result, (ExternalApproverRequestType)requestType, address);
+        _logger?.WiFiDirectApproveResult(result, (ExternalApproverRequestType)requestType, address);
 
         ActionListener promise = new();
         _context.Manager.SetConnectionRequestResult(_context.Channel, address, (int)result, promise);

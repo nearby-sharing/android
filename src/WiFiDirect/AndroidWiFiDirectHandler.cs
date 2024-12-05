@@ -6,6 +6,7 @@ using Android.Runtime;
 using ShortDev.Microsoft.ConnectedDevices.Transports.WiFiDirect;
 using System.Net;
 using System.Net.NetworkInformation;
+using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Runtime.Versioning;
 using static Android.Net.Wifi.P2p.WifiP2pManager;
@@ -141,7 +142,7 @@ internal sealed class AndroidWiFiDirectHandler : IWiFiDirectHandler
         {
             config = new WifiP2pConfig.Builder()
                 .EnablePersistentMode(persistent: true)
-                .SetDeviceAddress(Android.Net.MacAddress.FromString(peer.DeviceAddress!))
+                .SetDeviceAddress(global::Android.Net.MacAddress.FromString(peer.DeviceAddress!))
                 .SetNetworkName(groupInfo.Ssid)
                 .SetPassphrase(Convert.ToHexString(groupInfo.PreSharedKey.Span))
                 .Build();
@@ -167,7 +168,27 @@ internal sealed class AndroidWiFiDirectHandler : IWiFiDirectHandler
         if (!OperatingSystem.IsAndroidVersionAtLeast(29))
             throw new InvalidOperationException("Not supported on OS < 29");
 
+        TcpListener listener = new(IPAddress.Any, 5160);
+        listener.Start();
+        listener.BeginAcceptTcpClient(result =>
+        {
+
+        }, null);
+
         return await _context.CreateGroupAsync();
+    }
+
+    public void AddGroupAllowedDevice(PhysicalAddress allowedAddress)
+    {
+        if (!OperatingSystem.IsAndroidVersionAtLeast(33))
+            return;
+
+        WiFiDirectRequestApprover approver = new(null, _context);
+        _context.Manager.AddExternalApprover(
+            _context.Channel,
+            global::Android.Net.MacAddress.FromBytes(allowedAddress.GetAddressBytes()),
+            approver
+        );
     }
 
     [SupportedOSPlatform("android34.0")]

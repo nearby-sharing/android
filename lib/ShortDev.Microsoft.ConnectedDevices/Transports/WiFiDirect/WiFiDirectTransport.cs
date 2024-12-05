@@ -49,6 +49,7 @@ public sealed class WiFiDirectTransport(IWiFiDirectHandler handler, NetworkTrans
         const GroupRole roleDecision = GroupRole.GroupOwner;
 
         var groupInfo = await _handler.CreateAutonomousGroup();
+        // ToDo: _handler.AddGroupAllowedDevice
 
         EndianWriter writer = new(Endianness.BigEndian);
         WriteHeader(ref writer, MessageType.HostGetUpgradeEndpoints, _handler.MacAddress);

@@ -10,6 +10,7 @@ using Google.Android.Material.Dialog;
 using Google.Android.Material.ProgressIndicator;
 using Microsoft.Extensions.Logging;
 using NearShare.Droid.Settings;
+using NearShare.Droid.WiFiDirect;
 using ShortDev.Android.UI;
 using ShortDev.Microsoft.ConnectedDevices;
 using ShortDev.Microsoft.ConnectedDevices.Encryption;
@@ -17,6 +18,7 @@ using ShortDev.Microsoft.ConnectedDevices.NearShare;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
 using ShortDev.Microsoft.ConnectedDevices.Transports.Bluetooth;
 using ShortDev.Microsoft.ConnectedDevices.Transports.Network;
+using ShortDev.Microsoft.ConnectedDevices.Transports.WiFiDirect;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Net.NetworkInformation;
@@ -191,7 +193,11 @@ public sealed class ReceiveActivity : AppCompatActivity
         _cdp.AddTransport<BluetoothTransport>(new(bluetoothHandler));
 
         INetworkHandler networkHandler = new AndroidNetworkHandler(this);
-        _cdp.AddTransport<NetworkTransport>(new(networkHandler));
+        NetworkTransport networkTransport = new(networkHandler);
+        _cdp.AddTransport(networkTransport);
+
+        AndroidWiFiDirectHandler wiFiDirectHandler = new(this);
+        _cdp.AddTransport<WiFiDirectTransport>(new(wiFiDirectHandler, networkTransport));
 
         _cdp.Listen(_cancellationTokenSource.Token);
         _cdp.Advertise(_cancellationTokenSource.Token);

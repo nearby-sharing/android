@@ -6,6 +6,7 @@ public interface IWiFiDirectHandler : IDisposable
 {
     Task<IPAddress> ConnectAsync(string address, GroupInfo groupInfo, CancellationToken cancellationToken = default);
     Task<GroupInfo> CreateAutonomousGroup();
+    void AddGroupAllowedDevice(PhysicalAddress allowedAddress);
 
     PhysicalAddress MacAddress { get; }
     bool IsEnabled { get; }

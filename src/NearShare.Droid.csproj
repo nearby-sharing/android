@@ -23,6 +23,7 @@
 		<PackageReference Include="Xamarin.Google.Android.Material" Version="1.10.0.4" />
 	</ItemGroup>
 	<ItemGroup Label="Project References">
+		<ProjectReference Include="..\lib\NearShare.Android.WiFiDirect\NearShare.Android.WiFiDirect.csproj" />
 		<ProjectReference Include="..\lib\ShortDev.Android.Preferences\ShortDev.Android.Preferences.csproj" />
 		<ProjectReference Include="..\lib\ShortDev.Android\ShortDev.Android.csproj" />
 		<ProjectReference Include="..\lib\ShortDev.Microsoft.ConnectedDevices.NearShare\ShortDev.Microsoft.ConnectedDevices.NearShare.csproj" />

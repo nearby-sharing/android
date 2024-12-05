@@ -95,7 +95,7 @@ public sealed class SendActivity : AppCompatActivity
         UIHelper.RequestSendPermissions(this);
     }
 
-    public override async void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
+    public override async void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] PackagePermission[] grantResults)
     {
         _logger.RequestPermissionResult(requestCode, permissions, grantResults);
         try

@@ -75,7 +75,7 @@ internal static class UIHelper
 
         try
         {
-            Intent intent = new(Android.Provider.Settings.ActionAppLocaleSettings);
+            Intent intent = new(global::Android.Provider.Settings.ActionAppLocaleSettings);
             intent.SetData(AndroidUri.FromParts("package", activity.PackageName, null));
             activity.StartActivity(intent);
         }

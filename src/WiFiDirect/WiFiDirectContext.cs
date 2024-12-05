@@ -1,5 +1,6 @@
 ﻿using Android.Content;
 using Android.Net.Wifi.P2p;
+using NearShare.Android.WiFiDirect;
 using ShortDev.Microsoft.ConnectedDevices.Transports.WiFiDirect;
 using System.Runtime.Versioning;
 using System.Security.Cryptography;
@@ -106,19 +107,31 @@ internal sealed class WiFiDirectContext(Context context, WifiP2pManager manager,
     [SupportedOSPlatform("android29.0")]
     public async Task<GroupInfo> CreateGroupAsync()
     {
+        Manager.RemoveGroup(Channel, new ActionListener());
+
         var ssid = string.Concat("DIRECT-", Guid.NewGuid().ToString().AsSpan(0, 4));
         var passphrase = RandomNumberGenerator.GetString(AlphabetWithDigits.Span, 63);
 
         WifiP2pConfig config = new WifiP2pConfig.Builder()
+            .EnablePersistentMode(true)
             .SetNetworkName(ssid)
             .SetPassphrase(passphrase)
             .Build();
 
-        ActionListener listener = new();
-        Manager.CreateGroup(Channel, config, listener);
-        await listener;
+        await Manager.StartAutonomousGroupAsync(Channel, config);
 
-        return GroupInfo.Create(ssid, passphrase);
+        WifiP2pGroup? groupInfo = await Manager.RequestGroupInfoAsync(Channel);
+        for (int retries = 3; retries > 0 && groupInfo is null; retries--)
+        {
+            groupInfo = await Manager.RequestGroupInfoAsync(Channel);
+            if(groupInfo is null)
+                await Task.Delay(500);
+        }
+
+        if (groupInfo is null)
+            throw new InvalidOperationException("Could not create WiFi-Direct group");
+
+        return GroupInfo.Create(groupInfo.NetworkName, groupInfo.Passphrase);
     }
 
     public static WiFiDirectContext Create(Context context)
