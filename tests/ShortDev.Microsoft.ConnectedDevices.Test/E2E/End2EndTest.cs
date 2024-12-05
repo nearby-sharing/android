@@ -36,6 +36,8 @@ public sealed class End2EndTest(ITestOutputHelper outputHelper)
 
     static void UseTcp(ConnectedDevicesPlatform cdp, int tcpPort, int udpPort)
     {
+        TestUtils.ListenLocalOnly();
+
         NetworkHandler networkHandler = new(IPAddress.Loopback);
         NetworkTransport networkTransport = new(networkHandler, tcpPort, udpPort);
         cdp.AddTransport(networkTransport);
