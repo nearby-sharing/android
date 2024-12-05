@@ -95,8 +95,9 @@ internal sealed class HostUpgradeHandler(CdpSession session, EndpointInfo initia
             Type = MessageType.Connect
         };
 
-        var localIp = _session.Platform.TryGetTransport<NetworkTransport>()?.Handler.TryGetLocalIp();
-        if (localIp == null)
+        var networkTransport = _session.Platform.TryGetTransport<NetworkTransport>();
+        var localIp = networkTransport?.Handler.TryGetLocalIp();
+        if (networkTransport == null || localIp == null)
         {
             EndianWriter writer = new(Endianness.BigEndian);
             new ConnectionHeader()
@@ -126,7 +127,7 @@ internal sealed class HostUpgradeHandler(CdpSession session, EndpointInfo initia
             {
                 Endpoints =
                 [
-                    EndpointInfo.FromTcp(localIp)
+                    EndpointInfo.FromTcp(localIp, networkTransport.TcpPort)
                 ],
                 MetaData =
                 [
