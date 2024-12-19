@@ -17,6 +17,10 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CdpSvcUtil", "utils\CdpSvcUtil\CdpSvcUtil.vcxproj", "{CFABE26A-FBFF-4CF9-8C94-B603B317A223}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{F0E5B489-0FD2-4A7E-B660-C28450479583}"
+	ProjectSection(SolutionItems) = preProject
+		dockerfile.test = dockerfile.test
+		testenvironments.json = testenvironments.json
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShortDev.Microsoft.ConnectedDevices.Test", "tests\ShortDev.Microsoft.ConnectedDevices.Test\ShortDev.Microsoft.ConnectedDevices.Test.csproj", "{B0DE3385-5FD7-4D05-8296-6E298A3F1BA2}"
 EndProject
