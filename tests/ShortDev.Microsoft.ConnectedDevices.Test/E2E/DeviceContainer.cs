@@ -44,8 +44,8 @@ internal sealed class DeviceContainer
                 Endpoint = new(TransportType, Address, "Some Service Id"),
                 Close = () =>
                 {
-                    stream.Value.Input.Dispose();
                     stream.Value.Output.Dispose();
+                    stream.Value.Input.Dispose();
                 }
             };
         }
