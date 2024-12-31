@@ -15,8 +15,9 @@
 		<AndroidPackageFormat>aab</AndroidPackageFormat>
 	</PropertyGroup>
 	<ItemGroup Label="Nuget">
-		<PackageReference Include="Rive.Android" Version="1.0.0" />
-		<PackageReference Include="Sentry" Version="4.6.2" />
+		<PackageReference Include="Rive.Android" Version="1.0.5" />
+		<PackageReference Include="Sentry" Version="5.0.0" />
+		<PackageReference Include="ShortDev.Android" Version="0.1.0-beta" />
 		<PackageReference Include="ShortDev.Android.FluentIcons" Version="1.1.203" />
 		<PackageReference Include="Xamarin.AndroidX.AppCompat" Version="1.6.1.8" />
 		<PackageReference Include="Xamarin.AndroidX.Browser" Version="1.8.0.1" />
@@ -24,7 +25,6 @@
 	</ItemGroup>
 	<ItemGroup Label="Project References">
 		<ProjectReference Include="..\lib\ShortDev.Android.Preferences\ShortDev.Android.Preferences.csproj" />
-		<ProjectReference Include="..\lib\ShortDev.Android\ShortDev.Android.csproj" />
 		<ProjectReference Include="..\lib\ShortDev.Microsoft.ConnectedDevices.NearShare\ShortDev.Microsoft.ConnectedDevices.NearShare.csproj" />
 	</ItemGroup>
 	<ItemGroup>
