@@ -7,6 +7,7 @@ using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.Authentication;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.DeviceInfo;
 using ShortDev.Microsoft.ConnectedDevices.Session.Upgrade;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
+using System.Runtime.CompilerServices;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Session.Connection;
 internal sealed class ClientConnectHandler(CdpSession session, ClientUpgradeHandler upgradeHandler) : ConnectHandler(session, upgradeHandler)
@@ -14,13 +15,13 @@ internal sealed class ClientConnectHandler(CdpSession session, ClientUpgradeHand
     readonly ClientUpgradeHandler _clientUpgradeHandler = upgradeHandler;
     readonly ILogger _logger = session.Platform.CreateLogger<ClientConnectHandler>();
 
-    TaskCompletionSource? _promise;
-    public Task ConnectAsync(CdpSocket socket, bool upgradeSupported = true)
+    ConnectionTask? _promise;
+    public async Task ConnectAsync(CdpSocket socket, bool upgradeSupported = true, CancellationToken cancellationToken = default)
     {
-        if (_promise != null)
-            throw new InvalidOperationException("Already connecting");
+        cancellationToken.ThrowIfCancellationRequested();
 
-        _promise = new();
+        if (Interlocked.CompareExchange(ref _promise, new(cancellationToken), null) is not null)
+            throw new InvalidOperationException("Already connecting");
 
         CommonHeader header = new()
         {
@@ -52,11 +53,14 @@ internal sealed class ClientConnectHandler(CdpSession session, ClientUpgradeHand
 
         _session.SendMessage(socket, header, writer);
 
-        return _promise.Task;
+        await _promise;
     }
 
     protected override void HandleMessageInternal(CdpSocket socket, CommonHeader header, ConnectionHeader connectionHeader, ref EndianReader reader)
     {
+        if (_promise?.CancellationToken.IsCancellationRequested == true)
+            return;
+
         if (connectionHeader.MessageType == ConnectionType.ConnectResponse)
         {
             if (_session.Cryptor != null)
@@ -135,7 +139,7 @@ internal sealed class ClientConnectHandler(CdpSession session, ClientUpgradeHand
                 try
                 {
                     var oldSocket = socket;
-                    socket = await _clientUpgradeHandler.RequestUpgradeAsync(oldSocket);
+                    socket = await _clientUpgradeHandler.UpgradeAsync(oldSocket);
                     oldSocket.Dispose();
                 }
                 catch (Exception ex)
@@ -146,25 +150,20 @@ internal sealed class ClientConnectHandler(CdpSession session, ClientUpgradeHand
 
             try
             {
-                SendAuthDone(socket);
+                EndianWriter writer = new(Endianness.BigEndian);
+                new ConnectionHeader()
+                {
+                    ConnectionMode = ConnectionMode.Proximal,
+                    MessageType = ConnectionType.AuthDoneRequest
+                }.Write(writer);
+
+                header.Flags = 0;
+                _session.SendMessage(socket, header, writer);
             }
             catch (Exception ex)
             {
                 _promise?.TrySetException(ex);
             }
-        }
-
-        void SendAuthDone(CdpSocket socket)
-        {
-            EndianWriter writer = new(Endianness.BigEndian);
-            new ConnectionHeader()
-            {
-                ConnectionMode = ConnectionMode.Proximal,
-                MessageType = ConnectionType.AuthDoneRequest
-            }.Write(writer);
-
-            header.Flags = 0;
-            _session.SendMessage(socket, header, writer);
         }
     }
 
@@ -211,5 +210,27 @@ internal sealed class ClientConnectHandler(CdpSession session, ClientUpgradeHand
         );
 
         _promise?.TrySetResult();
+    }
+
+    sealed class ConnectionTask
+    {
+        readonly TaskCompletionSource _promise = new();
+
+        public CancellationToken CancellationToken { get; }
+        public ConnectionTask(CancellationToken cancellationToken)
+        {
+            CancellationToken = cancellationToken;
+
+            cancellationToken.Register(() => _promise.TrySetCanceled());
+        }
+
+        public void TrySetResult()
+            => _promise.TrySetResult();
+
+        public void TrySetException(Exception ex)
+            => _promise.TrySetException(ex);
+
+        public TaskAwaiter GetAwaiter()
+            => _promise.Task.GetAwaiter();
     }
 }
