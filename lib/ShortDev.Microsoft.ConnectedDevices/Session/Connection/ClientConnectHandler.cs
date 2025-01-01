@@ -138,7 +138,9 @@ internal sealed class ClientConnectHandler(CdpSession session, ClientUpgradeHand
             {
                 try
                 {
-                    socket = await _clientUpgradeHandler.UpgradeAsync(socket);
+                    var oldSocket = socket;
+                    socket = await _clientUpgradeHandler.UpgradeAsync(oldSocket);
+                    oldSocket.Dispose();
                 }
                 catch (Exception ex)
                 {
