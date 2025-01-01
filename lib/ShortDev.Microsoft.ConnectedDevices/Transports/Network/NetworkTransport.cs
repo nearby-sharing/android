@@ -48,11 +48,11 @@ public sealed class NetworkTransport(INetworkHandler handler) : ICdpTransport, I
         catch (ObjectDisposedException) { }
     }
 
-    public async Task<CdpSocket> ConnectAsync(EndpointInfo endpoint)
+    public async Task<CdpSocket> ConnectAsync(EndpointInfo endpoint, CancellationToken cancellationToken = default)
     {
         // ToDo: If the windows machine tries to connect back it uses the port assigned here not 5040!!
         TcpClient client = new();
-        await client.ConnectAsync(endpoint.ToIPEndPoint()).ConfigureAwait(false);
+        await client.ConnectAsync(endpoint.ToIPEndPoint(), cancellationToken).ConfigureAwait(false);
         client.NoDelay = true;
         return new()
         {

@@ -140,19 +140,19 @@ public sealed class ConnectedDevicesPlatform(LocalDeviceInfo deviceInfo, ILogger
         }
     }
 
-    public async Task<CdpSession> ConnectAsync([NotNull] EndpointInfo endpoint, ConnectOptions? options = null)
+    public async Task<CdpSession> ConnectAsync([NotNull] EndpointInfo endpoint, ConnectOptions? options = null, CancellationToken cancellationToken = default)
     {
-        var socket = await CreateSocketAsync(endpoint).ConfigureAwait(false);
-        return await CdpSession.ConnectClientAsync(this, socket, options).ConfigureAwait(false);
+        var socket = await CreateSocketAsync(endpoint, cancellationToken).ConfigureAwait(false);
+        return await CdpSession.ConnectClientAsync(this, socket, options, cancellationToken).ConfigureAwait(false);
     }
 
-    internal async Task<CdpSocket> CreateSocketAsync(EndpointInfo endpoint)
+    internal async Task<CdpSocket> CreateSocketAsync(EndpointInfo endpoint, CancellationToken cancellationToken = default)
     {
         if (TryGetKnownSocket(endpoint, out var knownSocket))
             return knownSocket;
 
         var transport = TryGetTransport(endpoint.TransportType) ?? throw new InvalidOperationException($"No single transport found for type {endpoint.TransportType}");
-        var socket = await transport.ConnectAsync(endpoint).ConfigureAwait(false);
+        var socket = await transport.ConnectAsync(endpoint, cancellationToken).ConfigureAwait(false);
         ReceiveLoop(socket);
         return socket;
     }

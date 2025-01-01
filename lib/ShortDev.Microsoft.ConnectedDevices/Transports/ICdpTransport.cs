@@ -3,10 +3,11 @@
 public interface ICdpTransport : IDisposable
 {
     CdpTransportType TransportType { get; }
+    bool IsEnabled => true;
 
     EndpointInfo GetEndpoint();
 
-    Task<CdpSocket> ConnectAsync(EndpointInfo endpoint);
+    Task<CdpSocket> ConnectAsync(EndpointInfo endpoint, CancellationToken cancellationToken = default);
     async Task<CdpSocket?> TryConnectAsync(EndpointInfo endpoint, TimeSpan timeout)
     {
         try

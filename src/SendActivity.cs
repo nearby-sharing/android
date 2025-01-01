@@ -22,6 +22,7 @@ using ShortDev.Microsoft.ConnectedDevices.Transports.Bluetooth;
 using ShortDev.Microsoft.ConnectedDevices.Transports.Network;
 using System.Collections.ObjectModel;
 using System.Net.NetworkInformation;
+using OperationCanceledException = System.OperationCanceledException;
 
 namespace NearShare.Droid;
 
@@ -199,7 +200,7 @@ public sealed class SendActivity : AppCompatActivity
         try
         {
             if (remoteSystem.Endpoint.TransportType == CdpTransportType.Rfcomm &&
-                _cdp.TryGetTransport<BluetoothTransport>()?.Handler.IsEnabled == false)
+                _cdp.TryGetTransport(CdpTransportType.Rfcomm)?.IsEnabled == false)
             {
                 StartActivityForResult(new Intent(BluetoothAdapter.ActionRequestEnable), 42);
                 throw new TaskCanceledException("Bluetooth is disabled");
@@ -277,7 +278,7 @@ public sealed class SendActivity : AppCompatActivity
             , FeedbackFlags.IgnoreGlobalSetting);
             this.PlaySound(Resource.Raw.ding);
         }
-        catch (TaskCanceledException)
+        catch (OperationCanceledException)
         {
             // Ignore cancellation
             StatusTextView.Text = this.Localize(Resource.String.status_cancelled);

@@ -18,12 +18,12 @@ public sealed class NearShareSender(ConnectedDevicesPlatform platform)
 
     async Task<SenderStateMachine> PrepareTransferInternalAsync(EndpointInfo endpoint, CancellationToken cancellationToken)
     {
-        var session = await Platform.ConnectAsync(endpoint, options: new() { TransportUpgraded = TransportUpgraded });
+        var session = await Platform.ConnectAsync(endpoint, options: new() { TransportUpgraded = TransportUpgraded }, cancellationToken);
 
         Guid operationId = Guid.NewGuid();
 
         HandshakeHandler handshake = new(Platform);
-        using var handShakeChannel = await session.StartClientChannelAsync(NearShareHandshakeApp.Id, NearShareHandshakeApp.Name, handshake, cancellationToken);
+        using var handShakeChannel = await session.StartClientChannelAsync(handshake, cancellationToken);
         var handshakeResultMsg = await handshake.Execute(operationId);
 
         // ToDo: CorrelationVector
@@ -49,8 +49,11 @@ public sealed class NearShareSender(ConnectedDevicesPlatform platform)
         await senderStateMachine.SendFilesAsync(files, progress, cancellationToken);
     }
 
-    sealed class HandshakeHandler(ConnectedDevicesPlatform cdp) : CdpAppBase(cdp)
+    sealed class HandshakeHandler(ConnectedDevicesPlatform cdp) : CdpAppBase(cdp), ICdpAppId
     {
+        public static string Id { get; } = NearShareHandshakeApp.Id;
+        public static string Name { get; } = NearShareHandshakeApp.Name;
+
         readonly TaskCompletionSource<CdpMessage> _promise = new();
 
         public Task<CdpMessage> Execute(Guid operationId)
