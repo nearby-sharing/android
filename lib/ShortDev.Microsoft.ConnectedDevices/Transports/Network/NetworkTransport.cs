@@ -24,7 +24,7 @@ public sealed class NetworkTransport(
     public event DeviceConnectedEventHandler? DeviceConnected;
     public async Task Listen(CancellationToken cancellationToken)
     {
-        var listener = _listener ??= new(TestUtils.ListenAddress, TcpPort);
+        var listener = _listener ??= new(IPAddress.Any, TcpPort);
         listener.Start();
 
         try
@@ -88,7 +88,7 @@ public sealed class NetworkTransport(
         }
 
         client.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-        client.Client.Bind(new IPEndPoint(TestUtils.ListenAddress, port));
+        client.Client.Bind(new IPEndPoint(IPAddress.Any, port));
 
         return client;
     }
