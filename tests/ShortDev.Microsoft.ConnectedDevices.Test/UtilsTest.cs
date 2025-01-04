@@ -1,7 +1,7 @@
-﻿using System.Diagnostics;
+﻿using Xunit.Abstractions;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Test;
-public sealed class UtilsTest
+public sealed class UtilsTest(ITestOutputHelper output)
 {
     [Theory]
     [InlineData(200, 1)]
@@ -9,7 +9,7 @@ public sealed class UtilsTest
     [InlineData(200, 100)]
     public async Task WithTimeout_ShouldObserveException_WhenSlowerTimeout(int delayMs, int timeoutMs)
     {
-        using UnobservedTaskExceptionObserver exceptionObserver = new();
+        using UnobservedTaskExceptionObserver exceptionObserver = new(output);
 
         await Assert.ThrowsAsync<TaskCanceledException>(async () =>
         {
@@ -28,9 +28,9 @@ public sealed class UtilsTest
     [InlineData(100, 200)]
     public async Task WithTimeout_ShouldObserveException_WhenFasterAsTimeout(int delayMs, int timeoutMs)
     {
-        using UnobservedTaskExceptionObserver exceptionObserver = new();
+        using UnobservedTaskExceptionObserver exceptionObserver = new(output);
 
-        await Assert.ThrowsAsync<NotImplementedException>(async () =>
+        await Assert.ThrowsAsync<ObservableException>(async () =>
         {
             // Await long-running task with longer timeout
             await LongRunningOperationWithThrow(delayMs)
@@ -44,19 +44,31 @@ public sealed class UtilsTest
     static async Task<object> LongRunningOperationWithThrow(int delayMs)
     {
         await Task.Delay(delayMs);
-        throw new NotImplementedException();
+        throw new ObservableException();
     }
 
     sealed class UnobservedTaskExceptionObserver : IDisposable
     {
-        public UnobservedTaskExceptionObserver()
-            => TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
+        readonly ITestOutputHelper _output;
+        public UnobservedTaskExceptionObserver(ITestOutputHelper output)
+        {
+            _output = output;
 
-        bool _hadUnobservedTaskException;
+            TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
+        }
+
+        int _unobservedExceptionCounter;
         void OnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
-            => _hadUnobservedTaskException = true;
+        {
+            if (!e.Exception.InnerExceptions.All(x => x is ObservableException))
+            {
+                _output.WriteLine($"UnobservedTaskExceptions: {string.Join(',', e.Exception.InnerExceptions.Select(x => x.Message))}");
+                return;
+            }
 
-        [StackTraceHidden]
+            Interlocked.Increment(ref _unobservedExceptionCounter);
+        }
+
         public void Dispose()
         {
             // Force GC to cleanup long-running task
@@ -69,6 +81,8 @@ public sealed class UtilsTest
         }
 
         void CheckForUnobservedTaskExceptions()
-            => Assert.False(_hadUnobservedTaskException);
+            => Assert.Equal(0, _unobservedExceptionCounter);
     }
+
+    sealed class ObservableException : Exception;
 }
