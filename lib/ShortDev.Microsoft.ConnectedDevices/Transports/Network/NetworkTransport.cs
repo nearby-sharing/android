@@ -107,12 +107,12 @@ public sealed class NetworkTransport(
             DiscoveryMessageReceived -= OnMessage;
         }
 
-        void OnMessage(IPEndPoint remoteEndPoint, DiscoveryHeader header, EndianReader reader)
+        void OnMessage(IPAddress address, DiscoveryHeader header, EndianReader reader)
         {
             if (header.Type != DiscoveryType.PresenceRequest)
                 return;
 
-            SendPresenceResponse(remoteEndPoint.Address, presenceResponse);
+            SendPresenceResponse(address, presenceResponse);
         }
     }
 
@@ -143,7 +143,7 @@ public sealed class NetworkTransport(
             }
         }
 
-        void OnMessage(IPEndPoint remoteEndPoint, DiscoveryHeader header, EndianReader reader)
+        void OnMessage(IPAddress address, DiscoveryHeader header, EndianReader reader)
         {
             if (header.Type != DiscoveryType.PresenceResponse)
                 return;
@@ -154,13 +154,13 @@ public sealed class NetworkTransport(
                 new CdpDevice(
                     response.DeviceName,
                     response.DeviceType,
-                    EndpointInfo.FromTcp(remoteEndPoint)
+                    EndpointInfo.FromTcp(address)
                 )
             );
         }
     }
 
-    delegate void DiscoveryMessageReceivedHandler(IPEndPoint remoteEndPoint, DiscoveryHeader header, EndianReader reader);
+    delegate void DiscoveryMessageReceivedHandler(IPAddress address, DiscoveryHeader header, EndianReader reader);
     event DiscoveryMessageReceivedHandler? DiscoveryMessageReceived;
 
     bool _isListening;
@@ -199,7 +199,7 @@ public sealed class NetworkTransport(
                 return;
 
             DiscoveryHeader discoveryHeaders = DiscoveryHeader.Parse(ref reader);
-            DiscoveryMessageReceived?.Invoke(result.RemoteEndPoint, discoveryHeaders, reader);
+            DiscoveryMessageReceived?.Invoke(result.RemoteEndPoint.Address, discoveryHeaders, reader);
         }
     }
     #endregion

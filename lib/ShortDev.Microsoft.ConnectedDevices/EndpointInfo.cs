@@ -22,9 +22,6 @@ public record class EndpointInfo(
         return new(ipAddress, port);
     }
 
-    public static EndpointInfo FromTcp(IPEndPoint endpoint)
-        => FromTcp(endpoint.Address, endpoint.Port);
-
     public static EndpointInfo FromTcp(IPAddress address, int port = Constants.TcpPort)
     => FromTcp(address.ToString(), port);
 
