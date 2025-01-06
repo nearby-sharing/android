@@ -82,7 +82,7 @@ public sealed class SendActivity : AppCompatActivity
         );
         DeviceDiscoveryListView.SetAdapter(adapterDescriptor.CreateRecyclerViewAdapter(RemoteSystems));
 
-        _loggerFactory = ConnectedDevicesPlatform.CreateLoggerFactory(this.GetLogFilePattern());
+        _loggerFactory = CdpUtils.CreateLoggerFactory(this);
         _logger = _loggerFactory.CreateLogger<SendActivity>();
 
         UIHelper.RequestSendPermissions(this);

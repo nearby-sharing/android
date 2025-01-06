@@ -14,6 +14,23 @@ namespace NearShare.Utils;
 
 internal static class CdpUtils
 {
+    public static ILoggerFactory CreateLoggerFactory(Context context, LogLevel logLevel = LogLevel.Debug)
+    {
+        var pattern = context.GetLogFilePattern();
+
+        return LoggerFactory.Create(builder =>
+        {
+            builder.ClearProviders();
+
+            builder.SetMinimumLevel(logLevel);
+
+#if DEBUG
+            builder.AddDebug();
+#endif
+            builder.AddFile(context.GetLogFilePattern(), logLevel);
+        });
+    }
+
     public static ConnectedDevicesPlatform Create(Context context, ILoggerFactory loggerFactory)
     {
         var btService = (BluetoothManager)context.GetSystemService(Context.BluetoothService)!;

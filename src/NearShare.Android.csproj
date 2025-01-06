@@ -18,8 +18,11 @@
 		<AndroidPackageFormat>aab</AndroidPackageFormat>
 	</PropertyGroup>
 	<ItemGroup Label="Nuget">
+		<PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
 		<PackageReference Include="Rive.Android" Version="1.0.5" />
 		<PackageReference Include="Sentry" Version="5.0.0" />
+		<PackageReference Include="Serilog.Extensions.Logging.File" Version="3.0.0" />
 		<PackageReference Include="ShortDev.Android" Version="0.1.0-beta" />
 		<PackageReference Include="ShortDev.Android.FluentIcons" Version="1.1.203" />
 		<PackageReference Include="Xamarin.AndroidX.AppCompat" Version="1.6.1.8" />

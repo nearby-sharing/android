@@ -58,7 +58,7 @@ public sealed class ReceiveActivity : AppCompatActivity
 
         FindViewById<Button>(Resource.Id.openFAQButton)!.Click += (s, e) => UIHelper.OpenFAQ(this);
 
-        _loggerFactory = ConnectedDevicesPlatform.CreateLoggerFactory(this.GetLogFilePattern());
+        _loggerFactory = CdpUtils.CreateLoggerFactory(this);
         _logger = _loggerFactory.CreateLogger<ReceiveActivity>();
 
         UIHelper.RequestReceivePermissions(this);
