@@ -1,7 +1,6 @@
 ﻿using Android.Bluetooth;
 using Android.Content;
 using Android.Content.PM;
-using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using AndroidX.AppCompat.App;
@@ -9,14 +8,11 @@ using AndroidX.RecyclerView.Widget;
 using Google.Android.Material.Dialog;
 using Google.Android.Material.ProgressIndicator;
 using Microsoft.Extensions.Logging;
-using NearShare.Droid.Settings;
+using NearShare.Droid.Utils;
 using ShortDev.Android.UI;
 using ShortDev.Microsoft.ConnectedDevices;
-using ShortDev.Microsoft.ConnectedDevices.Encryption;
 using ShortDev.Microsoft.ConnectedDevices.NearShare;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
-using ShortDev.Microsoft.ConnectedDevices.Transports.Bluetooth;
-using ShortDev.Microsoft.ConnectedDevices.Transports.Network;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Net.NetworkInformation;
@@ -171,27 +167,9 @@ public sealed class ReceiveActivity : AppCompatActivity
         _cancellationTokenSource?.Dispose();
         _cancellationTokenSource = new();
 
-        var service = (BluetoothManager)GetSystemService(BluetoothService)!;
-        var btAdapter = service.Adapter!;
-
-        var deviceName = SettingsFragment.GetDeviceName(this, btAdapter);
-
         SystemDebug.Assert(_cdp == null);
 
-        _cdp = new(new()
-        {
-            Type = DeviceType.Android,
-            Name = deviceName,
-            OemModelName = Build.Model ?? string.Empty,
-            OemManufacturerName = Build.Manufacturer ?? string.Empty,
-            DeviceCertificate = ConnectedDevicesPlatform.CreateDeviceCertificate(CdpEncryptionParams.Default)
-        }, _loggerFactory);
-
-        IBluetoothHandler bluetoothHandler = new AndroidBluetoothHandler(btAdapter, btAddress);
-        _cdp.AddTransport<BluetoothTransport>(new(bluetoothHandler));
-
-        INetworkHandler networkHandler = new AndroidNetworkHandler(this);
-        _cdp.AddTransport<NetworkTransport>(new(networkHandler));
+        _cdp = CdpUtils.Create(this, _loggerFactory);
 
         _cdp.Listen(_cancellationTokenSource.Token);
         _cdp.Advertise(_cancellationTokenSource.Token);
@@ -202,11 +180,7 @@ public sealed class ReceiveActivity : AppCompatActivity
 
         FindViewById<TextView>(Resource.Id.deviceInfoTextView)!.Text = this.Localize(
             Resource.String.visible_as_template,
-            $"""
-            "{deviceName}"
-            Address: {btAddress.ToStringFormatted()}
-            IP-Address: {networkHandler.TryGetLocalIp()?.ToString() ?? "null"}
-            """
+            _cdp.DeviceInfo.Name
         );
     }
 

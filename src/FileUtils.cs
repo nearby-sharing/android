@@ -81,9 +81,9 @@ internal static class FileUtils
         return File.Create(filePath);
     }
 
-    public static string GetLogFilePattern(this Activity activity)
+    public static string GetLogFilePattern(this Context context)
     {
-        DirectoryInfo downloadDir = new(Path.Combine(activity.GetExternalMediaDirs()?.FirstOrDefault()?.AbsolutePath ?? "/sdcard/", "logs"));
+        DirectoryInfo downloadDir = new(Path.Combine(context.GetExternalMediaDirs()?.FirstOrDefault()?.AbsolutePath ?? "/sdcard/", "logs"));
         if (!downloadDir.Exists)
             downloadDir.Create();
 

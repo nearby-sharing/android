@@ -1,6 +1,5 @@
 ﻿using Android.Bluetooth;
 using Android.Content;
-using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using AndroidX.AppCompat.App;
@@ -11,17 +10,12 @@ using Google.Android.Material.BottomSheet;
 using Google.Android.Material.Color;
 using Google.Android.Material.ProgressIndicator;
 using Microsoft.Extensions.Logging;
-using NearShare.Droid.Settings;
 using NearShare.Droid.Utils;
 using ShortDev.Android.UI;
 using ShortDev.Microsoft.ConnectedDevices;
-using ShortDev.Microsoft.ConnectedDevices.Encryption;
 using ShortDev.Microsoft.ConnectedDevices.NearShare;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
-using ShortDev.Microsoft.ConnectedDevices.Transports.Bluetooth;
-using ShortDev.Microsoft.ConnectedDevices.Transports.Network;
 using System.Collections.ObjectModel;
-using System.Net.NetworkInformation;
 using OperationCanceledException = System.OperationCanceledException;
 
 namespace NearShare.Droid;
@@ -111,23 +105,7 @@ public sealed class SendActivity : AppCompatActivity
     ConnectedDevicesPlatform _cdp = null!;
     void InitializePlatform()
     {
-        var service = (BluetoothManager)GetSystemService(BluetoothService)!;
-        var adapter = service.Adapter!;
-
-        _cdp = new(new()
-        {
-            Type = DeviceType.Android,
-            Name = SettingsFragment.GetDeviceName(this, adapter),
-            OemModelName = Build.Model ?? string.Empty,
-            OemManufacturerName = Build.Manufacturer ?? string.Empty,
-            DeviceCertificate = ConnectedDevicesPlatform.CreateDeviceCertificate(CdpEncryptionParams.Default)
-        }, _loggerFactory);
-
-        AndroidBluetoothHandler bluetoothHandler = new(adapter, PhysicalAddress.None);
-        _cdp.AddTransport<BluetoothTransport>(new(bluetoothHandler));
-
-        AndroidNetworkHandler networkHandler = new(this);
-        _cdp.AddTransport<NetworkTransport>(new(networkHandler));
+        _cdp = CdpUtils.Create(this, _loggerFactory);
 
         _cdp.DeviceDiscovered += Platform_DeviceDiscovered;
         _cdp.Discover(_discoverCancellationTokenSource.Token);
