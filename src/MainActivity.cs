@@ -8,8 +8,9 @@ using AndroidX.Core.App;
 using Google.Android.Material.Card;
 using Google.Android.Material.Dialog;
 using Google.Android.Material.TextField;
+using NearShare.Utils;
 
-namespace NearShare.Droid;
+namespace NearShare;
 
 [Activity(Label = "@string/app_name", Theme = "@style/AppTheme", MainLauncher = true, ConfigurationChanges = UIHelper.ConfigChangesFlags)]
 public sealed class MainActivity : AppCompatActivity
@@ -42,7 +43,7 @@ public sealed class MainActivity : AppCompatActivity
     }
 
     const int FilePickCode = 0x1;
-    private void SendButton_Click(object? sender, System.EventArgs e)
+    private void SendButton_Click(object? sender, EventArgs e)
     {
         StartActivityForResult(
             new Intent(Intent.ActionOpenDocument)

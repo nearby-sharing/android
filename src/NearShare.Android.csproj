@@ -9,6 +9,9 @@
 		<UseAndroidCrypto>true</UseAndroidCrypto>
 		<AndroidErrorOnCustomJavaObject>false</AndroidErrorOnCustomJavaObject>
 	</PropertyGroup>
+	<PropertyGroup>
+		<RootNamespace>NearShare</RootNamespace>
+	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 		<RunAOTCompilation>False</RunAOTCompilation>
 		<PublishTrimmed>false</PublishTrimmed>

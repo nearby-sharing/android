@@ -3,7 +3,7 @@ using Android.Provider;
 using Microsoft.Win32.SafeHandles;
 using ShortDev.Microsoft.ConnectedDevices.NearShare;
 
-namespace NearShare.Droid;
+namespace NearShare.Utils;
 
 internal static class FileUtils
 {
@@ -50,7 +50,7 @@ internal static class FileUtils
     public static FileStream OpenFileStream(this ContentResolver resolver, AndroidUri mediaUri)
     {
         using var fileDescriptor = resolver.OpenFileDescriptor(mediaUri, "rwt") ?? throw new InvalidOperationException("Could not open file descriptor");
-        
+
         SafeFileHandle handle = new(fileDescriptor.DetachFd(), ownsHandle: true);
         return new(handle, FileAccess.ReadWrite);
     }

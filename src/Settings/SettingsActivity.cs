@@ -5,8 +5,9 @@ using Android.Views;
 using AndroidX.Activity;
 using AndroidX.AppCompat.App;
 using AndroidX.Preference;
+using NearShare.Utils;
 
-namespace NearShare.Droid.Settings;
+namespace NearShare.Settings;
 
 [IntentFilter([TileService.ActionQsTilePreferences])]
 [Activity(Label = "@string/app_name", Exported = true, Theme = "@style/AppTheme", ConfigurationChanges = UIHelper.ConfigChangesFlags)]

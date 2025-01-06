@@ -9,12 +9,12 @@ using AndroidX.AppCompat.App;
 using AndroidX.Browser.CustomTabs;
 using AndroidX.Core.App;
 using Google.Android.Material.Dialog;
-using NearShare.Droid.Settings;
+using NearShare.Settings;
 using System.Runtime.Versioning;
 using AlertDialog = AndroidX.AppCompat.App.AlertDialog;
 using CompatToolbar = AndroidX.AppCompat.Widget.Toolbar;
 
-namespace NearShare.Droid;
+namespace NearShare.Utils;
 
 internal static class UIHelper
 {

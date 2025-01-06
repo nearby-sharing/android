@@ -3,11 +3,12 @@ using Android.Content;
 using Android.Views;
 using AndroidX.AppCompat.App;
 using Google.Android.Material.TextField;
+using NearShare.Utils;
 using ShortDev.Microsoft.ConnectedDevices;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.NetworkInformation;
 
-namespace NearShare.Droid;
+namespace NearShare;
 
 [Activity(Label = "@string/app_name", Theme = "@style/AppTheme", ConfigurationChanges = UIHelper.ConfigChangesFlags)]
 public sealed class ReceiveSetupActivity : AppCompatActivity

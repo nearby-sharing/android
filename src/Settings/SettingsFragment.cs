@@ -4,7 +4,7 @@ using Android.Views;
 using AndroidX.Preference;
 using Google.Android.Material.Theme.Overlay;
 
-namespace NearShare.Droid.Settings;
+namespace NearShare.Settings;
 
 internal abstract class SettingsFragment : PreferenceFragmentCompat
 {

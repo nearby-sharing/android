@@ -2,14 +2,15 @@
 using Android.Content;
 using Android.OS;
 using Microsoft.Extensions.Logging;
-using NearShare.Droid.Settings;
+using NearShare.Handlers;
+using NearShare.Settings;
 using ShortDev.Microsoft.ConnectedDevices;
 using ShortDev.Microsoft.ConnectedDevices.Encryption;
 using ShortDev.Microsoft.ConnectedDevices.Transports.Bluetooth;
 using ShortDev.Microsoft.ConnectedDevices.Transports.Network;
 using System.Net.NetworkInformation;
 
-namespace NearShare.Droid.Utils;
+namespace NearShare.Utils;
 
 internal static class CdpUtils
 {

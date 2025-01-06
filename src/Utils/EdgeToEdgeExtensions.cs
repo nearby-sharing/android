@@ -1,7 +1,7 @@
 ﻿using Android.Graphics;
 using AndroidX.Activity;
 
-namespace NearShare.Droid.Utils;
+namespace NearShare.Utils;
 
 internal static class EdgeToEdgeExtensions
 {

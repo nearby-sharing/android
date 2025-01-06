@@ -8,7 +8,8 @@ using AndroidX.RecyclerView.Widget;
 using Google.Android.Material.Dialog;
 using Google.Android.Material.ProgressIndicator;
 using Microsoft.Extensions.Logging;
-using NearShare.Droid.Utils;
+using NearShare.Droid;
+using NearShare.Utils;
 using ShortDev.Android.UI;
 using ShortDev.Microsoft.ConnectedDevices;
 using ShortDev.Microsoft.ConnectedDevices.NearShare;
@@ -18,7 +19,7 @@ using System.Diagnostics;
 using System.Net.NetworkInformation;
 using SystemDebug = System.Diagnostics.Debug;
 
-namespace NearShare.Droid;
+namespace NearShare;
 
 [Activity(Label = "@string/app_name", Theme = "@style/AppTheme", ConfigurationChanges = UIHelper.ConfigChangesFlags)]
 public sealed class ReceiveActivity : AppCompatActivity

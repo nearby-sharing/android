@@ -10,7 +10,8 @@ using Google.Android.Material.BottomSheet;
 using Google.Android.Material.Color;
 using Google.Android.Material.ProgressIndicator;
 using Microsoft.Extensions.Logging;
-using NearShare.Droid.Utils;
+using NearShare.Droid;
+using NearShare.Utils;
 using ShortDev.Android.UI;
 using ShortDev.Microsoft.ConnectedDevices;
 using ShortDev.Microsoft.ConnectedDevices.NearShare;
@@ -18,7 +19,7 @@ using ShortDev.Microsoft.ConnectedDevices.Transports;
 using System.Collections.ObjectModel;
 using OperationCanceledException = System.OperationCanceledException;
 
-namespace NearShare.Droid;
+namespace NearShare;
 
 [IntentFilter([Intent.ActionProcessText], Categories = [Intent.CategoryDefault, Intent.CategoryBrowsable], DataMimeType = "text/plain", Label = "@string/app_name")]
 [IntentFilter([Intent.ActionSend, Intent.ActionSendMultiple], Categories = [Intent.CategoryDefault, Intent.CategoryBrowsable], DataMimeType = "*/*")]
