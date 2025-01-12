@@ -1,7 +1,7 @@
 ﻿using Android.Runtime;
 using AndroidX.AppCompat.App;
 using Google.Android.Material.Color;
-using NearShare.Droid.Settings;
+using NearShare.Settings;
 
 [assembly: UsesPermission(ManifestPermission.Bluetooth)]
 [assembly: UsesPermission(ManifestPermission.BluetoothAdmin)]
@@ -25,12 +25,12 @@ using NearShare.Droid.Settings;
 [assembly: UsesFeature("android.hardware.bluetooth", Required = false)]
 [assembly: UsesFeature("android.hardware.bluetooth_le", Required = false)]
 
-namespace NearShare.Droid;
+namespace NearShare;
 
 [Application]
 public sealed class App : Application
 {
-    public App(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer)
+    public App(nint javaReference, JniHandleOwnership transfer) : base(javaReference, transfer)
     {
         SentrySdk.Init(options =>
         {

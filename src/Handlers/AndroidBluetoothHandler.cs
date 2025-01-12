@@ -7,7 +7,7 @@ using ShortDev.Microsoft.ConnectedDevices.Transports;
 using System.Net.NetworkInformation;
 using ShortDev.Microsoft.ConnectedDevices.Transports.Bluetooth;
 
-namespace NearShare.Droid;
+namespace NearShare.Handlers;
 
 public sealed class AndroidBluetoothHandler(BluetoothAdapter adapter, PhysicalAddress macAddress) : IBluetoothHandler
 {

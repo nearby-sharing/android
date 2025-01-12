@@ -1,6 +1,5 @@
 ﻿using Android.Bluetooth;
 using Android.Content;
-using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using AndroidX.AppCompat.App;
@@ -11,25 +10,19 @@ using Google.Android.Material.BottomSheet;
 using Google.Android.Material.Color;
 using Google.Android.Material.ProgressIndicator;
 using Microsoft.Extensions.Logging;
-using NearShare.Droid.Settings;
-using NearShare.Droid.Utils;
-using NearShare.Droid.WiFiDirect;
+using NearShare.Droid;
+using NearShare.Utils;
 using ShortDev.Android.UI;
 using ShortDev.Microsoft.ConnectedDevices;
-using ShortDev.Microsoft.ConnectedDevices.Encryption;
 using ShortDev.Microsoft.ConnectedDevices.NearShare;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
-using ShortDev.Microsoft.ConnectedDevices.Transports.Bluetooth;
-using ShortDev.Microsoft.ConnectedDevices.Transports.Network;
-using ShortDev.Microsoft.ConnectedDevices.Transports.WiFiDirect;
 using System.Collections.ObjectModel;
-using System.Net.NetworkInformation;
+using OperationCanceledException = System.OperationCanceledException;
 
-namespace NearShare.Droid;
+namespace NearShare;
 
-[IntentFilter([Intent.ActionProcessText], Categories = [Intent.CategoryDefault, Intent.CategoryBrowsable], DataMimeType = "text/plain", Label = "@string/share_text")]
-[IntentFilter([Intent.ActionSend, Intent.ActionSendMultiple], Categories = [Intent.CategoryDefault, Intent.CategoryBrowsable], DataMimeType = "*/*", Label = "@string/share_file")]
-[IntentFilter([Intent.ActionSend], Categories = [Intent.CategoryDefault, Intent.CategoryBrowsable], DataMimeType = "text/plain", Label = "@string/share_url")]
+[IntentFilter([Intent.ActionProcessText], Categories = [Intent.CategoryDefault, Intent.CategoryBrowsable], DataMimeType = "text/plain", Label = "@string/app_name")]
+[IntentFilter([Intent.ActionSend, Intent.ActionSendMultiple], Categories = [Intent.CategoryDefault, Intent.CategoryBrowsable], DataMimeType = "*/*")]
 [Activity(Label = "@string/app_name", Exported = true, Theme = "@style/AppTheme.TranslucentOverlay", ConfigurationChanges = UIHelper.ConfigChangesFlags)]
 public sealed class SendActivity : AppCompatActivity
 {
@@ -89,7 +82,7 @@ public sealed class SendActivity : AppCompatActivity
         );
         DeviceDiscoveryListView.SetAdapter(adapterDescriptor.CreateRecyclerViewAdapter(RemoteSystems));
 
-        _loggerFactory = ConnectedDevicesPlatform.CreateLoggerFactory(this.GetLogFilePattern());
+        _loggerFactory = CdpUtils.CreateLoggerFactory(this);
         _logger = _loggerFactory.CreateLogger<SendActivity>();
 
         UIHelper.RequestSendPermissions(this);
@@ -113,26 +106,7 @@ public sealed class SendActivity : AppCompatActivity
     ConnectedDevicesPlatform _cdp = null!;
     void InitializePlatform()
     {
-        var service = (BluetoothManager)GetSystemService(BluetoothService)!;
-        var adapter = service.Adapter!;
-
-        _cdp = new(new()
-        {
-            Type = DeviceType.Android,
-            Name = SettingsFragment.GetDeviceName(this, adapter),
-            OemModelName = Build.Model ?? string.Empty,
-            OemManufacturerName = Build.Manufacturer ?? string.Empty,
-            DeviceCertificate = ConnectedDevicesPlatform.CreateDeviceCertificate(CdpEncryptionParams.Default)
-        }, _loggerFactory);
-
-        AndroidBluetoothHandler bluetoothHandler = new(adapter, PhysicalAddress.None);
-        _cdp.AddTransport<BluetoothTransport>(new(bluetoothHandler));
-
-        NetworkTransport networkTransport = new(new AndroidNetworkHandler(this));
-        _cdp.AddTransport(networkTransport);
-
-        AndroidWiFiDirectHandler wiFiDirectHandler = new(this);
-        _cdp.AddTransport<WiFiDirectTransport>(new(wiFiDirectHandler, networkTransport));
+        _cdp = CdpUtils.Create(this, _loggerFactory);
 
         _cdp.DeviceDiscovered += Platform_DeviceDiscovered;
         _cdp.Discover(_discoverCancellationTokenSource.Token);
@@ -204,7 +178,7 @@ public sealed class SendActivity : AppCompatActivity
         try
         {
             if (remoteSystem.Endpoint.TransportType == CdpTransportType.Rfcomm &&
-                _cdp.TryGetTransport<BluetoothTransport>()?.Handler.IsEnabled == false)
+                _cdp.TryGetTransport(CdpTransportType.Rfcomm)?.IsEnabled == false)
             {
                 StartActivityForResult(new Intent(BluetoothAdapter.ActionRequestEnable), 42);
                 throw new TaskCanceledException("Bluetooth is disabled");
@@ -282,7 +256,7 @@ public sealed class SendActivity : AppCompatActivity
             , FeedbackFlags.IgnoreGlobalSetting);
             this.PlaySound(Resource.Raw.ding);
         }
-        catch (TaskCanceledException)
+        catch (OperationCanceledException)
         {
             // Ignore cancellation
             StatusTextView.Text = this.Localize(Resource.String.status_cancelled);

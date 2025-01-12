@@ -1,7 +1,7 @@
 ﻿using Android.Views;
 using Google.Android.Material.BottomSheet;
 
-namespace NearShare.Droid.Layout;
+namespace NearShare.Utils;
 
 public class BottomSheetBehaviorCallback(Activity activity) : BottomSheetBehavior.BottomSheetCallback
 {

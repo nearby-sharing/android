@@ -1,7 +1,6 @@
 ﻿using Android.Bluetooth;
 using Android.Content;
 using Android.Content.PM;
-using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using AndroidX.AppCompat.App;
@@ -9,22 +8,18 @@ using AndroidX.RecyclerView.Widget;
 using Google.Android.Material.Dialog;
 using Google.Android.Material.ProgressIndicator;
 using Microsoft.Extensions.Logging;
-using NearShare.Droid.Settings;
-using NearShare.Droid.WiFiDirect;
+using NearShare.Droid;
+using NearShare.Utils;
 using ShortDev.Android.UI;
 using ShortDev.Microsoft.ConnectedDevices;
-using ShortDev.Microsoft.ConnectedDevices.Encryption;
 using ShortDev.Microsoft.ConnectedDevices.NearShare;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
-using ShortDev.Microsoft.ConnectedDevices.Transports.Bluetooth;
-using ShortDev.Microsoft.ConnectedDevices.Transports.Network;
-using ShortDev.Microsoft.ConnectedDevices.Transports.WiFiDirect;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Net.NetworkInformation;
 using SystemDebug = System.Diagnostics.Debug;
 
-namespace NearShare.Droid;
+namespace NearShare;
 
 [Activity(Label = "@string/app_name", Theme = "@style/AppTheme", ConfigurationChanges = UIHelper.ConfigChangesFlags)]
 public sealed class ReceiveActivity : AppCompatActivity
@@ -40,7 +35,7 @@ public sealed class ReceiveActivity : AppCompatActivity
     {
         base.OnCreate(savedInstanceState);
 
-        if (ReceiveSetupActivity.IsSetupRequired(this) || !ReceiveSetupActivity.TryGetBtAddress(this, out btAddress) || btAddress == null)
+        if (ReceiveSetupActivity.IsSetupRequired(this) || !ReceiveSetupActivity.TryGetBtAddress(this, out btAddress))
         {
             StartActivity(new Intent(this, typeof(ReceiveSetupActivity)));
 
@@ -63,7 +58,7 @@ public sealed class ReceiveActivity : AppCompatActivity
 
         FindViewById<Button>(Resource.Id.openFAQButton)!.Click += (s, e) => UIHelper.OpenFAQ(this);
 
-        _loggerFactory = ConnectedDevicesPlatform.CreateLoggerFactory(this.GetLogFilePattern());
+        _loggerFactory = CdpUtils.CreateLoggerFactory(this);
         _logger = _loggerFactory.CreateLogger<ReceiveActivity>();
 
         UIHelper.RequestReceivePermissions(this);
@@ -173,31 +168,9 @@ public sealed class ReceiveActivity : AppCompatActivity
         _cancellationTokenSource?.Dispose();
         _cancellationTokenSource = new();
 
-        var service = (BluetoothManager)GetSystemService(BluetoothService)!;
-        var btAdapter = service.Adapter!;
-
-        var deviceName = SettingsFragment.GetDeviceName(this, btAdapter);
-
         SystemDebug.Assert(_cdp == null);
 
-        _cdp = new(new()
-        {
-            Type = DeviceType.Android,
-            Name = deviceName,
-            OemModelName = Build.Model ?? string.Empty,
-            OemManufacturerName = Build.Manufacturer ?? string.Empty,
-            DeviceCertificate = ConnectedDevicesPlatform.CreateDeviceCertificate(CdpEncryptionParams.Default)
-        }, _loggerFactory);
-
-        IBluetoothHandler bluetoothHandler = new AndroidBluetoothHandler(btAdapter, btAddress);
-        _cdp.AddTransport<BluetoothTransport>(new(bluetoothHandler));
-
-        INetworkHandler networkHandler = new AndroidNetworkHandler(this);
-        NetworkTransport networkTransport = new(networkHandler);
-        _cdp.AddTransport(networkTransport);
-
-        AndroidWiFiDirectHandler wiFiDirectHandler = new(this);
-        _cdp.AddTransport<WiFiDirectTransport>(new(wiFiDirectHandler, networkTransport));
+        _cdp = CdpUtils.Create(this, _loggerFactory);
 
         _cdp.Listen(_cancellationTokenSource.Token);
         _cdp.Advertise(_cancellationTokenSource.Token);
@@ -208,11 +181,7 @@ public sealed class ReceiveActivity : AppCompatActivity
 
         FindViewById<TextView>(Resource.Id.deviceInfoTextView)!.Text = this.Localize(
             Resource.String.visible_as_template,
-            $"""
-            "{deviceName}"
-            Address: {btAddress.ToStringFormatted()}
-            IP-Address: {networkHandler.TryGetLocalIp()?.ToString() ?? "null"}
-            """
+            _cdp.DeviceInfo.Name
         );
     }
 

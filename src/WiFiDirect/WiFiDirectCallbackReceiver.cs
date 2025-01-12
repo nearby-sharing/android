@@ -1,6 +1,7 @@
 ﻿using Android.Content;
 using Android.Net;
 using Android.Net.Wifi.P2p;
+using NearShare.Utils;
 using static Android.Net.Wifi.P2p.WifiP2pManager;
 
 namespace NearShare.Droid.WiFiDirect;

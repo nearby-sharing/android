@@ -1,6 +1,5 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.TransportUpgrade;
 using ShortDev.Microsoft.ConnectedDevices.Transports.Network;
-using System.Security.Cryptography;
 using System.Text;
 using static ShortDev.Microsoft.ConnectedDevices.Transports.WiFiDirect.MetaDataWriter;
 
@@ -12,17 +11,17 @@ public sealed class WiFiDirectTransport(IWiFiDirectHandler handler, NetworkTrans
 
     public CdpTransportType TransportType { get; } = CdpTransportType.WifiDirect;
 
-    public async Task<CdpSocket> ConnectAsync(EndpointInfo endpoint)
-        => await ConnectAsync(endpoint, null);
+    public Task<CdpSocket> ConnectAsync(EndpointInfo endpoint, CancellationToken cancellation = default)
+        => throw new NotImplementedException();
 
-    public async Task<CdpSocket> ConnectAsync(EndpointInfo endpoint, EndpointMetadata? metadata)
+    public async Task<CdpSocket> ConnectAsync(EndpointInfo endpoint, EndpointMetadata? metadata, CancellationToken cancellation = default)
     {
         ArgumentNullException.ThrowIfNull(metadata);
 
         ParseHostResponse(metadata.Data, out var address, out var ssid, out var sharedKey);
 
-        var hostIp = await _handler.ConnectAsync(endpoint.Address, new(ssid, sharedKey));
-        return await _networkTransport.ConnectAsync(new EndpointInfo(CdpTransportType.Tcp, hostIp.ToString(), "5160"));
+        var hostIp = await _handler.ConnectAsync(endpoint.Address, new(ssid, sharedKey), cancellation);
+        return await _networkTransport.ConnectAsync(new EndpointInfo(CdpTransportType.Tcp, hostIp.ToString(), "5160"), cancellation);
     }
 
     // ToDo: Cannot listen

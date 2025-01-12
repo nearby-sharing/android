@@ -1,4 +1,4 @@
-﻿namespace NearShare.Droid.Settings;
+﻿namespace NearShare.Settings;
 
 internal interface ISettingsNavigation
 {

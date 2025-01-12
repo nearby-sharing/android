@@ -2,9 +2,9 @@
 using Java.Lang;
 using System.Collections;
 
-namespace NearShare.Droid;
+namespace NearShare.Utils;
 
-internal static class Compat
+internal static class IntentExtensions
 {
     public static IList<T>? GetParcelableArrayListExtra<T>(this Intent @this, string? name) where T : Java.Lang.Object
     {

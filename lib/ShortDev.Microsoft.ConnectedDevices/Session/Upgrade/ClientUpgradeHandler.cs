@@ -41,12 +41,11 @@ internal sealed class ClientUpgradeHandler(CdpSession session, EndpointInfo init
     }
 
     UpgradeInstance? _currentUpgrade;
-    public async ValueTask<CdpSocket> RequestUpgradeAsync(CdpSocket oldSocket)
+    public async ValueTask<CdpSocket> UpgradeAsync(CdpSocket oldSocket)
     {
-        if (_currentUpgrade != null)
+        if (Interlocked.CompareExchange(ref _currentUpgrade, new(), null) is not null)
             throw new InvalidOperationException("Only a single upgrade may occur at the same time");
 
-        _currentUpgrade = new();
         try
         {
             List<EndpointMetadata> endpoints = [];
@@ -83,7 +82,7 @@ internal sealed class ClientUpgradeHandler(CdpSession session, EndpointInfo init
             _logger.SendingUpgradeRequest(_currentUpgrade.Id, endpoints);
             _session.SendMessage(oldSocket, header, writer);
 
-            return await _currentUpgrade.Promise.Task;
+            return await _currentUpgrade;
         }
         finally
         {
@@ -113,12 +112,8 @@ internal sealed class ClientUpgradeHandler(CdpSession session, EndpointInfo init
         if (_currentUpgrade == null)
             return;
 
-        _currentUpgrade.NewSocket = tasks.FirstOrDefault(x => x != null);
-        if (_currentUpgrade.NewSocket == null)
-        {
-            _currentUpgrade.Promise.TrySetCanceled();
+        if (!_currentUpgrade.TryChooseSocket(tasks.FirstOrDefault(x => x != null)))
             return;
-        }
 
         var wifiDirectTransport = _session.Platform.TryGetTransport<WiFiDirectTransport>();
         SendUpgradFinalization(oldSocket, [
@@ -128,7 +123,7 @@ internal sealed class ClientUpgradeHandler(CdpSession session, EndpointInfo init
         // Cancel after timeout if upgrade has not finished yet
         await Task.Delay(UpgradeInstance.Timeout);
 
-        _currentUpgrade?.Promise.TrySetCanceled();
+        _currentUpgrade?.TrySetCanceled();
     }
 
     void SendUpgradFinalization(CdpSocket socket, IReadOnlyList<EndpointMetadata> endpoints)
@@ -181,7 +176,7 @@ internal sealed class ClientUpgradeHandler(CdpSession session, EndpointInfo init
     {
         var msg = HResultPayload.Parse(ref reader);
 
-        _currentUpgrade?.Promise.TrySetException(
+        _currentUpgrade?.TrySetException(
             new Exception($"Transport upgrade failed with HResult {msg.HResult} (hresult: {HResultPayload.HResultToString(msg.HResult)}, errorCode: {HResultPayload.ErrorCodeToString(msg.HResult)})")
         );
     }
@@ -200,7 +195,7 @@ internal sealed class ClientUpgradeHandler(CdpSession session, EndpointInfo init
         RemoteEndpoint = socket.Endpoint;
 
         // Complete promise
-        _currentUpgrade.Promise.TrySetResult(socket);
+        _currentUpgrade.TrySetResult(socket);
     }
 
     sealed class UpgradeInstance
@@ -208,11 +203,33 @@ internal sealed class ClientUpgradeHandler(CdpSession session, EndpointInfo init
         public static readonly TimeSpan Timeout = TimeSpan.FromSeconds(2);
 
         public Guid Id { get; } = Guid.NewGuid();
-        public TaskCompletionSource<CdpSocket> Promise { get; } = new();
+
+        readonly TaskCompletionSource<CdpSocket> _promise = new();
+        public bool TrySetCanceled()
+            => _promise.TrySetCanceled();
+
+        public bool TrySetResult(CdpSocket socket)
+            => _promise.TrySetResult(socket);
+
+        public bool TrySetException(Exception ex)
+            => _promise.TrySetException(ex);
 
         public TaskAwaiter<CdpSocket> GetAwaiter()
-            => Promise.Task.GetAwaiter();
+            => _promise.Task.GetAwaiter();
 
-        public CdpSocket? NewSocket { get; set; }
+        CdpSocket? _newSocket;
+        public bool TryChooseSocket(CdpSocket? newSocket)
+        {
+            if (newSocket is null)
+            {
+                _promise.TrySetCanceled();
+                return false;
+            }
+
+            return Interlocked.CompareExchange(ref _newSocket, newSocket, null) is null;
+        }
+
+        public CdpSocket? NewSocket
+            => _newSocket;
     }
 }

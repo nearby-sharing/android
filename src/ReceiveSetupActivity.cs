@@ -3,10 +3,12 @@ using Android.Content;
 using Android.Views;
 using AndroidX.AppCompat.App;
 using Google.Android.Material.TextField;
+using NearShare.Utils;
 using ShortDev.Microsoft.ConnectedDevices;
+using System.Diagnostics.CodeAnalysis;
 using System.Net.NetworkInformation;
 
-namespace NearShare.Droid;
+namespace NearShare;
 
 [Activity(Label = "@string/app_name", Theme = "@style/AppTheme", ConfigurationChanges = UIHelper.ConfigChangesFlags)]
 public sealed class ReceiveSetupActivity : AppCompatActivity
@@ -89,17 +91,17 @@ public sealed class ReceiveSetupActivity : AppCompatActivity
         }
     }
 
-    static ISharedPreferences GetPreferences(Activity activity)
-        => activity.GetSharedPreferences("mac_settings", FileCreationMode.MultiProcess)!;
+    static ISharedPreferences GetPreferences(Context context)
+        => context.GetSharedPreferences("mac_settings", FileCreationMode.MultiProcess)!;
 
-    public static bool IsSetupRequired(Activity activity)
-        => string.IsNullOrEmpty(GetPreferences(activity).GetString(Preference_MacAddress, null));
+    public static bool IsSetupRequired(Context context)
+        => string.IsNullOrEmpty(GetPreferences(context).GetString(Preference_MacAddress, null));
 
-    public static bool TryGetBtAddress(Activity activity, out PhysicalAddress? btAddress)
+    public static bool TryGetBtAddress(Context context, [NotNullWhen(true)] out PhysicalAddress? btAddress)
     {
         btAddress = null;
 
-        var addressStr = GetPreferences(activity).GetString(Preference_MacAddress, null);
+        var addressStr = GetPreferences(context).GetString(Preference_MacAddress, null);
         if (string.IsNullOrEmpty(addressStr))
             return false;
 

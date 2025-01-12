@@ -73,7 +73,7 @@ public sealed class CdpSession : IDisposable
         ), out _);
     }
 
-    internal static async Task<CdpSession> ConnectClientAsync(ConnectedDevicesPlatform platform, CdpSocket socket, ConnectOptions? options = null)
+    internal static async Task<CdpSession> ConnectClientAsync(ConnectedDevicesPlatform platform, CdpSocket socket, ConnectOptions? options = null, CancellationToken cancellationToken = default)
     {
         var session = _sessionRegistry.Create(localSessionId => new(
             platform,
@@ -86,7 +86,7 @@ public sealed class CdpSession : IDisposable
         if (options is not null)
             connectHandler.UpgradeHandler.Upgraded += options.TransportUpgraded;
 
-        await connectHandler.ConnectAsync(socket);
+        await connectHandler.ConnectAsync(socket, cancellationToken: cancellationToken);
 
         return session;
     }
@@ -187,12 +187,15 @@ public sealed class CdpSession : IDisposable
     }
     #endregion
 
+    public Task<CdpChannel> StartClientChannelAsync<TApp>(TApp handler, CancellationToken cancellationToken = default) where TApp : CdpAppBase, ICdpAppId
+        => StartClientChannelAsync(TApp.Id, TApp.Name, handler, cancellationToken);
+
     public async Task<CdpChannel> StartClientChannelAsync(string appId, string appName, CdpAppBase handler, CancellationToken cancellationToken = default)
     {
         if (_channelHandler is not ClientChannelHandler clientChannelHandler)
             throw new InvalidOperationException("Session is not a client");
 
-        var socket = await Platform.CreateSocketAsync(_connectHandler.UpgradeHandler.RemoteEndpoint);
+        var socket = await Platform.CreateSocketAsync(_connectHandler.UpgradeHandler.RemoteEndpoint, cancellationToken);
         return await clientChannelHandler.CreateChannelAsync(appId, appName, handler, socket, cancellationToken);
     }
 
