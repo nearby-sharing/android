@@ -3,6 +3,7 @@ using Android.Net;
 using Android.Net.Wifi;
 using Android.Net.Wifi.P2p;
 using Android.Runtime;
+using NearShare.Android.WiFiDirect;
 using ShortDev.Microsoft.ConnectedDevices.Transports.WiFiDirect;
 using System.Net;
 using System.Net.NetworkInformation;
@@ -164,6 +165,30 @@ internal sealed class AndroidWiFiDirectHandler : IWiFiDirectHandler
     }
 
     public async Task<GroupInfo> CreateAutonomousGroup()
+    {
+        if (!OperatingSystem.IsAndroidVersionAtLeast(26))
+            throw new InvalidOperationException("Not supported on OS < 29");
+
+        var wifiManager = (WifiManager)_context.Context.GetSystemService(Context.WifiService)!;
+        var hotspot = await wifiManager.StartLocalOnlyHotspot();
+
+        TcpListener listener = new(IPAddress.Any, 5160);
+        listener.Start();
+        listener.BeginAcceptTcpClient(result =>
+        {
+
+        }, null);
+
+        if (hotspot is null)
+            throw new InvalidOperationException("Could not create WiFi-Direct group");
+
+        if (OperatingSystem.IsAndroidVersionAtLeast(33))
+            return GroupInfo.Create(hotspot.SoftApConfiguration.WifiSsid?.ToString() ?? "", hotspot.SoftApConfiguration.Passphrase ?? "");
+        else
+            return GroupInfo.Create(hotspot.WifiConfiguration?.Ssid ?? "", hotspot.WifiConfiguration?.PreSharedKey ?? "");
+    }
+
+    public async Task<GroupInfo> CreateAutonomousGroup2()
     {
         if (!OperatingSystem.IsAndroidVersionAtLeast(29))
             throw new InvalidOperationException("Not supported on OS < 29");
