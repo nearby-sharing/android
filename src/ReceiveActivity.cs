@@ -14,10 +14,10 @@ using ShortDev.Android.UI;
 using ShortDev.Microsoft.ConnectedDevices;
 using ShortDev.Microsoft.ConnectedDevices.NearShare;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
+using ShortDev.Microsoft.ConnectedDevices.Transports.Network;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Net.NetworkInformation;
-using SystemDebug = System.Diagnostics.Debug;
 
 namespace NearShare;
 
@@ -159,8 +159,7 @@ public sealed class ReceiveActivity : AppCompatActivity
     }
 
     CancellationTokenSource? _cancellationTokenSource;
-    ConnectedDevicesPlatform? _cdp;
-    void InitializeCDP()
+    async void InitializeCDP()
     {
         if (btAddress == null)
             throw new NullReferenceException(nameof(btAddress));
@@ -168,20 +167,19 @@ public sealed class ReceiveActivity : AppCompatActivity
         _cancellationTokenSource?.Dispose();
         _cancellationTokenSource = new();
 
-        SystemDebug.Assert(_cdp == null);
+        var service = await CdpService.EnsureRunning(this);
+        var platform = service.Platform;
 
-        _cdp = CdpUtils.Create(this, _loggerFactory);
+        platform.Listen(_cancellationTokenSource.Token);
+        platform.Advertise(_cancellationTokenSource.Token);
 
-        _cdp.Listen(_cancellationTokenSource.Token);
-        _cdp.Advertise(_cancellationTokenSource.Token);
-
-        NearShareReceiver.Register(_cdp);
+        NearShareReceiver.Register(platform);
         NearShareReceiver.ReceivedUri += OnTransfer;
         NearShareReceiver.FileTransfer += OnTransfer;
 
         FindViewById<TextView>(Resource.Id.deviceInfoTextView)!.Text = this.Localize(
             Resource.String.visible_as_template,
-            _cdp.DeviceInfo.Name
+            platform.DeviceInfo.Name
         );
     }
 
@@ -201,7 +199,6 @@ public sealed class ReceiveActivity : AppCompatActivity
     public override void Finish()
     {
         _cancellationTokenSource?.Cancel();
-        _cdp?.Dispose();
         NearShareReceiver.Unregister();
         base.Finish();
     }

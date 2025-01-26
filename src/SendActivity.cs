@@ -104,9 +104,11 @@ public sealed class SendActivity : AppCompatActivity
     #region Initialization
     readonly CancellationTokenSource _discoverCancellationTokenSource = new();
     ConnectedDevicesPlatform _cdp = null!;
-    void InitializePlatform()
+    CdpService? _service;
+    async void InitializePlatform()
     {
-        _cdp = CdpUtils.Create(this, _loggerFactory);
+        _service = await CdpService.EnsureRunning(this);
+        _cdp = _service.Platform;
 
         _cdp.DeviceDiscovered += Platform_DeviceDiscovered;
         _cdp.Discover(_discoverCancellationTokenSource.Token);
@@ -205,6 +207,8 @@ public sealed class SendActivity : AppCompatActivity
                     uri
                 );
             }
+            else
+                throw new System.Diagnostics.UnreachableException("No file nor uri");
 
             if (progress != null)
             {
@@ -239,10 +243,14 @@ public sealed class SendActivity : AppCompatActivity
 #endif
                     });
                 };
+
+                _service?.ShowTransferNotification(remoteSystem, transferPromise, progress);
             }
 
-            if (transferPromise != null)
-                await transferPromise;
+            await transferPromise;
+
+            if (!Lifecycle.CurrentState.IsAtLeast(AndroidX.Lifecycle.Lifecycle.State.Started!))
+                return;
 
             progressIndicator.SetIndicatorColor([
                 MaterialColors.HarmonizeWithPrimary(this,
@@ -367,13 +375,6 @@ public sealed class SendActivity : AppCompatActivity
             _fileSendCancellationTokenSource.Cancel();
         }
         catch { }
-    }
-
-    public override void Finish()
-    {
-        base.Finish();
-
-        _cdp?.Dispose();
     }
 
     static int GetTransportIcon(CdpTransportType transportType)

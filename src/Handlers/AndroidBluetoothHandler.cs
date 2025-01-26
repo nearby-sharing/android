@@ -2,10 +2,10 @@
 using Android.Bluetooth.LE;
 using Android.Runtime;
 using ShortDev.Microsoft.ConnectedDevices;
-using BLeScanResult = Android.Bluetooth.LE.ScanResult;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
-using System.Net.NetworkInformation;
 using ShortDev.Microsoft.ConnectedDevices.Transports.Bluetooth;
+using System.Net.NetworkInformation;
+using BLeScanResult = Android.Bluetooth.LE.ScanResult;
 
 namespace NearShare.Handlers;
 
