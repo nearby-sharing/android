@@ -27,14 +27,17 @@ jobs:
         with:
           dotnet-version: "9.x.x"
 
-      - name: Install docfx
-        run: |
-          dotnet tool update -g docfx
-          echo "~/.dotnet/tools" >> $GITHUB_PATH
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
 
       - name: Install Workloads
         run: |
           dotnet workload install android --ignore-failed-sources
+
+      - name: Install docfx
+        run: |
+          dotnet tool update -g docfx
+          echo "~/.dotnet/tools" >> $GITHUB_PATH
 
       - name: Build docs
         run: docfx docfx.json
