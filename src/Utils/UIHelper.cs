@@ -55,11 +55,11 @@ internal static class UIHelper
     public static void OpenGitHub(Activity activity)
         => DisplayWebSite(activity, "https://github.com/nearby-sharing/android/");
 
-    public static void DisplayWebSite(Activity activity, string url)
+    public static void DisplayWebSite(Context context, string url)
     {
         CustomTabsIntent intent = new CustomTabsIntent.Builder()
             .Build();
-        intent.LaunchUrl(activity, AndroidUri.Parse(url) ?? throw new ArgumentException("Invalid url", nameof(url)));
+        intent.LaunchUrl(context, AndroidUri.Parse(url) ?? throw new ArgumentException("Invalid url", nameof(url)));
     }
 
     public static void OpenLocaleSettings(Activity activity)
@@ -88,10 +88,10 @@ internal static class UIHelper
         }
     }
 
-    public static void ViewDownloads(this Activity activity)
+    public static void ViewDownloads(this Context context)
     {
         Intent intent = new(DownloadManager.ActionViewDownloads);
-        activity.StartActivity(intent);
+        context.StartActivity(intent);
     }
 
     public static void SetupToolBar(AppCompatActivity activity, string? title = null)
