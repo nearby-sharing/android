@@ -50,10 +50,14 @@ public sealed class ReceiveActivity : AppCompatActivity
         notificationsRecyclerView = FindViewById<RecyclerView>(Resource.Id.notificationsRecyclerView)!;
         notificationsRecyclerView.SetLayoutManager(new LinearLayoutManager(this));
         notificationsRecyclerView.SetAdapter(
-            new AdapterDescriptor<TransferToken>(
+            _notifications.CreateAdapter(
                 Resource.Layout.item_transfer_notification,
-                OnInflateNotification
-            ).CreateRecyclerViewAdapter(_notifications)
+                view => new TransferNotificationViewHolder(view)
+                {
+                    OnRemove = _notifications.Remove,
+                    RunOnUiThread = RunOnUiThread
+                }
+            )
         );
 
         FindViewById<Button>(Resource.Id.openFAQButton)!.Click += (s, e) => UIHelper.OpenFAQ(this);
@@ -64,61 +68,72 @@ public sealed class ReceiveActivity : AppCompatActivity
         UIHelper.RequestReceivePermissions(this);
     }
 
-    void OnInflateNotification(View view, TransferToken transfer)
+    sealed class TransferNotificationViewHolder : ViewHolder<TransferToken>
     {
-        var acceptButton = view.FindViewById<Button>(Resource.Id.acceptButton)!;
-        var openButton = view.FindViewById<Button>(Resource.Id.openButton)!;
-        var fileNameTextView = view.FindViewById<TextView>(Resource.Id.fileNameTextView)!;
-        var detailsTextView = view.FindViewById<TextView>(Resource.Id.detailsTextView)!;
-        var loadingProgressIndicator = view.FindViewById<CircularProgressIndicator>(Resource.Id.loadingProgressIndicator)!;
-
-        view.FindViewById<Button>(Resource.Id.cancelButton)!.Click += (s, e) =>
+        readonly Context _context;
+        readonly Button _acceptButton, _openButton, _cancelButton;
+        readonly TextView _fileNameTextView, _detailsTextView;
+        readonly CircularProgressIndicator _loadingProgressIndicator;
+        public TransferNotificationViewHolder(View view) : base(view)
         {
-            if (transfer is FileTransferToken fileTransfer)
-                fileTransfer.Cancel();
+            _context = view.Context!;
 
-            _notifications.Remove(transfer);
-        };
+            _acceptButton = view.FindViewById<Button>(Resource.Id.acceptButton)!;
+            _acceptButton.Click += AcceptButton_Click;
 
-        if (transfer is UriTransferToken uriTranfer)
-        {
-            fileNameTextView.Text = uriTranfer.Uri;
-            detailsTextView.Text = uriTranfer.DeviceName;
+            _openButton = view.FindViewById<Button>(Resource.Id.openButton)!;
+            _openButton.Click += OpenButton_Click;
 
-            acceptButton.Visibility = ViewStates.Gone;
-            openButton.Visibility = ViewStates.Visible;
+            _cancelButton = view.FindViewById<Button>(Resource.Id.cancelButton)!;
+            _cancelButton.Click += CancelButton_Click;
 
-            openButton.Click += (s, e) => UIHelper.DisplayWebSite(this, uriTranfer.Uri);
-
-            return;
+            _fileNameTextView = view.FindViewById<TextView>(Resource.Id.fileNameTextView)!;
+            _detailsTextView = view.FindViewById<TextView>(Resource.Id.detailsTextView)!;
+            _loadingProgressIndicator = view.FindViewById<CircularProgressIndicator>(Resource.Id.loadingProgressIndicator)!;
         }
 
-        if (transfer is not FileTransferToken fileTransfer)
-            throw new UnreachableException();
-
-        fileNameTextView.Text = string.Join(", ", fileTransfer.Files.Select(x => x.Name));
-        detailsTextView.Text = $"{fileTransfer.DeviceName} • {FileTransferToken.FormatFileSize(fileTransfer.TotalBytes)}";
-
-        acceptButton.Click += OnAccept;
-
-        fileTransfer.Progress += progress => RunOnUiThread(() => OnProgress(progress));
-        loadingProgressIndicator.Indeterminate = true;
-
-        openButton.Click += (_, _) =>
+        TransferToken? _transfer;
+        public override void Bind(int index, TransferToken transfer)
         {
-            this.ViewDownloads();
+            _transfer = transfer;
 
-            // ToDo: View single file
-            // if (fileTransfer.Files.Count == 1)
-        };
+            switch (transfer)
+            {
+                case UriTransferToken uriTransfer:
+                    _fileNameTextView.Text = uriTransfer.Uri;
+                    _detailsTextView.Text = uriTransfer.DeviceName;
 
-        UpdateUI();
+                    _acceptButton.Visibility = ViewStates.Gone;
+                    _openButton.Visibility = ViewStates.Visible;
+                    break;
 
-        void OnAccept(object? sender, EventArgs e)
+                case FileTransferToken fileTransfer:
+                    _fileNameTextView.Text = string.Join(", ", fileTransfer.Files.Select(x => x.Name));
+                    _detailsTextView.Text = $"{fileTransfer.DeviceName} • {FileTransferToken.FormatFileSize(fileTransfer.TotalBytes)}";
+                    _loadingProgressIndicator.Indeterminate = true;
+                    UpdateUI(fileTransfer);
+
+                    fileTransfer.Progress += OnProgress;
+                    break;
+            }
+        }
+
+        public override void Recycle()
         {
+            if (_transfer is not FileTransferToken fileTransfer)
+                return;
+
+            fileTransfer.Progress -= OnProgress;
+        }
+
+        private void AcceptButton_Click(object? sender, EventArgs e)
+        {
+            if (_transfer is not FileTransferToken fileTransfer)
+                return;
+
             try
             {
-                var streams = fileTransfer.Select(file => ContentResolver!.CreateMediaStoreStream(file.Name).stream).ToArray();
+                var streams = fileTransfer.Select(file => _context.ContentResolver!.CreateMediaStoreStream(file.Name).stream).ToArray();
                 fileTransfer.Accept(streams);
 
                 fileTransfer.Finished += () =>
@@ -128,33 +143,68 @@ public sealed class ReceiveActivity : AppCompatActivity
             }
             catch (Exception ex)
             {
-                new MaterialAlertDialogBuilder(this)
+                new MaterialAlertDialogBuilder(_context)
                     .SetTitle(ex.GetType().Name)!
                     .SetMessage(ex.Message)!
                     .Show();
             }
 
-            UpdateUI();
+            UpdateUI(fileTransfer);
         }
 
+        public required Action<Action> RunOnUiThread { get; init; }
         void OnProgress(NearShareProgress progress)
         {
-            loadingProgressIndicator.Indeterminate = false;
+            if (_transfer is not FileTransferToken fileTransfer)
+                return;
 
-            int progressInt = progress.TotalBytes == 0 ? 0 : Math.Min((int)(progress.TransferedBytes * 100 / progress.TotalBytes), 100);
-            if (OperatingSystem.IsAndroidVersionAtLeast(24))
-                loadingProgressIndicator.SetProgress(progressInt, animate: true);
-            else
-                loadingProgressIndicator.Progress = progressInt;
+            RunOnUiThread(() =>
+            {
+                _loadingProgressIndicator.Indeterminate = false;
 
-            UpdateUI();
+                int progressInt = progress.TotalBytes == 0 ? 0 : Math.Min((int)(progress.TransferedBytes * 100 / progress.TotalBytes), 100);
+                if (OperatingSystem.IsAndroidVersionAtLeast(24))
+                    _loadingProgressIndicator.SetProgress(progressInt, animate: true);
+                else
+                    _loadingProgressIndicator.Progress = progressInt;
+
+                UpdateUI(fileTransfer);
+            });
         }
 
-        void UpdateUI()
+        public required Func<TransferToken, bool> OnRemove { get; init; }
+        private void CancelButton_Click(object? sender, EventArgs e)
         {
-            acceptButton.Visibility = !fileTransfer.IsTransferComplete && !fileTransfer.IsAccepted ? ViewStates.Visible : ViewStates.Gone;
-            loadingProgressIndicator.Visibility = !fileTransfer.IsTransferComplete && fileTransfer.IsAccepted ? ViewStates.Visible : ViewStates.Gone;
-            openButton.Visibility = fileTransfer.IsTransferComplete ? ViewStates.Visible : ViewStates.Gone;
+            if (_transfer is null)
+                return;
+
+            if (_transfer is FileTransferToken fileTransfer)
+                fileTransfer.Cancel();
+
+            OnRemove(_transfer);
+        }
+
+        private void OpenButton_Click(object? sender, EventArgs e)
+        {
+            switch (_transfer)
+            {
+                case UriTransferToken uriTransfer:
+                    UIHelper.DisplayWebSite(_context, uriTransfer.Uri);
+                    break;
+
+                case FileTransferToken:
+                    _context.ViewDownloads();
+                    // ToDo: View single file
+                    //if (fileTransfer.Files.Count == 1)
+                    break;
+            }
+        }
+
+        void UpdateUI(FileTransferToken fileTransfer)
+        {
+            _acceptButton.Visibility = !fileTransfer.IsTransferComplete && !fileTransfer.IsAccepted ? ViewStates.Visible : ViewStates.Gone;
+            _loadingProgressIndicator.Visibility = !fileTransfer.IsTransferComplete && fileTransfer.IsAccepted ? ViewStates.Visible : ViewStates.Gone;
+            _openButton.Visibility = fileTransfer.IsTransferComplete ? ViewStates.Visible : ViewStates.Gone;
         }
     }
 

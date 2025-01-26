@@ -68,24 +68,49 @@ public sealed class SendActivity : AppCompatActivity
 
         DeviceDiscoveryListView = _dialog.FindViewById<RecyclerView>(Resource.Id.deviceSelector)!;
         DeviceDiscoveryListView.SetLayoutManager(new LinearLayoutManager(this, (int)Orientation.Horizontal, reverseLayout: false));
-        var adapterDescriptor = new AdapterDescriptor<CdpDevice>(
-            Resource.Layout.item_device,
-            (view, device) =>
-            {
-                view.FindViewById<ImageView>(Resource.Id.deviceTypeImageView)!.SetImageResource(
-                    device.Type.IsMobile() ? Resource.Drawable.ic_fluent_phone_24_regular : Resource.Drawable.ic_fluent_desktop_24_regular
-                );
-                view.FindViewById<ImageView>(Resource.Id.transportTypeImageView)!.SetImageResource(GetTransportIcon(device.Endpoint.TransportType));
-                view.FindViewById<TextView>(Resource.Id.deviceNameTextView)!.Text = device.Name;
-                view.Click += (s, e) => SendData(device);
-            }
+        DeviceDiscoveryListView.SetAdapter(
+            RemoteSystems.CreateAdapter(Resource.Layout.item_device, view => new RemoteSystemViewHolder(view) { Click = SendData })
         );
-        DeviceDiscoveryListView.SetAdapter(adapterDescriptor.CreateRecyclerViewAdapter(RemoteSystems));
 
         _loggerFactory = CdpUtils.CreateLoggerFactory(this);
         _logger = _loggerFactory.CreateLogger<SendActivity>();
 
         UIHelper.RequestSendPermissions(this);
+    }
+
+    sealed class RemoteSystemViewHolder : ViewHolder<CdpDevice>
+    {
+        readonly ImageView _deviceType, _transportType;
+        readonly TextView _deviceName;
+        public RemoteSystemViewHolder(View view) : base(view)
+        {
+            _deviceType = view.FindViewById<ImageView>(Resource.Id.deviceTypeImageView)!;
+            _transportType = view.FindViewById<ImageView>(Resource.Id.transportTypeImageView)!;
+            _deviceName = view.FindViewById<TextView>(Resource.Id.deviceNameTextView)!;
+
+            view.Click += OnClick;
+        }
+
+        CdpDevice? _remoteSystem;
+        public override void Bind(int index, CdpDevice device)
+        {
+            _remoteSystem = device;
+
+            _deviceType.SetImageResource(
+                device.Type.IsMobile() ? Resource.Drawable.ic_fluent_phone_24_regular : Resource.Drawable.ic_fluent_desktop_24_regular
+            );
+            _transportType.SetImageResource(GetTransportIcon(device.Endpoint.TransportType));
+            _deviceName.Text = device.Name;
+        }
+
+        public required Action<CdpDevice> Click { get; init; }
+        private void OnClick(object? sender, EventArgs e)
+        {
+            if (_remoteSystem is null)
+                return;
+
+            Click(_remoteSystem);
+        }
     }
 
     public override async void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
