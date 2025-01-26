@@ -32,7 +32,7 @@ public sealed class CryptorTest
 
         var decrypted = cryptor.DecryptMessage(header, encryptedPayload, hmac).Span;
 
-        Assert.True(payload.SequenceEqual(decrypted[sizeof(uint)..]));
+        Assert.True(payload.SequenceEqual(decrypted));
     }
 
     sealed class FragmentSenderSpy : IFragmentSender
