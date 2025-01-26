@@ -1,0 +1,37 @@
+{
+  "$schema": "https://raw.githubusercontent.com/dotnet/docfx/main/schemas/docfx.schema.json",
+  "metadata": [
+    {
+      "src": [
+        {
+          "files": ["lib/**/*.csproj"]
+        }
+      ],
+      "output": "docs/lib/api/"
+    },
+    {
+      "src": [
+        {
+          "files": ["src/*.csproj"]
+        }
+      ],
+      "output": "docs/android/api/"
+    }
+  ],
+  "build": {
+    "content": [
+      {
+        "files": "**/*.{md,yml}",
+        "exclude": "_site/**/*"
+      }
+    ],
+    "postProcessors": ["ExtractSearchIndex"],
+    "globalMetadata": {
+      "_disableNextArticle": true,
+      "_appName": "NearShare",
+      "_gitUrlPattern": "github"
+    },
+    "output": "_site",
+    "template": ["default", "modern"]
+  }
+}

@@ -1,4 +1,5 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Encryption;
+using ShortDev.Microsoft.ConnectedDevices.Transports;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages.Connection;
 
@@ -21,7 +22,7 @@ public sealed class ConnectionRequest : ICdpPayload<ConnectionRequest>
     public required CdpNonce Nonce { get; set; }
     /// <summary>
     /// The maximum size of a single message fragment. <br/>
-    /// (Fixed Value of <see cref="Constants.DefaultMessageFragmentSize"/>).
+    /// (Fixed Value of <see cref="MessageFragmenter.DefaultMessageFragmentSize"/>).
     /// </summary>
     public required uint MessageFragmentSize { get; set; }
     /// <summary>

@@ -1,6 +1,5 @@
-- name: Documentation
-  toc: docs-toc.yml
-- name: libCdp
-  href: api/lib/
-- name: Android App
-  href: api/android/
+- href: ../README.md
+
+- name: Development
+- href: ../CONTRIBUTING.md
+- href: ../CREDITS.md

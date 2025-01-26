@@ -364,3 +364,6 @@ FodyWeavers.xsd
 
 # Rider
 .idea
+
+# Docfx
+_site/
