@@ -1,7 +1,6 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Exceptions;
 using ShortDev.Microsoft.ConnectedDevices.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
-using System.Buffers;
 using System.Buffers.Binary;
 using System.Diagnostics;
 using System.Security.Cryptography;
@@ -59,10 +58,8 @@ public sealed class CdpCryptor : IDisposable
 
         byte[] decryptedPayload = _aes.DecryptCbc(payload, iv, PaddingMode.None);
 
-        if (HasPadding(decryptedPayload, out var paddingSize))
-            return decryptedPayload.AsMemory()[0..^paddingSize];
-
-        return decryptedPayload;
+        var payloadSize = BinaryPrimitives.ReadUInt32BigEndian(decryptedPayload.AsSpan()[..sizeof(uint)]);
+        return decryptedPayload.AsMemory(sizeof(uint), (int)payloadSize);
     }
 
     void VerifyHMac(CommonHeader header, ReadOnlySpan<byte> payload, ReadOnlySpan<byte> hmac)
@@ -157,10 +154,6 @@ public sealed class CdpCryptor : IDisposable
 
         var decryptedPayload = DecryptMessage(header, encryptedPayload, hmac);
         reader = new(Endianness.BigEndian, decryptedPayload.Span);
-
-        var payloadLength = reader.ReadUInt32();
-        if (payloadLength != decryptedPayload.Length - sizeof(Int32))
-            throw new CdpSecurityException($"Expected payload to be {payloadLength} bytes long");
     }
 
     public void Dispose()
@@ -168,16 +161,5 @@ public sealed class CdpCryptor : IDisposable
         _ivAes.Dispose();
         _aes.Dispose();
         _hmac.Dispose();
-    }
-
-    static bool HasPadding(ReadOnlySpan<byte> buffer, out byte paddingSize)
-    {
-        paddingSize = buffer[^1];
-        for (int i = buffer.Length - paddingSize; i < buffer.Length; i++)
-        {
-            if (paddingSize != buffer[i])
-                return false;
-        }
-        return true;
     }
 }
