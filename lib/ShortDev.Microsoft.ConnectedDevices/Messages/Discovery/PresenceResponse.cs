@@ -39,15 +39,14 @@ public class PresenceResponse : ICdpPayload<PresenceResponse>
     {
         var salt = RandomNumberGenerator.GetInt32(int.MaxValue);
 
-        using MemoryStream stream = new();
-        EndianWriter writer = new(Endianness.LittleEndian);
+        using var writer = EndianWriter.Create(Endianness.LittleEndian, ConnectedDevicesPlatform.MemoryPool);
 
         // ToDo: Wrong
         writer.Write(salt);
         writer.Write(deviceInfo.GetDeduplicationHint());
 
-        writer.CopyTo(stream);
-        var hash = _hashAlgorithm.ComputeHash(stream);
+        var hash = new byte[_hashAlgorithm.HashSize];
+        _hashAlgorithm.TryComputeHash(writer.Buffer.WrittenSpan, hash, out _);
 
         return new()
         {
