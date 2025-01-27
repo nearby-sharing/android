@@ -1,5 +1,6 @@
 ﻿using System.Buffers.Binary;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages;
 
@@ -93,6 +94,35 @@ public sealed class CommonHeader : ICdpHeader<CommonHeader>
         writer.Write((byte)0);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveOptimization | MethodImplOptions.AggressiveInlining)]
+    internal int CalcSize()
+    {
+        int size =
+            sizeof(ushort) + // Constants.Signature
+            sizeof(ushort) + // MessageLength
+            sizeof(byte) + // Constants.ProtocolVersion
+            sizeof(byte) + // Type
+            sizeof(short) + // Flags
+            sizeof(uint) + // SequenceNumber
+            sizeof(ulong) + // RequestID
+            sizeof(ushort) + // FragmentIndex
+            sizeof(ushort) + // FragmentCount
+            sizeof(ulong) + // SessionId
+            sizeof(ulong); // ChannelId
+
+        foreach (var header in AdditionalHeaders)
+        {
+            size +=
+                sizeof(byte) + // Type
+                sizeof(byte) + // Value.Length
+                header.Value.Length; // Value
+        }
+
+        return size +
+            sizeof(byte) + // AdditionalHeaderType.None
+            sizeof(byte); // 0
+    }
+
     /// <summary>
     /// Entire message length in bytes including signature.
     /// </summary>
@@ -150,7 +180,7 @@ public sealed class CommonHeader : ICdpHeader<CommonHeader>
     /// Returns size of the whole rest of the message (excluding headers) (including hmac)
     /// </summary>
     public int PayloadSize
-        => MessageLength - (int)((ICdpSerializable<CommonHeader>)this).CalcSize();
+        => MessageLength - (int)CalcSize();
 
 
     #region Flags
@@ -171,7 +201,7 @@ public sealed class CommonHeader : ICdpHeader<CommonHeader>
     public const int MessageLengthOffset = 2;
     public void SetPayloadLength(int payloadSize)
     {
-        MessageLength = (ushort)(payloadSize + ((ICdpSerializable<CommonHeader>)this).CalcSize());
+        MessageLength = (ushort)(payloadSize + CalcSize());
     }
 
     public static void ModifyMessageLength(Span<byte> msgBuffer, short delta)
