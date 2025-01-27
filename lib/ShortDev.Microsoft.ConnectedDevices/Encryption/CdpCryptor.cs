@@ -1,8 +1,10 @@
-﻿using ShortDev.Microsoft.ConnectedDevices.Exceptions;
+﻿using ShortDev.IO.Buffers;
+using ShortDev.Microsoft.ConnectedDevices.Exceptions;
 using ShortDev.Microsoft.ConnectedDevices.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
 using System.Buffers.Binary;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Encryption;
@@ -25,6 +27,8 @@ public sealed class CdpCryptor : IDisposable
         _hmac = sharedSecret.AsMemory()[^32..^0];
     }
 
+    [SkipLocalsInit]
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     void GenerateIV(CommonHeader header, Span<byte> destination)
     {
         Debug.Assert(destination.Length == Constants.IVSize);
@@ -49,14 +53,17 @@ public sealed class CdpCryptor : IDisposable
         Debug.Assert(bytesWritten == destination.Length);
     }
 
-    public ReadOnlyMemory<byte> DecryptMessage(CommonHeader header, ReadOnlySpan<byte> payload, ReadOnlySpan<byte> hmac)
+    public PooledMemory<byte> DecryptMessage(CommonHeader header, ReadOnlySpan<byte> payload, ReadOnlySpan<byte> hmac)
     {
         VerifyHMac(header, payload, hmac);
 
         Span<byte> iv = stackalloc byte[Constants.IVSize];
         GenerateIV(header, iv);
 
-        byte[] decryptedPayload = _aes.DecryptCbc(payload, iv, PaddingMode.None);
+        var decryptedBufferSize = _aes.GetCiphertextLengthCbc(payload.Length, PaddingMode.None);
+
+        var decryptedPayload = ConnectedDevicesPlatform.MemoryPool.RentMemory(decryptedBufferSize);
+        _aes.DecryptCbc(payload, iv, decryptedPayload.Span, PaddingMode.None);
 
         var payloadSize = BinaryPrimitives.ReadUInt32BigEndian(decryptedPayload.AsSpan()[..sizeof(uint)]);
         return decryptedPayload.AsMemory(sizeof(uint), (int)payloadSize);
@@ -67,15 +74,15 @@ public sealed class CdpCryptor : IDisposable
         if (!header.HasFlag(MessageFlags.HasHMAC))
             return;
 
-        if (hmac == null || hmac.Length != Constants.HMacSize)
+        if (hmac.Length != Constants.HMacSize)
             throw new CdpSecurityException("Invalid hmac size!");
 
-        EndianWriter writer = new(Endianness.BigEndian);
+        using var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
         header.Write(writer);
         writer.Write(payload);
 
-        var buffer = writer.Buffer.AsWriteableSpan();
-        CommonHeader.ModifyMessageLength(buffer, -Constants.HMacSize);
+        var buffer = writer.Buffer.WrittenSpan;
+        CommonHeader.ModifyMessageLength(buffer.AsSpanUnsafe(), -Constants.HMacSize);
 
         Span<byte> expectedHMac = stackalloc byte[Constants.HMacSize];
         ComputeHmac(buffer, expectedHMac);
@@ -85,39 +92,38 @@ public sealed class CdpCryptor : IDisposable
 
     public void EncryptMessage(IFragmentSender sender, CommonHeader header, ReadOnlySpan<byte> payloadBuffer)
     {
-        // Prepend payload with length
-        ReadOnlySpan<byte> finalPayload;
+        using var msgWriter = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
+
+        using (EndianWriter payloadWriter = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool, payloadBuffer.Length + sizeof(uint)))
         {
-            EndianWriter payloadWriter = new(Endianness.BigEndian);
+            // Prepend payload with length
             payloadWriter.Write((uint)payloadBuffer.Length);
             payloadWriter.Write(payloadBuffer);
 
-            finalPayload = payloadWriter.Buffer.AsSpan();
+            // Encrypt
+            Encrypt(msgWriter, header, payloadWriter.Buffer.WrittenSpan);
         }
-
-        // Encrypt
-        var msgWriter = Encrypt(header, finalPayload);
 
         // HMAC
         {
-            var msgBuffer = msgWriter.Buffer.AsWriteableSpan();
+            var msgBuffer = msgWriter.Buffer.WrittenSpan;
             Span<byte> hmac = stackalloc byte[Constants.HMacSize];
             ComputeHmac(msgBuffer, hmac);
-            CommonHeader.ModifyMessageLength(msgBuffer, +Constants.HMacSize);
+            CommonHeader.ModifyMessageLength(msgBuffer.AsSpanUnsafe(), +Constants.HMacSize);
             msgWriter.Write(hmac);
         }
 
-        sender.SendFragment(msgWriter.Buffer.AsSpan());
+        sender.SendFragment(msgWriter.Buffer.WrittenSpan);
     }
 
-    EndianWriter Encrypt(CommonHeader header, ReadOnlySpan<byte> buffer)
+    [SkipLocalsInit]
+    void Encrypt(EndianWriter writer, CommonHeader header, ReadOnlySpan<byte> buffer)
     {
         // If payload size is an exact multiple of block length (16 bytes) no padding is applied
         PaddingMode paddingMode = buffer.Length % 16 == 0 ? PaddingMode.None : PaddingMode.PKCS7;
         var encryptedPayloadLength = _aes.GetCiphertextLengthCbc(buffer.Length, paddingMode);
 
         // Write header
-        EndianWriter writer = new(Endianness.BigEndian);
         header.Flags |= MessageFlags.SessionEncrypted | MessageFlags.HasHMAC;
         header.SetPayloadLength(encryptedPayloadLength);
         header.Write(writer);
@@ -128,14 +134,12 @@ public sealed class CdpCryptor : IDisposable
         // Encrypt and write to msgWriter
         _aes.EncryptCbc(buffer, iv, writer.Buffer.GetSpan(encryptedPayloadLength), paddingMode);
         writer.Buffer.Advance(encryptedPayloadLength);
-
-        return writer;
     }
 
-    public void Read(ref EndianReader reader, CommonHeader header)
+    public DisposeToken<byte> Read(ref EndianReader reader, CommonHeader header)
     {
         if (!header.HasFlag(MessageFlags.SessionEncrypted))
-            return;
+            return default;
 
         int payloadSize = header.PayloadSize;
         if (header.HasFlag(MessageFlags.HasHMAC))
@@ -153,7 +157,8 @@ public sealed class CdpCryptor : IDisposable
         }
 
         var decryptedPayload = DecryptMessage(header, encryptedPayload, hmac);
-        reader = new(Endianness.BigEndian, decryptedPayload.Span);
+        reader = EndianReader.Create(Endianness.BigEndian, decryptedPayload.Span);
+        return decryptedPayload;
     }
 
     public void Dispose()

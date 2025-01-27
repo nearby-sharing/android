@@ -194,7 +194,7 @@ public sealed class NetworkTransport(
 
         void HandleMsg(UdpReceiveResult result)
         {
-            EndianReader reader = new(Endianness.BigEndian, result.Buffer);
+            EndianReader reader = EndianReader.Create(Endianness.BigEndian, result.Buffer);
             if (!CommonHeader.TryParse(ref reader, out var headers, out _) || headers.Type != MessageType.Discovery)
                 return;
 
@@ -211,14 +211,14 @@ public sealed class NetworkTransport(
             Type = MessageType.Discovery,
         };
 
-        EndianWriter payloadWriter = new(Endianness.BigEndian);
+        using var payloadWriter = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
         new DiscoveryHeader()
         {
             Type = DiscoveryType.PresenceRequest
         }.Write(payloadWriter);
 
         new UdpFragmentSender(_udpclient, new IPEndPoint(IPAddress.Broadcast, UdpPort))
-            .SendMessage(header, payloadWriter.Buffer.AsSpan());
+            .SendMessage(header, payloadWriter.Buffer.WrittenSpan);
     }
 
     void SendPresenceResponse(IPAddress device, PresenceResponse response)
@@ -228,7 +228,7 @@ public sealed class NetworkTransport(
             Type = MessageType.Discovery
         };
 
-        EndianWriter payloadWriter = new(Endianness.BigEndian);
+        using var payloadWriter = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
         new DiscoveryHeader()
         {
             Type = DiscoveryType.PresenceResponse
@@ -236,7 +236,7 @@ public sealed class NetworkTransport(
         response.Write(payloadWriter);
 
         new UdpFragmentSender(_udpclient, new IPEndPoint(device, UdpPort))
-            .SendMessage(header, payloadWriter.Buffer.AsSpan());
+            .SendMessage(header, payloadWriter.Buffer.WrittenSpan);
     }
 
     sealed class UdpFragmentSender(UdpClient client, IPEndPoint receiver) : IFragmentSender

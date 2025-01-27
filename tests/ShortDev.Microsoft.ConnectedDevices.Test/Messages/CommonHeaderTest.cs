@@ -1,4 +1,5 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Messages;
+using System.Buffers;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Test.Messages;
 
@@ -7,11 +8,11 @@ public class CommonHeaderTest
     [Fact]
     public void CalcSize_YieldsCorrectResult_WhenNoHeaders()
     {
-        EndianWriter writer = new(Endianness.BigEndian);
+        using EndianWriter writer = EndianWriter.Create(Endianness.BigEndian, ArrayPool<byte>.Shared);
 
         CommonHeader header = new();
         header.Write(writer);
-        var expected = writer.Buffer.Size;
+        var expected = writer.Buffer.WrittenSpan.Length;
 
         var actual = header.CalcSize();
 
@@ -21,7 +22,7 @@ public class CommonHeaderTest
     [Fact]
     public void CalcSize_YieldsCorrectResult_WhenWithHeaders()
     {
-        EndianWriter writer = new(Endianness.BigEndian);
+        using EndianWriter writer = EndianWriter.Create(Endianness.BigEndian, ArrayPool<byte>.Shared);
 
         CommonHeader header = new()
         {
@@ -33,7 +34,7 @@ public class CommonHeaderTest
             }
         };
         header.Write(writer);
-        var expected = writer.Buffer.Size;
+        var expected = writer.Buffer.WrittenSpan.Length;
 
         var actual = header.CalcSize();
 
