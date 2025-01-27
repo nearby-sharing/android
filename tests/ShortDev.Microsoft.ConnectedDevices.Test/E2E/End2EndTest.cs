@@ -4,7 +4,6 @@ using ShortDev.Microsoft.ConnectedDevices.NearShare;
 using ShortDev.Microsoft.ConnectedDevices.Transports.Bluetooth;
 using ShortDev.Microsoft.ConnectedDevices.Transports.Network;
 using System.Net;
-using Xunit.Abstractions;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Test.E2E;
 
@@ -54,14 +53,14 @@ public sealed class End2EndTest(ITestOutputHelper outputHelper)
         if (useTcp1)
             UseTcp(device1, tcpPort: 5041, udpPort: 5051);
 
-        device1.Discover(cancellationToken: default);
+        device1.Discover(TestContext.Current.CancellationToken);
 
         using var device2 = CreateDevice(network, "Device 2", "81-7A-80-8F-D5-80");
         if (useTcp2)
             UseTcp(device2, tcpPort: 5041, udpPort: 5051);
 
-        device2.Advertise(cancellationToken: default);
-        device2.Listen(cancellationToken: default);
+        device2.Advertise(TestContext.Current.CancellationToken);
+        device2.Listen(TestContext.Current.CancellationToken);
 
         TaskCompletionSource<UriTransferToken> receivePromise = new();
         NearShareReceiver.ReceivedUri += receivePromise.SetResult;
@@ -73,7 +72,8 @@ public sealed class End2EndTest(ITestOutputHelper outputHelper)
             await sender.SendUriAsync(
                 device: new("Device 2", DeviceType.Linux, Endpoint:
                     new(Transports.CdpTransportType.Rfcomm, "81-7A-80-8F-D5-80", "ServiceId")
-                ), new Uri("https://nearshare.shortdev.de/")
+                ), new Uri("https://nearshare.shortdev.de/"),
+                TestContext.Current.CancellationToken
             );
 
             var token = await receivePromise.Task;
@@ -99,14 +99,14 @@ public sealed class End2EndTest(ITestOutputHelper outputHelper)
         if (useTcp1)
             UseTcp(device1, tcpPort: 5041, udpPort: 5051);
 
-        device1.Discover(cancellationToken: default);
+        device1.Discover(TestContext.Current.CancellationToken);
 
         using var device2 = CreateDevice(network, "Device 2", "81-7A-80-8F-D5-80");
         if (useTcp2)
             UseTcp(device2, tcpPort: 5041, udpPort: 5051);
 
-        device2.Advertise(cancellationToken: default);
-        device2.Listen(cancellationToken: default);
+        device2.Advertise(TestContext.Current.CancellationToken);
+        device2.Listen(TestContext.Current.CancellationToken);
 
         var buffer = new byte[Random.Shared.Next(1_000, 1_000_000)];
         outputHelper.WriteLine($"[Information]: Generated buffer with size {buffer.LongLength}");
@@ -125,7 +125,8 @@ public sealed class End2EndTest(ITestOutputHelper outputHelper)
                     new(Transports.CdpTransportType.Rfcomm, "81-7A-80-8F-D5-80", "ServiceId")
                 ),
                 CdpFileProvider.FromBuffer("TestFile", buffer),
-                new Progress<NearShareProgress>()
+                new Progress<NearShareProgress>(),
+                TestContext.Current.CancellationToken
             );
 
             await receivePromise.Task;
@@ -140,7 +141,7 @@ public sealed class End2EndTest(ITestOutputHelper outputHelper)
         void OnFileTransfer(FileTransferToken token)
         {
             Assert.Equal("Device 1", token.DeviceName);
-            Assert.Equal(1, token.Files.Count);
+            Assert.Single(token.Files);
             Assert.Equal("TestFile", token.Files[0].Name);
             Assert.Equal((ulong)buffer.LongLength, token.Files[0].Size);
 
