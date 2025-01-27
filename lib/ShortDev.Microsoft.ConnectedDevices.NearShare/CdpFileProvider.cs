@@ -45,7 +45,7 @@ public sealed class CdpFileProvider : IDisposable
     public void ReadBlob(ulong start, Span<byte> buffer)
     {
         _buffer.Position = (long)start;
-        _buffer.Read(buffer);
+        _buffer.ReadExactly(buffer);
     }
 
     public void Dispose()
