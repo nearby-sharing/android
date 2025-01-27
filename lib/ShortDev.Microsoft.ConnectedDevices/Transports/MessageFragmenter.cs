@@ -41,11 +41,10 @@ public static class MessageFragmenter
         }
         else
         {
-            EndianWriter writer = new(Endianness.BigEndian);
+            EndianWriter headerWriter = new(Endianness.BigEndian);
             header.SetPayloadLength(payload.Length);
-            header.Write(writer);
-            writer.Write(payload);
-            sender.SendFragment(writer.Buffer.AsSpan());
+            header.Write(headerWriter);
+            sender.SendFragment(headerWriter.Buffer.AsSpan(), payload);
         }
     }
 }
@@ -55,5 +54,11 @@ public interface IFragmentSender
     /// <summary>
     /// Sends a binary fragment.
     /// </summary>
-    void SendFragment(ReadOnlySpan<byte> fragment);
+    void SendFragment(ReadOnlySpan<byte> message);
+
+    /// <summary>
+    /// Sends a binary fragment.
+    /// </summary>
+    void SendFragment(ReadOnlySpan<byte> header, ReadOnlySpan<byte> payload)
+        => SendFragment([.. header, .. payload]);
 }
