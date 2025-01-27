@@ -2,8 +2,6 @@ using ShortDev.Microsoft.ConnectedDevices.Encryption;
 using ShortDev.Microsoft.ConnectedDevices.Messages;
 using ShortDev.Microsoft.ConnectedDevices.NearShare.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Serialization;
-using System.Diagnostics;
-using Xunit.Abstractions;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Test;
 
@@ -16,7 +14,7 @@ public sealed class SerializationTest(ITestOutputHelper output)
 
     private readonly ITestOutputHelper _output = output;
 
-    public static IEnumerable<object[]> GenerateMsgTypes()
+    public static IEnumerable<TheoryDataRow<Type>> GenerateMsgTypes()
     {
         var assembly = typeof(CommonHeader).Assembly;
         foreach (var type in assembly.DefinedTypes)
@@ -26,7 +24,7 @@ public sealed class SerializationTest(ITestOutputHelper output)
                 IsOk(typeof(ICdpPayload<>), type) &&
                 type.Name != "PresenceResponse"
             )
-                yield return new object[] { type };
+                yield return type;
         }
 
         static bool IsOk(Type TInterface, Type TClass)
@@ -56,7 +54,7 @@ public sealed class SerializationTest(ITestOutputHelper output)
             Type type = typeof(T);
 
             // allocate
-            var instance = (T)TestValueGenerator.RandomValue(typeof(T));
+            var instance = TestValueGenerator.RandomValue<T>();
 
             // write - 1st pass
             EndianWriter writer = new(endianness);

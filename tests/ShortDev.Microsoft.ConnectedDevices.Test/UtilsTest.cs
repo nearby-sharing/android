@@ -1,6 +1,4 @@
-﻿using Xunit.Abstractions;
-
-namespace ShortDev.Microsoft.ConnectedDevices.Test;
+﻿namespace ShortDev.Microsoft.ConnectedDevices.Test;
 public sealed class UtilsTest(ITestOutputHelper output)
 {
     [Theory]
@@ -19,7 +17,7 @@ public sealed class UtilsTest(ITestOutputHelper output)
         });
 
         // Wait for long-running task to complete
-        await Task.Delay(delayMs * 2);
+        await Task.Delay(delayMs * 2, TestContext.Current.CancellationToken);
     }
 
     [Theory]
@@ -38,7 +36,7 @@ public sealed class UtilsTest(ITestOutputHelper output)
         });
 
         // Wait for long-running task to complete
-        await Task.Delay(delayMs * 2);
+        await Task.Delay(delayMs * 2, TestContext.Current.CancellationToken);
     }
 
     static async Task<object> LongRunningOperationWithThrow(int delayMs)
