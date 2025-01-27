@@ -4,24 +4,16 @@ using ShortDev.Microsoft.ConnectedDevices.Transports;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages;
 
-public sealed class CdpMessage
+public sealed class CdpMessage(CommonHeader header)
 {
-    readonly EndianBuffer _buffer;
+    readonly HeapOutputBuffer _buffer = new(
+        new DotNext.Buffers.PoolingArrayBufferWriter<byte>()
+        {
+            Capacity = header.FragmentCount * MessageFragmenter.DefaultMessageFragmentSize
+        }
+    );
 
-    public CdpMessage(CommonHeader header)
-    {
-        Header = header;
-        _buffer = new(header.FragmentCount * MessageFragmenter.DefaultMessageFragmentSize);
-    }
-
-    public CdpMessage(CommonHeader header, byte[] payload)
-    {
-        Header = header;
-        _buffer = new(payload);
-        _receivedFragmentCount = header.FragmentCount;
-    }
-
-    public CommonHeader Header { get; }
+    public CommonHeader Header { get; } = header;
 
     public uint Id
         => Header.SequenceNumber;
@@ -45,7 +37,7 @@ public sealed class CdpMessage
     {
         ThrowIfNotCompleted();
 
-        reader = new(Endianness.BigEndian, _buffer.AsSpan());
+        reader = EndianReader.Create(Endianness.BigEndian, _buffer.WrittenSpan);
     }
 
     public void ReadBinary(out EndianReader reader, out BinaryMsgHeader header)

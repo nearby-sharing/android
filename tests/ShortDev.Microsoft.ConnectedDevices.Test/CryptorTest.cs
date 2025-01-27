@@ -22,7 +22,7 @@ public sealed class CryptorTest
         cryptor.EncryptMessage(fragmentSender, header, payload);
         Assert.NotNull(fragmentSender.Fragment);
 
-        EndianReader reader = new(Endianness.BigEndian, fragmentSender.Fragment.Value.Span);
+        EndianReader reader = EndianReader.Create(Endianness.BigEndian, fragmentSender.Fragment.Value.Span);
 
         header = CommonHeader.Parse(ref reader);
         var readerContent = reader.ReadToEnd();
