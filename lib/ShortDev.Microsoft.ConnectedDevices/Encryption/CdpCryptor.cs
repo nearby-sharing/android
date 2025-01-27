@@ -13,7 +13,7 @@ public sealed class CdpCryptor : IDisposable
 
     readonly Aes _ivAes;
     readonly Aes _aes;
-    readonly HMACSHA256 _hmac;
+    readonly ReadOnlyMemory<byte> _hmac;
     public CdpCryptor(byte[] sharedSecret)
     {
         _aes = Aes.Create();
@@ -22,7 +22,7 @@ public sealed class CdpCryptor : IDisposable
         _ivAes = Aes.Create();
         _ivAes.Key = sharedSecret[16..32];
 
-        _hmac = new(sharedSecret[^32..^0]);
+        _hmac = sharedSecret.AsMemory()[^32..^0];
     }
 
     void GenerateIV(CommonHeader header, Span<byte> destination)
@@ -43,7 +43,7 @@ public sealed class CdpCryptor : IDisposable
     {
         Debug.Assert(destination.Length == Constants.HMacSize);
 
-        var isSuccess = _hmac.TryComputeHash(buffer, destination, out var bytesWritten);
+        var isSuccess = HMACSHA256.TryHashData(_hmac.Span, buffer, destination, out var bytesWritten);
 
         Debug.Assert(isSuccess);
         Debug.Assert(bytesWritten == destination.Length);
@@ -160,6 +160,5 @@ public sealed class CdpCryptor : IDisposable
     {
         _ivAes.Dispose();
         _aes.Dispose();
-        _hmac.Dispose();
     }
 }
