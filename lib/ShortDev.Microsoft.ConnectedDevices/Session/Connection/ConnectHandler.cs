@@ -44,7 +44,7 @@ internal abstract class ConnectHandler(CdpSession session, UpgradeHandler upgrad
 
         DeviceInfo = msg.DeviceInfo;
 
-        EndianWriter writer = new(Endianness.BigEndian);
+        using var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
         new ConnectionHeader()
         {
             ConnectionMode = ConnectionMode.Proximal,
