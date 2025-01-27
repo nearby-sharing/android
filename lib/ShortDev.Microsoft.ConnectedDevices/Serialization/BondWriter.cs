@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Serialization;
-public readonly ref struct CompactBinaryBondWriter(EndianBuffer buffer)
+public readonly ref struct CompactBinaryBondWriter(HeapOutputBuffer buffer)
 {
     const ushort Magic = 16963;
 

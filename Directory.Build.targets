@@ -1,6 +1,6 @@
 <Project>
 	<ItemGroup Label="Global Dependencies">
-		<PackageReference Include="ShortDev.IO" Version="0.1.4" />
+		<PackageReference Include="ShortDev.IO" Version="0.1.4.8" />
 	</ItemGroup>
 
 	<ItemGroup Label="Global Usings">
