@@ -5,13 +5,6 @@ public interface ICdpSerializable<T> : ICdpWriteable where T : ICdpSerializable<
     static abstract T Parse(ref EndianReader reader);
     public static bool TryParse(ref EndianReader reader, out T? result, out Exception? error)
         => throw new NotImplementedException();
-
-    public long CalcSize()
-    {
-        EndianWriter writer = new(Endianness.BigEndian);
-        Write(writer);
-        return writer.Buffer.Size;
-    }
 }
 
 public interface ICdpArraySerializable<T> where T : ICdpArraySerializable<T>
