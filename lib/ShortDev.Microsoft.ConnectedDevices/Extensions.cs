@@ -1,5 +1,4 @@
-﻿using System.Buffers;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Net.NetworkInformation;
 
 namespace ShortDev.Microsoft.ConnectedDevices;
@@ -62,22 +61,4 @@ public static class Extensions
         if (exceptions.Count > 0)
             throw new AggregateException(exceptions);
     }
-
-    public readonly struct ArrayPoolToken<T>(ArrayPool<T> pool, int capacity) : IDisposable
-    {
-        private readonly ArrayPool<T>? _pool = pool;
-        private readonly int _capacity = capacity;
-        private readonly T[] _array = pool.Rent(capacity);
-
-        public T[] ArrayUnsafe => _array;
-
-        public Memory<T> Memory => _array.AsMemory()[0.._capacity];
-        public Span<T> Span => Memory.Span;
-
-        public void Dispose()
-            => _pool?.Return(_array);
-    }
-
-    public static ArrayPoolToken<T> RentToken<T>(this ArrayPool<T> pool, int capacity)
-        => new(pool, capacity);
 }
