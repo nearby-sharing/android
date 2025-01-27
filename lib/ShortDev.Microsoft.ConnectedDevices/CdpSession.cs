@@ -92,13 +92,10 @@ public sealed class CdpSession : IDisposable
     #endregion
 
     #region SendMessage
-    public void SendMessage(CdpSocket socket, CommonHeader header, EndianWriter payloadWriter, bool supplyRequestId = false)
-        => SendMessage(socket, header, payloadWriter.Buffer.AsSpan(), supplyRequestId);
-
     uint _sequenceNumber = 0;
     ulong _requestId = 0;
     internal CdpCryptor? Cryptor { get; set; }
-    public void SendMessage(CdpSocket socket, CommonHeader header, ReadOnlySpan<byte> payload, bool supplyRequestId = false)
+    public void SendMessage(CdpSocket socket, CommonHeader header, in EndianWriter payloadWriter, bool supplyRequestId = false)
     {
         if (header.Type == MessageType.Session && Cryptor == null)
             throw new InvalidOperationException("Invalid session state!");
@@ -115,7 +112,7 @@ public sealed class CdpSession : IDisposable
         if (header.Type == MessageType.Session)
             header.AdditionalHeaders.Add(AdditionalHeader.CreateCorrelationHeader());
 
-        socket.SendMessage(header, payload, Cryptor);
+        socket.SendMessage(header, payloadWriter.Buffer.WrittenSpan, Cryptor);
     }
     #endregion
 
@@ -125,7 +122,7 @@ public sealed class CdpSession : IDisposable
     {
         ThrowIfDisposed();
 
-        Cryptor?.Read(ref reader, header);
+        using var disposeToken = Cryptor?.Read(ref reader, header) ?? default;
         header.CorrectClientSessionBit();
 
         if (header.Type == MessageType.Connect)

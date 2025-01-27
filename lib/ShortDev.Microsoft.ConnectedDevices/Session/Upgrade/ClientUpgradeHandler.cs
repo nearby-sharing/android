@@ -54,20 +54,22 @@ internal sealed class ClientUpgradeHandler(CdpSession session, EndpointInfo init
                 Type = MessageType.Connect
             };
 
-            EndianWriter writer = new(Endianness.BigEndian);
-            new ConnectionHeader()
+            using (var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool))
             {
-                ConnectionMode = ConnectionMode.Proximal,
-                MessageType = ConnectionType.UpgradeRequest
-            }.Write(writer);
+                new ConnectionHeader()
+                {
+                    ConnectionMode = ConnectionMode.Proximal,
+                    MessageType = ConnectionType.UpgradeRequest
+                }.Write(writer);
 
-            new UpgradeRequest()
-            {
-                UpgradeId = _currentUpgrade.Id,
-                Endpoints = UpgradeEndpoints
-            }.Write(writer);
+                new UpgradeRequest()
+                {
+                    UpgradeId = _currentUpgrade.Id,
+                    Endpoints = UpgradeEndpoints
+                }.Write(writer);
 
-            _session.SendMessage(oldSocket, header, writer);
+                _session.SendMessage(oldSocket, header, writer);
+            }
 
             return await _currentUpgrade;
         }
@@ -117,7 +119,7 @@ internal sealed class ClientUpgradeHandler(CdpSession session, EndpointInfo init
 
     void SendUpgradFinalization(CdpSocket socket)
     {
-        EndianWriter writer = new(Endianness.BigEndian);
+        using var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
         new ConnectionHeader()
         {
             ConnectionMode = ConnectionMode.Proximal,
@@ -147,7 +149,7 @@ internal sealed class ClientUpgradeHandler(CdpSession session, EndpointInfo init
         _allowedAddresses.Add(_currentUpgrade.NewSocket.Endpoint.Address);
 
         // Request transport permission for new socket
-        EndianWriter writer = new(Endianness.BigEndian);
+        using var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
         new ConnectionHeader()
         {
             ConnectionMode = ConnectionMode.Proximal,

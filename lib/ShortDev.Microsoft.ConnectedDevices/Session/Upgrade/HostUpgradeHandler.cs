@@ -69,7 +69,7 @@ internal sealed class HostUpgradeHandler(CdpSession session, EndpointInfo initia
             Type = MessageType.Connect
         };
 
-        EndianWriter writer = new(Endianness.BigEndian);
+        using var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
         new ConnectionHeader()
         {
             ConnectionMode = ConnectionMode.Proximal,
@@ -99,7 +99,7 @@ internal sealed class HostUpgradeHandler(CdpSession session, EndpointInfo initia
         var localIp = networkTransport?.Handler.TryGetLocalIp();
         if (networkTransport == null || localIp == null)
         {
-            EndianWriter writer = new(Endianness.BigEndian);
+            using var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
             new ConnectionHeader()
             {
                 ConnectionMode = ConnectionMode.Proximal,
@@ -116,8 +116,8 @@ internal sealed class HostUpgradeHandler(CdpSession session, EndpointInfo initia
 
         _upgradeIds.Add(msg.UpgradeId);
 
+        using (var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool))
         {
-            EndianWriter writer = new(Endianness.BigEndian);
             new ConnectionHeader()
             {
                 ConnectionMode = ConnectionMode.Proximal,
@@ -151,7 +151,7 @@ internal sealed class HostUpgradeHandler(CdpSession session, EndpointInfo initia
             Type = MessageType.Connect
         };
 
-        EndianWriter writer = new(Endianness.BigEndian);
+        using var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
         new ConnectionHeader()
         {
             ConnectionMode = ConnectionMode.Proximal,

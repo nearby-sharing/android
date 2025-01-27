@@ -20,7 +20,7 @@ public sealed record BLeBeacon(DeviceType DeviceType, PhysicalAddress MacAddress
         if (beaconData == null)
             return false;
 
-        EndianReader reader = new(Endianness.BigEndian, beaconData);
+        var reader = EndianReader.Create(Endianness.BigEndian, beaconData);
 
         var scenarioType = (ScenarioType)reader.ReadByte();
         if (scenarioType != ScenarioType.Bluetooth)
@@ -44,7 +44,7 @@ public sealed record BLeBeacon(DeviceType DeviceType, PhysicalAddress MacAddress
 
         data = new(
             deviceType,
-            new PhysicalAddress(BinaryConvert.ToReversed(reader.ReadBytes(6))),
+            new PhysicalAddress(reader.ReadBytes(6).ToReversed().ToArray()),
             Encoding.UTF8.GetString(reader.ReadToEnd())
         );
 
@@ -53,7 +53,7 @@ public sealed record BLeBeacon(DeviceType DeviceType, PhysicalAddress MacAddress
 
     public byte[] ToArray()
     {
-        EndianWriter writer = new(Endianness.LittleEndian);
+        using var writer = EndianWriter.Create(Endianness.LittleEndian, ConnectedDevicesPlatform.MemoryPool);
         writer.Write((byte)ScenarioType.Bluetooth);
         writer.Write((byte)DeviceType);
 
@@ -64,13 +64,13 @@ public sealed record BLeBeacon(DeviceType DeviceType, PhysicalAddress MacAddress
         var deviceStatus = ExtendedDeviceStatus.RemoteSessionsNotHosted | ExtendedDeviceStatus.NearShareAuthPolicyPermissive;
         writer.Write((byte)deviceStatus);
 
-        writer.Write(BinaryConvert.ToReversed(MacAddress.GetAddressBytes()));
+        writer.Write(MacAddress.GetAddressBytes().AsSpan().ReverseInPlace());
 
         // ToDo: Don't crop characters wider that 2 bytes!
         ReadOnlySpan<byte> deviceNameBuffer = Encoding.UTF8.GetBytes(DeviceName);
         var deviceNameLength = Math.Min(deviceNameBuffer.Length, Constants.BLeBeaconDeviceNameMaxByteLength);
         writer.Write(deviceNameBuffer[..deviceNameLength]);
 
-        return writer.Buffer.ToArray();
+        return writer.Buffer.WrittenSpan.ToArray();
     }
 }

@@ -59,29 +59,33 @@ public sealed class AuthenticationPayload : ICdpPayload<AuthenticationPayload>
     {
         var publicKey = Certificate.GetECDsaPublicKey() ?? throw new CdpSecurityException("Invalid certificate!");
 
-        var merged = MergeNoncesWithCertificate(Certificate, hostNonce, clientNonce).Span;
-        return publicKey.VerifyData(merged, SignedThumbprint, thumbprintHashType);
+        // Use little-endian here!
+        using var nonceWriter = EndianWriter.Create(Endianness.LittleEndian, ConnectedDevicesPlatform.MemoryPool);
+        MergeNoncesWithCertificate(nonceWriter, Certificate, hostNonce, clientNonce);
+
+        return publicKey.VerifyData(nonceWriter.Buffer.WrittenSpan, SignedThumbprint, thumbprintHashType);
     }
 
     #region Thumbprint Api
     static readonly HashAlgorithmName thumbprintHashType = HashAlgorithmName.SHA256;
 
-    static ReadOnlyMemory<byte> MergeNoncesWithCertificate(X509Certificate2 cert, CdpNonce hostNonce, CdpNonce clientNonce)
+    static void MergeNoncesWithCertificate(EndianWriter writer, X509Certificate2 cert, CdpNonce hostNonce, CdpNonce clientNonce)
     {
         byte[] certData = cert.Export(X509ContentType.Cert);
 
-        EndianWriter writer = new(Endianness.LittleEndian); // Use little-endian here!
         writer.Write(hostNonce.Value);
         writer.Write(clientNonce.Value);
         writer.Write(certData);
-        return writer.Buffer.AsMemory();
     }
 
     static byte[] CreateSignedThumbprint(X509Certificate2 cert, CdpNonce hostNonce, CdpNonce clientNonce)
     {
-        var data = MergeNoncesWithCertificate(cert, hostNonce, clientNonce);
+        // Use little-endian here!
+        using var nonceWriter = EndianWriter.Create(Endianness.LittleEndian, ConnectedDevicesPlatform.MemoryPool);
+        MergeNoncesWithCertificate(nonceWriter, cert, hostNonce, clientNonce);
+
         var privateKey = cert.GetECDsaPrivateKey() ?? throw new ArgumentException("No ECDsa private key!", nameof(cert));
-        return privateKey.SignData(data.Span, thumbprintHashType);
+        return privateKey.SignData(nonceWriter.Buffer.WrittenSpan, thumbprintHashType);
     }
     #endregion
 }

@@ -41,10 +41,10 @@ public static class MessageFragmenter
         }
         else
         {
-            EndianWriter headerWriter = new(Endianness.BigEndian);
+            using var headerWriter = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
             header.SetPayloadLength(payload.Length);
             header.Write(headerWriter);
-            sender.SendFragment(headerWriter.Buffer.AsSpan(), payload);
+            sender.SendFragment(headerWriter.Buffer.WrittenSpan, payload);
         }
     }
 }

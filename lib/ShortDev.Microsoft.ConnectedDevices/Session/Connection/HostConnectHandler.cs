@@ -50,25 +50,27 @@ internal sealed class HostConnectHandler(CdpSession session, HostUpgradeHandler 
         var connectionRequest = ConnectionRequest.Parse(ref reader);
         _remoteEncryption = CdpEncryptionInfo.FromRemote(connectionRequest.PublicKeyX, connectionRequest.PublicKeyY, connectionRequest.Nonce, CdpEncryptionParams.Default);
 
-        EndianWriter writer = new(Endianness.BigEndian);
-        new ConnectionHeader()
+        using (var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool))
         {
-            ConnectionMode = ConnectionMode.Proximal,
-            MessageType = ConnectionType.ConnectResponse
-        }.Write(writer);
+            new ConnectionHeader()
+            {
+                ConnectionMode = ConnectionMode.Proximal,
+                MessageType = ConnectionType.ConnectResponse
+            }.Write(writer);
 
-        var publicKey = _localEncryption.PublicKey;
-        new ConnectionResponse()
-        {
-            Result = ConnectionResult.Pending,
-            HmacSize = connectionRequest.HmacSize,
-            MessageFragmentSize = connectionRequest.MessageFragmentSize,
-            Nonce = _localEncryption.Nonce,
-            PublicKeyX = publicKey.X!,
-            PublicKeyY = publicKey.Y!
-        }.Write(writer);
+            var publicKey = _localEncryption.PublicKey;
+            new ConnectionResponse()
+            {
+                Result = ConnectionResult.Pending,
+                HmacSize = connectionRequest.HmacSize,
+                MessageFragmentSize = connectionRequest.MessageFragmentSize,
+                Nonce = _localEncryption.Nonce,
+                PublicKeyX = publicKey.X!,
+                PublicKeyY = publicKey.Y!
+            }.Write(writer);
 
-        _session.SendMessage(socket, header, writer);
+            _session.SendMessage(socket, header, writer);
+        }
 
         // We have to set cryptor after we send the message because it would be encrypted otherwise
         var secret = _localEncryption.GenerateSharedSecret(_remoteEncryption);
@@ -81,7 +83,7 @@ internal sealed class HostConnectHandler(CdpSession session, HostUpgradeHandler 
         if (!authRequest.VerifyThumbprint(hostNonce: _localEncryption.Nonce, clientNonce: _remoteEncryption!.Nonce))
             throw new CdpSecurityException("Invalid thumbprint");
 
-        EndianWriter writer = new();
+        using var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
         new ConnectionHeader()
         {
             ConnectionMode = ConnectionMode.Proximal,
@@ -98,7 +100,7 @@ internal sealed class HostConnectHandler(CdpSession session, HostUpgradeHandler 
 
     void HandleAuthDoneRequest(CommonHeader header, CdpSocket socket)
     {
-        EndianWriter writer = new(Endianness.BigEndian);
+        using var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
         new ConnectionHeader()
         {
             ConnectionMode = ConnectionMode.Proximal,

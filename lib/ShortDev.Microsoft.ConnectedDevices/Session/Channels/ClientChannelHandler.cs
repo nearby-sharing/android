@@ -50,7 +50,7 @@ internal sealed class ClientChannelHandler(CdpSession session) : ChannelHandler(
 
     ulong SendChannelRequest(CdpSocket socket, string appId, string appName)
     {
-        EndianWriter writer = new(Endianness.BigEndian);
+        using var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
         new ControlHeader()
         {
             MessageType = ControlMessageType.StartChannelRequest

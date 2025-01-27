@@ -33,25 +33,27 @@ internal sealed class ClientConnectHandler(CdpSession session, ClientUpgradeHand
             }
         };
 
-        EndianWriter writer = new(Endianness.BigEndian);
-        new ConnectionHeader()
+        using (var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool))
         {
-            ConnectionMode = ConnectionMode.Proximal,
-            MessageType = ConnectionType.ConnectRequest
-        }.Write(writer);
+            new ConnectionHeader()
+            {
+                ConnectionMode = ConnectionMode.Proximal,
+                MessageType = ConnectionType.ConnectRequest
+            }.Write(writer);
 
-        var publicKey = _localEncryption.PublicKey;
-        new ConnectionRequest()
-        {
-            CurveType = CurveType.CT_NIST_P256_KDF_SHA512,
-            HmacSize = Constants.HMacSize,
-            MessageFragmentSize = MessageFragmenter.DefaultMessageFragmentSize,
-            Nonce = _localEncryption.Nonce,
-            PublicKeyX = publicKey.X!,
-            PublicKeyY = publicKey.Y!
-        }.Write(writer);
+            var publicKey = _localEncryption.PublicKey;
+            new ConnectionRequest()
+            {
+                CurveType = CurveType.CT_NIST_P256_KDF_SHA512,
+                HmacSize = Constants.HMacSize,
+                MessageFragmentSize = MessageFragmenter.DefaultMessageFragmentSize,
+                Nonce = _localEncryption.Nonce,
+                PublicKeyX = publicKey.X!,
+                PublicKeyY = publicKey.Y!
+            }.Write(writer);
 
-        _session.SendMessage(socket, header, writer);
+            _session.SendMessage(socket, header, writer);
+        }
 
         await _promise;
     }
@@ -103,7 +105,7 @@ internal sealed class ClientConnectHandler(CdpSession session, ClientUpgradeHand
         var secret = _localEncryption.GenerateSharedSecret(_remoteEncryption);
         _session.Cryptor = new(secret);
 
-        EndianWriter writer = new(Endianness.BigEndian);
+        using var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
         new ConnectionHeader()
         {
             ConnectionMode = ConnectionMode.Proximal,
@@ -150,7 +152,7 @@ internal sealed class ClientConnectHandler(CdpSession session, ClientUpgradeHand
 
             try
             {
-                EndianWriter writer = new(Endianness.BigEndian);
+                using var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
                 new ConnectionHeader()
                 {
                     ConnectionMode = ConnectionMode.Proximal,
@@ -169,7 +171,7 @@ internal sealed class ClientConnectHandler(CdpSession session, ClientUpgradeHand
 
     void HandleDeviceAuthResponse(CdpSocket socket, CommonHeader header)
     {
-        EndianWriter writer = new(Endianness.BigEndian);
+        using var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
         new ConnectionHeader()
         {
             ConnectionMode = ConnectionMode.Proximal,
@@ -189,25 +191,27 @@ internal sealed class ClientConnectHandler(CdpSession session, ClientUpgradeHand
         var msg = ResultPayload.Parse(ref reader);
         msg.ThrowOnError();
 
-        EndianWriter writer = new(Endianness.BigEndian);
-        new ConnectionHeader()
+        using (var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool))
         {
-            ConnectionMode = ConnectionMode.Proximal,
-            MessageType = ConnectionType.DeviceInfoMessage
-        }.Write(writer);
-        new DeviceInfoMessage()
-        {
-            DeviceInfo = _session.Platform.GetCdpDeviceInfo()
-        }.Write(writer);
-
-        _session.SendMessage(
-            socket,
-            new CommonHeader()
+            new ConnectionHeader()
             {
-                Type = MessageType.Connect
-            },
-            writer
-        );
+                ConnectionMode = ConnectionMode.Proximal,
+                MessageType = ConnectionType.DeviceInfoMessage
+            }.Write(writer);
+            new DeviceInfoMessage()
+            {
+                DeviceInfo = _session.Platform.GetCdpDeviceInfo()
+            }.Write(writer);
+
+            _session.SendMessage(
+                socket,
+                new CommonHeader()
+                {
+                    Type = MessageType.Connect
+                },
+                writer
+            );
+        }
 
         _promise?.TrySetResult();
     }
