@@ -8,6 +8,7 @@
 		<ApplicationDisplayVersion>1.9.0</ApplicationDisplayVersion>
 		<UseAndroidCrypto>true</UseAndroidCrypto>
 		<AndroidErrorOnCustomJavaObject>false</AndroidErrorOnCustomJavaObject>
+		<RuntimeIdentifiers>android-arm;android-arm64;android-x86;android-x64</RuntimeIdentifiers>
 	</PropertyGroup>
 	<PropertyGroup>
 		<RootNamespace>NearShare</RootNamespace>
