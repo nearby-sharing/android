@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using ShortDev.IO.ValueStream;
 using ShortDev.Microsoft.ConnectedDevices.Encryption;
 using ShortDev.Microsoft.ConnectedDevices.Exceptions;
 using ShortDev.Microsoft.ConnectedDevices.Internal;
@@ -95,7 +96,7 @@ public sealed class CdpSession : IDisposable
     uint _sequenceNumber = 0;
     ulong _requestId = 0;
     internal CdpCryptor? Cryptor { get; set; }
-    public void SendMessage(CdpSocket socket, CommonHeader header, in EndianWriter payloadWriter, bool supplyRequestId = false)
+    public void SendMessage(CdpSocket socket, CommonHeader header, ReadOnlySpan<byte> payload, bool supplyRequestId = false)
     {
         if (header.Type == MessageType.Session && Cryptor == null)
             throw new InvalidOperationException("Invalid session state!");
@@ -112,13 +113,13 @@ public sealed class CdpSession : IDisposable
         if (header.Type == MessageType.Session)
             header.AdditionalHeaders.Add(AdditionalHeader.CreateCorrelationHeader());
 
-        socket.SendMessage(header, payloadWriter.Buffer.WrittenSpan, Cryptor);
+        socket.SendMessage(header, payload, Cryptor);
     }
     #endregion
 
     #region HandleMessages
     bool _connectionEstablished = false;
-    internal void HandleMessage(CdpSocket socket, CommonHeader header, ref EndianReader reader)
+    internal void HandleMessage(CdpSocket socket, CommonHeader header, ref HeapEndianReader reader)
     {
         ThrowIfDisposed();
 
@@ -155,10 +156,10 @@ public sealed class CdpSession : IDisposable
     }
 
     readonly ConcurrentDictionary<uint, CdpMessage> _msgRegistry = new();
-    void HandleSession(CommonHeader header, ref EndianReader reader)
+    void HandleSession(CommonHeader header, ref HeapEndianReader reader)
     {
         CdpMessage msg = _msgRegistry.GetOrAdd(header.SequenceNumber, id => new(header));
-        msg.AddFragment(reader.ReadToEnd()); // ToDo: Reduce allocations
+        msg.AddFragment(reader.Stream.ReadSlice((int)(reader.Stream.Length - reader.Stream.Position)));
 
         if (msg.IsComplete)
         {

@@ -1,8 +1,5 @@
 ﻿using Microsoft.CorrelationVector;
-using Newtonsoft.Json.Linq;
-using System;
 using System.Buffers.Binary;
-using System.Reflection.PortableExecutable;
 using System.Text;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages;
