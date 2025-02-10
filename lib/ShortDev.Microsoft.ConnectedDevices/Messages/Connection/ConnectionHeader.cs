@@ -3,7 +3,7 @@
 /// <summary>
 /// The <see cref="ConnectionHeader"/> is common for all Connection Messages.
 /// </summary>
-public sealed class ConnectionHeader : ICdpHeader<ConnectionHeader>
+public sealed class ConnectionHeader : IBinaryWritable, IBinaryParsable<ConnectionHeader>
 {
     /// <summary>
     /// Indicates the current connection type.
@@ -15,16 +15,16 @@ public sealed class ConnectionHeader : ICdpHeader<ConnectionHeader>
     /// </summary>
     public required ConnectionMode ConnectionMode { get; set; }
 
-    public static ConnectionHeader Parse(ref EndianReader reader)
+    public static ConnectionHeader Parse<TReader>(ref TReader reader) where TReader : struct, IEndianReader, allows ref struct
     {
         return new()
         {
             ConnectionMode = (ConnectionMode)reader.ReadInt16(),
-            MessageType = (ConnectionType)reader.ReadByte()
+            MessageType = (ConnectionType)reader.ReadUInt8()
         };
     }
 
-    public void Write(EndianWriter writer)
+    public void Write<TWriter>(ref TWriter writer) where TWriter : struct, IEndianWriter, allows ref struct
     {
         writer.Write((short)ConnectionMode);
         writer.Write((byte)MessageType);

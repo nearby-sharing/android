@@ -1,8 +1,8 @@
 ﻿namespace ShortDev.Microsoft.ConnectedDevices.Messages.Session.AppControl;
 
-public sealed class LaunchUriResult : ICdpPayload<LaunchUriResult>
+public sealed class LaunchUriResult : IBinaryWritable, IBinaryParsable<LaunchUriResult>
 {
-    public static LaunchUriResult Parse(ref EndianReader reader)
+    public static LaunchUriResult Parse<TReader>(ref TReader reader) where TReader : struct, IEndianReader, allows ref struct
         => new()
         {
             Result = reader.ReadInt32(),
@@ -20,7 +20,7 @@ public sealed class LaunchUriResult : ICdpPayload<LaunchUriResult>
     /// </summary>
     public required int ResponseID { get; init; }
 
-    public void Write(EndianWriter writer)
+    public void Write<TWriter>(ref TWriter writer) where TWriter : struct, IEndianWriter, allows ref struct
     {
         writer.Write(Result);
         writer.Write(ResponseID);
