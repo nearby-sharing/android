@@ -16,7 +16,7 @@ internal abstract class ConnectHandler(CdpSession session, UpgradeHandler upgrad
 
     internal UpgradeHandler UpgradeHandler { get; } = upgradeHandler;
 
-    public void HandleConnect(CdpSocket socket, CommonHeader header, ref EndianReader reader)
+    public void HandleConnect(CdpSocket socket, CommonHeader header, ref HeapEndianReader reader)
     {
         ConnectionHeader connectionHeader = ConnectionHeader.Parse(ref reader);
         _logger.ReceivedConnectMessage(
@@ -34,25 +34,32 @@ internal abstract class ConnectHandler(CdpSession session, UpgradeHandler upgrad
         HandleMessageInternal(socket, header, connectionHeader, ref reader);
     }
 
-    protected abstract void HandleMessageInternal(CdpSocket socket, CommonHeader header, ConnectionHeader connectionHeader, ref EndianReader reader);
+    protected abstract void HandleMessageInternal(CdpSocket socket, CommonHeader header, ConnectionHeader connectionHeader, ref HeapEndianReader reader);
 
     public CdpDeviceInfo? DeviceInfo { get; private set; }
-    protected void HandleDeviceInfoMessage(CommonHeader header, ref EndianReader reader, CdpSocket socket)
+    protected void HandleDeviceInfoMessage(CommonHeader header, ref HeapEndianReader reader, CdpSocket socket)
     {
         var msg = DeviceInfoMessage.Parse(ref reader);
         _logger.ReceivedDeviceInfo(msg.DeviceInfo);
 
         DeviceInfo = msg.DeviceInfo;
 
-        using var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
-        new ConnectionHeader()
+        var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
+        try
         {
-            ConnectionMode = ConnectionMode.Proximal,
-            MessageType = ConnectionType.DeviceInfoResponseMessage // Ack
-        }.Write(writer);
+            new ConnectionHeader()
+            {
+                ConnectionMode = ConnectionMode.Proximal,
+                MessageType = ConnectionType.DeviceInfoResponseMessage // Ack
+            }.Write(ref writer);
 
-        header.Flags = 0;
-        _session.SendMessage(socket, header, writer);
+            header.Flags = 0;
+            _session.SendMessage(socket, header, writer.Stream.WrittenSpan);
+        }
+        finally
+        {
+            writer.Dispose();
+        }
     }
 
     public static ConnectHandler Create(CdpSession session, EndpointInfo initialEndpoint)

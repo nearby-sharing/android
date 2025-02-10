@@ -1,4 +1,5 @@
 ﻿using ShortDev.IO.Buffers;
+using ShortDev.IO.ValueStream;
 using ShortDev.Microsoft.ConnectedDevices.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
 
@@ -11,7 +12,7 @@ partial class ConnectedDevicesPlatform
         RegisterKnownSocket(socket);
         Task.Run(() =>
         {
-            EndianReader streamReader = EndianReader.Create(Endianness.BigEndian, socket.InputStream);
+            var streamReader = EndianReader.FromStream(Endianness.BigEndian, socket.InputStream);
             using (socket)
             {
                 ReceiveLoop(socket, ref streamReader);
@@ -19,7 +20,7 @@ partial class ConnectedDevicesPlatform
         });
     }
 
-    void ReceiveLoop(CdpSocket socket, ref EndianReader streamReader)
+    void ReceiveLoop(CdpSocket socket, ref EndianReader<StreamWrapperStream> streamReader)
     {
         do
         {
@@ -37,13 +38,13 @@ partial class ConnectedDevicesPlatform
                     header
                 );
 
-                using var payload = ConnectedDevicesPlatform.MemoryPool.RentMemory(header.PayloadSize);
+                using var payload = MemoryPool.RentMemory(header.PayloadSize);
                 streamReader.ReadBytes(payload.Span);
 
                 if (socket.IsClosed)
                     return;
 
-                EndianReader reader = EndianReader.Create(Endianness.BigEndian, payload.Span);
+                var reader = EndianReader.FromMemory(Endianness.BigEndian, payload);
                 session.HandleMessage(socket, header, ref reader);
             }
             catch (IOException)
