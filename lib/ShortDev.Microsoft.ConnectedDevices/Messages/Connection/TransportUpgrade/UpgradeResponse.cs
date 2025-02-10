@@ -5,7 +5,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Messages.Connection.TransportUpgra
 /// <summary>
 /// This message transports the upgrade response.
 /// </summary>
-public sealed class UpgradeResponse : ICdpPayload<UpgradeResponse>
+public sealed class UpgradeResponse : IBinaryWritable, IBinaryParsable<UpgradeResponse>
 {
     /// <summary>
     /// A length-prefixed list of endpoint structures (see following) that are provided by each transport on the host device.
@@ -13,7 +13,7 @@ public sealed class UpgradeResponse : ICdpPayload<UpgradeResponse>
     public required IReadOnlyList<EndpointInfo> Endpoints { get; init; }
     public required IReadOnlyList<EndpointMetadata> MetaData { get; init; }
 
-    public static UpgradeResponse Parse(ref EndianReader reader)
+    public static UpgradeResponse Parse<TReader>(ref TReader reader) where TReader : struct, IEndianReader, allows ref struct
     {
         var length = reader.ReadUInt16();
         var endpoints = new EndpointInfo[length];
@@ -35,7 +35,7 @@ public sealed class UpgradeResponse : ICdpPayload<UpgradeResponse>
         };
     }
 
-    public void Write(EndianWriter writer)
+    public void Write<TWriter>(ref TWriter writer) where TWriter : struct, IEndianWriter, allows ref struct
     {
         writer.Write((ushort)Endpoints.Count);
         foreach (var endpoint in Endpoints)
@@ -45,6 +45,6 @@ public sealed class UpgradeResponse : ICdpPayload<UpgradeResponse>
             writer.Write((ushort)endpoint.TransportType);
         }
 
-        EndpointMetadata.WriteArray(writer, MetaData);
+        EndpointMetadata.WriteArray(ref writer, MetaData);
     }
 }

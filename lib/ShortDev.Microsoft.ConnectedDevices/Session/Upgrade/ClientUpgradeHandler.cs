@@ -11,7 +11,7 @@ internal sealed class ClientUpgradeHandler(CdpSession session, EndpointInfo init
 {
     private readonly ILogger _logger = session.Platform.CreateLogger<ClientUpgradeHandler>();
 
-    protected override bool TryHandleConnectInternal(CdpSocket socket, ConnectionHeader connectionHeader, ref EndianReader reader)
+    protected override bool TryHandleConnectInternal(CdpSocket socket, ConnectionHeader connectionHeader, ref HeapEndianReader reader)
     {
         if (!IsSocketAllowed(socket))
             return false;
@@ -54,21 +54,26 @@ internal sealed class ClientUpgradeHandler(CdpSession session, EndpointInfo init
                 Type = MessageType.Connect
             };
 
-            using (var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool))
+            var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
+            try
             {
                 new ConnectionHeader()
                 {
                     ConnectionMode = ConnectionMode.Proximal,
                     MessageType = ConnectionType.UpgradeRequest
-                }.Write(writer);
+                }.Write(ref writer);
 
                 new UpgradeRequest()
                 {
                     UpgradeId = _currentUpgrade.Id,
                     Endpoints = UpgradeEndpoints
-                }.Write(writer);
+                }.Write(ref writer);
 
-                _session.SendMessage(oldSocket, header, writer);
+                _session.SendMessage(oldSocket, header, writer.Stream.WrittenSpan);
+            }
+            finally
+            {
+                writer.Dispose();
             }
 
             return await _currentUpgrade;
@@ -79,7 +84,7 @@ internal sealed class ClientUpgradeHandler(CdpSession session, EndpointInfo init
         }
     }
 
-    void HandleUpgradeResponse(CdpSocket oldSocket, ref EndianReader reader)
+    void HandleUpgradeResponse(CdpSocket oldSocket, ref HeapEndianReader reader)
     {
         if (_currentUpgrade == null)
             return;
@@ -119,21 +124,28 @@ internal sealed class ClientUpgradeHandler(CdpSession session, EndpointInfo init
 
     void SendUpgradFinalization(CdpSocket socket)
     {
-        using var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
-        new ConnectionHeader()
+        var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
+        try
         {
-            ConnectionMode = ConnectionMode.Proximal,
-            MessageType = ConnectionType.UpgradeFinalization
-        }.Write(writer);
-        EndpointMetadata.WriteArray(writer,
-        [
-            EndpointMetadata.Tcp
-        ]);
+            new ConnectionHeader()
+            {
+                ConnectionMode = ConnectionMode.Proximal,
+                MessageType = ConnectionType.UpgradeFinalization
+            }.Write(ref writer);
+            EndpointMetadata.WriteArray(ref writer,
+            [
+                EndpointMetadata.Tcp
+            ]);
 
-        _session.SendMessage(socket, new()
+            _session.SendMessage(socket, new()
+            {
+                Type = MessageType.Connect,
+            }, writer.Stream.WrittenSpan);
+        }
+        finally
         {
-            Type = MessageType.Connect,
-        }, writer);
+            writer.Dispose();
+        }
     }
 
     void HandleUpgradeFinalizationResponse()
@@ -149,24 +161,31 @@ internal sealed class ClientUpgradeHandler(CdpSession session, EndpointInfo init
         _allowedAddresses.Add(_currentUpgrade.NewSocket.Endpoint.Address);
 
         // Request transport permission for new socket
-        using var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
-        new ConnectionHeader()
+        var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
+        try
         {
-            ConnectionMode = ConnectionMode.Proximal,
-            MessageType = ConnectionType.TransportRequest
-        }.Write(writer);
-        new UpgradeIdPayload()
-        {
-            UpgradeId = _currentUpgrade.Id
-        }.Write(writer);
+            new ConnectionHeader()
+            {
+                ConnectionMode = ConnectionMode.Proximal,
+                MessageType = ConnectionType.TransportRequest
+            }.Write(ref writer);
+            new UpgradeIdPayload()
+            {
+                UpgradeId = _currentUpgrade.Id
+            }.Write(ref writer);
 
-        _session.SendMessage(_currentUpgrade.NewSocket, new()
+            _session.SendMessage(_currentUpgrade.NewSocket, new()
+            {
+                Type = MessageType.Connect,
+            }, writer.Stream.WrittenSpan);
+        }
+        finally
         {
-            Type = MessageType.Connect,
-        }, writer);
+            writer.Dispose();
+        }
     }
 
-    void HandleUpgradeFailure(ref EndianReader reader)
+    void HandleUpgradeFailure(ref HeapEndianReader reader)
     {
         var msg = HResultPayload.Parse(ref reader);
 
@@ -175,7 +194,7 @@ internal sealed class ClientUpgradeHandler(CdpSession session, EndpointInfo init
         );
     }
 
-    void HandleTransportConfirmation(CdpSocket socket, ref EndianReader reader)
+    void HandleTransportConfirmation(CdpSocket socket, ref HeapEndianReader reader)
     {
         var msg = UpgradeIdPayload.Parse(ref reader);
 

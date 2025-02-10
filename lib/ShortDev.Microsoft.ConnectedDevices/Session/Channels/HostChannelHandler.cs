@@ -5,7 +5,7 @@ using ShortDev.Microsoft.ConnectedDevices.Transports;
 namespace ShortDev.Microsoft.ConnectedDevices.Session.Channels;
 internal sealed class HostChannelHandler(CdpSession session) : ChannelHandler(session)
 {
-    protected override void HandleMessageInternal(CdpSocket socket, CommonHeader header, ControlHeader controlHeader, ref EndianReader reader)
+    protected override void HandleMessageInternal(CdpSocket socket, CommonHeader header, ControlHeader controlHeader, ref HeapEndianReader reader)
     {
         if (controlHeader.MessageType != ControlMessageType.StartChannelRequest)
             return;
@@ -22,18 +22,25 @@ internal sealed class HostChannelHandler(CdpSession session) : ChannelHandler(se
 
         _channelRegistry.Create(channelId => CdpChannel.CreateServerChannel(this, socket, request, channelId), out var channelId);
 
-        using var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
-        new ControlHeader()
+        var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
+        try
         {
-            MessageType = ControlMessageType.StartChannelResponse
-        }.Write(writer);
-        new StartChannelResponse()
-        {
-            Result = ChannelResult.Success,
-            ChannelId = channelId
-        }.Write(writer);
+            new ControlHeader()
+            {
+                MessageType = ControlMessageType.StartChannelResponse
+            }.Write(ref writer);
+            new StartChannelResponse()
+            {
+                Result = ChannelResult.Success,
+                ChannelId = channelId
+            }.Write(ref writer);
 
-        header.Flags = 0;
-        Session.SendMessage(socket, header, writer);
+            header.Flags = 0;
+            Session.SendMessage(socket, header, writer.Stream.WrittenSpan);
+        }
+        finally
+        {
+            writer.Dispose();
+        }
     }
 }

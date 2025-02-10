@@ -58,15 +58,22 @@ public sealed class CdpChannel : IDisposable
             ChannelId = ChannelId
         };
 
-        using var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
-        new BinaryMsgHeader()
+        var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
+        try
         {
-            MessageId = msgId
-        }.Write(writer);
-        bodyCallback(writer);
+            new BinaryMsgHeader()
+            {
+                MessageId = msgId
+            }.Write(ref writer);
+            bodyCallback(ref writer);
 
-        using SpeedMeassure speedMeassure = new((uint)writer.Buffer.WrittenSpan.Length);
-        Session.SendMessage(Socket, header, writer);
+            using SpeedMeassure speedMeassure = new((uint)writer.Stream.WrittenSpan.Length);
+            Session.SendMessage(Socket, header, writer.Stream.WrittenSpan);
+        }
+        finally
+        {
+            writer.Dispose();
+        }
     }
 
     void IDisposable.Dispose()

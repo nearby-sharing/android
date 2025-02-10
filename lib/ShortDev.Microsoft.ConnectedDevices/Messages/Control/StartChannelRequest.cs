@@ -1,8 +1,8 @@
 ﻿namespace ShortDev.Microsoft.ConnectedDevices.Messages.Control;
 
-public sealed class StartChannelRequest : ICdpPayload<StartChannelRequest>
+public sealed class StartChannelRequest : IBinaryWritable, IBinaryParsable<StartChannelRequest>
 {
-    public static StartChannelRequest Parse(ref EndianReader reader)
+    public static StartChannelRequest Parse<TReader>(ref TReader reader) where TReader : struct, IEndianReader, allows ref struct
         => new()
         {
             Id = reader.ReadStringWithLength(),
@@ -16,7 +16,7 @@ public sealed class StartChannelRequest : ICdpPayload<StartChannelRequest>
     public short Reserved1 { get; init; }
     public string Reserved2 { get; init; } = string.Empty;
 
-    public void Write(EndianWriter writer)
+    public void Write<TWriter>(ref TWriter writer) where TWriter : struct, IEndianWriter, allows ref struct
     {
         writer.WriteWithLength(Id);
         writer.WriteWithLength(Name);

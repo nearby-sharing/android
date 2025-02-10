@@ -1,14 +1,4 @@
 <Project>
-	<ItemGroup Label="Global Dependencies">
-		<PackageReference Include="ShortDev.IO" Version="0.1.4.8" />
-	</ItemGroup>
-
-	<ItemGroup Label="Global Usings">
-		<Using Include="ShortDev.IO" />
-		<Using Include="ShortDev.IO.Input" />
-		<Using Include="ShortDev.IO.Output" />
-	</ItemGroup>
-
 	<ItemGroup Label="Tests">
 		<InternalsVisibleTo Include="ShortDev.Microsoft.ConnectedDevices.Test" />
 	</ItemGroup>

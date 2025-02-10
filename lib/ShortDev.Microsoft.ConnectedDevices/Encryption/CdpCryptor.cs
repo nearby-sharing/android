@@ -1,4 +1,5 @@
 ﻿using ShortDev.IO.Buffers;
+using ShortDev.IO.ValueStream;
 using ShortDev.Microsoft.ConnectedDevices.Exceptions;
 using ShortDev.Microsoft.ConnectedDevices.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
@@ -65,8 +66,8 @@ public sealed class CdpCryptor : IDisposable
         var decryptedPayload = ConnectedDevicesPlatform.MemoryPool.RentMemory(decryptedBufferSize);
         _aes.DecryptCbc(payload, iv, decryptedPayload.Span, PaddingMode.None);
 
-        var payloadSize = BinaryPrimitives.ReadUInt32BigEndian(decryptedPayload.AsSpan()[..sizeof(uint)]);
-        return decryptedPayload.AsMemory(sizeof(uint), (int)payloadSize);
+        var payloadSize = BinaryPrimitives.ReadUInt32BigEndian(decryptedPayload.Span[..sizeof(uint)]);
+        return decryptedPayload.Slice(sizeof(uint), (int)payloadSize);
     }
 
     void VerifyHMac(CommonHeader header, ReadOnlySpan<byte> payload, ReadOnlySpan<byte> hmac)
@@ -77,47 +78,60 @@ public sealed class CdpCryptor : IDisposable
         if (hmac.Length != Constants.HMacSize)
             throw new CdpSecurityException("Invalid hmac size!");
 
-        using var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
-        header.Write(writer);
-        writer.Write(payload);
+        var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
+        try
+        {
+            header.Write(ref writer);
+            writer.Write(payload);
 
-        var buffer = writer.Buffer.WrittenSpan;
-        CommonHeader.ModifyMessageLength(buffer.AsSpanUnsafe(), -Constants.HMacSize);
+            var buffer = writer.Stream.WrittenSpan;
+            CommonHeader.ModifyMessageLength(buffer.AsSpanUnsafe(), -Constants.HMacSize);
 
-        Span<byte> expectedHMac = stackalloc byte[Constants.HMacSize];
-        ComputeHmac(buffer, expectedHMac);
-        if (!hmac.SequenceEqual(expectedHMac))
-            throw new CdpSecurityException("Invalid hmac!");
+            Span<byte> expectedHMac = stackalloc byte[Constants.HMacSize];
+            ComputeHmac(buffer, expectedHMac);
+            if (!hmac.SequenceEqual(expectedHMac))
+                throw new CdpSecurityException("Invalid hmac!");
+        }
+        finally
+        {
+            writer.Dispose();
+        }
     }
 
     public void EncryptMessage(IFragmentSender sender, CommonHeader header, ReadOnlySpan<byte> payloadBuffer)
     {
-        using var msgWriter = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
-
-        using (EndianWriter payloadWriter = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool, payloadBuffer.Length + sizeof(uint)))
+        var msgWriter = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
+        try
         {
-            // Prepend payload with length
-            payloadWriter.Write((uint)payloadBuffer.Length);
-            payloadWriter.Write(payloadBuffer);
+            using (var payloadWriter = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool, payloadBuffer.Length + sizeof(uint)))
+            {
+                // Prepend payload with length
+                payloadWriter.Write((uint)payloadBuffer.Length);
+                payloadWriter.Write(payloadBuffer);
 
-            // Encrypt
-            Encrypt(msgWriter, header, payloadWriter.Buffer.WrittenSpan);
+                // Encrypt
+                Encrypt(ref msgWriter, header, payloadWriter.Stream.WrittenSpan);
+            }
+
+            // HMAC
+            {
+                var msgBuffer = msgWriter.Stream.WrittenSpan;
+                Span<byte> hmac = stackalloc byte[Constants.HMacSize];
+                ComputeHmac(msgBuffer, hmac);
+                CommonHeader.ModifyMessageLength(msgBuffer.AsSpanUnsafe(), +Constants.HMacSize);
+                msgWriter.Write(hmac);
+            }
+
+            sender.SendFragment(msgWriter.Stream.WrittenSpan);
         }
-
-        // HMAC
+        finally
         {
-            var msgBuffer = msgWriter.Buffer.WrittenSpan;
-            Span<byte> hmac = stackalloc byte[Constants.HMacSize];
-            ComputeHmac(msgBuffer, hmac);
-            CommonHeader.ModifyMessageLength(msgBuffer.AsSpanUnsafe(), +Constants.HMacSize);
-            msgWriter.Write(hmac);
+            msgWriter.Dispose();
         }
-
-        sender.SendFragment(msgWriter.Buffer.WrittenSpan);
     }
 
     [SkipLocalsInit]
-    void Encrypt(EndianWriter writer, CommonHeader header, ReadOnlySpan<byte> buffer)
+    void Encrypt<TWriter>(ref TWriter writer, CommonHeader header, ReadOnlySpan<byte> buffer) where TWriter : struct, IEndianWriter, allows ref struct
     {
         // If payload size is an exact multiple of block length (16 bytes) no padding is applied
         PaddingMode paddingMode = buffer.Length % 16 == 0 ? PaddingMode.None : PaddingMode.PKCS7;
@@ -126,17 +140,17 @@ public sealed class CdpCryptor : IDisposable
         // Write header
         header.Flags |= MessageFlags.SessionEncrypted | MessageFlags.HasHMAC;
         header.SetPayloadLength(encryptedPayloadLength);
-        header.Write(writer);
+        header.Write(ref writer);
 
         Span<byte> iv = stackalloc byte[Constants.IVSize];
         GenerateIV(header, iv);
 
         // Encrypt and write to msgWriter
-        _aes.EncryptCbc(buffer, iv, writer.Buffer.GetSpan(encryptedPayloadLength), paddingMode);
-        writer.Buffer.Advance(encryptedPayloadLength);
+        _aes.EncryptCbc(buffer, iv, writer.GetSpan(encryptedPayloadLength), paddingMode);
+        writer.Advance(encryptedPayloadLength);
     }
 
-    public DisposeToken<byte> Read(ref EndianReader reader, CommonHeader header)
+    public DisposeToken<byte> Read(ref HeapEndianReader reader, CommonHeader header)
     {
         if (!header.HasFlag(MessageFlags.SessionEncrypted))
             return default;
@@ -147,7 +161,7 @@ public sealed class CdpCryptor : IDisposable
             payloadSize -= Constants.HMacSize;
         }
 
-        var encryptedPayload = reader.ReadBytes(payloadSize);
+        var encryptedPayload = reader.Stream.ReadSlice(payloadSize);
 
         scoped Span<byte> hmac = [];
         if (header.HasFlag(MessageFlags.HasHMAC))
@@ -157,7 +171,8 @@ public sealed class CdpCryptor : IDisposable
         }
 
         var decryptedPayload = DecryptMessage(header, encryptedPayload, hmac);
-        reader = EndianReader.Create(Endianness.BigEndian, decryptedPayload.Span);
+        reader = EndianReader.FromMemory(Endianness.BigEndian, decryptedPayload);
+
         return decryptedPayload;
     }
 

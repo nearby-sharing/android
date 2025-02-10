@@ -20,15 +20,15 @@ public sealed record BLeBeacon(DeviceType DeviceType, PhysicalAddress MacAddress
         if (beaconData == null)
             return false;
 
-        var reader = EndianReader.Create(Endianness.BigEndian, beaconData);
+        var reader = EndianReader.FromMemory(Endianness.BigEndian, beaconData);
 
-        var scenarioType = (ScenarioType)reader.ReadByte();
+        var scenarioType = (ScenarioType)reader.ReadUInt8();
         if (scenarioType != ScenarioType.Bluetooth)
             return false;
 
-        var deviceType = (DeviceType)reader.ReadByte();
+        var deviceType = (DeviceType)reader.ReadUInt8();
 
-        var versionAndFlags = reader.ReadByte();
+        var versionAndFlags = reader.ReadUInt8();
         if (versionAndFlags >> 5 != 1)
             return false; // wrong version
 
@@ -37,15 +37,15 @@ public sealed record BLeBeacon(DeviceType DeviceType, PhysicalAddress MacAddress
             return false; // wrong flags
 
         /* deviceStatus */
-        _ = (ExtendedDeviceStatus)reader.ReadByte();
+        _ = (ExtendedDeviceStatus)reader.ReadUInt8();
 
         if (flags != BeaconFlags.Public)
             return false;
 
         data = new(
             deviceType,
-            new PhysicalAddress(reader.ReadBytes(6).ToReversed().ToArray()),
-            Encoding.UTF8.GetString(reader.ReadToEnd())
+            reader.ReadPhysicalAddress(),
+            reader.ReadString((int)(reader.Stream.Length - reader.Stream.Position - 1))
         );
 
         return true;
@@ -53,24 +53,31 @@ public sealed record BLeBeacon(DeviceType DeviceType, PhysicalAddress MacAddress
 
     public byte[] ToArray()
     {
-        using var writer = EndianWriter.Create(Endianness.LittleEndian, ConnectedDevicesPlatform.MemoryPool);
-        writer.Write((byte)ScenarioType.Bluetooth);
-        writer.Write((byte)DeviceType);
+        var writer = EndianWriter.Create(Endianness.LittleEndian, ConnectedDevicesPlatform.MemoryPool);
+        try
+        {
+            writer.Write((byte)ScenarioType.Bluetooth);
+            writer.Write((byte)DeviceType);
 
-        byte versionAndFlags = (byte)BeaconFlags.Public;
-        versionAndFlags |= Constants.BLeBeaconVersion << 5;
-        writer.Write(versionAndFlags);
+            byte versionAndFlags = (byte)BeaconFlags.Public;
+            versionAndFlags |= Constants.BLeBeaconVersion << 5;
+            writer.Write(versionAndFlags);
 
-        var deviceStatus = ExtendedDeviceStatus.RemoteSessionsNotHosted | ExtendedDeviceStatus.NearShareAuthPolicyPermissive;
-        writer.Write((byte)deviceStatus);
+            var deviceStatus = ExtendedDeviceStatus.RemoteSessionsNotHosted | ExtendedDeviceStatus.NearShareAuthPolicyPermissive;
+            writer.Write((byte)deviceStatus);
 
-        writer.Write(MacAddress.GetAddressBytes().AsSpan().ReverseInPlace());
+            writer.Write(MacAddress);
 
-        // ToDo: Don't crop characters wider that 2 bytes!
-        ReadOnlySpan<byte> deviceNameBuffer = Encoding.UTF8.GetBytes(DeviceName);
-        var deviceNameLength = Math.Min(deviceNameBuffer.Length, Constants.BLeBeaconDeviceNameMaxByteLength);
-        writer.Write(deviceNameBuffer[..deviceNameLength]);
+            // ToDo: Don't crop characters wider that 2 bytes!
+            ReadOnlySpan<byte> deviceNameBuffer = Encoding.UTF8.GetBytes(DeviceName);
+            var deviceNameLength = Math.Min(deviceNameBuffer.Length, Constants.BLeBeaconDeviceNameMaxByteLength);
+            writer.Write(deviceNameBuffer[..deviceNameLength]);
 
-        return writer.Buffer.WrittenSpan.ToArray();
+            return writer.Stream.WrittenSpan.ToArray();
+        }
+        finally
+        {
+            writer.Dispose();
+        }
     }
 }

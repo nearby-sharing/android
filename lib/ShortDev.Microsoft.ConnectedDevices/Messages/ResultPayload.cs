@@ -7,17 +7,17 @@ namespace ShortDev.Microsoft.ConnectedDevices.Messages;
 /// <br/>
 /// (e.g. <see cref="Connection.ConnectionType.AuthDoneRespone"/>)
 /// </summary>
-public sealed class ResultPayload : ICdpPayload<ResultPayload>
+public sealed class ResultPayload : IBinaryWritable, IBinaryParsable<ResultPayload>
 {
-    public static ResultPayload Parse(ref EndianReader reader)
+    public static ResultPayload Parse<TReader>(ref TReader reader) where TReader : struct, IEndianReader, allows ref struct
         => new()
         {
-            Result = (CdpResult)reader.ReadByte()
+            Result = (CdpResult)reader.ReadUInt8()
         };
 
     public required CdpResult Result { get; init; }
 
-    public void Write(EndianWriter writer)
+    public void Write<TWriter>(ref TWriter writer) where TWriter : struct, IEndianWriter, allows ref struct
     {
         writer.Write((byte)Result);
     }

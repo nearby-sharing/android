@@ -5,7 +5,7 @@ using ShortDev.Microsoft.ConnectedDevices.Transports;
 namespace ShortDev.Microsoft.ConnectedDevices.Session.Channels;
 internal sealed class ClientChannelHandler(CdpSession session) : ChannelHandler(session)
 {
-    protected override void HandleMessageInternal(CdpSocket socket, CommonHeader header, ControlHeader controlHeader, ref EndianReader reader)
+    protected override void HandleMessageInternal(CdpSocket socket, CommonHeader header, ControlHeader controlHeader, ref HeapEndianReader reader)
     {
         if (controlHeader.MessageType != ControlMessageType.StartChannelResponse)
             return;
@@ -50,23 +50,30 @@ internal sealed class ClientChannelHandler(CdpSession session) : ChannelHandler(
 
     ulong SendChannelRequest(CdpSocket socket, string appId, string appName)
     {
-        using var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
-        new ControlHeader()
+        var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
+        try
         {
-            MessageType = ControlMessageType.StartChannelRequest
-        }.Write(writer);
-        new StartChannelRequest()
-        {
-            Id = appId,
-            Name = appName
-        }.Write(writer);
+            new ControlHeader()
+            {
+                MessageType = ControlMessageType.StartChannelRequest
+            }.Write(ref writer);
+            new StartChannelRequest()
+            {
+                Id = appId,
+                Name = appName
+            }.Write(ref writer);
 
-        CommonHeader header = new()
-        {
-            Type = MessageType.Control
-        };
-        Session.SendMessage(socket, header, writer, supplyRequestId: true);
+            CommonHeader header = new()
+            {
+                Type = MessageType.Control
+            };
+            Session.SendMessage(socket, header, writer.Stream.WrittenSpan, supplyRequestId: true);
 
-        return header.RequestID;
+            return header.RequestID;
+        }
+        finally
+        {
+            writer.Dispose();
+        }
     }
 }

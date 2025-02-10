@@ -6,7 +6,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Messages.Connection;
 /// <summary>
 /// Client initiates a connection request with a host device.
 /// </summary>
-public sealed class ConnectionRequest : ICdpPayload<ConnectionRequest>
+public sealed class ConnectionRequest : IBinaryWritable, IBinaryParsable<ConnectionRequest>
 {
     /// <summary>
     /// The type of elliptical curve used.
@@ -30,26 +30,26 @@ public sealed class ConnectionRequest : ICdpPayload<ConnectionRequest>
     /// This is the X component of the key. <br/>
     /// (See <see cref="System.Security.Cryptography.ECPoint.X"/>)
     /// </summary>
-    public required byte[] PublicKeyX { get; set; }
+    public required ReadOnlyMemory<byte> PublicKeyX { get; set; }
     /// <summary>
     /// A fixed-length key.
     /// This is the Y component of the key. <br/>
     /// (See <see cref="System.Security.Cryptography.ECPoint.Y"/>)
     /// </summary>
-    public required byte[] PublicKeyY { get; set; }
+    public required ReadOnlyMemory<byte> PublicKeyY { get; set; }
 
-    public static ConnectionRequest Parse(ref EndianReader reader)
+    public static ConnectionRequest Parse<TReader>(ref TReader reader) where TReader : struct, IEndianReader, allows ref struct
         => new()
         {
-            CurveType = (CurveType)reader.ReadByte(),
+            CurveType = (CurveType)reader.ReadUInt8(),
             HmacSize = reader.ReadUInt16(),
             Nonce = new(reader.ReadUInt64()),
             MessageFragmentSize = reader.ReadUInt32(),
-            PublicKeyX = reader.ReadBytesWithLength().ToArray(),
-            PublicKeyY = reader.ReadBytesWithLength().ToArray()
+            PublicKeyX = reader.ReadBytesWithLength(),
+            PublicKeyY = reader.ReadBytesWithLength()
         };
 
-    public void Write(EndianWriter writer)
+    public void Write<TWriter>(ref TWriter writer) where TWriter : struct, IEndianWriter, allows ref struct
     {
         writer.Write((byte)CurveType);
         writer.Write((ushort)HmacSize);
@@ -57,8 +57,8 @@ public sealed class ConnectionRequest : ICdpPayload<ConnectionRequest>
         writer.Write((uint)MessageFragmentSize);
 
         writer.Write((ushort)PublicKeyX.Length);
-        writer.Write(PublicKeyX);
+        writer.Write(PublicKeyX.Span);
         writer.Write((ushort)PublicKeyY.Length);
-        writer.Write(PublicKeyY);
+        writer.Write(PublicKeyY.Span);
     }
 }

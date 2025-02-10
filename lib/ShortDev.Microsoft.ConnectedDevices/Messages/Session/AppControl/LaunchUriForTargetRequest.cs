@@ -1,8 +1,8 @@
 ﻿namespace ShortDev.Microsoft.ConnectedDevices.Messages.Session.AppControl;
 
-public sealed class LaunchUriForTargetRequest : ICdpPayload<LaunchUriForTargetRequest>
+public sealed class LaunchUriForTargetRequest : IBinaryWritable, IBinaryParsable<LaunchUriForTargetRequest>
 {
-    public static LaunchUriForTargetRequest Parse(ref EndianReader reader)
+    public static LaunchUriForTargetRequest Parse<TReader>(ref TReader reader) where TReader : struct, IEndianReader, allows ref struct
         => new()
         {
             Uri = reader.ReadStringWithLength(),
@@ -13,7 +13,7 @@ public sealed class LaunchUriForTargetRequest : ICdpPayload<LaunchUriForTargetRe
             AlternateId = reader.ReadStringWithLength(),
             TitleId = reader.ReadInt32(),
             FacadeName = reader.ReadStringWithLength(),
-            InputData = reader.ReadBytesWithLength().ToArray()
+            InputData = reader.ReadBytesWithLength()
         };
 
     /// <summary>
@@ -50,9 +50,9 @@ public sealed class LaunchUriForTargetRequest : ICdpPayload<LaunchUriForTargetRe
     /// BOND.NET serialized data that is passed as a value set to the app launched by the call. <br/>
     /// (Optional)
     /// </summary>
-    public byte[] InputData { get; init; } = [];
+    public ReadOnlyMemory<byte> InputData { get; init; } = default;
 
-    public void Write(EndianWriter writer)
+    public void Write<TWriter>(ref TWriter writer) where TWriter : struct, IEndianWriter, allows ref struct
     {
         writer.WriteWithLength(Uri);
         writer.Write((short)LaunchLocation);
@@ -62,6 +62,6 @@ public sealed class LaunchUriForTargetRequest : ICdpPayload<LaunchUriForTargetRe
         writer.WriteWithLength(AlternateId);
         writer.Write(TitleId);
         writer.WriteWithLength(FacadeName);
-        writer.WriteWithLength(InputData);
+        writer.WriteWithLength(InputData.Span);
     }
 }
