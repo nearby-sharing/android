@@ -3,9 +3,9 @@
 /// <summary>
 /// General payload to represent a HRESULT (<see cref="int"/>).
 /// </summary>
-public sealed class HResultPayload : ICdpPayload<HResultPayload>
+public sealed class HResultPayload : IBinaryWritable, IBinaryParsable<HResultPayload>
 {
-    public static HResultPayload Parse(ref EndianReader reader)
+    public static HResultPayload Parse<TReader>(ref TReader reader) where TReader : struct, IEndianReader, allows ref struct
         => new()
         {
             HResult = reader.ReadInt32()
@@ -13,7 +13,7 @@ public sealed class HResultPayload : ICdpPayload<HResultPayload>
 
     public required int HResult { get; init; }
 
-    public void Write(EndianWriter writer)
+    public void Write<TWriter>(ref TWriter writer) where TWriter : struct, IEndianWriter, allows ref struct
     {
         writer.Write(HResult);
     }
