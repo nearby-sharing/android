@@ -1,9 +1,11 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Messages.Connection;
 using System.Security.Cryptography;
+using ShortDev.IO;
+using System.Diagnostics;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages.Discovery;
 
-public class PresenceResponse : ICdpPayload<PresenceResponse>
+public class PresenceResponse : IBinaryWritable, IBinaryParsable<PresenceResponse>
 {
     public required ConnectionMode ConnectionMode { get; init; }
 
@@ -13,25 +15,25 @@ public class PresenceResponse : ICdpPayload<PresenceResponse>
 
     public required int DeviceIdSalt { get; init; }
 
-    public required byte[] DeviceIdHash { get; init; }
+    public required DeviceIdHash DeviceIdHash { get; init; }
 
-    public static PresenceResponse Parse(ref EndianReader reader)
+    public static PresenceResponse Parse<TReader>(ref TReader reader) where TReader : struct, IEndianReader, allows ref struct
         => new()
         {
             ConnectionMode = (ConnectionMode)reader.ReadInt16(),
             DeviceType = (DeviceType)reader.ReadInt16(),
             DeviceName = reader.ReadStringWithLength(),
             DeviceIdSalt = reader.ReadInt32(),
-            DeviceIdHash = reader.ReadBytes(32).ToArray()
+            DeviceIdHash = reader.Read<DeviceIdHash>()
         };
 
-    public void Write(EndianWriter writer)
+    public void Write<TWriter>(ref TWriter writer) where TWriter : struct, IEndianWriter, allows ref struct
     {
         writer.Write((short)ConnectionMode);
         writer.Write((short)DeviceType);
         writer.WriteWithLength(DeviceName);
         writer.Write((int)DeviceIdSalt);
-        writer.Write(DeviceIdHash);
+        writer.Write<DeviceIdHash>(DeviceIdHash);
     }
 
     static readonly HashAlgorithm _hashAlgorithm = SHA256.Create();
@@ -45,8 +47,10 @@ public class PresenceResponse : ICdpPayload<PresenceResponse>
         writer.Write(salt);
         writer.Write(deviceInfo.GetDeduplicationHint());
 
-        var hash = new byte[_hashAlgorithm.HashSize];
-        _hashAlgorithm.TryComputeHash(writer.Buffer.WrittenSpan, hash, out _);
+        Debug.Assert(_hashAlgorithm.HashSize / 8 == 32);
+
+        DeviceIdHash hash = default;
+        _hashAlgorithm.TryComputeHash(writer.Stream.WrittenSpan, hash, out _);
 
         return new()
         {
