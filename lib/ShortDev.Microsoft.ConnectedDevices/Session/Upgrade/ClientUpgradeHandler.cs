@@ -97,8 +97,8 @@ internal sealed class ClientUpgradeHandler(CdpSession session, EndpointInfo init
                 if (!int.TryParse(endpoint.Service, out var port))
                     return null;
 
-                return await _session.Platform.TryCreateSocketAsync(endpoint, UpgradeInstance.Timeout);
-            }));
+                return await _session.Platform.TryCreateSocketAsync(endpoint, UpgradeInstance.Timeout).ConfigureAwait(false);
+            })).ConfigureAwait(false);
 
             if (_currentUpgrade == null)
                 return;
@@ -109,7 +109,7 @@ internal sealed class ClientUpgradeHandler(CdpSession session, EndpointInfo init
             SendUpgradFinalization(oldSocket);
 
             // Cancel after timeout if upgrade has not finished yet
-            await Task.Delay(UpgradeInstance.Timeout);
+            await Task.Delay(UpgradeInstance.Timeout).ConfigureAwait(false);
 
             _currentUpgrade?.TrySetCanceled();
         }

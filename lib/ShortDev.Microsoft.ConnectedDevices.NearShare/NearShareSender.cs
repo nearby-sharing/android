@@ -18,35 +18,35 @@ public sealed class NearShareSender(ConnectedDevicesPlatform platform)
 
     async Task<SenderStateMachine> PrepareTransferInternalAsync(EndpointInfo endpoint, CancellationToken cancellationToken)
     {
-        var session = await Platform.ConnectAsync(endpoint, options: new() { TransportUpgraded = TransportUpgraded }, cancellationToken);
+        var session = await Platform.ConnectAsync(endpoint, options: new() { TransportUpgraded = TransportUpgraded }, cancellationToken).ConfigureAwait(false);
 
         Guid operationId = Guid.NewGuid();
 
         HandshakeHandler handshake = new(Platform);
-        using var handShakeChannel = await session.StartClientChannelAsync(handshake, cancellationToken);
-        var handshakeResultMsg = await handshake.Execute(operationId);
+        using var handShakeChannel = await session.StartClientChannelAsync(handshake, cancellationToken).ConfigureAwait(false);
+        var handshakeResultMsg = await handshake.Execute(operationId).ConfigureAwait(false);
 
         // ToDo: CorrelationVector
         // var cv = handshakeResultMsg.Header.TryGetCorrelationVector() ?? throw new InvalidDataException("No Correlation Vector");
 
         SenderStateMachine senderStateMachine = new(Platform);
-        var channel = await session.StartClientChannelAsync(operationId.ToString("D").ToUpper(), NearShareApp.Name, senderStateMachine, cancellationToken);
+        var channel = await session.StartClientChannelAsync(operationId.ToString("D").ToUpper(), NearShareApp.Name, senderStateMachine, cancellationToken).ConfigureAwait(false);
         return senderStateMachine;
     }
 
     public async Task SendUriAsync(CdpDevice device, Uri uri, CancellationToken cancellationToken = default)
     {
-        using var senderStateMachine = await PrepareTransferInternalAsync(device.Endpoint, cancellationToken);
-        await senderStateMachine.SendUriAsync(uri);
+        using var senderStateMachine = await PrepareTransferInternalAsync(device.Endpoint, cancellationToken).ConfigureAwait(false);
+        await senderStateMachine.SendUriAsync(uri).ConfigureAwait(false);
     }
 
     public async Task SendFileAsync(CdpDevice device, CdpFileProvider file, IProgress<NearShareProgress> progress, CancellationToken cancellationToken = default)
-        => await SendFilesAsync(device, [file], progress, cancellationToken);
+        => await SendFilesAsync(device, [file], progress, cancellationToken).ConfigureAwait(false);
 
     public async Task SendFilesAsync(CdpDevice device, IReadOnlyList<CdpFileProvider> files, IProgress<NearShareProgress> progress, CancellationToken cancellationToken = default)
     {
-        using var senderStateMachine = await PrepareTransferInternalAsync(device.Endpoint, cancellationToken);
-        await senderStateMachine.SendFilesAsync(files, progress, cancellationToken);
+        using var senderStateMachine = await PrepareTransferInternalAsync(device.Endpoint, cancellationToken).ConfigureAwait(false);
+        await senderStateMachine.SendFilesAsync(files, progress, cancellationToken).ConfigureAwait(false);
     }
 
     sealed class HandshakeHandler(ConnectedDevicesPlatform cdp) : CdpAppBase(cdp), ICdpAppId
@@ -93,7 +93,7 @@ public sealed class NearShareSender(ConnectedDevicesPlatform platform)
             valueSet.Add("Uri", uri.ToString());
             SendValueSet(valueSet, 10);
 
-            await _promise.Task;
+            await _promise.Task.ConfigureAwait(false);
         }
 
         IReadOnlyList<CdpFileProvider>? _files;
@@ -127,7 +127,7 @@ public sealed class NearShareSender(ConnectedDevicesPlatform platform)
                 _promise.TrySetCanceled();
             });
 
-            await _promise.Task;
+            await _promise.Task.ConfigureAwait(false);
         }
 
         static uint[] GenerateContentIds(uint fileCount)

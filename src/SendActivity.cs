@@ -118,7 +118,7 @@ public sealed class SendActivity : AppCompatActivity
         _logger.RequestPermissionResult(requestCode, permissions, grantResults);
         try
         {
-            await Task.Run(InitializePlatform);
+            await Task.Run(InitializePlatform).ConfigureAwait(false);
         }
         catch (Exception ex)
         {

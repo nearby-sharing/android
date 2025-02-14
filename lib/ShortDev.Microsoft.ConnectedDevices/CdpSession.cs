@@ -85,7 +85,7 @@ public sealed class CdpSession : IDisposable
         if (options is not null)
             connectHandler.UpgradeHandler.Upgraded += options.TransportUpgraded;
 
-        await connectHandler.ConnectAsync(socket, cancellationToken: cancellationToken);
+        await connectHandler.ConnectAsync(socket, cancellationToken: cancellationToken).ConfigureAwait(false);
 
         return session;
     }
@@ -186,8 +186,8 @@ public sealed class CdpSession : IDisposable
         if (_channelHandler is not ClientChannelHandler clientChannelHandler)
             throw new InvalidOperationException("Session is not a client");
 
-        var socket = await Platform.CreateSocketAsync(_connectHandler.UpgradeHandler.RemoteEndpoint, cancellationToken);
-        return await clientChannelHandler.CreateChannelAsync(appId, appName, handler, socket, cancellationToken);
+        var socket = await Platform.CreateSocketAsync(_connectHandler.UpgradeHandler.RemoteEndpoint, cancellationToken).ConfigureAwait(false);
+        return await clientChannelHandler.CreateChannelAsync(appId, appName, handler, socket, cancellationToken).ConfigureAwait(false);
     }
 
     #region Utils

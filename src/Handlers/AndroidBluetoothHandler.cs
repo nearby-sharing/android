@@ -33,7 +33,7 @@ public sealed class AndroidBluetoothHandler(BluetoothAdapter adapter, PhysicalAd
         };
         scanner.StartScan(scanningCallback);
 
-        await cancellationToken.AwaitCancellation();
+        await cancellationToken.AwaitCancellation().ConfigureAwait(false);
 
         scanner.StopScan(scanningCallback);
     }
@@ -64,7 +64,7 @@ public sealed class AndroidBluetoothHandler(BluetoothAdapter adapter, PhysicalAd
 
         var btDevice = Adapter.GetRemoteDevice(endpoint.Address) ?? throw new ArgumentException($"Could not find bt device with address \"{endpoint.Address}\"");
         var btSocket = btDevice.CreateInsecureRfcommSocketToServiceRecord(Java.Util.UUID.FromString(options.ServiceId)) ?? throw new ArgumentException("Could not create service socket");
-        await btSocket.ConnectAsync();
+        await btSocket.ConnectAsync().ConfigureAwait(false);
         return btSocket.ToCdp();
     }
     #endregion
@@ -85,7 +85,7 @@ public sealed class AndroidBluetoothHandler(BluetoothAdapter adapter, PhysicalAd
         BLeAdvertiseCallback callback = new();
         Adapter!.BluetoothLeAdvertiser!.StartAdvertising(settings, data, callback);
 
-        await cancellationToken.AwaitCancellation();
+        await cancellationToken.AwaitCancellation().ConfigureAwait(false);
 
         Adapter.BluetoothLeAdvertiser.StopAdvertising(callback);
     }

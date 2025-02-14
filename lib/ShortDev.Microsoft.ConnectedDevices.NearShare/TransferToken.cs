@@ -45,7 +45,7 @@ public sealed class FileTransferToken : TransferToken, IEnumerable<FileShareInfo
     #region Acceptance
     readonly TaskCompletionSource<IReadOnlyList<Stream>> _acceptPromise = new();
     internal async ValueTask AwaitAcceptance()
-        => await _acceptPromise.Task;
+        => await _acceptPromise.Task.ConfigureAwait(false);
 
     public bool IsAccepted
         => _acceptPromise.Task.IsCompletedSuccessfully;
@@ -109,7 +109,7 @@ public sealed class FileTransferToken : TransferToken, IEnumerable<FileShareInfo
     {
         await Task.WhenAll(_acceptPromise.Task.Result.Select(async stream =>
         {
-            await stream.FlushAsync();
+            await stream.FlushAsync().ConfigureAwait(false);
 
             stream.Close();
             stream.Dispose();
