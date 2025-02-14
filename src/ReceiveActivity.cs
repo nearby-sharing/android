@@ -21,7 +21,7 @@ using SystemDebug = System.Diagnostics.Debug;
 
 namespace NearShare;
 
-[Activity(Label = "@string/app_name", Theme = "@style/AppTheme", ConfigurationChanges = UIHelper.ConfigChangesFlags)]
+[Activity(Label = "@string/app_name", Theme = "@style/AppTheme", ConfigurationChanges = UIHelper.ConfigChangesFlags, LaunchMode = LaunchMode.SingleTask)]
 public sealed class ReceiveActivity : AppCompatActivity
 {
     RecyclerView notificationsRecyclerView = null!;

@@ -121,10 +121,12 @@ public sealed class NearShareSender(ConnectedDevicesPlatform platform)
 
             cancellationToken.Register(() =>
             {
+                if (!_promise.TrySetCanceled())
+                    return;
+
                 ValueSet request = new();
                 request.Add("ControlMessage", (uint)NearShareControlMsgType.CancelTransfer);
                 SendValueSet(request, 11);
-                _promise.TrySetCanceled();
             });
 
             await _promise.Task.ConfigureAwait(false);

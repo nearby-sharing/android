@@ -29,7 +29,7 @@ public sealed class AndroidBluetoothHandler(BluetoothAdapter adapter, PhysicalAd
                 if (beaconData != null && BLeBeacon.TryParse(beaconData, out var data))
                     scanOptions.OnDeviceDiscovered?.Invoke(data, result.Rssi);
             }
-            catch (InvalidDataException) { }
+            catch { }
         };
         scanner.StartScan(scanningCallback);
 
