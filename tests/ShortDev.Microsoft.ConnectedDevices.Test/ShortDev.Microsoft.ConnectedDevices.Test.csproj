@@ -24,4 +24,10 @@
 		<ProjectReference Include="..\..\lib\ShortDev.Microsoft.ConnectedDevices\ShortDev.Microsoft.ConnectedDevices.csproj" />
 	</ItemGroup>
 
+	<ItemGroup Label="Global Usings">
+		<Using Include="ShortDev.IO" />
+		<Using Include="ShortDev.IO.Input" />
+		<Using Include="ShortDev.IO.Output" />
+	</ItemGroup>
+
 </Project>
