@@ -30,7 +30,6 @@ public sealed class ReceiveActivity : AppCompatActivity
     PhysicalAddress? btAddress = null;
 
     ILogger<ReceiveActivity> _logger = null!;
-    ILoggerFactory _loggerFactory = null!;
     protected override void OnCreate(Bundle? savedInstanceState)
     {
         base.OnCreate(savedInstanceState);
@@ -62,8 +61,7 @@ public sealed class ReceiveActivity : AppCompatActivity
 
         FindViewById<Button>(Resource.Id.openFAQButton)!.Click += (s, e) => UIHelper.OpenFAQ(this);
 
-        _loggerFactory = CdpUtils.CreateLoggerFactory(this);
-        _logger = _loggerFactory.CreateLogger<ReceiveActivity>();
+        _logger = App.LoggerFactory.CreateLogger<ReceiveActivity>();
 
         UIHelper.RequestReceivePermissions(this);
     }
@@ -209,7 +207,6 @@ public sealed class ReceiveActivity : AppCompatActivity
     }
 
     CancellationTokenSource? _cancellationTokenSource;
-    ConnectedDevicesPlatform? _cdp;
     void InitializeCDP()
     {
         if (btAddress == null)
@@ -218,20 +215,16 @@ public sealed class ReceiveActivity : AppCompatActivity
         _cancellationTokenSource?.Dispose();
         _cancellationTokenSource = new();
 
-        SystemDebug.Assert(_cdp == null);
+        App.Platform.Listen(_cancellationTokenSource.Token);
+        App.Platform.Advertise(_cancellationTokenSource.Token);
 
-        _cdp = CdpUtils.Create(this, _loggerFactory);
-
-        _cdp.Listen(_cancellationTokenSource.Token);
-        _cdp.Advertise(_cancellationTokenSource.Token);
-
-        NearShareReceiver.Register(_cdp);
+        NearShareReceiver.Register(App.Platform);
         NearShareReceiver.ReceivedUri += OnTransfer;
         NearShareReceiver.FileTransfer += OnTransfer;
 
         FindViewById<TextView>(Resource.Id.deviceInfoTextView)!.Text = this.Localize(
             Resource.String.visible_as_template,
-            _cdp.DeviceInfo.Name
+            App.Platform.DeviceInfo.Name
         );
     }
 
@@ -250,9 +243,13 @@ public sealed class ReceiveActivity : AppCompatActivity
 
     public override void Finish()
     {
-        _cancellationTokenSource?.Cancel();
-        _cdp?.Dispose();
+        try
+        {
+            _cancellationTokenSource?.Cancel();
+        }
+        catch { }
         NearShareReceiver.Unregister();
+
         base.Finish();
     }
 

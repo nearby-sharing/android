@@ -13,26 +13,27 @@ public sealed partial class ConnectedDevicesPlatform(LocalDeviceInfo deviceInfo,
     #region Host
     #region Advertise
     public GuardFlag IsAdvertising { get; } = new();
-    public async void Advertise(CancellationToken cancellationToken)
+    public IDisposable Advertise()
     {
-        using var isAdvertising = IsAdvertising.Lock();
-
-        _logger.AdvertisingStarted();
-        try
+        return IsAdvertising.Run(static async (@this, token) =>
         {
-            await Task.WhenAll(_transportMap.Values
-                .OfType<ICdpDiscoverableTransport>()
-                .Select(x => x.Advertise(DeviceInfo, cancellationToken))
-            ).ConfigureAwait(false);
-        }
-        catch (Exception ex)
-        {
-            _logger.AdvertisingError(ex);
-        }
-        finally
-        {
-            _logger.AdvertisingStopped();
-        }
+            @this._logger.AdvertisingStarted();
+            try
+            {
+                await Task.WhenAll(@this._transportMap.Values
+                    .OfType<ICdpDiscoverableTransport>()
+                    .Select(x => x.Advertise(@this.DeviceInfo, token))
+                ).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                @this._logger.AdvertisingError(ex);
+            }
+            finally
+            {
+                @this._logger.AdvertisingStopped();
+            }
+        }, this);
     }
     #endregion
 

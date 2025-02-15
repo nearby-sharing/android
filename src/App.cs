@@ -1,7 +1,11 @@
 ﻿using Android.Runtime;
 using AndroidX.AppCompat.App;
 using Google.Android.Material.Color;
+using Microsoft.Extensions.Logging;
 using NearShare.Settings;
+using NearShare.Utils;
+using ShortDev.Microsoft.ConnectedDevices;
+using System.Diagnostics.CodeAnalysis;
 
 [assembly: UsesPermission(ManifestPermission.Bluetooth)]
 [assembly: UsesPermission(ManifestPermission.BluetoothAdmin)]
@@ -44,4 +48,10 @@ public sealed class App : Application
 
         DynamicColors.ApplyToActivitiesIfAvailable(this);
     }
+
+    [field: MaybeNull]
+    public static ILoggerFactory LoggerFactory => field ??= CdpUtils.CreateLoggerFactory(Context);
+
+    [field: MaybeNull]
+    public static ConnectedDevicesPlatform Platform => field ??= CdpUtils.Create(Context, LoggerFactory);
 }

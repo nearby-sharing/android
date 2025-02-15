@@ -37,7 +37,6 @@ public sealed class SendActivity : AppCompatActivity
     View _emptyDeviceListView = null!;
 
     ILogger<SendActivity> _logger = null!;
-    ILoggerFactory _loggerFactory = null!;
     protected override void OnCreate(Bundle? savedInstanceState)
     {
         this.EnableEdgeToEdge();
@@ -76,8 +75,7 @@ public sealed class SendActivity : AppCompatActivity
 
         _emptyDeviceListView = _dialog.FindViewById<View>(Resource.Id.emptyDeviceListView)!;
 
-        _loggerFactory = CdpUtils.CreateLoggerFactory(this);
-        _logger = _loggerFactory.CreateLogger<SendActivity>();
+        _logger = App.LoggerFactory.CreateLogger<SendActivity>();
 
         UIHelper.RequestSendPermissions(this);
     }
@@ -132,15 +130,12 @@ public sealed class SendActivity : AppCompatActivity
 
     #region Initialization
     readonly CancellationTokenSource _discoverCancellationTokenSource = new();
-    ConnectedDevicesPlatform _cdp = null!;
     void InitializePlatform()
     {
-        _cdp = CdpUtils.Create(this, _loggerFactory);
+        App.Platform.DeviceDiscovered += Platform_DeviceDiscovered;
+        App.Platform.Discover(_discoverCancellationTokenSource.Token);
 
-        _cdp.DeviceDiscovered += Platform_DeviceDiscovered;
-        _cdp.Discover(_discoverCancellationTokenSource.Token);
-
-        _nearShareSender = new NearShareSender(_cdp);
+        _nearShareSender = new NearShareSender(App.Platform);
     }
 
     readonly ObservableCollection<CdpDevice> RemoteSystems = [];
@@ -207,7 +202,7 @@ public sealed class SendActivity : AppCompatActivity
         try
         {
             if (remoteSystem.Endpoint.TransportType == CdpTransportType.Rfcomm &&
-                _cdp.TryGetTransport(CdpTransportType.Rfcomm)?.IsEnabled == false)
+                 App.Platform.TryGetTransport(CdpTransportType.Rfcomm)?.IsEnabled == false)
             {
                 StartActivityForResult(new Intent(BluetoothAdapter.ActionRequestEnable), 42);
                 throw new TaskCanceledException("Bluetooth is disabled");
@@ -411,13 +406,17 @@ public sealed class SendActivity : AppCompatActivity
 
     public override void Finish()
     {
-        _discoverCancellationTokenSource.Cancel();
+        try
+        {
+            _discoverCancellationTokenSource.Cancel();
+        }
+        catch { }
+        App.Platform.DeviceDiscovered -= Platform_DeviceDiscovered;
         try
         {
             _transferCancellation.Cancel();
         }
         catch { }
-        _cdp?.Dispose();
 
         base.Finish();
     }
