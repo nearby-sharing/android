@@ -1,5 +1,6 @@
 ﻿using Android.Bluetooth;
 using Android.Content;
+using Android.Content.PM;
 using Android.Runtime;
 using Android.Views;
 using AndroidX.AppCompat.App;
@@ -23,7 +24,7 @@ namespace NearShare;
 
 [IntentFilter([Intent.ActionProcessText], Categories = [Intent.CategoryDefault, Intent.CategoryBrowsable], DataMimeType = "text/plain", Label = "@string/app_name")]
 [IntentFilter([Intent.ActionSend, Intent.ActionSendMultiple], Categories = [Intent.CategoryDefault, Intent.CategoryBrowsable], DataMimeType = "*/*")]
-[Activity(Label = "@string/app_name", Exported = true, Theme = "@style/AppTheme.TranslucentOverlay", ConfigurationChanges = UIHelper.ConfigChangesFlags)]
+[Activity(Label = "@string/app_name", Exported = true, Theme = "@style/AppTheme.TranslucentOverlay", ConfigurationChanges = UIHelper.ConfigChangesFlags, LaunchMode = LaunchMode.SingleTask)]
 public sealed class SendActivity : AppCompatActivity
 {
     NearShareSender _nearShareSender = null!;
@@ -33,6 +34,7 @@ public sealed class SendActivity : AppCompatActivity
     TextView StatusTextView = null!;
     Button cancelButton = null!;
     Button readyButton = null!;
+    View _emptyDeviceListView = null!;
 
     ILogger<SendActivity> _logger = null!;
     ILoggerFactory _loggerFactory = null!;
@@ -71,6 +73,8 @@ public sealed class SendActivity : AppCompatActivity
         DeviceDiscoveryListView.SetAdapter(
             RemoteSystems.CreateAdapter(Resource.Layout.item_device, view => new RemoteSystemViewHolder(view) { Click = SendData })
         );
+
+        _emptyDeviceListView = _dialog.FindViewById<View>(Resource.Id.emptyDeviceListView)!;
 
         _loggerFactory = CdpUtils.CreateLoggerFactory(this);
         _logger = _loggerFactory.CreateLogger<SendActivity>();
@@ -118,7 +122,7 @@ public sealed class SendActivity : AppCompatActivity
         _logger.RequestPermissionResult(requestCode, permissions, grantResults);
         try
         {
-            await Task.Run(InitializePlatform);
+            await Task.Run(InitializePlatform).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -157,7 +161,7 @@ public sealed class SendActivity : AppCompatActivity
                 }
 
                 RemoteSystems.Insert(newIndex, device);
-                _dialog.FindViewById<View>(Resource.Id.emptyDeviceListView)!.Visibility = ViewStates.Gone;
+                _emptyDeviceListView.Visibility = ViewStates.Gone;
                 this.PlaySound(Resource.Raw.pop);
             }
         });
@@ -176,7 +180,7 @@ public sealed class SendActivity : AppCompatActivity
     }
     #endregion
 
-    readonly CancellationTokenSource _fileSendCancellationTokenSource = new();
+    readonly CancellationTokenSource _transferCancellation = new();
     private async void SendData(CdpDevice remoteSystem)
     {
         _discoverCancellationTokenSource.Cancel();
@@ -220,14 +224,15 @@ public sealed class SendActivity : AppCompatActivity
                     remoteSystem,
                     files,
                     progress,
-                    _fileSendCancellationTokenSource.Token
+                    _transferCancellation.Token
                 );
             }
             else if (uri != null)
             {
                 transferPromise = _nearShareSender.SendUriAsync(
                     remoteSystem,
-                    uri
+                    uri,
+                    _transferCancellation.Token
                 );
             }
 
@@ -239,35 +244,39 @@ public sealed class SendActivity : AppCompatActivity
                     this.GetColorAttr(Resource.Attribute.colorPrimary)
                 ]);
                 progressIndicator.Indeterminate = true;
+
+                var progressTemplate = GetString(Resource.String.sending_template);
                 progress.ProgressChanged += (s, args) =>
                 {
                     RunOnUiThread(() =>
                     {
-#if !DEBUG
                         try
                         {
-#endif
-                        progressIndicator.Indeterminate = false;
-                        progressIndicator.Max = (int)args.TotalBytes;
-                        progressIndicator.SetProgressCompat((int)args.TransferedBytes, animated: true);
+                            progressIndicator.Indeterminate = false;
+                            progressIndicator.Max = (int)args.TotalBytes;
+                            progressIndicator.SetProgressCompat((int)args.TransferedBytes, animated: true);
 
-                        if (args.TotalFiles != 0 && args.TotalBytes != 0)
+                            if (args.TotalFiles != 0 && args.TotalBytes != 0)
+                            {
+                                StatusTextView.Text = string.Format(
+                                    progressTemplate,
+                                    args.TotalFiles
+                                );
+                            }
+                        }
+                        catch (Exception ex)
                         {
-                            StatusTextView.Text = this.Localize(
-                                Resource.String.sending_template,
-                                args.TotalFiles
-                            );
+                            System.Diagnostics.Debug.Fail(ex.Message);
                         }
-#if !DEBUG
-                        }
-                        catch { }
-#endif
                     });
                 };
             }
 
             if (transferPromise != null)
                 await transferPromise;
+
+            if (!Lifecycle.CurrentState.IsAtLeast(AndroidX.Lifecycle.Lifecycle.State.Started!))
+                return;
 
             progressIndicator.SetIndicatorColor([
                 MaterialColors.HarmonizeWithPrimary(this,
@@ -283,11 +292,17 @@ public sealed class SendActivity : AppCompatActivity
         }
         catch (OperationCanceledException)
         {
+            if (!Lifecycle.CurrentState.IsAtLeast(AndroidX.Lifecycle.Lifecycle.State.Started!))
+                return;
+
             // Ignore cancellation
             StatusTextView.Text = this.Localize(Resource.String.status_cancelled);
         }
         catch (Exception ex)
         {
+            if (!Lifecycle.CurrentState.IsAtLeast(AndroidX.Lifecycle.Lifecycle.State.Started!))
+                return;
+
             this.ShowErrorDialog(ex);
 
             progressIndicator.SetIndicatorColor([
@@ -389,16 +404,22 @@ public sealed class SendActivity : AppCompatActivity
     {
         try
         {
-            _fileSendCancellationTokenSource.Cancel();
+            _transferCancellation.Cancel();
         }
         catch { }
     }
 
     public override void Finish()
     {
-        base.Finish();
-
+        _discoverCancellationTokenSource.Cancel();
+        try
+        {
+            _transferCancellation.Cancel();
+        }
+        catch { }
         _cdp?.Dispose();
+
+        base.Finish();
     }
 
     static int GetTransportIcon(CdpTransportType transportType)
