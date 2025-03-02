@@ -71,7 +71,8 @@ internal sealed class NearShareApp(ConnectedDevicesPlatform cdp) : CdpAppBase(cd
                         TotalBytes = bytesToSend,
                         Files = files
                     };
-                    HandleFileTransferToken(_fileTransferToken);
+                    _fileTransferToken.CancellationToken.Register(OnCancel);
+                    _fileTransferToken.Accepted += OnFileTransferAccepted;
 
                     NearShareReceiver.OnFileTransfer(_fileTransferToken);
                     return;
@@ -100,19 +101,10 @@ internal sealed class NearShareApp(ConnectedDevicesPlatform cdp) : CdpAppBase(cd
     }
 
     IEnumerator? _blobCursor;
-    async void HandleFileTransferToken(FileTransferToken token)
+    void OnFileTransferAccepted(FileTransferToken token)
     {
-        try
-        {
-            await token.AwaitAcceptance();
-
-            _blobCursor = CreateBlobCursor(token);
-            _blobCursor.MoveNext();
-        }
-        catch (TaskCanceledException)
-        {
-            OnCancel();
-        }
+        _blobCursor = CreateBlobCursor(token);
+        _blobCursor.MoveNext();
 
         IEnumerator CreateBlobCursor(FileTransferToken transferToken)
         {
@@ -180,22 +172,44 @@ internal sealed class NearShareApp(ConnectedDevicesPlatform cdp) : CdpAppBase(cd
 
     void OnCancel()
     {
-        ValueSet request = new();
-        request.Add("ControlMessage", (uint)NearShareControlMsgType.CancelTransfer);
-        SendValueSet(request, _messageId);
-
-        _fileTransferToken?.OnFinish();
-        Dispose();
+        try
+        {
+            try
+            {
+                ValueSet request = new();
+                request.Add("ControlMessage", (uint)NearShareControlMsgType.CancelTransfer);
+                SendValueSet(request, _messageId);
+            }
+            finally
+            {
+                _fileTransferToken?.OnFinish();
+            }
+        }
+        finally
+        {
+            Dispose();
+        }
     }
 
     void OnCompleted()
     {
-        ValueSet request = new();
-        request.Add("ControlMessage", (uint)NearShareControlMsgType.CompleteTransfer);
-        SendValueSet(request, _messageId);
-
-        _fileTransferToken?.OnFinish();
-        Dispose();
+        try
+        {
+            try
+            {
+                ValueSet request = new();
+                request.Add("ControlMessage", (uint)NearShareControlMsgType.CompleteTransfer);
+                SendValueSet(request, _messageId);
+            }
+            finally
+            {
+                _fileTransferToken?.OnFinish();
+            }
+        }
+        finally
+        {
+            Dispose();
+        }
     }
 
     public override void Dispose()

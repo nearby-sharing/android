@@ -26,15 +26,15 @@ public static class Extensions
 
         Forget(task);
         throw new TaskCanceledException();
+    }
 
-        static async void Forget(Task task)
+    public static async void Forget(this Task task)
+    {
+        try
         {
-            try
-            {
-                await task.ConfigureAwait(false);
-            }
-            catch { }
+            await task.ConfigureAwait(false);
         }
+        catch { }
     }
 
     public static string ToStringFormatted(this PhysicalAddress @this)
