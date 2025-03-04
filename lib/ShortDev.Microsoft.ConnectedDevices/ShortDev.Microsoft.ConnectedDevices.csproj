@@ -8,9 +8,9 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.CorrelationVector" Version="1.0.42" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.1" />
-		<PackageReference Include="Bond.CSharp" Version="10.0.0" />
+		<PackageReference Include="ShortDev.Microsoft.CorrelationVector" Version="2.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.2" />
+		<PackageReference Include="Bond.CSharp" Version="13.0.2" />
 	</ItemGroup>
 
 </Project>

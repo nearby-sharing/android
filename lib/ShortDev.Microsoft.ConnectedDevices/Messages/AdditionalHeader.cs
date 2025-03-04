@@ -1,8 +1,5 @@
 ﻿using Microsoft.CorrelationVector;
-using Newtonsoft.Json.Linq;
-using System;
 using System.Buffers.Binary;
-using System.Reflection.PortableExecutable;
 using System.Text;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages;
@@ -16,10 +13,10 @@ namespace ShortDev.Microsoft.ConnectedDevices.Messages;
 public record AdditionalHeader(AdditionalHeaderType Type, ReadOnlyMemory<byte> Value)
 {
     public static AdditionalHeader CreateCorrelationHeader()
-        => FromCorrelationVector(new CorrelationVector());
+        => FromCorrelationVector(new CorrelationVectorV1());
 
     public static AdditionalHeader FromCorrelationVector(CorrelationVector cv)
-        => FromCorrelationVector(cv.ToString());
+        => FromCorrelationVector(cv.Value);
 
     public static AdditionalHeader FromCorrelationVector(string cv)
     {
