@@ -34,6 +34,7 @@ public sealed class ReceiveActivity : AppCompatActivity
     ILoggerFactory _loggerFactory = null!;
     protected override void OnCreate(Bundle? savedInstanceState)
     {
+        this.EnableEdgeToEdge();
         base.OnCreate(savedInstanceState);
 
         if (ReceiveSetupActivity.IsSetupRequired(this) || !ReceiveSetupActivity.TryGetBtAddress(this, out btAddress))
