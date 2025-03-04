@@ -17,7 +17,7 @@ public sealed class BluetoothTransport(IBluetoothHandler handler) : ICdpTranspor
                 SocketConnected = (socket) => DeviceConnected?.Invoke(this, socket)
             },
             cancellationToken
-        );
+        ).ConfigureAwait(false);
     }
 
     public async Task<CdpSocket> ConnectAsync(EndpointInfo endpoint, CancellationToken cancellationToken = default)
@@ -26,7 +26,7 @@ public sealed class BluetoothTransport(IBluetoothHandler handler) : ICdpTranspor
             ServiceId = Constants.RfcommServiceId,
             ServiceName = Constants.RfcommServiceName,
             SocketConnected = (socket) => DeviceConnected?.Invoke(this, socket)
-        }, cancellationToken);
+        }, cancellationToken).ConfigureAwait(false);
 
     public async Task Advertise(LocalDeviceInfo deviceInfo, CancellationToken cancellationToken)
     {
@@ -37,7 +37,7 @@ public sealed class BluetoothTransport(IBluetoothHandler handler) : ICdpTranspor
                 BeaconData = new BLeBeacon(deviceInfo.Type, _handler.MacAddress, deviceInfo.Name)
             },
             cancellationToken
-        );
+        ).ConfigureAwait(false);
     }
 
     public event DeviceDiscoveredEventHandler? DeviceDiscovered;
@@ -57,7 +57,7 @@ public sealed class BluetoothTransport(IBluetoothHandler handler) : ICdpTranspor
                 };
                 DeviceDiscovered?.Invoke(this, device);
             }
-        }, cancellationToken);
+        }, cancellationToken).ConfigureAwait(false);
     }
 
     public void Dispose()

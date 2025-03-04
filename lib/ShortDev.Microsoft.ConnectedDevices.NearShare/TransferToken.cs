@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Frozen;
 
 namespace ShortDev.Microsoft.ConnectedDevices.NearShare;
 
@@ -43,33 +44,28 @@ public sealed class FileTransferToken : TransferToken, IEnumerable<FileShareInfo
     #endregion
 
     #region Acceptance
-    readonly TaskCompletionSource<IReadOnlyList<Stream>> _acceptPromise = new();
-    internal async ValueTask AwaitAcceptance()
-        => await _acceptPromise.Task;
+    internal event Action<FileTransferToken>? Accepted;
 
-    public bool IsAccepted
-        => _acceptPromise.Task.IsCompletedSuccessfully;
+    public bool IsAccepted => _streams is not null;
 
-    public void Accept(IReadOnlyList<Stream> streams)
+    FrozenDictionary<uint, Stream>? _streams;
+    public void Accept(FrozenDictionary<uint, Stream> streams)
     {
-        if (streams.Count != TotalFiles)
-            throw new ArgumentException("Invalid number of streams", nameof(streams));
+        CancellationToken.ThrowIfCancellationRequested();
 
-        _acceptPromise.SetResult(streams);
+        foreach (var file in Files)
+        {
+            if (!streams.ContainsKey(file.Id))
+                throw new ArgumentException($"Could not find stream for file '{file.Id}'", nameof(streams));
+        }
+
+        _streams = streams;
+
+        Accepted?.Invoke(this);
     }
 
     internal Stream GetStream(uint contentId)
-    {
-        for (int i = 0; i < Files.Count; i++)
-        {
-            if (Files[i].Id != contentId)
-                continue;
-
-            return _acceptPromise.Task.Result[i];
-        }
-
-        throw new ArgumentOutOfRangeException(nameof(contentId));
-    }
+        => _streams?[contentId] ?? throw new InvalidOperationException("Transfer not accepted");
     #endregion
 
 
@@ -78,10 +74,7 @@ public sealed class FileTransferToken : TransferToken, IEnumerable<FileShareInfo
 
     public CancellationToken CancellationToken => _cancellationSource.Token;
     public void Cancel()
-    {
-        _acceptPromise.TrySetCanceled();
-        _cancellationSource.Cancel();
-    }
+        => _cancellationSource.Cancel();
     #endregion
 
 
@@ -100,21 +93,26 @@ public sealed class FileTransferToken : TransferToken, IEnumerable<FileShareInfo
             TotalFiles = TotalFiles
         };
         IsTransferComplete = progress.TransferedBytes >= progress.TotalBytes;
-        _ = Task.Run(() => Progress?.Invoke(progress));
+        Task.Run(() => Progress?.Invoke(progress)).Forget();
     }
     #endregion
 
     public event Action? Finished;
-    internal async void OnFinish()
+    internal void OnFinish()
     {
-        await Task.WhenAll(_acceptPromise.Task.Result.Select(async stream =>
+        try
         {
-            await stream.FlushAsync();
+            foreach (var stream in _streams?.Values ?? [])
+            {
+                stream.Flush();
 
-            stream.Close();
-            stream.Dispose();
-        })).ConfigureAwait(continueOnCapturedContext: false);
-
-        Finished?.Invoke();
+                stream.Close();
+                stream.Dispose();
+            }
+        }
+        finally
+        {
+            Finished?.Invoke();
+        }
     }
 }

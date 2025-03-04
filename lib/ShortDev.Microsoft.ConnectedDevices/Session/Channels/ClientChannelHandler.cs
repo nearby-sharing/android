@@ -40,7 +40,7 @@ internal sealed class ClientChannelHandler(CdpSession session) : ChannelHandler(
     {
         var requestId = SendChannelRequest(socket, appId, appName);
 
-        var response = await WaitForChannelResponse(requestId, cancellationToken);
+        var response = await WaitForChannelResponse(requestId, cancellationToken).ConfigureAwait(false);
         response.ThrowOnError();
 
         var channel = CdpChannel.CreateClientChannel(this, socket, response, handler);

@@ -3,6 +3,7 @@ using ShortDev.Microsoft.ConnectedDevices.Encryption;
 using ShortDev.Microsoft.ConnectedDevices.NearShare;
 using ShortDev.Microsoft.ConnectedDevices.Transports.Bluetooth;
 using ShortDev.Microsoft.ConnectedDevices.Transports.Network;
+using System.Collections.Frozen;
 using System.Net;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Test.E2E;
@@ -145,7 +146,7 @@ public sealed class End2EndTest(ITestOutputHelper outputHelper)
             Assert.Equal("TestFile", token.Files[0].Name);
             Assert.Equal((ulong)buffer.LongLength, token.Files[0].Size);
 
-            token.Accept([receivedData]);
+            token.Accept(new Dictionary<uint, Stream>() { { 0, receivedData } }.ToFrozenDictionary());
             token.Finished += receivePromise.SetResult;
         }
     }

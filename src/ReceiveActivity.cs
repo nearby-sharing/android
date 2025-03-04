@@ -14,6 +14,7 @@ using ShortDev.Android.UI;
 using ShortDev.Microsoft.ConnectedDevices;
 using ShortDev.Microsoft.ConnectedDevices.NearShare;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
+using System.Collections.Frozen;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Net.NetworkInformation;
@@ -21,7 +22,7 @@ using SystemDebug = System.Diagnostics.Debug;
 
 namespace NearShare;
 
-[Activity(Label = "@string/app_name", Theme = "@style/AppTheme", ConfigurationChanges = UIHelper.ConfigChangesFlags)]
+[Activity(Label = "@string/app_name", Theme = "@style/AppTheme", ConfigurationChanges = UIHelper.ConfigChangesFlags, LaunchMode = LaunchMode.SingleTask)]
 public sealed class ReceiveActivity : AppCompatActivity
 {
     RecyclerView notificationsRecyclerView = null!;
@@ -133,8 +134,8 @@ public sealed class ReceiveActivity : AppCompatActivity
 
             try
             {
-                var streams = fileTransfer.Select(file => _context.ContentResolver!.CreateMediaStoreStream(file.Name).stream).ToArray();
-                fileTransfer.Accept(streams);
+                var streams = fileTransfer.ToFrozenDictionary(x => x.Id, file => (Stream)_context.ContentResolver!.CreateMediaStoreStream(file.Name).stream);
+                fileTransfer.Accept(streams ?? throw new UnreachableException("Could not generated streams to accept"));
 
                 fileTransfer.Finished += () =>
                 {
