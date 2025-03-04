@@ -17,6 +17,7 @@ public sealed class SettingsActivity : AppCompatActivity, ISettingsNavigation
 
     protected override void OnCreate(Bundle? savedInstanceState)
     {
+        this.EnableEdgeToEdge();
         base.OnCreate(savedInstanceState);
         SetContentView(Resource.Layout.activity_settings);
         UIHelper.SetupToolBar(this, GetString(Resource.String.generic_settings));
