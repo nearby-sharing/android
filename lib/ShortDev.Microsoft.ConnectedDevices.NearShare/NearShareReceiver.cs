@@ -6,11 +6,6 @@ public sealed class NearShareReceiver
 {
     public static void Register(ConnectedDevicesPlatform platform)
     {
-        if (!platform.IsAdvertising)
-            throw new InvalidOperationException($"\"{platform}\" is not advertising!");
-        if (!platform.IsListening)
-            throw new InvalidOperationException($"\"{platform}\" is not listening!");
-
         CdpAppRegistration.RegisterApp<NearShareHandshakeApp>(cdp => new(cdp));
     }
 

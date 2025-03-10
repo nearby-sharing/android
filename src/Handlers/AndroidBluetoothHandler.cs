@@ -2,10 +2,10 @@
 using Android.Bluetooth.LE;
 using Android.Runtime;
 using ShortDev.Microsoft.ConnectedDevices;
-using BLeScanResult = Android.Bluetooth.LE.ScanResult;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
-using System.Net.NetworkInformation;
 using ShortDev.Microsoft.ConnectedDevices.Transports.Bluetooth;
+using System.Net.NetworkInformation;
+using BLeScanResult = Android.Bluetooth.LE.ScanResult;
 
 namespace NearShare.Handlers;
 
@@ -15,13 +15,20 @@ public sealed class AndroidBluetoothHandler(BluetoothAdapter adapter, PhysicalAd
     public bool IsEnabled => Adapter.IsEnabled;
     public PhysicalAddress MacAddress { get; } = macAddress;
 
-    #region BLe Scan
-    public async Task ScanBLeAsync(ScanOptions scanOptions, CancellationToken cancellationToken = default)
-    {
-        using var scanner = Adapter?.BluetoothLeScanner ?? throw new InvalidOperationException($"\"{nameof(Adapter)}\" is not initialized");
+    private BluetoothLeScanner BleScanner
+        => Adapter?.BluetoothLeScanner ?? throw new InvalidOperationException($"\"{nameof(Adapter)}\" is not initialized");
 
-        BluetoothLeScannerCallback scanningCallback = new();
-        scanningCallback.OnFoundDevice += (result) =>
+    private BluetoothLeAdvertiser BleAdvertiser
+        => Adapter?.BluetoothLeAdvertiser ?? throw new InvalidOperationException($"\"{nameof(Adapter)}\" is not initialized");
+
+    #region BLe Scan
+    BleScannerCallback? _scanningCallback;
+    public ValueTask StartScanBle(ScanOptions scanOptions, CancellationToken cancellationToken = default)
+    {
+        if (Interlocked.Exchange(ref _scanningCallback, value: new()) is not null)
+            throw new InvalidOperationException("Scan is already running");
+
+        _scanningCallback.OnFoundDevice += (result) =>
         {
             try
             {
@@ -31,14 +38,22 @@ public sealed class AndroidBluetoothHandler(BluetoothAdapter adapter, PhysicalAd
             }
             catch { }
         };
-        scanner.StartScan(scanningCallback);
+        BleScanner.StartScan(_scanningCallback);
 
-        await cancellationToken.AwaitCancellation().ConfigureAwait(false);
-
-        scanner.StopScan(scanningCallback);
+        return ValueTask.CompletedTask;
     }
 
-    sealed class BluetoothLeScannerCallback : ScanCallback
+    public ValueTask StopScanBle(CancellationToken cancellationToken)
+    {
+        var callback = Volatile.Read(ref _scanningCallback) ?? throw new InvalidOperationException("Scan is not running");
+
+        BleScanner.StopScan(callback);
+        Volatile.Write(ref _scanningCallback, null);
+
+        return ValueTask.CompletedTask;
+    }
+
+    sealed class BleScannerCallback : ScanCallback
     {
         public event Action<BLeScanResult>? OnFoundDevice;
 
@@ -56,6 +71,7 @@ public sealed class AndroidBluetoothHandler(BluetoothAdapter adapter, PhysicalAd
                         OnFoundDevice?.Invoke(result);
         }
     }
+    #endregion
 
     public async Task<CdpSocket> ConnectRfcommAsync(EndpointInfo endpoint, RfcommOptions options, CancellationToken cancellationToken = default)
     {
@@ -67,11 +83,14 @@ public sealed class AndroidBluetoothHandler(BluetoothAdapter adapter, PhysicalAd
         await btSocket.ConnectAsync().ConfigureAwait(false);
         return btSocket.ToCdp();
     }
-    #endregion
 
     #region BLe Advertisement
-    public async Task AdvertiseBLeBeaconAsync(AdvertiseOptions options, CancellationToken cancellationToken = default)
+    BLeAdvertiseCallback? _advertiserCallback;
+    public ValueTask StartAdvertiseBle(AdvertiseOptions options, CancellationToken cancellationToken = default)
     {
+        if (Interlocked.Exchange(ref _advertiserCallback, value: new()) is not null)
+            throw new InvalidOperationException("Advertise is already running");
+
         var settings = new AdvertiseSettings.Builder()
             .SetAdvertiseMode(AdvertiseMode.LowLatency)!
             .SetTxPowerLevel(AdvertiseTx.PowerHigh)!
@@ -82,42 +101,82 @@ public sealed class AndroidBluetoothHandler(BluetoothAdapter adapter, PhysicalAd
             .AddManufacturerData(options.ManufacturerId, options.BeaconData.ToArray())!
             .Build();
 
-        BLeAdvertiseCallback callback = new();
-        Adapter!.BluetoothLeAdvertiser!.StartAdvertising(settings, data, callback);
+        BleAdvertiser.StartAdvertising(settings, data, _advertiserCallback);
 
-        await cancellationToken.AwaitCancellation().ConfigureAwait(false);
+        return ValueTask.CompletedTask;
+    }
 
-        Adapter.BluetoothLeAdvertiser.StopAdvertising(callback);
+    public ValueTask StopAdvertiseBle(CancellationToken cancellationToken)
+    {
+        var callback = Volatile.Read(ref _advertiserCallback) ?? throw new InvalidOperationException("Advertise is not running");
+
+        BleAdvertiser.StopAdvertising(callback);
+        Volatile.Write(ref _advertiserCallback, null);
+
+        return ValueTask.CompletedTask;
     }
 
     class BLeAdvertiseCallback : AdvertiseCallback { }
     #endregion
 
     #region Rfcomm
-    public async Task ListenRfcommAsync(RfcommOptions options, CancellationToken cancellationToken = default)
+    ListenerStateMachine? _listener;
+    public ValueTask StartListenRfcomm(RfcommOptions options, CancellationToken cancellationToken = default)
     {
-        if (Adapter == null)
-            throw new InvalidOperationException($"{nameof(Adapter)} is null");
+        if (_listener == null)
+            throw new InvalidOperationException("Listener is already running");
 
         using var listener = Adapter.ListenUsingInsecureRfcommWithServiceRecord(
             options.ServiceName,
             Java.Util.UUID.FromString(options.ServiceId)
         )!;
 
-        cancellationToken.Register(() => listener.Close());
+        _listener = new(listener, options);
 
-        while (!cancellationToken.IsCancellationRequested)
+        return ValueTask.CompletedTask;
+    }
+
+    sealed class ListenerStateMachine
+    {
+        readonly CancellationTokenSource _cancellationTokenSource = new();
+        readonly Task _task;
+
+        public ListenerStateMachine(BluetoothServerSocket serverSocket, RfcommOptions options)
+            => _task = Run(serverSocket, options);
+
+        async Task Run(BluetoothServerSocket listener, RfcommOptions options)
         {
-            var socket = await listener.AcceptAsync();
-            if (cancellationToken.IsCancellationRequested)
+            while (!_cancellationTokenSource.IsCancellationRequested)
             {
-                socket?.Dispose();
-                return;
-            }
+                var socket = await listener.AcceptAsync();
+                if (_cancellationTokenSource.IsCancellationRequested)
+                {
+                    socket?.Dispose();
+                    return;
+                }
 
-            if (socket != null)
-                options!.SocketConnected!(socket.ToCdp());
+                if (socket != null)
+                    options.SocketConnected(socket.ToCdp());
+            }
         }
+
+        public async ValueTask Stop()
+        {
+            if (_task == null)
+                return;
+
+            _cancellationTokenSource.Cancel();
+            await _task.ConfigureAwait(false);
+        }
+    }
+
+    public async ValueTask StopListenRfcomm(CancellationToken cancellationToken)
+    {
+        var listener = Volatile.Read(ref _listener) ?? throw new InvalidOperationException("Listener is not running");
+
+        await listener.Stop();
+
+        Volatile.Write(ref _listener, null);
     }
     #endregion
 }

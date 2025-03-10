@@ -4,12 +4,17 @@ namespace ShortDev.Microsoft.ConnectedDevices.Transports.Bluetooth;
 
 public interface IBluetoothHandler
 {
-    Task ScanBLeAsync(ScanOptions scanOptions, CancellationToken cancellationToken = default);
-    Task<CdpSocket> ConnectRfcommAsync(EndpointInfo device, RfcommOptions options, CancellationToken cancellationToken = default);
+    ValueTask StartScanBle(ScanOptions scanOptions, CancellationToken cancellationToken);
+    ValueTask StopScanBle(CancellationToken cancellationToken);
 
-    Task AdvertiseBLeBeaconAsync(AdvertiseOptions options, CancellationToken cancellationToken = default);
-    Task ListenRfcommAsync(RfcommOptions options, CancellationToken cancellationToken = default);
+    Task<CdpSocket> ConnectRfcommAsync(EndpointInfo device, RfcommOptions options, CancellationToken cancellationToken);
+
+    ValueTask StartAdvertiseBle(AdvertiseOptions options, CancellationToken cancellationToken);
+    ValueTask StopAdvertiseBle(CancellationToken cancellationToken);
+
+    ValueTask StartListenRfcomm(RfcommOptions options, CancellationToken cancellationToken);
+    ValueTask StopListenRfcomm(CancellationToken cancellationToken);
 
     PhysicalAddress MacAddress { get; }
-    bool IsEnabled => true;
+    bool IsEnabled { get; }
 }

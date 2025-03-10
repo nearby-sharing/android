@@ -52,7 +52,7 @@ internal sealed class BluetoothHandler(DeviceContainer container, DeviceContaine
         }
     }
 
-    public async Task AdvertiseBLeBeaconAsync(AdvertiseOptions options, CancellationToken cancellationToken = default)
+    public async Task StartAdvertiseBle(AdvertiseOptions options, CancellationToken cancellationToken = default)
     {
         var data = options.BeaconData.ToArray();
         container.Advertise(device, (uint)options.ManufacturerId, data);
@@ -62,7 +62,7 @@ internal sealed class BluetoothHandler(DeviceContainer container, DeviceContaine
         container.TryRemove(device);
     }
 
-    public async Task ScanBLeAsync(ScanOptions scanOptions, CancellationToken cancellationToken = default)
+    public async Task StartScanBle(ScanOptions scanOptions, CancellationToken cancellationToken = default)
     {
         container.FoundDevice += OnNewDevice;
 

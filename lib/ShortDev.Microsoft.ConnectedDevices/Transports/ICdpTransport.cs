@@ -19,5 +19,6 @@ public interface ICdpTransport : IDisposable
     }
 
     public event DeviceConnectedEventHandler? DeviceConnected;
-    Task Listen(CancellationToken cancellationToken);
+    ValueTask StartListen(CancellationToken cancellationToken);
+    ValueTask StopListen(CancellationToken cancellationToken);
 }

@@ -10,38 +10,9 @@ public sealed partial class ConnectedDevicesPlatform(LocalDeviceInfo deviceInfo,
 
     readonly ILogger<ConnectedDevicesPlatform> _logger = loggerFactory.CreateLogger<ConnectedDevicesPlatform>();
 
-    #region Host
-    #region Advertise
-    public GuardFlag IsAdvertising { get; } = new();
-    public async void Advertise(CancellationToken cancellationToken)
-    {
-        using var isAdvertising = IsAdvertising.Lock();
-
-        _logger.AdvertisingStarted();
-        try
-        {
-            await Task.WhenAll(_transportMap.Values
-                .OfType<ICdpDiscoverableTransport>()
-                .Select(x => x.Advertise(DeviceInfo, cancellationToken))
-            ).ConfigureAwait(false);
-        }
-        catch (Exception ex)
-        {
-            _logger.AdvertisingError(ex);
-        }
-        finally
-        {
-            _logger.AdvertisingStopped();
-        }
-    }
-    #endregion
-
     #region Listen
-    public GuardFlag IsListening { get; } = new();
-    public async void Listen(CancellationToken cancellationToken)
+    public async ValueTask StartListen(CancellationToken cancellation = default)
     {
-        using var isListening = IsListening.Lock();
-
         _logger.ListeningStarted();
         try
         {
@@ -49,14 +20,25 @@ public sealed partial class ConnectedDevicesPlatform(LocalDeviceInfo deviceInfo,
                 .Select(async transport =>
                 {
                     transport.DeviceConnected += OnDeviceConnected;
-                    try
-                    {
-                        await transport.Listen(cancellationToken).ConfigureAwait(false);
-                    }
-                    finally
-                    {
-                        transport.DeviceConnected -= OnDeviceConnected;
-                    }
+                    await transport.StartListen(cancellation).ConfigureAwait(false);
+                })
+            ).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            _logger.ListeningError(ex);
+        }
+    }
+
+    public async ValueTask StopListen(CancellationToken cancellation = default)
+    {
+        try
+        {
+            await Task.WhenAll(_transportMap.Values
+                .Select(async transport =>
+                {
+                    await transport.StopListen(cancellation).ConfigureAwait(false);
+                    transport.DeviceConnected -= OnDeviceConnected;
                 })
             ).ConfigureAwait(false);
         }
@@ -76,45 +58,8 @@ public sealed partial class ConnectedDevicesPlatform(LocalDeviceInfo deviceInfo,
         ReceiveLoop(socket);
     }
     #endregion
-    #endregion
 
     #region Client
-    public event DeviceDiscoveredEventHandler? DeviceDiscovered;
-
-    public GuardFlag IsDiscovering { get; } = new();
-    public async void Discover(CancellationToken cancellationToken)
-    {
-        using var isDiscovering = IsDiscovering.Lock();
-
-        _logger.DiscoveryStarted(_transportMap.Values.Select(x => x.TransportType));
-        try
-        {
-            await Task.WhenAll(_transportMap.Values
-                .OfType<ICdpDiscoverableTransport>()
-                .Select(async transport =>
-                {
-                    transport.DeviceDiscovered += DeviceDiscovered;
-                    try
-                    {
-                        await transport.Discover(cancellationToken).ConfigureAwait(false);
-                    }
-                    finally
-                    {
-                        transport.DeviceDiscovered -= DeviceDiscovered;
-                    }
-                })
-            ).ConfigureAwait(false);
-        }
-        catch (Exception ex)
-        {
-            _logger.DiscoveryError(ex);
-        }
-        finally
-        {
-            _logger.DiscoveryStopped();
-        }
-    }
-
     public async Task<CdpSession> ConnectAsync([NotNull] EndpointInfo endpoint, ConnectOptions? options = null, CancellationToken cancellationToken = default)
     {
         var socket = await CreateSocketAsync(endpoint, cancellationToken).ConfigureAwait(false);
