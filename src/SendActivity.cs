@@ -78,7 +78,7 @@ public sealed class SendActivity : AppCompatActivity
         _loggerFactory = CdpUtils.CreateLoggerFactory(this);
         _logger = _loggerFactory.CreateLogger<SendActivity>();
 
-        await UIHelper.RequestSendPermissions(this);
+        await this.RequestPermissions(UIHelper.GetSendPermissions());
 
         try
         {

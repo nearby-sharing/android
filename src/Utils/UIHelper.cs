@@ -113,13 +113,8 @@ internal static class UIHelper
         ManifestPermission.BluetoothScan,
         ManifestPermission.BluetoothConnect
     ];
-    public static async Task RequestSendPermissions(Activity activity)
-    {
-        await Intents.RequestPermissions(
-            activity,
-            OperatingSystem.IsAndroidVersionAtLeast(31) ? _sendPermissionsApi31 : _sendPermissions
-        ).ConfigureAwait(false);
-    }
+    public static string[] GetSendPermissions()
+        => OperatingSystem.IsAndroidVersionAtLeast(31) ? _sendPermissionsApi31 : _sendPermissions;
 
     private static readonly string[] _receivePermissions = [
         ManifestPermission.AccessFineLocation,

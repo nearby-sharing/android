@@ -4,6 +4,7 @@ using Android.Service.QuickSettings;
 using Android.Views;
 using AndroidX.Activity;
 using AndroidX.AppCompat.App;
+using AndroidX.Core.App;
 using AndroidX.Preference;
 using NearShare.Utils;
 
@@ -117,7 +118,7 @@ sealed class CdpScreenFragment : SettingsFragment
         SetPreferencesFromResource(Resource.Xml.preferences_cdp, rootKey);
 
         PreferenceScreen!.FindPreference("request_permissions_send")!.PreferenceClick +=
-            (s, e) => UIHelper.RequestSendPermissions(Activity!);
+            (s, e) => ActivityCompat.RequestPermissions(Activity!, UIHelper.GetSendPermissions(), requestCode: 0);
         PreferenceScreen!.FindPreference("request_permissions_receive")!.PreferenceClick +=
             (s, e) => UIHelper.RequestReceivePermissions(Activity!);
 
