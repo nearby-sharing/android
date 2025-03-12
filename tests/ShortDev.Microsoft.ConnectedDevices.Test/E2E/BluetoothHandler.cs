@@ -81,12 +81,11 @@ internal sealed class BluetoothHandler(DeviceContainer container, DeviceContaine
 
     #region Discovery
     ScanOptions? _scanOptions;
-    public async ValueTask StartScanBle(ScanOptions scanOptions, CancellationToken cancellationToken = default)
+    public ValueTask StartScanBle(ScanOptions scanOptions, CancellationToken cancellationToken = default)
     {
         _scanOptions = scanOptions;
         container.FoundDevice += OnFoundNewDevice;
-
-        await cancellationToken.AwaitCancellation();
+        return ValueTask.CompletedTask;
     }
 
     public ValueTask StopScanBle(CancellationToken cancellationToken)
