@@ -260,8 +260,8 @@ public sealed class ReceiveActivity : AppCompatActivity
     public override void Finish()
     {
         _advertiser?.Stop().Forget();
-        _cdp?.DisposeAsync().Forget();
         _receiver?.Dispose();
+        _cdp?.DisposeAsync().Forget();
         base.Finish();
     }
 
