@@ -215,7 +215,7 @@ internal sealed class NearShareApp(ConnectedDevicesPlatform cdp) : CdpAppBase
     public override void Dispose()
     {
         cdp.TryUnregisterApp(Id);
-        
+
         base.Dispose();
     }
 }
