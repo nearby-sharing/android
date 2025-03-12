@@ -97,6 +97,29 @@ public sealed partial class ConnectedDevicesPlatform(LocalDeviceInfo deviceInfo,
 
     public async ValueTask DisposeAsync()
     {
+        // Stop listening
+        if (Volatile.Read(ref _isInitialized) != 0)
+        {
+            try
+            {
+                await Task.WhenAll(_transportMap.Values
+                    .Select(async transport =>
+                    {
+                        await transport.StopListen(cancellation: default).ConfigureAwait(false);
+                        transport.DeviceConnected -= OnDeviceConnected;
+                    })
+                ).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                _logger.ListeningError(ex);
+            }
+            finally
+            {
+                _logger.ListeningStopped();
+            }
+        }
+
         Extensions.DisposeAll(
             _transportMap.Select(x => x.Value),
             _knownSockets.Select(x => x.Value)
@@ -104,28 +127,5 @@ public sealed partial class ConnectedDevicesPlatform(LocalDeviceInfo deviceInfo,
 
         _transportMap.Clear();
         _knownSockets.Clear();
-
-        if (Volatile.Read(ref _isInitialized) == 0)
-            return;
-
-        // Stop listening
-        try
-        {
-            await Task.WhenAll(_transportMap.Values
-                .Select(async transport =>
-                {
-                    await transport.StopListen(cancellation: default).ConfigureAwait(false);
-                    transport.DeviceConnected -= OnDeviceConnected;
-                })
-            ).ConfigureAwait(false);
-        }
-        catch (Exception ex)
-        {
-            _logger.ListeningError(ex);
-        }
-        finally
-        {
-            _logger.ListeningStopped();
-        }
     }
 }

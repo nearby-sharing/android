@@ -11,7 +11,7 @@ partial class ConnectedDevicesPlatform
         _transportMap.AddOrUpdate(
             transport.TransportType,
             static (key, newTansport) => newTansport,
-            (key, newTansport, oldTransport) =>
+            static (key, oldTransport, newTansport) =>
             {
                 oldTransport.Dispose();
                 return newTansport;

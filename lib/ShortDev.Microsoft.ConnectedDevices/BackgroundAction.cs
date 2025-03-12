@@ -13,7 +13,7 @@ public sealed class BackgroundAction(Task task, CancellationTokenSource stopping
         }
         finally
         {
-            await task.WaitAsync(cancellation).ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing);
+            await task.WaitAsync(cancellation);
         }
     }
 
@@ -38,6 +38,9 @@ public sealed class BackgroundAction(Task task, CancellationTokenSource stopping
         if (action is null)
             throw new InvalidOperationException($"Action '{expression}' is not running");
 
-        return action.StopAsync(cancellation);
+        var instance = action;
+        action = null;
+
+        return instance.StopAsync(cancellation);
     }
 }

@@ -80,10 +80,13 @@ partial class ConnectedDevicesPlatform
                 _logger.DiscoveryStopped();
             }
         }
+
+        public ValueTask DisposeAsync()
+            => Stop(CancellationToken.None);
     }
 }
 
-public interface IRemoteSystemWatcher
+public interface IRemoteSystemWatcher : IAsyncDisposable
 {
     ValueTask Start(CancellationToken cancellationToken = default);
     ValueTask Stop(CancellationToken cancellationToken = default);

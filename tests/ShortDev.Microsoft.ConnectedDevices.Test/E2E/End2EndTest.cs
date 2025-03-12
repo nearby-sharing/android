@@ -50,41 +50,36 @@ public sealed class End2EndTest(ITestOutputHelper outputHelper)
     {
         DeviceContainer network = new();
 
-        using var device1 = CreateDevice(network, "Device 1", "57-0C-4A-27-07-52");
+        await using var device1 = CreateDevice(network, "Device 1", "57-0C-4A-27-07-52");
         if (useTcp1)
             UseTcp(device1, tcpPort: 5041, udpPort: 5051);
 
-        device1.Discover(TestContext.Current.CancellationToken);
+        await using var watcher = device1.CreateWatcher();
+        await watcher.Start(TestContext.Current.CancellationToken);
 
-        using var device2 = CreateDevice(network, "Device 2", "81-7A-80-8F-D5-80");
+        await using var device2 = CreateDevice(network, "Device 2", "81-7A-80-8F-D5-80");
         if (useTcp2)
             UseTcp(device2, tcpPort: 5041, udpPort: 5051);
 
-        device2.Advertise(TestContext.Current.CancellationToken);
-        device2.Listen(TestContext.Current.CancellationToken);
+        await device2.InitializeAsync(TestContext.Current.CancellationToken);
+        await using var advertiser = device2.CreateAdvertiser();
+        await advertiser.Start(TestContext.Current.CancellationToken);
 
         TaskCompletionSource<UriTransferToken> receivePromise = new();
-        NearShareReceiver.ReceivedUri += receivePromise.SetResult;
-        NearShareReceiver.Register(device2);
+        using NearShareReceiver receiver = new(device2);
+        receiver.ReceivedUri += receivePromise.SetResult;
 
-        try
-        {
-            NearShareSender sender = new(device1);
-            await sender.SendUriAsync(
-                device: new("Device 2", DeviceType.Linux, Endpoint:
-                    new(Transports.CdpTransportType.Rfcomm, "81-7A-80-8F-D5-80", "ServiceId")
-                ), new Uri("https://nearshare.shortdev.de/"),
-                TestContext.Current.CancellationToken
-            );
+        NearShareSender sender = new(device1);
+        await sender.SendUriAsync(
+            device: new("Device 2", DeviceType.Linux, Endpoint:
+                new(Transports.CdpTransportType.Rfcomm, "81-7A-80-8F-D5-80", "ServiceId")
+            ), new Uri("https://nearshare.shortdev.de/"),
+            TestContext.Current.CancellationToken
+        );
 
-            var token = await receivePromise.Task;
-            Assert.Equal("Device 1", token.DeviceName);
-            Assert.Equal("https://nearshare.shortdev.de/", token.Uri);
-        }
-        finally
-        {
-            NearShareReceiver.Unregister();
-        }
+        var token = await receivePromise.Task;
+        Assert.Equal("Device 1", token.DeviceName);
+        Assert.Equal("https://nearshare.shortdev.de/", token.Uri);
     }
 
     [Theory]
@@ -96,18 +91,20 @@ public sealed class End2EndTest(ITestOutputHelper outputHelper)
     {
         DeviceContainer network = new();
 
-        using var device1 = CreateDevice(network, "Device 1", "57-0C-4A-27-07-52");
+        await using var device1 = CreateDevice(network, "Device 1", "57-0C-4A-27-07-52");
         if (useTcp1)
             UseTcp(device1, tcpPort: 5041, udpPort: 5051);
 
-        device1.Discover(TestContext.Current.CancellationToken);
+        await using var watcher = device1.CreateWatcher();
+        await watcher.Start(TestContext.Current.CancellationToken);
 
-        using var device2 = CreateDevice(network, "Device 2", "81-7A-80-8F-D5-80");
+        await using var device2 = CreateDevice(network, "Device 2", "81-7A-80-8F-D5-80");
         if (useTcp2)
             UseTcp(device2, tcpPort: 5041, udpPort: 5051);
 
-        device2.Advertise(TestContext.Current.CancellationToken);
-        device2.Listen(TestContext.Current.CancellationToken);
+        await device2.InitializeAsync(TestContext.Current.CancellationToken);
+        await using var advertiser = device2.CreateAdvertiser();
+        await advertiser.Start(TestContext.Current.CancellationToken);
 
         var buffer = new byte[Random.Shared.Next(1_000, 1_000_000)];
         outputHelper.WriteLine($"[Information]: Generated buffer with size {buffer.LongLength}");
@@ -115,29 +112,22 @@ public sealed class End2EndTest(ITestOutputHelper outputHelper)
 
         MemoryStream receivedData = new();
         TaskCompletionSource receivePromise = new();
-        NearShareReceiver.FileTransfer += OnFileTransfer;
-        NearShareReceiver.Register(device2);
+        using NearShareReceiver receiver = new(device2);
+        receiver.FileTransfer += OnFileTransfer;
 
-        try
-        {
-            NearShareSender sender = new(device1);
-            await sender.SendFileAsync(
-                device: new("Device 2", DeviceType.Linux, Endpoint:
-                    new(Transports.CdpTransportType.Rfcomm, "81-7A-80-8F-D5-80", "ServiceId")
-                ),
-                CdpFileProvider.FromBuffer("TestFile", buffer),
-                new Progress<NearShareProgress>(),
-                TestContext.Current.CancellationToken
-            );
+        NearShareSender sender = new(device1);
+        await sender.SendFileAsync(
+            device: new("Device 2", DeviceType.Linux, Endpoint:
+                new(Transports.CdpTransportType.Rfcomm, "81-7A-80-8F-D5-80", "ServiceId")
+            ),
+            CdpFileProvider.FromBuffer("TestFile", buffer),
+            new Progress<NearShareProgress>(),
+            TestContext.Current.CancellationToken
+        );
 
-            await receivePromise.Task;
+        await receivePromise.Task;
 
-            Assert.Equal(buffer, receivedData.ToArray());
-        }
-        finally
-        {
-            NearShareReceiver.Unregister();
-        }
+        Assert.Equal(buffer, receivedData.ToArray());
 
         void OnFileTransfer(FileTransferToken token)
         {

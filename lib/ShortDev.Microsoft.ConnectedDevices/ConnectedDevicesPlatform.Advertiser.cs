@@ -61,10 +61,13 @@ partial class ConnectedDevicesPlatform
                 _logger.AdvertisingStopped();
             }
         }
+
+        public ValueTask DisposeAsync()
+            => Stop(CancellationToken.None);
     }
 }
 
-public interface IRemoteSystemAdvertiser
+public interface IRemoteSystemAdvertiser : IAsyncDisposable
 {
     ValueTask Start(CancellationToken cancellationToken = default);
     ValueTask Stop(CancellationToken cancellationToken = default);
