@@ -2,27 +2,29 @@
 
 namespace ShortDev.Microsoft.ConnectedDevices.NearShare;
 
-public sealed class NearShareReceiver
+public sealed class NearShareReceiver : IDisposable
 {
-    public static void Register(ConnectedDevicesPlatform platform)
+    public ConnectedDevicesPlatform Platform { get; }
+    public NearShareReceiver(ConnectedDevicesPlatform platform)
     {
-        CdpAppRegistration.RegisterApp<NearShareHandshakeApp>(cdp => new(cdp));
+        Platform = platform;
+
+        platform.RegisterApp<NearShareHandshakeApp>(cdp => new(cdp) { Receiver = this });
     }
 
-
-    public static event Action<UriTransferToken>? ReceivedUri;
-    internal static void OnReceivedUri(UriTransferToken token)
+    public event Action<UriTransferToken>? ReceivedUri;
+    internal void OnReceivedUri(UriTransferToken token)
         => ReceivedUri?.Invoke(token);
 
-    public static event Action<FileTransferToken>? FileTransfer;
-    internal static void OnFileTransfer(FileTransferToken token)
+    public event Action<FileTransferToken>? FileTransfer;
+    internal void OnFileTransfer(FileTransferToken token)
         => FileTransfer?.Invoke(token);
 
-    public static void Unregister()
+    public void Dispose()
     {
         ReceivedUri = null;
         FileTransfer = null;
 
-        CdpAppRegistration.TryUnregisterApp<NearShareHandshakeApp>();
+        Platform.TryUnregisterApp<NearShareHandshakeApp>();
     }
 }

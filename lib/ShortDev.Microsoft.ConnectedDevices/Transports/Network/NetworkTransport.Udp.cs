@@ -9,13 +9,8 @@ partial class NetworkTransport
 {
     readonly UdpClient _udpclient = CreateUdpClient(udpPort);
 
-    bool _isListening;
-    async Task EnsureListeningUdp(CancellationToken cancellationToken)
+    async Task ListenUdp(CancellationToken cancellationToken)
     {
-        if (_isListening)
-            return;
-
-        _isListening = true;
         try
         {
             await Task.Run(async () =>
@@ -33,10 +28,6 @@ partial class NetworkTransport
             if (ex.SocketErrorCode is not (SocketError.Shutdown or SocketError.OperationAborted))
                 throw;
         }
-        finally
-        {
-            _isListening = false;
-        }
 
         void HandleMsg(UdpReceiveResult result)
         {
@@ -47,41 +38,6 @@ partial class NetworkTransport
             DiscoveryHeader discoveryHeaders = DiscoveryHeader.Parse(ref reader);
             DiscoveryMessageReceived?.Invoke(result.RemoteEndPoint.Address, discoveryHeaders, ref reader);
         }
-    }
-
-    void SendPresenceRequest()
-    {
-        CommonHeader header = new()
-        {
-            Type = MessageType.Discovery,
-        };
-
-        EndianWriter payloadWriter = new(Endianness.BigEndian);
-        new DiscoveryHeader()
-        {
-            Type = DiscoveryType.PresenceRequest
-        }.Write(payloadWriter);
-
-        new UdpFragmentSender(_udpclient, new IPEndPoint(IPAddress.Broadcast, UdpPort))
-            .SendMessage(header, payloadWriter.Buffer.AsSpan());
-    }
-
-    void SendPresenceResponse(IPAddress device, PresenceResponse response)
-    {
-        CommonHeader header = new()
-        {
-            Type = MessageType.Discovery
-        };
-
-        EndianWriter payloadWriter = new(Endianness.BigEndian);
-        new DiscoveryHeader()
-        {
-            Type = DiscoveryType.PresenceResponse
-        }.Write(payloadWriter);
-        response.Write(payloadWriter);
-
-        new UdpFragmentSender(_udpclient, new IPEndPoint(device, UdpPort))
-            .SendMessage(header, payloadWriter.Buffer.AsSpan());
     }
 
     static UdpClient CreateUdpClient(int port)

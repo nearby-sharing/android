@@ -37,21 +37,33 @@ public static class Extensions
         catch { }
     }
 
+    public static async void Forget(this ValueTask task)
+    {
+        try
+        {
+            await task.ConfigureAwait(false);
+        }
+        catch { }
+    }
+
     public static string ToStringFormatted(this PhysicalAddress @this)
         => string.Join(':', Array.ConvertAll(@this.GetAddressBytes(), (x) => x.ToString("X2")));
 
-    public static void DisposeAll(params IEnumerable<IDisposable>[] disposables)
+    public static void DisposeAll(params IEnumerable<IEnumerable<IDisposable>> disposables)
         => disposables.SelectMany(x => x).DisposeAll();
 
     public static void DisposeAll<T>([NotNull] this IEnumerable<T> disposables) where T : IDisposable
+        => disposables.Select<T, Action>(x => x.Dispose).DisposeAll();
+
+    public static void DisposeAll([NotNull] this IEnumerable<Action> disposeActions)
     {
         List<Exception> exceptions = [];
 
-        foreach (var disposable in disposables)
+        foreach (var dispose in disposeActions)
         {
             try
             {
-                disposable.Dispose();
+                dispose();
             }
             catch (Exception ex)
             {

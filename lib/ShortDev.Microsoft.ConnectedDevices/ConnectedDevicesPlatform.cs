@@ -4,15 +4,19 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace ShortDev.Microsoft.ConnectedDevices;
 
-public sealed partial class ConnectedDevicesPlatform(LocalDeviceInfo deviceInfo, ILoggerFactory loggerFactory) : IDisposable
+public sealed partial class ConnectedDevicesPlatform(LocalDeviceInfo deviceInfo, ILoggerFactory loggerFactory) : IAsyncDisposable
 {
     public LocalDeviceInfo DeviceInfo { get; } = deviceInfo;
 
     readonly ILogger<ConnectedDevicesPlatform> _logger = loggerFactory.CreateLogger<ConnectedDevicesPlatform>();
 
     #region Listen
-    public async ValueTask StartListen(CancellationToken cancellation = default)
+    int _isInitialized = 0;
+    public async ValueTask InitializeAsync(CancellationToken cancellation = default)
     {
+        if (Interlocked.CompareExchange(ref _isInitialized, 1, 0) == 1)
+            return;
+
         _logger.ListeningStarted();
         try
         {
@@ -27,28 +31,6 @@ public sealed partial class ConnectedDevicesPlatform(LocalDeviceInfo deviceInfo,
         catch (Exception ex)
         {
             _logger.ListeningError(ex);
-        }
-    }
-
-    public async ValueTask StopListen(CancellationToken cancellation = default)
-    {
-        try
-        {
-            await Task.WhenAll(_transportMap.Values
-                .Select(async transport =>
-                {
-                    await transport.StopListen(cancellation).ConfigureAwait(false);
-                    transport.DeviceConnected -= OnDeviceConnected;
-                })
-            ).ConfigureAwait(false);
-        }
-        catch (Exception ex)
-        {
-            _logger.ListeningError(ex);
-        }
-        finally
-        {
-            _logger.ListeningStopped();
         }
     }
 
@@ -113,7 +95,7 @@ public sealed partial class ConnectedDevicesPlatform(LocalDeviceInfo deviceInfo,
     public ILogger<T> CreateLogger<T>()
         => loggerFactory.CreateLogger<T>();
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
         Extensions.DisposeAll(
             _transportMap.Select(x => x.Value),
@@ -122,5 +104,28 @@ public sealed partial class ConnectedDevicesPlatform(LocalDeviceInfo deviceInfo,
 
         _transportMap.Clear();
         _knownSockets.Clear();
+
+        if (Volatile.Read(ref _isInitialized) == 0)
+            return;
+
+        // Stop listening
+        try
+        {
+            await Task.WhenAll(_transportMap.Values
+                .Select(async transport =>
+                {
+                    await transport.StopListen(cancellation: default).ConfigureAwait(false);
+                    transport.DeviceConnected -= OnDeviceConnected;
+                })
+            ).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            _logger.ListeningError(ex);
+        }
+        finally
+        {
+            _logger.ListeningStopped();
+        }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Serialization;
-using System;
 
 namespace ShortDev.Microsoft.ConnectedDevices;
 
@@ -8,7 +7,7 @@ namespace ShortDev.Microsoft.ConnectedDevices;
 /// A cdp app is responsible for the application layer communication over an established <see cref="CdpChannel"/>. <br/>
 /// Every channel has a unique app.
 /// </summary>
-public abstract class CdpAppBase(ConnectedDevicesPlatform cdp) : IDisposable
+public abstract class CdpAppBase : IDisposable
 {
     CdpChannel? _channel;
     internal void Initialize(CdpChannel channel)

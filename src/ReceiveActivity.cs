@@ -211,6 +211,7 @@ public sealed class ReceiveActivity : AppCompatActivity
     }
 
     ConnectedDevicesPlatform? _cdp;
+    NearShareReceiver? _receiver;
     IRemoteSystemAdvertiser? _advertiser;
 
     [MemberNotNull(nameof(_cdp), nameof(_advertiser))]
@@ -223,17 +224,16 @@ public sealed class ReceiveActivity : AppCompatActivity
 
         _cdp = CdpUtils.Create(this, _loggerFactory);
         _advertiser = _cdp.CreateAdvertiser();
-
-        NearShareReceiver.Register(_cdp);
-        NearShareReceiver.ReceivedUri += OnTransfer;
-        NearShareReceiver.FileTransfer += OnTransfer;
+        _receiver = new(_cdp);
+        _receiver.ReceivedUri += OnTransfer;
+        _receiver.FileTransfer += OnTransfer;
 
         FindViewById<TextView>(Resource.Id.deviceInfoTextView)!.Text = this.Localize(
             Resource.String.visible_as_template,
             _cdp.DeviceInfo.Name
         );
 
-        await _cdp.StartListen();
+        await _cdp.InitializeAsync();
         await _advertiser.Start();
     }
 
@@ -259,10 +259,9 @@ public sealed class ReceiveActivity : AppCompatActivity
 
     public override void Finish()
     {
-        _advertiser?.Stop().AsTask().Forget();
-
-        _cdp?.Dispose();
-        NearShareReceiver.Unregister();
+        _advertiser?.Stop().Forget();
+        _cdp?.DisposeAsync().Forget();
+        _receiver?.Dispose();
         base.Finish();
     }
 

@@ -410,13 +410,13 @@ public sealed class SendActivity : AppCompatActivity
 
     public override void Finish()
     {
-        _watcher?.Stop().AsTask().Forget();
+        _watcher?.Stop().Forget();
         try
         {
             _transferCancellation.Cancel();
         }
         catch { }
-        _cdp?.Dispose();
+        _cdp?.DisposeAsync().Forget();
 
         base.Finish();
     }

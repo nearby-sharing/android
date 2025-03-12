@@ -4,12 +4,11 @@ using ShortDev.Microsoft.ConnectedDevices.Messages;
 using ShortDev.Microsoft.ConnectedDevices.NearShare.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Serialization;
 using System.Collections;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace ShortDev.Microsoft.ConnectedDevices.NearShare.Apps;
 
-internal sealed class NearShareApp(ConnectedDevicesPlatform cdp) : CdpAppBase(cdp)
+internal sealed class NearShareApp(ConnectedDevicesPlatform cdp) : CdpAppBase
 {
     const uint PartitionSize = 102400u; // 131072u
     public static string Name { get; } = "NearSharePlatform";
@@ -17,6 +16,7 @@ internal sealed class NearShareApp(ConnectedDevicesPlatform cdp) : CdpAppBase(cd
     readonly ILogger<NearShareApp> _logger = cdp.CreateLogger<NearShareApp>();
 
     public required string Id { get; init; }
+    public required NearShareReceiver Receiver { get; init; }
 
     uint _messageId = 0;
     public override void HandleMessage(CdpMessage msg)
@@ -74,7 +74,7 @@ internal sealed class NearShareApp(ConnectedDevicesPlatform cdp) : CdpAppBase(cd
                     _fileTransferToken.CancellationToken.Register(OnCancel);
                     _fileTransferToken.Accepted += OnFileTransferAccepted;
 
-                    NearShareReceiver.OnFileTransfer(_fileTransferToken);
+                    Receiver.OnFileTransfer(_fileTransferToken);
                     return;
                 }
             case DataKind.Uri:
@@ -87,7 +87,7 @@ internal sealed class NearShareApp(ConnectedDevicesPlatform cdp) : CdpAppBase(cd
                         Channel.Socket.TransportType
                     );
 
-                    NearShareReceiver.OnReceivedUri(new()
+                    Receiver.OnReceivedUri(new()
                     {
                         DeviceName = Channel.Session.DeviceInfo?.Name ?? "UNKNOWM",
                         Uri = uri
@@ -214,8 +214,8 @@ internal sealed class NearShareApp(ConnectedDevicesPlatform cdp) : CdpAppBase(cd
 
     public override void Dispose()
     {
-        CdpAppRegistration.TryUnregisterApp(Id);
-
+        cdp.TryUnregisterApp(Id);
+        
         base.Dispose();
     }
 }

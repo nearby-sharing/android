@@ -1,4 +1,5 @@
-﻿using ShortDev.Microsoft.ConnectedDevices.Messages.Discovery;
+﻿using ShortDev.Microsoft.ConnectedDevices.Messages;
+using ShortDev.Microsoft.ConnectedDevices.Messages.Discovery;
 using System.Net;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Transports.Network;
@@ -18,25 +19,17 @@ partial class NetworkTransport
         DiscoveryMessageReceived += OnMessage;
         try
         {
-            await Task.WhenAll(
-                EnsureListeningUdp(cancellationToken),
-                RunPresenceSendLoop()
-            ).ConfigureAwait(false);
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                SendPresenceRequest();
+                await Task.Delay(500, cancellationToken).ConfigureAwait(false);
+            }
         }
         catch (OperationCanceledException) { }
         catch (ObjectDisposedException) { }
         finally
         {
             DiscoveryMessageReceived -= OnMessage;
-        }
-
-        async Task RunPresenceSendLoop()
-        {
-            while (!cancellationToken.IsCancellationRequested)
-            {
-                SendPresenceRequest();
-                await Task.Delay(500, cancellationToken).ConfigureAwait(false);
-            }
         }
 
         void OnMessage(IPAddress address, DiscoveryHeader header, ref EndianReader reader)
@@ -54,6 +47,23 @@ partial class NetworkTransport
                 )
             );
         }
+    }
+
+    void SendPresenceRequest()
+    {
+        CommonHeader header = new()
+        {
+            Type = MessageType.Discovery,
+        };
+
+        EndianWriter payloadWriter = new(Endianness.BigEndian);
+        new DiscoveryHeader()
+        {
+            Type = DiscoveryType.PresenceRequest
+        }.Write(payloadWriter);
+
+        new UdpFragmentSender(_udpclient, new IPEndPoint(IPAddress.Broadcast, UdpPort))
+            .SendMessage(header, payloadWriter.Buffer.AsSpan());
     }
 
     delegate void DiscoveryMessageReceivedHandler(IPAddress address, DiscoveryHeader header, ref EndianReader reader);

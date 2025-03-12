@@ -49,7 +49,7 @@ public sealed class NearShareSender(ConnectedDevicesPlatform platform)
         await senderStateMachine.SendFilesAsync(files, progress, cancellationToken).ConfigureAwait(false);
     }
 
-    sealed class HandshakeHandler(ConnectedDevicesPlatform cdp) : CdpAppBase(cdp), ICdpAppId
+    sealed class HandshakeHandler(ConnectedDevicesPlatform cdp) : CdpAppBase, ICdpAppId
     {
         public static string Id { get; } = NearShareHandshakeApp.Id;
         public static string Name { get; } = NearShareHandshakeApp.Name;
@@ -80,7 +80,7 @@ public sealed class NearShareSender(ConnectedDevicesPlatform platform)
         }
     }
 
-    sealed class SenderStateMachine(ConnectedDevicesPlatform cdp) : CdpAppBase(cdp)
+    sealed class SenderStateMachine(ConnectedDevicesPlatform cdp) : CdpAppBase
     {
         readonly TaskCompletionSource _promise = new();
         public async Task SendUriAsync(Uri uri)

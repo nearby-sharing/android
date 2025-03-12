@@ -120,63 +120,32 @@ public sealed class AndroidBluetoothHandler(BluetoothAdapter adapter, PhysicalAd
     #endregion
 
     #region Rfcomm
-    ListenerStateMachine? _listener;
+    BackgroundAction? _rfcommListenTask;
     public ValueTask StartListenRfcomm(RfcommOptions options, CancellationToken cancellationToken = default)
-    {
-        if (_listener == null)
-            throw new InvalidOperationException("Listener is already running");
+        => BackgroundAction.Start(ref _rfcommListenTask, token => ListenRfcomm(options, token), cancellationToken);
 
+    async Task ListenRfcomm(RfcommOptions options, CancellationToken cancellationToken)
+    {
         using var listener = Adapter.ListenUsingInsecureRfcommWithServiceRecord(
             options.ServiceName,
             Java.Util.UUID.FromString(options.ServiceId)
         )!;
 
-        _listener = new(listener, options);
-
-        return ValueTask.CompletedTask;
-    }
-
-    sealed class ListenerStateMachine
-    {
-        readonly CancellationTokenSource _cancellationTokenSource = new();
-        readonly Task _task;
-
-        public ListenerStateMachine(BluetoothServerSocket serverSocket, RfcommOptions options)
-            => _task = Run(serverSocket, options);
-
-        async Task Run(BluetoothServerSocket listener, RfcommOptions options)
+        while (!cancellationToken.IsCancellationRequested)
         {
-            while (!_cancellationTokenSource.IsCancellationRequested)
+            var socket = await listener.AcceptAsync();
+            if (cancellationToken.IsCancellationRequested)
             {
-                var socket = await listener.AcceptAsync();
-                if (_cancellationTokenSource.IsCancellationRequested)
-                {
-                    socket?.Dispose();
-                    return;
-                }
-
-                if (socket != null)
-                    options.SocketConnected(socket.ToCdp());
-            }
-        }
-
-        public async ValueTask Stop()
-        {
-            if (_task == null)
+                socket?.Close();
                 return;
+            }
 
-            _cancellationTokenSource.Cancel();
-            await _task.ConfigureAwait(false);
+            if (socket != null)
+                options.SocketConnected(socket.ToCdp());
         }
     }
 
     public async ValueTask StopListenRfcomm(CancellationToken cancellationToken)
-    {
-        var listener = Volatile.Read(ref _listener) ?? throw new InvalidOperationException("Listener is not running");
-
-        await listener.Stop();
-
-        Volatile.Write(ref _listener, null);
-    }
+        => await BackgroundAction.Stop(ref _rfcommListenTask, cancellationToken);
     #endregion
 }
