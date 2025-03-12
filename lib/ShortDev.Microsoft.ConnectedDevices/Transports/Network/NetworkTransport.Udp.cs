@@ -17,7 +17,7 @@ partial class NetworkTransport
             {
                 while (!cancellationToken.IsCancellationRequested)
                 {
-                    var result = await _udpclient.ReceiveAsync().ConfigureAwait(false);
+                    var result = await _udpclient.ReceiveAsync(cancellationToken).ConfigureAwait(false);
                     HandleMsg(result);
                 }
             }, cancellationToken).ConfigureAwait(false);
