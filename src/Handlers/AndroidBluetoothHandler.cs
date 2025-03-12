@@ -131,17 +131,24 @@ public sealed class AndroidBluetoothHandler(BluetoothAdapter adapter, PhysicalAd
             Java.Util.UUID.FromString(options.ServiceId)
         )!;
 
-        while (!cancellationToken.IsCancellationRequested)
+        try
         {
-            var socket = await listener.AcceptAsync();
-            if (cancellationToken.IsCancellationRequested)
+            while (!cancellationToken.IsCancellationRequested)
             {
-                socket?.Close();
-                return;
-            }
+                var socket = await listener.AcceptAsync();
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    socket?.Close();
+                    return;
+                }
 
-            if (socket != null)
-                options.SocketConnected(socket.ToCdp());
+                if (socket != null)
+                    options.SocketConnected(socket.ToCdp());
+            }
+        }
+        finally
+        {
+            listener.Close();
         }
     }
 
