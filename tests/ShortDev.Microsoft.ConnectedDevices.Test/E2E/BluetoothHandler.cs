@@ -9,6 +9,8 @@ internal sealed class BluetoothHandler(DeviceContainer container, DeviceContaine
 {
     public PhysicalAddress MacAddress => PhysicalAddress.Parse(device.Address);
 
+    public bool IsEnabled => throw new NotImplementedException();
+
     public Task<CdpSocket> ConnectRfcommAsync(EndpointInfo endpoint, RfcommOptions options, CancellationToken cancellationToken = default)
     {
         var device = container.FindDevice(endpoint.Address)
@@ -19,66 +21,91 @@ internal sealed class BluetoothHandler(DeviceContainer container, DeviceContaine
         );
     }
 
-    public async Task ListenRfcommAsync(RfcommOptions options, CancellationToken cancellationToken = default)
+    #region Listen
+    RfcommOptions? _listenOptions;
+    public ValueTask StartListenRfcomm(RfcommOptions options, CancellationToken cancellationToken)
     {
+        _listenOptions = options;
         device.ConnectionRequest += OnNewConnection;
-
-        await cancellationToken.AwaitCancellation();
-
-        device.ConnectionRequest -= OnNewConnection;
-
-        void OnNewConnection(EndpointInfo client, ref (Stream Input, Stream Output)? clientStream)
-        {
-            AnonymousPipeServerStream serverInputStream = new(PipeDirection.In);
-            AnonymousPipeServerStream serverOutputStream = new(PipeDirection.Out);
-
-            // Accept connection
-            clientStream = (
-                new AnonymousPipeClientStream(PipeDirection.In, serverOutputStream.GetClientHandleAsString()),
-                new AnonymousPipeClientStream(PipeDirection.Out, serverInputStream.GetClientHandleAsString())
-            );
-
-            options.SocketConnected?.Invoke(new CdpSocket()
-            {
-                InputStream = serverInputStream,
-                OutputStream = serverOutputStream,
-                Endpoint = client,
-                Close = () =>
-                {
-                    serverInputStream.Dispose();
-                    serverOutputStream.Dispose();
-                }
-            });
-        }
+        return ValueTask.CompletedTask;
     }
 
-    public async Task AdvertiseBLeBeaconAsync(AdvertiseOptions options, CancellationToken cancellationToken = default)
+    public ValueTask StopListenRfcomm(CancellationToken cancellationToken)
+    {
+        device.ConnectionRequest -= OnNewConnection;
+        return ValueTask.CompletedTask;
+    }
+
+    void OnNewConnection(EndpointInfo client, ref (Stream Input, Stream Output)? clientStream)
+    {
+        if (_listenOptions is null)
+            return;
+
+        AnonymousPipeServerStream serverInputStream = new(PipeDirection.In);
+        AnonymousPipeServerStream serverOutputStream = new(PipeDirection.Out);
+
+        // Accept connection
+        clientStream = (
+            new AnonymousPipeClientStream(PipeDirection.In, serverOutputStream.GetClientHandleAsString()),
+            new AnonymousPipeClientStream(PipeDirection.Out, serverInputStream.GetClientHandleAsString())
+        );
+
+        _listenOptions.SocketConnected?.Invoke(new CdpSocket()
+        {
+            InputStream = serverInputStream,
+            OutputStream = serverOutputStream,
+            Endpoint = client,
+            Close = () =>
+            {
+                serverInputStream.Dispose();
+                serverOutputStream.Dispose();
+            }
+        });
+    }
+    #endregion
+
+    #region Advertise
+    public ValueTask StartAdvertiseBle(AdvertiseOptions options, CancellationToken cancellationToken = default)
     {
         var data = options.BeaconData.ToArray();
         container.Advertise(device, (uint)options.ManufacturerId, data);
-
-        await cancellationToken.AwaitCancellation();
-
-        container.TryRemove(device);
+        return ValueTask.CompletedTask;
     }
 
-    public async Task ScanBLeAsync(ScanOptions scanOptions, CancellationToken cancellationToken = default)
+    public ValueTask StopAdvertiseBle(CancellationToken cancellationToken)
     {
-        container.FoundDevice += OnNewDevice;
-
-        await cancellationToken.AwaitCancellation();
-
-        container.FoundDevice -= OnNewDevice;
-
-        void OnNewDevice(DeviceContainer.Device device, DeviceContainer.Adverstisement ad)
-        {
-            if (ad.Manufacturer != Constants.BLeBeaconManufacturerId)
-                return;
-
-            if (!BLeBeacon.TryParse(ad.Data.ToArray(), out var beaconData))
-                return;
-
-            scanOptions.OnDeviceDiscovered?.Invoke(beaconData);
-        }
+        container.TryRemove(device);
+        return ValueTask.CompletedTask;
     }
+    #endregion
+
+    #region Discovery
+    ScanOptions? _scanOptions;
+    public ValueTask StartScanBle(ScanOptions scanOptions, CancellationToken cancellationToken = default)
+    {
+        _scanOptions = scanOptions;
+        container.FoundDevice += OnFoundNewDevice;
+        return ValueTask.CompletedTask;
+    }
+
+    public ValueTask StopScanBle(CancellationToken cancellationToken)
+    {
+        container.FoundDevice -= OnFoundNewDevice;
+        return ValueTask.CompletedTask;
+    }
+
+    void OnFoundNewDevice(DeviceContainer.Device device, DeviceContainer.Adverstisement ad)
+    {
+        if (_scanOptions is null)
+            return;
+
+        if (ad.Manufacturer != Constants.BLeBeaconManufacturerId)
+            return;
+
+        if (!BLeBeacon.TryParse(ad.Data.ToArray(), out var beaconData))
+            return;
+
+        _scanOptions.OnDeviceDiscovered?.Invoke(beaconData);
+    }
+    #endregion
 }

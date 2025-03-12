@@ -84,7 +84,7 @@ public sealed class CdpChannel : IDisposable
 
     internal static CdpChannel CreateServerChannel(ChannelHandler handler, CdpSocket socket, StartChannelRequest request, ulong channelId)
     {
-        var app = CdpAppRegistration.InstantiateApp(request.Id, request.Name, handler.Session.Platform);
+        var app = handler.Session.Platform.InstantiateApp(request.Id, request.Name);
         CdpChannel channel = new(handler, channelId, socket, app);
         app.Initialize(channel);
         return channel;

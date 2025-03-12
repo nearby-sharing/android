@@ -17,6 +17,7 @@ using ShortDev.Microsoft.ConnectedDevices.Transports;
 using System.Collections.Frozen;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Net.NetworkInformation;
 using SystemDebug = System.Diagnostics.Debug;
 
@@ -209,38 +210,45 @@ public sealed class ReceiveActivity : AppCompatActivity
         }
     }
 
-    CancellationTokenSource? _cancellationTokenSource;
     ConnectedDevicesPlatform? _cdp;
-    void InitializeCDP()
+    NearShareReceiver? _receiver;
+    IRemoteSystemAdvertiser? _advertiser;
+
+    [MemberNotNull(nameof(_cdp), nameof(_advertiser))]
+    async ValueTask InitializeCdp()
     {
         if (btAddress == null)
             throw new NullReferenceException(nameof(btAddress));
 
-        _cancellationTokenSource?.Dispose();
-        _cancellationTokenSource = new();
-
         SystemDebug.Assert(_cdp == null);
 
         _cdp = CdpUtils.Create(this, _loggerFactory);
-
-        _cdp.Listen(_cancellationTokenSource.Token);
-        _cdp.Advertise(_cancellationTokenSource.Token);
-
-        NearShareReceiver.Register(_cdp);
-        NearShareReceiver.ReceivedUri += OnTransfer;
-        NearShareReceiver.FileTransfer += OnTransfer;
+        _advertiser = _cdp.CreateAdvertiser();
+        _receiver = new(_cdp);
+        _receiver.ReceivedUri += OnTransfer;
+        _receiver.FileTransfer += OnTransfer;
 
         FindViewById<TextView>(Resource.Id.deviceInfoTextView)!.Text = this.Localize(
             Resource.String.visible_as_template,
             _cdp.DeviceInfo.Name
         );
+
+        await _cdp.InitializeAsync();
+        await _advertiser.Start();
     }
 
-    public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
+    public override async void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
     {
         _logger.RequestPermissionResult(requestCode, permissions, grantResults);
 
-        InitializeCDP();
+        try
+        {
+            await InitializeCdp();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to initialize CDP");
+        }
     }
 
     public override bool OnCreateOptionsMenu(IMenu? menu)
@@ -251,9 +259,9 @@ public sealed class ReceiveActivity : AppCompatActivity
 
     public override void Finish()
     {
-        _cancellationTokenSource?.Cancel();
-        _cdp?.Dispose();
-        NearShareReceiver.Unregister();
+        _advertiser?.Stop().Forget();
+        _receiver?.Dispose();
+        _cdp?.DisposeAsync().Forget();
         base.Finish();
     }
 

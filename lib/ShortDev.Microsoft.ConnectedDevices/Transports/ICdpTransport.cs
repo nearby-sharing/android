@@ -7,7 +7,7 @@ public interface ICdpTransport : IDisposable
 
     EndpointInfo GetEndpoint();
 
-    Task<CdpSocket> ConnectAsync(EndpointInfo endpoint, CancellationToken cancellationToken = default);
+    Task<CdpSocket> ConnectAsync(EndpointInfo endpoint, CancellationToken cancellation = default);
     async Task<CdpSocket?> TryConnectAsync(EndpointInfo endpoint, TimeSpan timeout)
     {
         try
@@ -19,5 +19,6 @@ public interface ICdpTransport : IDisposable
     }
 
     public event DeviceConnectedEventHandler? DeviceConnected;
-    Task Listen(CancellationToken cancellationToken);
+    ValueTask StartListen(CancellationToken cancellation);
+    ValueTask StopListen(CancellationToken cancellation);
 }

@@ -6,10 +6,11 @@ public sealed class BluetoothTransport(IBluetoothHandler handler) : ICdpTranspor
     public CdpTransportType TransportType { get; } = CdpTransportType.Rfcomm;
     public bool IsEnabled => _handler.IsEnabled;
 
+    #region Listen
     public event DeviceConnectedEventHandler? DeviceConnected;
-    public async Task Listen(CancellationToken cancellationToken)
+    public ValueTask StartListen(CancellationToken cancellationToken)
     {
-        await _handler.ListenRfcommAsync(
+        return _handler.StartListenRfcomm(
             new RfcommOptions()
             {
                 ServiceId = Constants.RfcommServiceId,
@@ -17,8 +18,12 @@ public sealed class BluetoothTransport(IBluetoothHandler handler) : ICdpTranspor
                 SocketConnected = (socket) => DeviceConnected?.Invoke(this, socket)
             },
             cancellationToken
-        ).ConfigureAwait(false);
+        );
     }
+
+    public ValueTask StopListen(CancellationToken cancellationToken)
+        => _handler.StopListenRfcomm(cancellationToken);
+    #endregion
 
     public async Task<CdpSocket> ConnectAsync(EndpointInfo endpoint, CancellationToken cancellationToken = default)
         => await _handler.ConnectRfcommAsync(endpoint, new RfcommOptions()
@@ -28,22 +33,29 @@ public sealed class BluetoothTransport(IBluetoothHandler handler) : ICdpTranspor
             SocketConnected = (socket) => DeviceConnected?.Invoke(this, socket)
         }, cancellationToken).ConfigureAwait(false);
 
-    public async Task Advertise(LocalDeviceInfo deviceInfo, CancellationToken cancellationToken)
+    #region Advertisement
+    public ValueTask StartAdvertisement(LocalDeviceInfo deviceInfo, CancellationToken cancellationToken)
     {
-        await _handler.AdvertiseBLeBeaconAsync(
+        return _handler.StartAdvertiseBle(
             new AdvertiseOptions()
             {
                 ManufacturerId = Constants.BLeBeaconManufacturerId,
                 BeaconData = new BLeBeacon(deviceInfo.Type, _handler.MacAddress, deviceInfo.Name)
             },
             cancellationToken
-        ).ConfigureAwait(false);
+        );
     }
 
+    public ValueTask StopAdvertisement(CancellationToken cancellationToken)
+        => _handler.StopAdvertiseBle(cancellationToken);
+    #endregion
+
+    #region Discovery
     public event DeviceDiscoveredEventHandler? DeviceDiscovered;
-    public async Task Discover(CancellationToken cancellationToken)
+
+    public ValueTask StartDiscovery(CancellationToken cancellationToken)
     {
-        await _handler.ScanBLeAsync(new()
+        return _handler.StartScanBle(new()
         {
             OnDeviceDiscovered = (advertisement, rssi) =>
             {
@@ -57,8 +69,12 @@ public sealed class BluetoothTransport(IBluetoothHandler handler) : ICdpTranspor
                 };
                 DeviceDiscovered?.Invoke(this, device);
             }
-        }, cancellationToken).ConfigureAwait(false);
+        }, cancellationToken);
     }
+
+    public ValueTask StopDiscovery(CancellationToken cancellationToken)
+        => _handler.StopScanBle(cancellationToken);
+    #endregion
 
     public void Dispose()
     {

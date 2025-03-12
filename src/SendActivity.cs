@@ -18,6 +18,7 @@ using ShortDev.Microsoft.ConnectedDevices;
 using ShortDev.Microsoft.ConnectedDevices.NearShare;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using OperationCanceledException = System.OperationCanceledException;
 
 namespace NearShare;
@@ -27,8 +28,6 @@ namespace NearShare;
 [Activity(Label = "@string/app_name", Exported = true, Theme = "@style/AppTheme.TranslucentOverlay", ConfigurationChanges = UIHelper.ConfigChangesFlags, LaunchMode = LaunchMode.SingleTask)]
 public sealed class SendActivity : AppCompatActivity
 {
-    NearShareSender _nearShareSender = null!;
-
     BottomSheetDialog _dialog = null!;
     RecyclerView DeviceDiscoveryListView = null!;
     TextView StatusTextView = null!;
@@ -38,7 +37,7 @@ public sealed class SendActivity : AppCompatActivity
 
     ILogger<SendActivity> _logger = null!;
     ILoggerFactory _loggerFactory = null!;
-    protected override void OnCreate(Bundle? savedInstanceState)
+    protected override async void OnCreate(Bundle? savedInstanceState)
     {
         this.EnableEdgeToEdge();
         base.OnCreate(savedInstanceState);
@@ -79,7 +78,16 @@ public sealed class SendActivity : AppCompatActivity
         _loggerFactory = CdpUtils.CreateLoggerFactory(this);
         _logger = _loggerFactory.CreateLogger<SendActivity>();
 
-        UIHelper.RequestSendPermissions(this);
+        await this.RequestPermissions(UIHelper.GetSendPermissions());
+
+        try
+        {
+            await Task.Run(InitializePlatform);
+        }
+        catch (Exception ex)
+        {
+            this.ShowErrorDialog(ex);
+        }
     }
 
     sealed class RemoteSystemViewHolder : ViewHolder<CdpDevice>
@@ -117,34 +125,35 @@ public sealed class SendActivity : AppCompatActivity
         }
     }
 
-    public override async void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
+    public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
     {
         _logger.RequestPermissionResult(requestCode, permissions, grantResults);
-        try
-        {
-            await Task.Run(InitializePlatform).ConfigureAwait(false);
-        }
-        catch (Exception ex)
-        {
-            this.ShowErrorDialog(ex);
-        }
+        Intents.OnPermissionsResult(requestCode, permissions, grantResults);
     }
 
     #region Initialization
-    readonly CancellationTokenSource _discoverCancellationTokenSource = new();
     ConnectedDevicesPlatform _cdp = null!;
-    void InitializePlatform()
+    IRemoteSystemWatcher? _watcher;
+
+    [MemberNotNull(nameof(_cdp), nameof(_watcher))]
+    async Task InitializePlatform()
     {
         _cdp = CdpUtils.Create(this, _loggerFactory);
+        _watcher = _cdp.CreateWatcher();
 
-        _cdp.DeviceDiscovered += Platform_DeviceDiscovered;
-        _cdp.Discover(_discoverCancellationTokenSource.Token);
+        _watcher.RemoteSystemAdded += Platform_DeviceDiscovered;
 
-        _nearShareSender = new NearShareSender(_cdp);
+        if (_cdp.TryGetTransport(CdpTransportType.Rfcomm)?.IsEnabled == false)
+        {
+            StartActivityForResult(new Intent(BluetoothAdapter.ActionRequestEnable), 42);
+            throw new TaskCanceledException("Bluetooth is disabled");
+        }
+
+        await _watcher.Start();
     }
 
     readonly ObservableCollection<CdpDevice> RemoteSystems = [];
-    private void Platform_DeviceDiscovered(ICdpTransport sender, CdpDevice device)
+    private void Platform_DeviceDiscovered(object? sender, CdpDevice device)
     {
         RunOnUiThread(() =>
         {
@@ -183,7 +192,8 @@ public sealed class SendActivity : AppCompatActivity
     readonly CancellationTokenSource _transferCancellation = new();
     private async void SendData(CdpDevice remoteSystem)
     {
-        _discoverCancellationTokenSource.Cancel();
+        _watcher?.Stop().AsTask().Forget();
+        NearShareSender sender = new(_cdp);
 
         _dialog.FindViewById<View>(Resource.Id.selectDeviceLayout)!.Visibility = ViewStates.Gone;
 
@@ -196,7 +206,7 @@ public sealed class SendActivity : AppCompatActivity
 
         var transportTypeImage = sendingDataLayout.FindViewById<ImageView>(Resource.Id.transportTypeImageView)!;
         transportTypeImage.SetImageResource(GetTransportIcon(remoteSystem.Endpoint.TransportType));
-        _nearShareSender.TransportUpgraded += OnTransportUpgrade;
+        sender.TransportUpgraded += OnTransportUpgrade;
 
         var deviceNameTextView = sendingDataLayout.FindViewById<TextView>(Resource.Id.deviceNameTextView)!;
         var progressIndicator = sendingDataLayout.FindViewById<CircularProgressIndicator>(Resource.Id.sendProgressIndicator)!;
@@ -206,21 +216,14 @@ public sealed class SendActivity : AppCompatActivity
         StatusTextView.Text = GetString(Resource.String.wait_for_acceptance);
         try
         {
-            if (remoteSystem.Endpoint.TransportType == CdpTransportType.Rfcomm &&
-                _cdp.TryGetTransport(CdpTransportType.Rfcomm)?.IsEnabled == false)
-            {
-                StartActivityForResult(new Intent(BluetoothAdapter.ActionRequestEnable), 42);
-                throw new TaskCanceledException("Bluetooth is disabled");
-            }
-
             Progress<NearShareProgress>? progress = null;
 
             Task? transferPromise = null;
-            var (files, uri) = ParseIntentAsync();
+            var (files, uri) = ParseIntent(Intent!);
             if (files != null)
             {
                 progress = new();
-                transferPromise = _nearShareSender.SendFilesAsync(
+                transferPromise = sender.SendFilesAsync(
                     remoteSystem,
                     files,
                     progress,
@@ -229,7 +232,7 @@ public sealed class SendActivity : AppCompatActivity
             }
             else if (uri != null)
             {
-                transferPromise = _nearShareSender.SendUriAsync(
+                transferPromise = sender.SendUriAsync(
                     remoteSystem,
                     uri,
                     _transferCancellation.Token
@@ -320,7 +323,7 @@ public sealed class SendActivity : AppCompatActivity
             progressIndicator.Indeterminate = false;
             progressIndicator.Progress = progressIndicator.Max;
 
-            _nearShareSender.TransportUpgraded -= OnTransportUpgrade;
+            sender.TransportUpgraded -= OnTransportUpgrade;
         }
 
         void OnTransportUpgrade(object? sender, CdpTransportType transportType)
@@ -331,50 +334,46 @@ public sealed class SendActivity : AppCompatActivity
         }
     }
 
-    (IReadOnlyList<CdpFileProvider>? files, Uri? uri) ParseIntentAsync()
+    (IReadOnlyList<CdpFileProvider>? files, Uri? uri) ParseIntent(Intent intent)
     {
-        ArgumentNullException.ThrowIfNull(Intent);
+        ArgumentNullException.ThrowIfNull(intent);
 
-        if (Intent.Action == Intent.ActionProcessText && OperatingSystem.IsAndroidVersionAtLeast(23))
+        if (intent.Action == Intent.ActionProcessText && OperatingSystem.IsAndroidVersionAtLeast(23))
         {
             return (
-                files: [SendText(Intent.GetStringExtra(Intent.ExtraProcessText))],
+                files: [SendText(intent.GetStringExtra(Intent.ExtraProcessText))],
                 null
             );
         }
 
-        if (Intent.Action == Intent.ActionSendMultiple)
+        if (intent.Action == Intent.ActionSendMultiple)
         {
-            if (Intent.HasExtra(Intent.ExtraText))
+            if (intent.HasExtra(Intent.ExtraText))
             {
                 return (
-                    files: (Intent.GetStringArrayListExtra(Intent.ExtraText) ?? throw new InvalidDataException("Could not get extra files from intent"))
-                        .Select(SendText)
-                        .ToArray(),
+                    files: [.. (intent.GetStringArrayListExtra(Intent.ExtraText) ?? throw new InvalidDataException("Could not get extra files from intent")).Select(SendText)],
                     null
                 );
             }
 
             return (
-                files: (Intent.GetParcelableArrayListExtra<AndroidUri>(Intent.ExtraStream) ?? throw new InvalidDataException("Could not get extra files from intent"))
-                    .Select(ContentResolver!.CreateNearShareFileFromContentUri)
-                    .ToArray(),
+                files: [.. (intent.GetParcelableArrayListExtra<AndroidUri>(Intent.ExtraStream) ?? throw new InvalidDataException("Could not get extra files from intent")).Select(ContentResolver!.CreateNearShareFileFromContentUri)],
                 null
             );
         }
 
-        if (Intent.Action == Intent.ActionSend)
+        if (intent.Action == Intent.ActionSend)
         {
-            if (Intent.HasExtra(Intent.ExtraStream))
+            if (intent.HasExtra(Intent.ExtraStream))
             {
-                AndroidUri fileUri = Intent.GetParcelableExtra<AndroidUri>(Intent.ExtraStream) ?? throw new InvalidDataException("Could not get ExtraStream");
+                AndroidUri fileUri = intent.GetParcelableExtra<AndroidUri>(Intent.ExtraStream) ?? throw new InvalidDataException("Could not get ExtraStream");
                 return (
                     files: [ContentResolver!.CreateNearShareFileFromContentUri(fileUri)],
                     null
                 );
             }
 
-            var text = Intent.GetStringExtra(Intent.ExtraText) ?? "";
+            var text = intent.GetStringExtra(Intent.ExtraText) ?? "";
             if (Uri.IsWellFormedUriString(text, UriKind.Absolute))
             {
                 return (
@@ -411,13 +410,13 @@ public sealed class SendActivity : AppCompatActivity
 
     public override void Finish()
     {
-        _discoverCancellationTokenSource.Cancel();
+        _watcher?.Stop().Forget();
         try
         {
             _transferCancellation.Cancel();
         }
         catch { }
-        _cdp?.Dispose();
+        _cdp?.DisposeAsync().Forget();
 
         base.Finish();
     }
