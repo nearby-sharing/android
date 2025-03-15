@@ -39,6 +39,6 @@ internal abstract class SettingsFragment : PreferenceFragmentCompat
         if (string.IsNullOrEmpty(deviceName))
             deviceName = adapter.Name;
 
-        return deviceName ?? throw new NullReferenceException("Could not find device name");
+        return deviceName ?? Environment.MachineName;
     }
 }
