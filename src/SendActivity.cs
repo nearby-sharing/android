@@ -209,7 +209,7 @@ public sealed class SendActivity : AppCompatActivity
             if (remoteSystem.Endpoint.TransportType == CdpTransportType.Rfcomm &&
                 _cdp.TryGetTransport(CdpTransportType.Rfcomm)?.IsEnabled == false)
             {
-                StartActivityForResult(new Intent(BluetoothAdapter.ActionRequestEnable), 42);
+                this.EnableBluetooth();
                 throw new TaskCanceledException("Bluetooth is disabled");
             }
 
