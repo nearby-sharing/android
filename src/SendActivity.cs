@@ -117,7 +117,7 @@ public sealed class SendActivity : AppCompatActivity
         }
     }
 
-    public override async void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
+    public override async void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
     {
         _logger.RequestPermissionResult(requestCode, permissions, grantResults);
         try
@@ -126,6 +126,11 @@ public sealed class SendActivity : AppCompatActivity
         }
         catch (Exception ex)
         {
+            SentrySdk.CaptureException(ex);
+
+            if (!Lifecycle.CurrentState.IsAtLeast(AndroidX.Lifecycle.Lifecycle.State.Started!))
+                return;
+
             this.ShowErrorDialog(ex);
         }
     }
@@ -136,11 +141,10 @@ public sealed class SendActivity : AppCompatActivity
     void InitializePlatform()
     {
         _cdp = CdpUtils.Create(this, _loggerFactory);
+        _nearShareSender = new NearShareSender(_cdp);
 
         _cdp.DeviceDiscovered += Platform_DeviceDiscovered;
         _cdp.Discover(_discoverCancellationTokenSource.Token);
-
-        _nearShareSender = new NearShareSender(_cdp);
     }
 
     readonly ObservableCollection<CdpDevice> RemoteSystems = [];
