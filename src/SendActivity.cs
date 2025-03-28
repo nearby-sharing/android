@@ -1,4 +1,5 @@
-﻿using Android.Bluetooth;
+﻿using Android.App;
+using Android.Bluetooth;
 using Android.Content;
 using Android.Content.PM;
 using Android.Runtime;
@@ -29,12 +30,12 @@ public sealed class SendActivity : AppCompatActivity
 {
     NearShareSender _nearShareSender = null!;
 
-    BottomSheetDialog _dialog = null!;
+    bool _useDialog = false;
     RecyclerView DeviceDiscoveryListView = null!;
     TextView StatusTextView = null!;
     Button cancelButton = null!;
     Button readyButton = null!;
-    View _emptyDeviceListView = null!;
+    View _emptyDeviceListView = null!, _selectDeviceLayout = null!, _sendingDataLayout = null!;
 
     ILogger<SendActivity> _logger = null!;
     ILoggerFactory _loggerFactory = null!;
@@ -43,38 +44,58 @@ public sealed class SendActivity : AppCompatActivity
         this.EnableEdgeToEdge();
         base.OnCreate(savedInstanceState);
 
-        SetContentView(new CoordinatorLayout(this)
+        ViewGroup rootLayout;
+        Action closeShareExperience;
+        if (_useDialog)
         {
-            LayoutParameters = new(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.MatchParent)
-        });
+            SetContentView(new CoordinatorLayout(this)
+            {
+                LayoutParameters = new(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.MatchParent)
+            });
 
-        _dialog = new(this);
-        _dialog.SetContentView(Resource.Layout.activity_share);
-        _dialog.DismissWithAnimation = true;
-        _dialog.Behavior.State = BottomSheetBehavior.StateExpanded;
-        _dialog.Behavior.FitToContents = true;
-        _dialog.Behavior.Draggable = false;
-        _dialog.Behavior.AddBottomSheetCallback(new FinishActivityBottomSheetCallback(this));
-        _dialog.Window?.ClearFlags(WindowManagerFlags.DimBehind);
-        _dialog.Show();
+            BottomSheetDialog dialog = new(this);
+            dialog.SetContentView(Resource.Layout.activity_share);
+            dialog.DismissWithAnimation = true;
+            dialog.Behavior.State = BottomSheetBehavior.StateExpanded;
+            dialog.Behavior.FitToContents = true;
+            dialog.Behavior.Draggable = false;
+            dialog.Behavior.AddBottomSheetCallback(new FinishActivityBottomSheetCallback(this));
+            dialog.Window?.ClearFlags(WindowManagerFlags.DimBehind);
+            dialog.Show();
 
-        _dialog.FindViewById<ViewGroup>(Resource.Id.rootLayout)!.EnableLayoutTransition();
+            rootLayout = dialog.FindViewById<ViewGroup>(Resource.Id.rootLayout)!;
+            closeShareExperience = dialog.Dismiss;
+        }
+        else
+        {
+            SetContentView(Resource.Layout.activity_share);
+            rootLayout = FindViewById<ViewGroup>(Resource.Id.rootLayout)!;
+            closeShareExperience = Finish;
+        }
 
-        StatusTextView = _dialog.FindViewById<TextView>(Resource.Id.statusTextView)!;
+        rootLayout.EnableLayoutTransition();
 
-        cancelButton = _dialog.FindViewById<Button>(Resource.Id.cancel_button)!;
+        StatusTextView = rootLayout.FindViewById<TextView>(Resource.Id.statusTextView)!;
+
+        cancelButton = rootLayout.FindViewById<Button>(Resource.Id.cancel_button)!;
         cancelButton.Click += CancelButton_Click;
 
-        readyButton = _dialog.FindViewById<Button>(Resource.Id.readyButton)!;
-        readyButton.Click += (s, e) => _dialog.Cancel();
+        readyButton = rootLayout.FindViewById<Button>(Resource.Id.readyButton)!;
+        readyButton.Click += (s, e) => closeShareExperience();
 
-        DeviceDiscoveryListView = _dialog.FindViewById<RecyclerView>(Resource.Id.deviceSelector)!;
-        DeviceDiscoveryListView.SetLayoutManager(new LinearLayoutManager(this, (int)Orientation.Horizontal, reverseLayout: false));
+        DeviceDiscoveryListView = rootLayout.FindViewById<RecyclerView>(Resource.Id.deviceSelector)!;
+        DeviceDiscoveryListView.SetLayoutManager(_useDialog switch
+        {
+            true => new LinearLayoutManager(this, (int)Orientation.Horizontal, reverseLayout: false),
+            false => new GridLayoutManager(this, 3, (int)Orientation.Vertical, reverseLayout: false)
+        });
         DeviceDiscoveryListView.SetAdapter(
             RemoteSystems.CreateAdapter(Resource.Layout.item_device, view => new RemoteSystemViewHolder(view) { Click = SendData })
         );
 
-        _emptyDeviceListView = _dialog.FindViewById<View>(Resource.Id.emptyDeviceListView)!;
+        _emptyDeviceListView = rootLayout.FindViewById<View>(Resource.Id.emptyDeviceListView)!;
+        _selectDeviceLayout = rootLayout.FindViewById<View>(Resource.Id.selectDeviceLayout)!;
+        _sendingDataLayout = rootLayout.FindViewById<View>(Resource.Id.sendingDataLayout)!;
 
         _loggerFactory = CdpUtils.CreateLoggerFactory(this);
         _logger = _loggerFactory.CreateLogger<SendActivity>();
@@ -189,21 +210,19 @@ public sealed class SendActivity : AppCompatActivity
     {
         _discoverCancellationTokenSource.Cancel();
 
-        _dialog.FindViewById<View>(Resource.Id.selectDeviceLayout)!.Visibility = ViewStates.Gone;
+        _selectDeviceLayout.Visibility = ViewStates.Gone;
+        _sendingDataLayout.Visibility = ViewStates.Visible;
 
-        var sendingDataLayout = _dialog.FindViewById<View>(Resource.Id.sendingDataLayout)!;
-        sendingDataLayout.Visibility = ViewStates.Visible;
-
-        sendingDataLayout.FindViewById<ImageView>(Resource.Id.deviceTypeImageView)!.SetImageResource(
+        _sendingDataLayout.FindViewById<ImageView>(Resource.Id.deviceTypeImageView)!.SetImageResource(
             remoteSystem.Type.IsMobile() ? Resource.Drawable.ic_fluent_phone_24_regular : Resource.Drawable.ic_fluent_desktop_24_regular
         );
 
-        var transportTypeImage = sendingDataLayout.FindViewById<ImageView>(Resource.Id.transportTypeImageView)!;
+        var transportTypeImage = _sendingDataLayout.FindViewById<ImageView>(Resource.Id.transportTypeImageView)!;
         transportTypeImage.SetImageResource(GetTransportIcon(remoteSystem.Endpoint.TransportType));
         _nearShareSender.TransportUpgraded += OnTransportUpgrade;
 
-        var deviceNameTextView = sendingDataLayout.FindViewById<TextView>(Resource.Id.deviceNameTextView)!;
-        var progressIndicator = sendingDataLayout.FindViewById<CircularProgressIndicator>(Resource.Id.sendProgressIndicator)!;
+        var deviceNameTextView = _sendingDataLayout.FindViewById<TextView>(Resource.Id.deviceNameTextView)!;
+        var progressIndicator = _sendingDataLayout.FindViewById<CircularProgressIndicator>(Resource.Id.sendProgressIndicator)!;
         progressIndicator.Visibility = ViewStates.Visible;
         progressIndicator.SetProgressCompat(0, animated: false);
 
