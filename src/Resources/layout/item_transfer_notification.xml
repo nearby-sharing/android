@@ -50,7 +50,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
-            android:progress="90"
             app:trackCornerRadius="10dp"
             android:layout_gravity="center|right"
             android:visibility="gone" />

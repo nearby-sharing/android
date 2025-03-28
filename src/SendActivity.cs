@@ -204,6 +204,7 @@ public sealed class SendActivity : AppCompatActivity
 
         var deviceNameTextView = sendingDataLayout.FindViewById<TextView>(Resource.Id.deviceNameTextView)!;
         var progressIndicator = sendingDataLayout.FindViewById<CircularProgressIndicator>(Resource.Id.sendProgressIndicator)!;
+        progressIndicator.Visibility = ViewStates.Visible;
         progressIndicator.SetProgressCompat(0, animated: false);
 
         deviceNameTextView.Text = remoteSystem.Name;

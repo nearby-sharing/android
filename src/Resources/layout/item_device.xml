@@ -36,9 +36,9 @@
             android:layout_height="match_parent"
             android:layout_centerInParent="true"
             android:id="@+id/sendProgressIndicator"
-            android:progress="0"
             app:indicatorSize="70dp"
-            app:trackCornerRadius="10dp" />
+            app:trackCornerRadius="10dp"
+			android:visibility="invisible" />
 
         <Button
             android:id="@id/cancel_button"
