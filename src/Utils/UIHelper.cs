@@ -1,4 +1,5 @@
 ﻿using Android.Animation;
+using Android.Bluetooth;
 using Android.Content;
 using Android.Content.PM;
 using Android.Media;
@@ -8,6 +9,7 @@ using Android.Views;
 using AndroidX.AppCompat.App;
 using AndroidX.Browser.CustomTabs;
 using AndroidX.Core.App;
+using AndroidX.Core.Content;
 using Google.Android.Material.Dialog;
 using NearShare.Settings;
 using System.Runtime.Versioning;
@@ -196,5 +198,17 @@ internal static class UIHelper
     {
         MediaPlayer player = MediaPlayer.Create(context, soundId) ?? throw new NullReferenceException("Could not create MediaPlayer");
         player.Start();
+    }
+
+    public static void EnableBluetooth(this Context context)
+    {
+        if (OperatingSystem.IsAndroidVersionAtLeast(31))
+        {
+            var permission = ContextCompat.CheckSelfPermission(context, ManifestPermission.BluetoothConnect);
+            if (permission == Permission.Granted)
+                return;
+        }
+
+        context.StartActivity(new Intent(BluetoothAdapter.ActionRequestEnable));
     }
 }
