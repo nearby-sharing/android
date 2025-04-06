@@ -114,7 +114,8 @@ public sealed class CdpSession : IDisposable
         bool supplyRequestId = false
     ) where TMessageHeader : IBinaryWritable where TMessage : IBinaryWritable
     {
-        var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
+        var bufferSize = EndianWriter.CalcBinarySize(messageHeader) + EndianWriter.CalcBinarySize(message);
+        var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool, initialCapacity: (int)bufferSize);
         try
         {
             messageHeader.Write(ref writer);
