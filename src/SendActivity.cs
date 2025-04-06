@@ -1,5 +1,4 @@
-﻿using Android.App;
-using Android.Bluetooth;
+﻿using Android.Bluetooth;
 using Android.Content;
 using Android.Content.PM;
 using Android.Runtime;
@@ -25,7 +24,7 @@ namespace NearShare;
 
 [IntentFilter([Intent.ActionProcessText], Categories = [Intent.CategoryDefault, Intent.CategoryBrowsable], DataMimeType = "text/plain", Label = "@string/app_name")]
 [IntentFilter([Intent.ActionSend, Intent.ActionSendMultiple], Categories = [Intent.CategoryDefault, Intent.CategoryBrowsable], DataMimeType = "*/*")]
-[Activity(Label = "@string/app_name", Exported = true, Theme = "@style/AppTheme.TranslucentOverlay", ConfigurationChanges = UIHelper.ConfigChangesFlags, LaunchMode = LaunchMode.SingleTask)]
+[Activity(Label = "@string/app_name", Exported = true, Theme = "@style/AppTheme", ConfigurationChanges = UIHelper.ConfigChangesFlags, LaunchMode = LaunchMode.SingleTask)]
 public sealed class SendActivity : AppCompatActivity
 {
     NearShareSender _nearShareSender = null!;
@@ -68,7 +67,9 @@ public sealed class SendActivity : AppCompatActivity
         }
         else
         {
-            SetContentView(Resource.Layout.activity_share);
+            SetContentView(Resource.Layout.activity_share_full);
+            UIHelper.SetupToolBar(this);
+
             rootLayout = FindViewById<ViewGroup>(Resource.Id.rootLayout)!;
             closeShareExperience = Finish;
         }
@@ -101,6 +102,15 @@ public sealed class SendActivity : AppCompatActivity
         _logger = _loggerFactory.CreateLogger<SendActivity>();
 
         UIHelper.RequestSendPermissions(this);
+    }
+
+    public override bool OnCreateOptionsMenu(IMenu? menu)
+    {
+        if (_useDialog)
+            return base.OnCreateOptionsMenu(menu);
+
+        MenuInflater.Inflate(Resource.Menu.menu_send, menu);
+        return true;
     }
 
     sealed class RemoteSystemViewHolder : ViewHolder<CdpDevice>
