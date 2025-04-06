@@ -50,30 +50,25 @@ internal sealed class ClientChannelHandler(CdpSession session) : ChannelHandler(
 
     ulong SendChannelRequest(CdpSocket socket, string appId, string appName)
     {
-        var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
-        try
+        CommonHeader header = new()
         {
+            Type = MessageType.Control
+        };
+        Session.SendMessage(
+            socket,
+            ref header,
             new ControlHeader()
             {
                 MessageType = ControlMessageType.StartChannelRequest
-            }.Write(ref writer);
+            },
             new StartChannelRequest()
             {
                 Id = appId,
                 Name = appName
-            }.Write(ref writer);
+            },
+            supplyRequestId: true
+        );
 
-            CommonHeader header = new()
-            {
-                Type = MessageType.Control
-            };
-            Session.SendMessage(socket, header, writer.Stream.WrittenSpan, supplyRequestId: true);
-
-            return header.RequestID;
-        }
-        finally
-        {
-            writer.Dispose();
-        }
+        return header.RequestID;
     }
 }

@@ -44,22 +44,17 @@ internal abstract class ConnectHandler(CdpSession session, UpgradeHandler upgrad
 
         DeviceInfo = msg.DeviceInfo;
 
-        var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
-        try
-        {
+        header.Flags = 0;
+        _session.SendMessage(
+            socket,
+            ref header,
             new ConnectionHeader()
             {
                 ConnectionMode = ConnectionMode.Proximal,
                 MessageType = ConnectionType.DeviceInfoResponseMessage // Ack
-            }.Write(ref writer);
-
-            header.Flags = 0;
-            _session.SendMessage(socket, header, writer.Stream.WrittenSpan);
-        }
-        finally
-        {
-            writer.Dispose();
-        }
+            },
+            new EmptyMessage()
+        );
     }
 
     public static ConnectHandler Create(CdpSession session, EndpointInfo initialEndpoint)
