@@ -1,11 +1,10 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Messages.Connection;
-using System.Security.Cryptography;
-using ShortDev.IO;
 using System.Diagnostics;
+using System.Security.Cryptography;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages.Discovery;
 
-public class PresenceResponse : IBinaryWritable, IBinaryParsable<PresenceResponse>
+public readonly record struct PresenceResponse : IBinaryWritable, IBinaryParsable<PresenceResponse>
 {
     public required ConnectionMode ConnectionMode { get; init; }
 
