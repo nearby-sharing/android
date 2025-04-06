@@ -247,6 +247,6 @@ public sealed class CommonHeader : IBinaryWritable, IBinaryParsable<CommonHeader
         if (header == null)
             return null;
 
-        return BinaryPrimitives.ReadUInt64LittleEndian(header.Value.Span);
+        return BinaryPrimitives.ReadUInt64LittleEndian(header.Value.Value.Span);
     }
 }

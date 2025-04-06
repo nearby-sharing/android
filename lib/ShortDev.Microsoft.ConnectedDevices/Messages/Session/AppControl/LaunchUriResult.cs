@@ -1,6 +1,6 @@
 ﻿namespace ShortDev.Microsoft.ConnectedDevices.Messages.Session.AppControl;
 
-public sealed class LaunchUriResult : IBinaryWritable, IBinaryParsable<LaunchUriResult>
+public readonly record struct LaunchUriResult : IBinaryWritable, IBinaryParsable<LaunchUriResult>
 {
     public static LaunchUriResult Parse<TReader>(ref TReader reader) where TReader : struct, IEndianReader, allows ref struct
         => new()

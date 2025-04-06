@@ -50,16 +50,15 @@ internal sealed class HostConnectHandler(CdpSession session, HostUpgradeHandler 
         var connectionRequest = ConnectionRequest.Parse(ref reader);
         _remoteEncryption = CdpEncryptionInfo.FromRemote(connectionRequest.PublicKeyX, connectionRequest.PublicKeyY, connectionRequest.Nonce, CdpEncryptionParams.Default);
 
-        var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
-        try
-        {
+        var publicKey = _localEncryption.PublicKey;
+        _session.SendMessage(
+            socket,
+            ref header,
             new ConnectionHeader()
             {
                 ConnectionMode = ConnectionMode.Proximal,
                 MessageType = ConnectionType.ConnectResponse
-            }.Write(ref writer);
-
-            var publicKey = _localEncryption.PublicKey;
+            },
             new ConnectionResponse()
             {
                 Result = ConnectionResult.Pending,
@@ -68,14 +67,8 @@ internal sealed class HostConnectHandler(CdpSession session, HostUpgradeHandler 
                 Nonce = _localEncryption.Nonce,
                 PublicKeyX = publicKey.X!,
                 PublicKeyY = publicKey.Y!
-            }.Write(ref writer);
-
-            _session.SendMessage(socket, header, writer.Stream.WrittenSpan);
-        }
-        finally
-        {
-            writer.Dispose();
-        }
+            }
+        );
 
         // We have to set cryptor after we send the message because it would be encrypted otherwise
         var secret = _localEncryption.GenerateSharedSecret(_remoteEncryption);
@@ -88,49 +81,37 @@ internal sealed class HostConnectHandler(CdpSession session, HostUpgradeHandler 
         if (!authRequest.VerifyThumbprint(hostNonce: _localEncryption.Nonce, clientNonce: _remoteEncryption!.Nonce))
             throw new CdpSecurityException("Invalid thumbprint");
 
-        var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
-        try
-        {
+        header.Flags = 0;
+        _session.SendMessage(
+            socket,
+            ref header,
             new ConnectionHeader()
             {
                 ConnectionMode = ConnectionMode.Proximal,
                 MessageType = connectionType == ConnectionType.DeviceAuthRequest ? ConnectionType.DeviceAuthResponse : ConnectionType.UserDeviceAuthResponse
-            }.Write(ref writer);
+            },
             AuthenticationPayload.Create(
                 _session.Platform.DeviceInfo.DeviceCertificate, // ToDo: User cert
                 hostNonce: _localEncryption.Nonce, clientNonce: _remoteEncryption!.Nonce
-            ).Write(ref writer);
-
-            header.Flags = 0;
-            _session.SendMessage(socket, header, writer.Stream.WrittenSpan);
-        }
-        finally
-        {
-            writer.Dispose();
-        }
+            )
+        );
     }
 
     void HandleAuthDoneRequest(CommonHeader header, CdpSocket socket)
     {
-        var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
-        try
-        {
+        header.Flags = 0;
+        _session.SendMessage(
+            socket,
+            ref header,
             new ConnectionHeader()
             {
                 ConnectionMode = ConnectionMode.Proximal,
                 MessageType = ConnectionType.AuthDoneRespone // Ack
-            }.Write(ref writer);
+            },
             new ResultPayload()
             {
                 Result = CdpResult.Success
-            }.Write(ref writer);
-
-            header.Flags = 0;
-            _session.SendMessage(socket, header, writer.Stream.WrittenSpan);
-        }
-        finally
-        {
-            writer.Dispose();
-        }
+            }
+        );
     }
 }

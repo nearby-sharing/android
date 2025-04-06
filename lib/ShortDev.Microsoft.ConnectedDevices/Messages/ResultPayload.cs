@@ -7,7 +7,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Messages;
 /// <br/>
 /// (e.g. <see cref="Connection.ConnectionType.AuthDoneRespone"/>)
 /// </summary>
-public sealed class ResultPayload : IBinaryWritable, IBinaryParsable<ResultPayload>
+public readonly record struct ResultPayload : IBinaryWritable, IBinaryParsable<ResultPayload>
 {
     public static ResultPayload Parse<TReader>(ref TReader reader) where TReader : struct, IEndianReader, allows ref struct
         => new()
