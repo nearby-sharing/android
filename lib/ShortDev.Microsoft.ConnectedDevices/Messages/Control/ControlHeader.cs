@@ -1,8 +1,8 @@
 ﻿namespace ShortDev.Microsoft.ConnectedDevices.Messages.Control;
 
-public sealed class ControlHeader : IBinaryWritable, IBinaryParsable<ControlHeader>
+public readonly record struct ControlHeader : IBinaryWritable, IBinaryParsable<ControlHeader>
 {
-    public required ControlMessageType MessageType { get; set; }
+    public required ControlMessageType MessageType { get; init; }
 
     public static ControlHeader Parse<TReader>(ref TReader reader) where TReader : struct, IEndianReader, allows ref struct
     {

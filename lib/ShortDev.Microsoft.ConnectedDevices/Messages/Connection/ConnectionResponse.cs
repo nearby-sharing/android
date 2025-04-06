@@ -7,37 +7,37 @@ namespace ShortDev.Microsoft.ConnectedDevices.Messages.Connection;
 /// The host responds with a connection response message including device information. <br/>
 /// Only the Result is sent if the Result is anything other than <see cref="ConnectionResult.Pending"/>.
 /// </summary>
-public sealed class ConnectionResponse : IBinaryWritable, IBinaryParsable<ConnectionResponse>
+public readonly record struct ConnectionResponse : IBinaryWritable, IBinaryParsable<ConnectionResponse>
 {
     /// <summary>
     /// The result of the connection request.
     /// </summary>
-    public required ConnectionResult Result { get; set; }
+    public required ConnectionResult Result { get; init; }
     /// <summary>
     /// The expected size of HMAC.
     /// </summary>
-    public required ushort HmacSize { get; set; }
+    public required ushort HmacSize { get; init; }
     /// <summary>
     /// Random values.
     /// </summary>
-    public required CdpNonce Nonce { get; set; }
+    public required CdpNonce Nonce { get; init; }
     /// <summary>
     /// The maximum size of a single message fragment. <br/>
     /// (Fixed Value of <see cref="MessageFragmenter.DefaultMessageFragmentSize"/>).
     /// </summary>
-    public required uint MessageFragmentSize { get; set; }
+    public required uint MessageFragmentSize { get; init; }
     /// <summary>
     /// A fixed-length key that is based on the <see cref="CurveType"/> from <see cref="ConnectionRequest"/>, which is sent only if the connection is successful. <br/>
     /// This is the X component of the key. <br/>
     /// (See <see cref="System.Security.Cryptography.ECPoint.X"/>)
     /// </summary>
-    public required ReadOnlyMemory<byte> PublicKeyX { get; set; }
+    public required ReadOnlyMemory<byte> PublicKeyX { get; init; }
     /// <summary>
     /// A fixed-length key that is based on the <see cref="CurveType"/> from <see cref="ConnectionRequest"/>, which is sent only if the connection is successful. <br/>
     /// This is the Y component of the key.
     /// (See <see cref="System.Security.Cryptography.ECPoint.Y"/>)
     /// </summary>
-    public required ReadOnlyMemory<byte> PublicKeyY { get; set; }
+    public required ReadOnlyMemory<byte> PublicKeyY { get; init; }
 
     public static ConnectionResponse Parse<TReader>(ref TReader reader) where TReader : struct, IEndianReader, allows ref struct
     {

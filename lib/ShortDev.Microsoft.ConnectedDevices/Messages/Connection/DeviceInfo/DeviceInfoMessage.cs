@@ -6,7 +6,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Messages.Connection.DeviceInfo;
 /// <summary>
 /// This message requests information from the device.
 /// </summary>
-public sealed class DeviceInfoMessage : IBinaryWritable, IBinaryParsable<DeviceInfoMessage>
+public readonly record struct DeviceInfoMessage : IBinaryWritable, IBinaryParsable<DeviceInfoMessage>
 {
     public static DeviceInfoMessage Parse<TReader>(ref TReader reader) where TReader : struct, IEndianReader, allows ref struct
         => new()

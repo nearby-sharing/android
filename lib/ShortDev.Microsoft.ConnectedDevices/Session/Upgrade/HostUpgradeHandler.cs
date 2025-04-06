@@ -64,27 +64,19 @@ internal sealed class HostUpgradeHandler(CdpSession session, EndpointInfo initia
             allowed ? "succeeded" : "failed"
         );
 
-        CommonHeader header = new()
-        {
-            Type = MessageType.Connect
-        };
-
-        var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
-        try
-        {
+        _session.SendMessage(
+            socket,
+            new CommonHeader()
+            {
+                Type = MessageType.Connect
+            },
             new ConnectionHeader()
             {
                 ConnectionMode = ConnectionMode.Proximal,
                 MessageType = allowed ? ConnectionType.TransportConfirmation : ConnectionType.UpgradeFailure
-            }.Write(ref writer);
-            msg.Write(ref writer);
-
-            _session.SendMessage(socket, header, writer.Stream.WrittenSpan);
-        }
-        finally
-        {
-            writer.Dispose();
-        }
+            },
+            msg
+        );
 
         RemoteEndpoint = socket.Endpoint;
     }
@@ -106,38 +98,32 @@ internal sealed class HostUpgradeHandler(CdpSession session, EndpointInfo initia
         var localIp = networkTransport?.Handler.TryGetLocalIp();
         if (networkTransport == null || localIp == null)
         {
-            var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
-            try
-            {
+            _session.SendMessage(
+                socket,
+                header,
                 new ConnectionHeader()
                 {
                     ConnectionMode = ConnectionMode.Proximal,
                     MessageType = ConnectionType.UpgradeFailure
-                }.Write(ref writer);
+                },
                 new HResultPayload()
                 {
                     HResult = -1
-                }.Write(ref writer);
-
-                _session.SendMessage(socket, header, writer.Stream.WrittenSpan);
-            }
-            finally
-            {
-                writer.Dispose();
-            }
+                }
+            );
         }
         else
         {
             _upgradeIds.Add(msg.UpgradeId);
 
-            var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
-            try
-            {
+            _session.SendMessage(
+                socket,
+                ref header,
                 new ConnectionHeader()
                 {
                     ConnectionMode = ConnectionMode.Proximal,
                     MessageType = ConnectionType.UpgradeResponse
-                }.Write(ref writer);
+                },
                 new UpgradeResponse()
                 {
                     Endpoints =
@@ -148,14 +134,8 @@ internal sealed class HostUpgradeHandler(CdpSession session, EndpointInfo initia
                     [
                         EndpointMetadata.Tcp
                     ]
-                }.Write(ref writer);
-
-                _session.SendMessage(socket, header, writer.Stream.WrittenSpan);
-            }
-            finally
-            {
-                writer.Dispose();
-            }
+                }
+            );
         }
     }
 
@@ -166,25 +146,18 @@ internal sealed class HostUpgradeHandler(CdpSession session, EndpointInfo initia
             msg.Select((x) => x.Type)
         );
 
-        CommonHeader header = new()
-        {
-            Type = MessageType.Connect
-        };
-
-        var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
-        try
-        {
+        _session.SendMessage(
+            socket,
+            new CommonHeader()
+            {
+                Type = MessageType.Connect
+            },
             new ConnectionHeader()
             {
                 ConnectionMode = ConnectionMode.Proximal,
                 MessageType = ConnectionType.UpgradeFinalizationResponse
-            }.Write(ref writer);
-
-            _session.SendMessage(socket, header, writer.Stream.WrittenSpan);
-        }
-        finally
-        {
-            writer.Dispose();
-        }
+            },
+            new EmptyMessage()
+        );
     }
 }

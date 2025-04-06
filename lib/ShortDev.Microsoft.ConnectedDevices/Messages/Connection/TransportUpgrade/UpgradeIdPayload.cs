@@ -4,7 +4,7 @@
 /// This message transports the details of the upgrade. <br/>
 /// (See <see cref="ConnectionType.TransportRequest"/> and <see cref="ConnectionType.TransportConfirmation"/>)
 /// </summary>
-public sealed class UpgradeIdPayload : IBinaryWritable, IBinaryParsable<UpgradeIdPayload>
+public readonly record struct UpgradeIdPayload : IBinaryWritable, IBinaryParsable<UpgradeIdPayload>
 {
     public required Guid UpgradeId { get; init; }
 

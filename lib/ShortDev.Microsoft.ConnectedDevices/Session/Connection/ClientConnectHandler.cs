@@ -33,16 +33,15 @@ internal sealed class ClientConnectHandler(CdpSession session, ClientUpgradeHand
             }
         };
 
-        var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
-        try
-        {
+        var publicKey = _localEncryption.PublicKey;
+        _session.SendMessage(
+            socket,
+            ref header,
             new ConnectionHeader()
             {
                 ConnectionMode = ConnectionMode.Proximal,
                 MessageType = ConnectionType.ConnectRequest
-            }.Write(ref writer);
-
-            var publicKey = _localEncryption.PublicKey;
+            },
             new ConnectionRequest()
             {
                 CurveType = CurveType.CT_NIST_P256_KDF_SHA512,
@@ -51,14 +50,8 @@ internal sealed class ClientConnectHandler(CdpSession session, ClientUpgradeHand
                 Nonce = _localEncryption.Nonce,
                 PublicKeyX = publicKey.X!,
                 PublicKeyY = publicKey.Y!
-            }.Write(ref writer);
-
-            _session.SendMessage(socket, header, writer.Stream.WrittenSpan);
-        }
-        finally
-        {
-            writer.Dispose();
-        }
+            }
+        );
 
         await _promise;
     }
@@ -110,26 +103,20 @@ internal sealed class ClientConnectHandler(CdpSession session, ClientUpgradeHand
         var secret = _localEncryption.GenerateSharedSecret(_remoteEncryption);
         _session.Cryptor = new(secret);
 
-        var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
-        try
-        {
+        header.Flags = 0;
+        _session.SendMessage(
+            socket,
+            ref header,
             new ConnectionHeader()
             {
                 ConnectionMode = ConnectionMode.Proximal,
                 MessageType = ConnectionType.DeviceAuthRequest
-            }.Write(ref writer);
+            },
             AuthenticationPayload.Create(
                 _session.Platform.DeviceInfo.DeviceCertificate!, // ToDo: User cert
                 hostNonce: _remoteEncryption!.Nonce, clientNonce: _localEncryption.Nonce
-            ).Write(ref writer);
-
-            header.Flags = 0;
-            _session.SendMessage(socket, header, writer.Stream.WrittenSpan);
-        }
-        finally
-        {
-            writer.Dispose();
-        }
+            )
+        );
     }
 
     void HandleAuthResponse(CommonHeader header, ref HeapEndianReader reader, CdpSocket socket, ConnectionType connectionType)
@@ -162,51 +149,43 @@ internal sealed class ClientConnectHandler(CdpSession session, ClientUpgradeHand
                 }
             }
 
-            var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
             try
             {
-                new ConnectionHeader()
-                {
-                    ConnectionMode = ConnectionMode.Proximal,
-                    MessageType = ConnectionType.AuthDoneRequest
-                }.Write(ref writer);
-
                 header.Flags = 0;
-                _session.SendMessage(socket, header, writer.Stream.WrittenSpan);
+                _session.SendMessage(
+                    socket,
+                    ref header,
+                    new ConnectionHeader()
+                    {
+                        ConnectionMode = ConnectionMode.Proximal,
+                        MessageType = ConnectionType.AuthDoneRequest
+                    },
+                    new EmptyMessage()
+                );
             }
             catch (Exception ex)
             {
                 _promise?.TrySetException(ex);
-            }
-            finally
-            {
-                writer.Dispose();
             }
         }
     }
 
     void HandleDeviceAuthResponse(CdpSocket socket, CommonHeader header)
     {
-        var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
-        try
-        {
+        header.Flags = 0;
+        _session.SendMessage(
+            socket,
+            ref header,
             new ConnectionHeader()
             {
                 ConnectionMode = ConnectionMode.Proximal,
                 MessageType = ConnectionType.UserDeviceAuthRequest
-            }.Write(ref writer);
+            },
             AuthenticationPayload.Create(
                 _session.Platform.DeviceInfo.DeviceCertificate!, // ToDo: User cert
                 hostNonce: _remoteEncryption!.Nonce, clientNonce: _localEncryption.Nonce
-            ).Write(ref writer);
-
-            header.Flags = 0;
-            _session.SendMessage(socket, header, writer.Stream.WrittenSpan);
-        }
-        finally
-        {
-            writer.Dispose();
-        }
+            )
+        );
     }
 
     void HandleAuthDoneResponse(CdpSocket socket, ref HeapEndianReader reader)
@@ -214,32 +193,22 @@ internal sealed class ClientConnectHandler(CdpSession session, ClientUpgradeHand
         var msg = ResultPayload.Parse(ref reader);
         msg.ThrowOnError();
 
-        var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
-        try
-        {
+        _session.SendMessage(
+            socket,
+            new CommonHeader()
+            {
+                Type = MessageType.Connect
+            },
             new ConnectionHeader()
             {
                 ConnectionMode = ConnectionMode.Proximal,
                 MessageType = ConnectionType.DeviceInfoMessage
-            }.Write(ref writer);
+            },
             new DeviceInfoMessage()
             {
                 DeviceInfo = _session.Platform.GetCdpDeviceInfo()
-            }.Write(ref writer);
-
-            _session.SendMessage(
-                socket,
-                new CommonHeader()
-                {
-                    Type = MessageType.Connect
-                },
-                writer.Stream.WrittenSpan
-            );
-        }
-        finally
-        {
-            writer.Dispose();
-        }
+            }
+        );
 
         _promise?.TrySetResult();
     }

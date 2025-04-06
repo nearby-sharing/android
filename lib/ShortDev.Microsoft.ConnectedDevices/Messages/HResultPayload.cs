@@ -3,7 +3,7 @@
 /// <summary>
 /// General payload to represent a HRESULT (<see cref="int"/>).
 /// </summary>
-public sealed class HResultPayload : IBinaryWritable, IBinaryParsable<HResultPayload>
+public readonly record struct HResultPayload : IBinaryWritable, IBinaryParsable<HResultPayload>
 {
     public static HResultPayload Parse<TReader>(ref TReader reader) where TReader : struct, IEndianReader, allows ref struct
         => new()

@@ -4,7 +4,7 @@
 /// The Disconnect message is an optional message sent by a client or host used to inform the other device to disconnect the connected session. <br/>
 /// The <see cref="SessionId"/> is sent to identify the session to be disconnected.
 /// </summary>
-public sealed class DisconnectMessage : IBinaryParsable<DisconnectMessage>
+public readonly record struct DisconnectMessage : IBinaryParsable<DisconnectMessage>
 {
     /// <summary>
     /// ID representing the session.

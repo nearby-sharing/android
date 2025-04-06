@@ -22,25 +22,19 @@ internal sealed class HostChannelHandler(CdpSession session) : ChannelHandler(se
 
         _channelRegistry.Create(channelId => CdpChannel.CreateServerChannel(this, socket, request, channelId), out var channelId);
 
-        var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
-        try
-        {
+        header.Flags = 0;
+        Session.SendMessage(
+            socket,
+            ref header,
             new ControlHeader()
             {
                 MessageType = ControlMessageType.StartChannelResponse
-            }.Write(ref writer);
+            },
             new StartChannelResponse()
             {
                 Result = ChannelResult.Success,
                 ChannelId = channelId
-            }.Write(ref writer);
-
-            header.Flags = 0;
-            Session.SendMessage(socket, header, writer.Stream.WrittenSpan);
-        }
-        finally
-        {
-            writer.Dispose();
-        }
+            }
+        );
     }
 }

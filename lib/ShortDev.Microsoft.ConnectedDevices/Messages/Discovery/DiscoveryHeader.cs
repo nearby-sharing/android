@@ -1,6 +1,6 @@
 ﻿namespace ShortDev.Microsoft.ConnectedDevices.Messages.Discovery;
 
-public sealed class DiscoveryHeader : IBinaryWritable, IBinaryParsable<DiscoveryHeader>
+public readonly record struct DiscoveryHeader : IBinaryWritable, IBinaryParsable<DiscoveryHeader>
 {
     public static DiscoveryHeader Parse<TReader>(ref TReader reader) where TReader : struct, IEndianReader, allows ref struct
         => new()
@@ -13,5 +13,5 @@ public sealed class DiscoveryHeader : IBinaryWritable, IBinaryParsable<Discovery
         writer.Write((byte)Type);
     }
 
-    public required DiscoveryType Type { get; set; }
+    public required DiscoveryType Type { get; init; }
 }

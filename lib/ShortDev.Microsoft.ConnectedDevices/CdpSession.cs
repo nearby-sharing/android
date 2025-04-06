@@ -8,6 +8,7 @@ using ShortDev.Microsoft.ConnectedDevices.Session.Channels;
 using ShortDev.Microsoft.ConnectedDevices.Session.Connection;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
 using System.Collections.Concurrent;
+using System.ComponentModel;
 
 namespace ShortDev.Microsoft.ConnectedDevices;
 
@@ -96,6 +97,36 @@ public sealed class CdpSession : IDisposable
     uint _sequenceNumber = 0;
     ulong _requestId = 0;
     internal CdpCryptor? Cryptor { get; set; }
+
+    public void SendMessage<TMessageHeader, TMessage>(
+        CdpSocket socket,
+        CommonHeader header, in TMessageHeader messageHeader, in TMessage message,
+        bool supplyRequestId = false
+    ) where TMessageHeader : IBinaryWritable where TMessage : IBinaryWritable
+    {
+        SendMessage(socket, ref header, messageHeader, message, supplyRequestId: supplyRequestId);
+    }
+
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public void SendMessage<TMessageHeader, TMessage>(
+        CdpSocket socket,
+        ref CommonHeader header, in TMessageHeader messageHeader, in TMessage message,
+        bool supplyRequestId = false
+    ) where TMessageHeader : IBinaryWritable where TMessage : IBinaryWritable
+    {
+        var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
+        try
+        {
+            messageHeader.Write(ref writer);
+            message.Write(ref writer);
+            SendMessage(socket, header, writer.Stream.WrittenSpan, supplyRequestId);
+        }
+        finally
+        {
+            writer.Dispose();
+        }
+    }
+
     public void SendMessage(CdpSocket socket, CommonHeader header, ReadOnlySpan<byte> payload, bool supplyRequestId = false)
     {
         if (header.Type == MessageType.Session && Cryptor == null)

@@ -2,7 +2,7 @@
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages.Connection.TransportUpgrade;
 
-public record class EndpointMetadata(CdpTransportType Type, byte[] Data) : IBinaryWritable, IBinaryParsable<EndpointMetadata>
+public readonly record struct EndpointMetadata(CdpTransportType Type, byte[] Data) : IBinaryWritable, IBinaryParsable<EndpointMetadata>
 {
     public static EndpointMetadata Tcp { get; } = new(CdpTransportType.Tcp, []);
     public static EndpointMetadata WifiDirect { get; } = new(CdpTransportType.WifiDirect, []);
@@ -39,4 +39,12 @@ public record class EndpointMetadata(CdpTransportType Type, byte[] Data) : IBina
         foreach (var endpoint in endpoints)
             endpoint.Write(ref writer);
     }
+}
+
+public readonly record struct EndpointMetadataArray(IReadOnlyList<EndpointMetadata> Endpoints) : IBinaryWritable, IBinaryParsable<EndpointMetadataArray>
+{
+    public void Write<TWriter>(ref TWriter writer) where TWriter : struct, IEndianWriter, allows ref struct
+        => EndpointMetadata.WriteArray(ref writer, Endpoints);
+    public static EndpointMetadataArray Parse<TReader>(ref TReader reader) where TReader : struct, IEndianReader, allows ref struct
+        => new(EndpointMetadata.ParseArray(ref reader));
 }
