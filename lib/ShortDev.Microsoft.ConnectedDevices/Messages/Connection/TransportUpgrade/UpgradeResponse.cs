@@ -5,7 +5,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Messages.Connection.TransportUpgra
 /// <summary>
 /// This message transports the upgrade response.
 /// </summary>
-public sealed class UpgradeResponse : IBinaryWritable, IBinaryParsable<UpgradeResponse>
+public readonly record struct UpgradeResponse : IBinaryWritable, IBinaryParsable<UpgradeResponse>
 {
     /// <summary>
     /// A length-prefixed list of endpoint structures (see following) that are provided by each transport on the host device.

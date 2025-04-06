@@ -6,37 +6,37 @@ namespace ShortDev.Microsoft.ConnectedDevices.Messages.Connection;
 /// <summary>
 /// Client initiates a connection request with a host device.
 /// </summary>
-public sealed class ConnectionRequest : IBinaryWritable, IBinaryParsable<ConnectionRequest>
+public readonly record struct ConnectionRequest : IBinaryWritable, IBinaryParsable<ConnectionRequest>
 {
     /// <summary>
     /// The type of elliptical curve used.
     /// </summary>
-    public required CurveType CurveType { get; set; }
+    public required CurveType CurveType { get; init; }
     /// <summary>
     /// The expected size of HMAC.
     /// </summary>
-    public required ushort HmacSize { get; set; }
+    public required ushort HmacSize { get; init; }
     /// <summary>
     /// Random values
     /// </summary>
-    public required CdpNonce Nonce { get; set; }
+    public required CdpNonce Nonce { get; init; }
     /// <summary>
     /// The maximum size of a single message fragment. <br/>
     /// (Fixed Value of <see cref="MessageFragmenter.DefaultMessageFragmentSize"/>).
     /// </summary>
-    public required uint MessageFragmentSize { get; set; }
+    public required uint MessageFragmentSize { get; init; }
     /// <summary>
     /// A fixed-length key.
     /// This is the X component of the key. <br/>
     /// (See <see cref="System.Security.Cryptography.ECPoint.X"/>)
     /// </summary>
-    public required ReadOnlyMemory<byte> PublicKeyX { get; set; }
+    public required ReadOnlyMemory<byte> PublicKeyX { get; init; }
     /// <summary>
     /// A fixed-length key.
     /// This is the Y component of the key. <br/>
     /// (See <see cref="System.Security.Cryptography.ECPoint.Y"/>)
     /// </summary>
-    public required ReadOnlyMemory<byte> PublicKeyY { get; set; }
+    public required ReadOnlyMemory<byte> PublicKeyY { get; init; }
 
     public static ConnectionRequest Parse<TReader>(ref TReader reader) where TReader : struct, IEndianReader, allows ref struct
         => new()
