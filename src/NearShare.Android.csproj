@@ -21,7 +21,7 @@
 	<ItemGroup Label="Nuget">
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.3" />
 		<PackageReference Include="Rive.Android" Version="1.1.0" />
-		<PackageReference Include="Sentry" Version="5.4.0" />
+		<PackageReference Include="Sentry" Version="5.5.0" />
 		<PackageReference Include="Serilog.Extensions.Logging.File" Version="3.0.0" />
 		<PackageReference Include="ShortDev.Android" Version="0.3.0-beta" />
 		<PackageReference Include="ShortDev.Android.FluentIcons" Version="1.1.203" />
