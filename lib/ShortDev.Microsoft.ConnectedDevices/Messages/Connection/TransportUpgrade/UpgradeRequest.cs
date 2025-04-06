@@ -3,7 +3,7 @@
 /// <summary>
 /// This message transports the upgrade request.
 /// </summary>
-public sealed class UpgradeRequest : IBinaryWritable, IBinaryParsable<UpgradeRequest>
+public readonly record struct UpgradeRequest : IBinaryWritable, IBinaryParsable<UpgradeRequest>
 {
     /// <summary>
     /// A random GUID identifying this upgrade process across transports.

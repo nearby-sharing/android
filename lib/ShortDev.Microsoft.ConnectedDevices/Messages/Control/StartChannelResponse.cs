@@ -2,7 +2,7 @@
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages.Control;
 
-public sealed class StartChannelResponse : IBinaryWritable, IBinaryParsable<StartChannelResponse>
+public readonly record struct StartChannelResponse : IBinaryWritable, IBinaryParsable<StartChannelResponse>
 {
     public static StartChannelResponse Parse<TReader>(ref TReader reader) where TReader : struct, IEndianReader, allows ref struct
        => new()

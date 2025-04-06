@@ -9,10 +9,8 @@ namespace ShortDev.Microsoft.ConnectedDevices.Messages.Connection.Authentication
 /// <summary>
 /// For all authentication, devices send their device / user certificate, which is self-signed.
 /// </summary>
-public sealed class AuthenticationPayload : IBinaryWritable, IBinaryParsable<AuthenticationPayload>
+public readonly record struct AuthenticationPayload : IBinaryWritable, IBinaryParsable<AuthenticationPayload>
 {
-    private AuthenticationPayload() { }
-
     public static AuthenticationPayload Parse<TReader>(ref TReader reader) where TReader : struct, IEndianReader, allows ref struct
         => new()
         {
