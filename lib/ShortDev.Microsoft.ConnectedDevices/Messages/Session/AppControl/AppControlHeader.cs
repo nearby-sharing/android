@@ -1,8 +1,8 @@
 ﻿namespace ShortDev.Microsoft.ConnectedDevices.Messages.Session.AppControl;
 
-public sealed class AppControlHeader : IBinaryWritable, IBinaryParsable<AppControlHeader>
+public readonly record struct AppControlHeader : IBinaryWritable, IBinaryParsable<AppControlHeader>
 {
-    public required AppControlType MessageType { get; set; }
+    public required AppControlType MessageType { get; init; }
 
     public static AppControlHeader Parse<TReader>(ref TReader reader) where TReader : struct, IEndianReader, allows ref struct
     {
