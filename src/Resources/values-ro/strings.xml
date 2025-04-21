@@ -4,67 +4,74 @@
 	<string name="app_titlebar_title_default">Trimite date pe Windows 10 / 11</string>
 	<string name="app_titlebar_title_receive">Primește date de pe Windows 10 / 11</string>
 	<string name="app_titlebar_title_receive_setup">Configurare / Informații</string>
-
 	<string name="assets_prefix">ro</string>
-
 	<!-- #region generic -->
 	<string name="generic_back">Înapoi</string>
 	<string name="generic_next">Mai departe</string>
 	<string name="generic_cancel">Anulează</string>
-
 	<string name="generic_send">Trimite</string>
 	<string name="generic_receive">Primește</string>
-
 	<string name="generic_status_template">Stare: {0}</string>
 	<string name="generic_error_template">Eroare: {0}</string>
-
 	<string name="generic_important">Important</string>
 	<string name="generic_notifications">Notificări</string>
 	<string name="generic_settings">Setări</string>
 	<string name="device_name">Numele dispozitivului</string>
 	<!-- #endregion -->
-
 	<!-- #region activity_mac_address.xml -->
 	<string name="launch_settings">Deschide Setări</string>
 	<string name="bt_mac_address">Adresa Mac Bluetooth</string>
 	<!-- #endregion -->
-
 	<!-- #region activity_receive.xml -->
 	<string name="visible_as_template">Vizibil ca și {0}</string>
 	<string name="debug_log">Jurnal de depanare</string>
 	<!-- #endregion -->
-
 	<!-- #region activity_share.xml -->
 	<string name="scanning">Se scanează ...</string>
 	<!-- #endregion -->
-
 	<!-- #region preferences.xml -->
 	<string name="category_general">General</string>
-
+	<string name="category_links">Links / Help</string>
+	<string name="category_permissions">Permissions</string>
+	<string name="category_setup">Setup</string>
+	<string name="category_about">About</string>
 	<string name="request_permissions_title">Cere Permisiuni</string>
 	<string name="request_permissions_summary">Oferă aplicației permisiunile necesare</string>
-
+	<string name="request_enable_bluetooth">Enable Bluetooth</string>
 	<string name="open_sponsor_title">Susține</string>
 	<string name="open_sponsor_summary">Susține creatorul aplicației</string>
-
 	<string name="open_faq_title">Ajutor</string>
 	<string name="open_faq_summary">Deschide secțiunea de întrebări frecvente</string>
-
-
+	<string name="open_discord_title">Discord</string>
+	<string name="open_discord_summary">Join Discord-Server</string>
+	<string name="preference_appearance_title">UI / Design</string>
+	<string name="preference_appearance_summary">Language, Dark Mode</string>
+	<string name="force_dark_mode_title">Dark Mode</string>
+	<string name="force_dark_mode_summary">Force Dark Mode</string>
+	<string name="switch_language_title">App Language</string>
+	<string name="switch_language_summary">Change app display language</string>
+	<string name="preference_cdp_title">Connected Devices Platform</string>
+	<string name="preference_cdp_summary">Setup sending and receiving</string>
+	<string name="open_setup">Setup Windows PC</string>
+	<string name="open_setup_title">PC Setup</string>
+	<string name="open_setup_summary">Tutorial about the necessary PC Settings</string>
 	<string name="goto_mac_address_title">Specifică adresa Mac</string>
 	<string name="goto_mac_address_summary">Specifică adresa mac a acestui dispozitiv</string>
+	<string name="device_name_title">Device Name</string>
+	<string name="device_name_summary">Change how others see you</string>
+	<string name="show_credits_title">Show credits</string>
 	<!-- #endregion -->
-
 	<!-- #region ReceiveActivity.cs -->
 	<string name="receive_missing_permissions">Nu se poate primi fără permisiuni!</string>
 	<!-- #endregion -->
-
 	<!-- #region ReceiveActivity.cs -->
 	<string name="share_file">Trimite fișier</string>
 	<string name="share_url">Trimite link</string>
-
+	<string name="share_text">Share Text</string>
 	<string name="send_missing_permissions">Permisiunea lipsește!</string>
 	<string name="wait_for_acceptance">Se așteaptă confirmarea</string>
+	<string name="status_cancelled">Cancelled</string>
+	<string name="status_done">Done</string>
 	<string name="sending_template">Se trimit {0} fișiere</string>
 	<!-- #endregion -->
 </resources>
