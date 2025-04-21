@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="app_name">Ús compartit en proximitat</string>
+	<string name="app_titlebar_title_default">Enviar a Windows 10 / 11</string>
+	<string name="app_titlebar_title_receive">Rebre de Windows 10 / 11</string>
+	<string name="app_titlebar_title_receive_setup">Configuració / Informació</string>
+	<string name="assets_prefix">ca</string>
+	<!-- #region generic -->
+	<string name="generic_back">Tornar</string>
+	<string name="generic_next">Següent</string>
+	<string name="generic_cancel">Cancel·lar</string>
+	<string name="generic_send">Enviar</string>
+	<string name="generic_receive">Rebre</string>
+	<string name="generic_status_template">Estat: {0}</string>
+	<string name="generic_error_template">Error: {0}</string>
+	<string name="generic_important">Important</string>
+	<string name="generic_notifications">Notificacions</string>
+	<string name="generic_settings">Configuració</string>
+	<string name="device_name">Nom del dispositiu</string>
+	<!-- #endregion -->
+	<!-- #region activity_mac_address.xml -->
+	<string name="launch_settings">Obrir configuració</string>
+	<string name="bt_mac_address">Direcció MAC del Bluetooth</string>
+	<!-- #endregion -->
+	<!-- #region activity_receive.xml -->
+	<string name="visible_as_template">Visible com {0}</string>
+	<string name="debug_log">Registre de depuració</string>
+	<!-- #endregion -->
+	<!-- #region activity_share.xml -->
+	<string name="scanning">Escanejant...</string>
+	<!-- #endregion -->
+	<!-- #region preferences.xml -->
+	<string name="category_general">General</string>
+	<string name="category_links">Enllaços / Ajuda</string>
+	<string name="category_permissions">Permisos</string>
+	<string name="category_setup">Configuració inicial</string>
+	<string name="category_about">Sobre</string>
+	<string name="request_permissions_title">Sol·licitar permisos necessaris</string>
+	<string name="request_permissions_summary">Dona-li els permisos necessaris a l \'aplicació </string>
+	<string name="request_enable_bluetooth">Activa el Bluetooth</string>
+	<string name="open_sponsor_title">Patrocinar</string>
+	<string name="open_sponsor_summary">Patrocina al desenvolupador de l \'aplicació</string>
+	<string name="open_faq_title">Ajuda</string>
+	<string name="open_faq_summary">Obrir les Preguntes Més Freqüents</string>
+	<string name="open_discord_title">Discord</string>
+	<string name="open_discord_summary">Unir-se al servidor de Discord</string>
+	<string name="preference_appearance_title">Interfície / Diseny</string>
+	<string name="preference_appearance_summary">Idioma, tema fosc</string>
+	<string name="force_dark_mode_title">Tema fosc</string>
+	<string name="force_dark_mode_summary">Força el tema fosc</string>
+	<string name="switch_language_title">Idioma de l\'aplicació</string>
+	<string name="switch_language_summary">Canvia l \'idioma de l \'aplicació</string>
+	<string name="preference_cdp_title">Plataforma de dispositius conectats</string>
+	<string name="preference_cdp_summary">Configurar l\'enviament i la recepció </string>
+	<string name="open_setup">Setup Windows PC</string>
+	<string name="open_setup_title">Configuració de l \'ordinador</string>
+	<string name="open_setup_summary">Tutorial sobre els ajustos de l \'ordinador necessaris</string>
+	<string name="goto_mac_address_title">Indica la direcció MAC</string>
+	<string name="goto_mac_address_summary">Indica la direcció MAC d \'aquest dispositiu </string>
+	<string name="device_name_title">Nom del dispositiu</string>
+	<string name="device_name_summary">Canvia com et veu la resta de dispositius</string>
+	<string name="show_credits_title">Mostrar crèdits</string>
+	<!-- #endregion -->
+	<!-- #region ReceiveActivity.cs -->
+	<string name="receive_missing_permissions">No es pot rebre res sense els permisos necessaris!</string>
+	<!-- #endregion -->
+	<!-- #region ReceiveActivity.cs -->
+	<string name="share_file">Comparteix l \'arxiu</string>
+	<string name="share_url">Comparteix l \'enllaç</string>
+	<string name="share_text">Comparteix el text</string>
+	<string name="send_missing_permissions">Falten alguns permisos necessaris!</string>
+	<string name="wait_for_acceptance">Esperant reposta</string>
+	<string name="status_cancelled">Cancel·lat</string>
+	<string name="status_done">Fet</string>
+	<string name="sending_template">Enviant {0} arxius</string>
+	<!-- #endregion -->
+</resources>
