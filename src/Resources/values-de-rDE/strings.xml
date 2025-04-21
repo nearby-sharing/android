@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="app_name">Nearby Sharing</string>
+	<string name="app_titlebar_title_default">Sende zu Windows 10 / 11</string>
+	<string name="app_titlebar_title_receive">Empfange von Windows 10 / 11</string>
+	<string name="app_titlebar_title_receive_setup">Setup / Information</string>
+	<string name="assets_prefix">de</string>
+	<!-- #region generic -->
+	<string name="generic_back">Zurück</string>
+	<string name="generic_next">Weiter</string>
+	<string name="generic_cancel">Abbruch</string>
+	<string name="generic_send">Senden</string>
+	<string name="generic_receive">Empfangen</string>
+	<string name="generic_status_template">Status: {0}</string>
+	<string name="generic_error_template">Fehler: {0}</string>
+	<string name="generic_important">Wichtig</string>
+	<string name="generic_notifications">Benachrichtigungen</string>
+	<string name="generic_settings">Einstellungen</string>
+	<string name="device_name">Geräte Name</string>
+	<!-- #endregion -->
+	<!-- #region activity_mac_address.xml -->
+	<string name="launch_settings">Öffne Einstellungen</string>
+	<string name="bt_mac_address">Bluetooth Mac-Adresse</string>
+	<!-- #endregion -->
+	<!-- #region activity_receive.xml -->
+	<string name="visible_as_template">Sichtbar als {0}</string>
+	<string name="debug_log">Debug Log</string>
+	<!-- #endregion -->
+	<!-- #region activity_share.xml -->
+	<string name="scanning">Suche ...</string>
+	<!-- #endregion -->
+	<!-- #region preferences.xml -->
+	<string name="category_general">Generell</string>
+	<string name="category_links">Links / Hilfe</string>
+	<string name="category_permissions">Berechtigungen</string>
+	<string name="category_setup">Einrichtung</string>
+	<string name="category_about">Über</string>
+	<string name="request_permissions_title">Berechtigungen anfragen</string>
+	<string name="request_permissions_summary">Notwendige Berechtigungen erlauben</string>
+	<string name="request_enable_bluetooth">Bluetooth aktivieren</string>
+	<string name="open_sponsor_title">Sponsor</string>
+	<string name="open_sponsor_summary">Sponsor the app creator</string>
+	<string name="open_faq_title">Hilfe</string>
+	<string name="open_faq_summary">Öffne das FAQ</string>
+	<string name="open_discord_title">Discord</string>
+	<string name="open_discord_summary">Discord-Server beitreten</string>
+	<string name="preference_appearance_title">Darstellung</string>
+	<string name="preference_appearance_summary">Sprache, Dark Mode</string>
+	<string name="force_dark_mode_title">Dark Mode</string>
+	<string name="force_dark_mode_summary">Dark Mode erzwingen</string>
+	<string name="switch_language_title">App Sprache</string>
+	<string name="switch_language_summary">App Anzeige-Sprache ändern</string>
+	<string name="preference_cdp_title">Connected Devices Platform</string>
+	<string name="preference_cdp_summary">Senden und Empfangen</string>
+	<string name="open_setup">Windows PC einrichten</string>
+	<string name="open_setup_title">PC Einrichtung</string>
+	<string name="open_setup_summary">Tutorial zu den notwendigen PC Einstellungen</string>
+	<string name="goto_mac_address_title">Mac-Adresse angeben</string>
+	<string name="goto_mac_address_summary">Mac-Adresse für dieses Geräte angeben</string>
+	<string name="device_name_title">Geräte Name</string>
+	<string name="device_name_summary">Lege fest, wie andere dich sehen</string>
+	<string name="show_credits_title">Mitwirkende anzeigen</string>
+	<!-- #endregion -->
+	<!-- #region ReceiveActivity.cs -->
+	<string name="receive_missing_permissions">Fehlende Berechtigungen!</string>
+	<!-- #endregion -->
+	<!-- #region ReceiveActivity.cs -->
+	<string name="share_file">Datei teilen</string>
+	<string name="share_url">Webseite teilen</string>
+	<string name="share_text">Text teilen</string>
+	<string name="send_missing_permissions">Fehlende Berechtigungen!</string>
+	<string name="wait_for_acceptance">Warte auf Akzeptierung</string>
+	<string name="status_cancelled">Abgebrochen</string>
+	<string name="status_done">Erledigt</string>
+	<string name="sending_template">Sende {0} Dateien</string>
+	<!-- #endregion -->
+</resources>
