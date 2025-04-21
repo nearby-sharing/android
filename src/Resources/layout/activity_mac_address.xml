@@ -30,14 +30,6 @@
                 android:src="@drawable/ic_fluent_warning_24_regular"/>
 
             <TextView
-                style="@style/TextAppearance.AppCompat.Title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="3dp"
-                android:text="@string/generic_important" />
-
-            <TextView
                 android:id="@+id/infoTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
