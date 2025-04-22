@@ -37,7 +37,6 @@
 	<string name="category_about">À propos</string>
 	<string name="request_permissions_title">Permissions de l’application</string>
 	<string name="request_permissions_summary">Accorder les permissions nécessaires à l’application</string>
-	<string name="request_enable_bluetooth">Enable Bluetooth</string>
 	<string name="open_sponsor_title">Supporter</string>
 	<string name="open_sponsor_summary">Supporter le créateur de l’application</string>
 	<string name="open_faq_title">Aide</string>
@@ -52,7 +51,6 @@
 	<string name="switch_language_summary">Changer la langue de l’appli</string>
 	<string name="preference_cdp_title">Connectivité</string>
 	<string name="preference_cdp_summary">Configuration pour l’envoi et la réception</string>
-	<string name="open_setup">Setup Windows PC</string>
 	<string name="open_setup_title">Configuration PC</string>
 	<string name="open_setup_summary">Voir les réglages requis pour PC</string>
 	<string name="goto_mac_address_title">Définir l’adresse Mac</string>
