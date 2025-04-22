@@ -52,7 +52,6 @@
 	<string name="switch_language_summary">Canvia l \'idioma de l \'aplicació</string>
 	<string name="preference_cdp_title">Plataforma de dispositius conectats</string>
 	<string name="preference_cdp_summary">Configurar l\'enviament i la recepció </string>
-	<string name="open_setup">Setup Windows PC</string>
 	<string name="open_setup_title">Configuració de l \'ordinador</string>
 	<string name="open_setup_summary">Tutorial sobre els ajustos de l \'ordinador necessaris</string>
 	<string name="goto_mac_address_title">Indica la direcció MAC</string>
