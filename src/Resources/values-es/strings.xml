@@ -52,7 +52,6 @@
 	<string name="switch_language_summary">Cambiar el idioma de la aplicación</string>
 	<string name="preference_cdp_title">Plataforma de dispositivos conectados</string>
 	<string name="preference_cdp_summary">Configurar el envío y la recepción</string>
-	<string name="open_setup">Setup Windows PC</string>
 	<string name="open_setup_title">Configuración del PC</string>
 	<string name="open_setup_summary">Tutorial sobre los ajustes del PC necesarios</string>
 	<string name="goto_mac_address_title">Indica la dirección MAC</string>
