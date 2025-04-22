@@ -56,6 +56,9 @@
 	<string name="open_faq_title">Help</string>
 	<string name="open_faq_summary">Open the FAQ</string>
 
+	<string name="open_crowdin_title">Crowdin</string>
+	<string name="open_crowdin_summary">Help with translations</string>
+
 	<string name="open_discord_title">Discord</string>
 	<string name="open_discord_summary">Join Discord-Server</string>
 

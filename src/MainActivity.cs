@@ -35,6 +35,7 @@ public sealed class MainActivity : AppCompatActivity
         FindViewById<MaterialCardView>(Resource.Id.enableBluetoothButton)!.Click += (_, _) => EnableBluetooth();
         FindViewById<MaterialCardView>(Resource.Id.setupWindowButton)!.Click += (_, _) => UIHelper.OpenSetup(this);
         FindViewById<MaterialCardView>(Resource.Id.openFAQButton)!.Click += (_, _) => UIHelper.OpenFAQ(this);
+        FindViewById<MaterialCardView>(Resource.Id.openCrowdinButton)!.Click += (_, _) => UIHelper.OpenCrowdIn(this);
     }
 
     private void ReceiveButton_Click(object? sender, EventArgs e)

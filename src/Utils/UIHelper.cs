@@ -40,6 +40,9 @@ internal static class UIHelper
     public static void OpenFAQ(Activity activity)
         => DisplayWebSite(activity, "https://nearshare.shortdev.de/docs/FAQ");
 
+    public static void OpenCrowdIn(Activity activity)
+        => DisplayWebSite(activity, "https://translate.nearshare.shortdev.de/");
+
     public static void OpenSponsor(Activity activity)
         => DisplayWebSite(activity, "https://nearshare.shortdev.de/docs/sponsor");
 
