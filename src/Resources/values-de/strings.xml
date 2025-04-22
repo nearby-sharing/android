@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string name="app_name">Nearby Sharing</string>
 	<string name="app_titlebar_title_default">Sende zu Windows 10 / 11</string>
 	<string name="app_titlebar_title_receive">Empfange von Windows 10 / 11</string>
 	<string name="app_titlebar_title_receive_setup">Setup / Information</string>
@@ -42,7 +41,6 @@
 	<string name="open_sponsor_summary">Sponsor the app creator</string>
 	<string name="open_faq_title">Hilfe</string>
 	<string name="open_faq_summary">Öffne das FAQ</string>
-	<string name="open_crowdin_title">Crowdin</string>
 	<string name="open_crowdin_summary">Hilf uns beim Übersetzen</string>
 	<string name="open_discord_title">Discord</string>
 	<string name="open_discord_summary">Discord-Server beitreten</string>

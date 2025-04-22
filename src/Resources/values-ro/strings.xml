@@ -31,35 +31,14 @@
 	<!-- #endregion -->
 	<!-- #region preferences.xml -->
 	<string name="category_general">General</string>
-	<string name="category_links">Links / Help</string>
-	<string name="category_permissions">Permissions</string>
-	<string name="category_setup">Setup</string>
-	<string name="category_about">About</string>
 	<string name="request_permissions_title">Cere Permisiuni</string>
 	<string name="request_permissions_summary">Oferă aplicației permisiunile necesare</string>
-	<string name="request_enable_bluetooth">Enable Bluetooth</string>
 	<string name="open_sponsor_title">Susține</string>
 	<string name="open_sponsor_summary">Susține creatorul aplicației</string>
 	<string name="open_faq_title">Ajutor</string>
 	<string name="open_faq_summary">Deschide secțiunea de întrebări frecvente</string>
-	<string name="open_discord_title">Discord</string>
-	<string name="open_discord_summary">Join Discord-Server</string>
-	<string name="preference_appearance_title">UI / Design</string>
-	<string name="preference_appearance_summary">Language, Dark Mode</string>
-	<string name="force_dark_mode_title">Dark Mode</string>
-	<string name="force_dark_mode_summary">Force Dark Mode</string>
-	<string name="switch_language_title">App Language</string>
-	<string name="switch_language_summary">Change app display language</string>
-	<string name="preference_cdp_title">Connected Devices Platform</string>
-	<string name="preference_cdp_summary">Setup sending and receiving</string>
-	<string name="open_setup">Setup Windows PC</string>
-	<string name="open_setup_title">PC Setup</string>
-	<string name="open_setup_summary">Tutorial about the necessary PC Settings</string>
 	<string name="goto_mac_address_title">Specifică adresa Mac</string>
 	<string name="goto_mac_address_summary">Specifică adresa mac a acestui dispozitiv</string>
-	<string name="device_name_title">Device Name</string>
-	<string name="device_name_summary">Change how others see you</string>
-	<string name="show_credits_title">Show credits</string>
 	<!-- #endregion -->
 	<!-- #region ReceiveActivity.cs -->
 	<string name="receive_missing_permissions">Nu se poate primi fără permisiuni!</string>
@@ -67,11 +46,8 @@
 	<!-- #region ReceiveActivity.cs -->
 	<string name="share_file">Trimite fișier</string>
 	<string name="share_url">Trimite link</string>
-	<string name="share_text">Share Text</string>
 	<string name="send_missing_permissions">Permisiunea lipsește!</string>
 	<string name="wait_for_acceptance">Se așteaptă confirmarea</string>
-	<string name="status_cancelled">Cancelled</string>
-	<string name="status_done">Done</string>
 	<string name="sending_template">Se trimit {0} fișiere</string>
 	<!-- #endregion -->
 </resources>
