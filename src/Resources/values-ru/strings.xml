@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+	<string name="app_name">Nearby Sharing</string>
 	<string name="app_titlebar_title_default">Отправка файлов на Windows 10 / 11</string>
 	<string name="app_titlebar_title_receive">Получение файлов с Windows 10 / 11</string>
 	<string name="app_titlebar_title_receive_setup">Настройка / Информация</string>
@@ -30,14 +31,35 @@
 	<!-- #endregion -->
 	<!-- #region preferences.xml -->
 	<string name="category_general">Основное</string>
+	<string name="category_links">Ссылки / Помощь</string>
+	<string name="category_permissions">Разрешения</string>
+	<string name="category_setup">Установки</string>
+	<string name="category_about">О нас</string>
 	<string name="request_permissions_title">Запросить разрешения</string>
 	<string name="request_permissions_summary">Предоставьте необходимые разрешения приложению</string>
+	<string name="request_enable_bluetooth">Включить Bluetooth</string>
 	<string name="open_sponsor_title">Спонсор</string>
 	<string name="open_sponsor_summary">Поддержите разработчика приложения</string>
 	<string name="open_faq_title">Помощь</string>
 	<string name="open_faq_summary">Открыть FAQ</string>
+	<string name="open_discord_title">Discord</string>
+	<string name="open_discord_summary">Присоединиться к Discord</string>
+	<string name="preference_appearance_title">Интерфейс / Дизайн</string>
+	<string name="preference_appearance_summary">Язык, Тёмный режим</string>
+	<string name="force_dark_mode_title">Тёмный режим</string>
+	<string name="force_dark_mode_summary">Принудительный Тёмный режим</string>
+	<string name="switch_language_title">Язык приложения</string>
+	<string name="switch_language_summary">Изменить язык приложения</string>
+	<string name="preference_cdp_title">Подключение устройств</string>
+	<string name="preference_cdp_summary">Настройка отправки и приёма</string>
+	<string name="open_setup">Настройка Windows ПК</string>
+	<string name="open_setup_title">ПК настройка</string>
+	<string name="open_setup_summary">Руководство о необходимых настройках ПК</string>
 	<string name="goto_mac_address_title">Указать MAC-Адрес</string>
 	<string name="goto_mac_address_summary">Укажите MAC-Адрес этого устройства</string>
+	<string name="device_name_title">Имя устройства</string>
+	<string name="device_name_summary">Изменить то, как вас видят другие устройства</string>
+	<string name="show_credits_title">Посмотреть благодарности</string>
 	<!-- #endregion -->
 	<!-- #region ReceiveActivity.cs -->
 	<string name="receive_missing_permissions">Невозможно получить файл без разрешений.</string>
@@ -45,8 +67,11 @@
 	<!-- #region ReceiveActivity.cs -->
 	<string name="share_file">Поделиться файлом</string>
 	<string name="share_url">Поделиться ссылкой</string>
+	<string name="share_text">Поделиться текстом</string>
 	<string name="send_missing_permissions">Недостаточно разрешений!</string>
 	<string name="wait_for_acceptance">Ожидаем принятия файла получателем</string>
+	<string name="status_cancelled">Отменено</string>
+	<string name="status_done">Готово</string>
 	<string name="sending_template">Отправка {0} файл(а/ов)</string>
 	<!-- #endregion -->
 </resources>
