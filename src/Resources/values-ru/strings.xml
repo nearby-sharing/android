@@ -44,6 +44,8 @@
 	<string name="open_faq_summary">Открыть FAQ</string>
 	<string name="open_discord_title">Discord</string>
 	<string name="open_discord_summary">Присоединиться к Discord</string>
+	<string name="open_crowdin_title">Crowdin</string>
+	<string name="open_crowdin_summary">Помочь с переводом</string>
 	<string name="preference_appearance_title">Интерфейс / Дизайн</string>
 	<string name="preference_appearance_summary">Язык, Тёмный режим</string>
 	<string name="force_dark_mode_title">Тёмный режим</string>
