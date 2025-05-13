@@ -27,7 +27,7 @@
 	<string name="debug_log">Журнал отладки</string>
 	<!-- #endregion -->
 	<!-- #region activity_share.xml -->
-	<string name="scanning">Сканирование ...</string>
+	<string name="scanning">Сканирование...</string>
 	<!-- #endregion -->
 	<!-- #region preferences.xml -->
 	<string name="category_general">Основное</string>
