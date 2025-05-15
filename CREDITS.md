@@ -16,3 +16,4 @@
  - Andrei Muntean (@andreimuntean1) (Romanian)
  - Franciszek (@pigluz) (Polish)
  - ɴᴇᴋᴏ (@NeKoOuO) (Taiwanese Mandarin)
+ - @userkilled (Russian)
