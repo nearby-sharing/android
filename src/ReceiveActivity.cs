@@ -180,7 +180,13 @@ public sealed class ReceiveActivity : AppCompatActivity
                 return;
 
             if (_transfer is FileTransferToken fileTransfer)
-                fileTransfer.Cancel();
+            {
+                try
+                {
+                    fileTransfer.Cancel();
+                }
+                catch { }
+            }
 
             OnRemove(_transfer);
         }
