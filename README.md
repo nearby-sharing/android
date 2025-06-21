@@ -16,7 +16,7 @@ This repo contains a fully functional implementation of the [`MS-CDP`](https://l
 
 ## Building
 
-This project consists of `.NET 8` library and `Android` projects.  
+This project consists of `.NET 9` library and `Android` projects.  
 You can use the [`Visual Studio`](https://visualstudio.microsoft.com/de/) solution or the [`dotnet`](https://dotnet.microsoft.com/en-us/download) cli to build and deploy the app:
 
 ```shell
@@ -27,7 +27,7 @@ dotnet run
 ## Contribute
 
 Contributions are welcome!  
-Have a look at the [contributing guidelines](CONTRIBUTING.md) to get started!
+Have a look at the [contributing guidelines](./docs/CONTRIBUTING.md) to get started!
 
 ## License
 

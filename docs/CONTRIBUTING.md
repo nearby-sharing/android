@@ -1,26 +1,44 @@
 # Contributing
 
-This guide will explain you how you can contribute to this project!
+This guide will explain you how you can contribute to this project!   
+Contributions are welcome!
 
-## What to do
+There're many possible ways to contribute to nearby-sharing!   
+Check if you happen to fall into one of the following categories.   
+If not: You can always help others with their setup or [translations](http://translate.nearshare.shortdev.de/).
 
-- 🐞 [Report bugs / feature requests](https://github.com/ShortDevelopment/Nearby-Sharing-Windows/issues)
-- 🌍 [Add Translation](#add-translation)
-- 📖 Better documentation (e.g. FAQ)
-- 📱 UI / UX improvements (Xamarin c# android)
-- 👨‍💻 Improve libCdp (.NET c#)
+## General
+Have a look at open issues
+- [good-first-issue](https://github.com/nearby-sharing/android/issues?q=is%3Aissue%20state%3Aopen%20label%3A%22good%20first%20issue%22) to get started
+- [help-wanted](https://github.com/nearby-sharing/android/issues?q=is%3Aissue%20state%3Aopen%20label%3A%22help%20wanted%22) for more complex work that may require specific knowledge
 
-## Where to start
+Before you start working on sth serious: Discuss with prior contributors in an open issue or on Discord.   
+But you may of cause experiment without asking 😊.
 
-- Have a look at [good first issue](https://github.com/nearby-sharing/android/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue")
+If you have any questions, just ask via [Discord](https://discord.gg/ArFA3Nymr2)!
 
-## How to
+## Android developers
+We are using Material You for the android app.   
+I'm always glad for UI / Design support.   
+Have a look at [`area::UI-UX`](https://github.com/nearby-sharing/android/issues?q=is%3Aissue%20state%3Aopen%20label%3Aarea%3A%3AUI-UX).
 
-- If you have any questions, just ask via [Discord](https://discord.gg/ArFA3Nymr2)!
+The logic is implemented using direct mappings of the android apis into c#.   
+If you happen to know both: Amazing!   
+If not: It's not that difficult to learn either of them 😉.   
+We always need people upgrading to the latest android apis or implementing new platform-specific features.
 
----
+## Gtk developers
+We are working on a new UI app for linux.   
+Checkout the [repo](https://github.com/nearby-sharing/linux).
+
+## .NET developers
+The core library is written in pure c#, no platform-specific knowledge required!   
+Have a look at issues with the label [`area::libCdp`](https://github.com/nearby-sharing/android/issues?q=is%3Aissue%20label%3Aarea%3A%3AlibCdp%20state%3Aopen).
 
 ## Add Translation
+
+> [!NOTE]
+> We now support [crowdin](http://translate.nearshare.shortdev.de/)!
 
 > [!IMPORTANT]  
 > Make sure to choose the right language code!  
