@@ -16,6 +16,16 @@ public sealed class CdpSocket : IFragmentSender, IDisposable
         OutputStream.Flush();
     }
 
+    public void SendFragment(ReadOnlySpan<byte> header, ReadOnlySpan<byte> payload)
+    {
+        lock (OutputStream)
+        {
+            OutputStream.Write(header);
+            OutputStream.Write(payload);
+            OutputStream.Flush();
+        }
+    }
+
     public bool IsClosed { get; private set; }
     public Action? Close { private get; set; }
 

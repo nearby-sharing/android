@@ -7,16 +7,16 @@ namespace ShortDev.Microsoft.ConnectedDevices.Messages;
 /// <summary>
 /// The <see cref="CommonHeader"/> is common for all Messages.
 /// </summary>
-public sealed class CommonHeader : ICdpHeader<CommonHeader>
+public sealed class CommonHeader : IBinaryWritable, IBinaryParsable<CommonHeader>
 {
-    public static CommonHeader Parse(ref EndianReader reader)
+    public static CommonHeader Parse<TReader>(ref TReader reader) where TReader : struct, IEndianReader, allows ref struct
     {
         if (!TryParse(ref reader, out var result, out var ex))
             throw ex;
         return result;
     }
 
-    public static bool TryParse(ref EndianReader reader, [MaybeNullWhen(false)] out CommonHeader result, [MaybeNullWhen(true)] out Exception ex)
+    public static bool TryParse<TReader>(ref TReader reader, [MaybeNullWhen(false)] out CommonHeader result, [MaybeNullWhen(true)] out Exception ex) where TReader : IEndianReader, allows ref struct
     {
         result = new();
         var sig = reader.ReadUInt16();
@@ -27,14 +27,14 @@ public sealed class CommonHeader : ICdpHeader<CommonHeader>
         }
 
         result.MessageLength = reader.ReadUInt16();
-        result.Version = reader.ReadByte();
+        result.Version = reader.ReadUInt8();
         if (result.Version != Constants.ProtocolVersion)
         {
             ex = new InvalidDataException($"Wrong version. Got \"{result.Version}\", expected \"{Constants.ProtocolVersion}\"");
             return false;
         }
 
-        result.Type = (MessageType)reader.ReadByte();
+        result.Type = (MessageType)reader.ReadUInt8();
         result.Flags = (MessageFlags)reader.ReadInt16();
         result.SequenceNumber = reader.ReadUInt32();
         result.RequestID = reader.ReadUInt64();
@@ -48,14 +48,15 @@ public sealed class CommonHeader : ICdpHeader<CommonHeader>
         List<AdditionalHeader> additionalHeaders = [];
         while (true)
         {
-            nextHeaderType = (AdditionalHeaderType)reader.ReadByte();
-            nextHeaderSize = reader.ReadByte();
+            nextHeaderType = (AdditionalHeaderType)reader.ReadUInt8();
+            nextHeaderSize = reader.ReadUInt8();
 
             if (nextHeaderType == AdditionalHeaderType.None)
                 break;
 
-            var value = reader.ReadBytes(nextHeaderSize);
-            additionalHeaders.Add(new(nextHeaderType, value.ToArray()));
+            byte[] value = new byte[nextHeaderSize];
+            reader.ReadBytes(value);
+            additionalHeaders.Add(new(nextHeaderType, value));
         }
 
         if (nextHeaderSize != 0)
@@ -70,7 +71,8 @@ public sealed class CommonHeader : ICdpHeader<CommonHeader>
         return true;
     }
 
-    public void Write(EndianWriter writer)
+
+    public void Write<TWriter>(ref TWriter writer) where TWriter : struct, IEndianWriter, allows ref struct
     {
         writer.Write(Constants.Signature);
         writer.Write(MessageLength);
@@ -245,6 +247,6 @@ public sealed class CommonHeader : ICdpHeader<CommonHeader>
         if (header == null)
             return null;
 
-        return BinaryPrimitives.ReadUInt64LittleEndian(header.Value.Span);
+        return BinaryPrimitives.ReadUInt64LittleEndian(header.Value.Value.Span);
     }
 }
