@@ -31,7 +31,9 @@ public sealed class SerializationTest(ITestOutputHelper output)
         {
             foreach (var item in TClass.GetInterfaces())
             {
-                if (item.IsGenericType && item.GetGenericTypeDefinition() == TInterface)
+                if (item == TInterface)
+                    return true;
+                else if (item.IsGenericType && item.GetGenericTypeDefinition() == TInterface)
                     return true;
             }
             return false;
