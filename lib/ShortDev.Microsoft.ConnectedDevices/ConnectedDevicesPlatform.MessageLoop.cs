@@ -10,14 +10,14 @@ partial class ConnectedDevicesPlatform
     private void ReceiveLoop(CdpSocket socket)
     {
         RegisterKnownSocket(socket);
-        Task.Run(() =>
+        Task.Factory.StartNew(() =>
         {
             var streamReader = EndianReader.FromStream(Endianness.BigEndian, socket.InputStream);
             using (socket)
             {
                 ReceiveLoop(socket, ref streamReader);
             }
-        });
+        }, TaskCreationOptions.LongRunning);
     }
 
     void ReceiveLoop(CdpSocket socket, ref EndianReader<StreamWrapperStream> streamReader)
