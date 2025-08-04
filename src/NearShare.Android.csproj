@@ -19,14 +19,14 @@
 		<AndroidPackageFormat>aab</AndroidPackageFormat>
 	</PropertyGroup>
 	<ItemGroup Label="Nuget">
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.5" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.7" />
 		<PackageReference Include="ShortDev.Rive.Android" Version="10.1.0.0" />
-		<PackageReference Include="Sentry" Version="5.8.0" />
+		<PackageReference Include="Sentry" Version="5.13.0" />
 		<PackageReference Include="Serilog.Extensions.Logging.File" Version="3.0.0" />
 		<PackageReference Include="ShortDev.Android" Version="0.3.0-beta" />
 		<PackageReference Include="ShortDev.Android.FluentIcons" Version="1.1.203" />
-		<PackageReference Include="Xamarin.AndroidX.Browser" Version="1.8.0.9" />
-		<PackageReference Include="Xamarin.Google.Android.Material" Version="1.12.0.3" />
+		<PackageReference Include="Xamarin.AndroidX.Browser" Version="1.8.0.10" />
+		<PackageReference Include="Xamarin.Google.Android.Material" Version="1.12.0.4" />
 	</ItemGroup>
 	<ItemGroup Label="Project References">
 		<ProjectReference Include="..\lib\ShortDev.Android.Preferences\ShortDev.Android.Preferences.csproj" />
