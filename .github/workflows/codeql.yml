@@ -3,15 +3,13 @@ name: "CodeQL C#"
 on:
   push:
     branches: [ "main" ]
-    paths: ["**.cs", "**.xml"]
   pull_request:
-    paths: ["**.cs", "**.xml"]
   workflow_dispatch:
 
 jobs:
   analyze:
     name: Analyze
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     permissions:
       actions: read
       contents: read

@@ -33,7 +33,7 @@
 		<ProjectReference Include="..\lib\ShortDev.Microsoft.ConnectedDevices.NearShare\ShortDev.Microsoft.ConnectedDevices.NearShare.csproj" />
 	</ItemGroup>
 	<ItemGroup>
-		<AndroidAsset Include="../Credits.md" Link="Assets/Credits.md" />
+		<AndroidAsset Include="../CREDITS.md" Link="Assets/Credits.md" />
 		<None Include="../README.md" />
 	</ItemGroup>
 </Project>
