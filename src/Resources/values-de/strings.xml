@@ -41,7 +41,6 @@
 	<string name="open_sponsor_summary">Sponsor the app creator</string>
 	<string name="open_faq_title">Hilfe</string>
 	<string name="open_faq_summary">Öffne das FAQ</string>
-	<string name="open_crowdin_summary">Hilf uns beim Übersetzen</string>
 	<string name="open_discord_title">Discord</string>
 	<string name="open_discord_summary">Discord-Server beitreten</string>
 	<string name="preference_appearance_title">Darstellung</string>
@@ -74,4 +73,5 @@
 	<string name="status_done">Erledigt</string>
 	<string name="sending_template">Sende {0} Dateien</string>
 	<!-- #endregion -->
+	<string name="open_crowdin_summary">Hilf uns beim Übersetzen</string>
 </resources>
