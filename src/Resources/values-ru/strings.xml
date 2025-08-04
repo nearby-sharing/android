@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string name="app_name">Nearby Sharing</string>
 	<string name="app_titlebar_title_default">Отправка файлов на Windows 10 / 11</string>
 	<string name="app_titlebar_title_receive">Получение файлов с Windows 10 / 11</string>
 	<string name="app_titlebar_title_receive_setup">Настройка / Информация</string>
@@ -27,7 +26,7 @@
 	<string name="debug_log">Журнал отладки</string>
 	<!-- #endregion -->
 	<!-- #region activity_share.xml -->
-	<string name="scanning">Сканирование...</string>
+	<string name="scanning">Сканирование ...</string>
 	<!-- #endregion -->
 	<!-- #region preferences.xml -->
 	<string name="category_general">Основное</string>
@@ -42,10 +41,7 @@
 	<string name="open_sponsor_summary">Поддержите разработчика приложения</string>
 	<string name="open_faq_title">Помощь</string>
 	<string name="open_faq_summary">Открыть FAQ</string>
-	<string name="open_discord_title">Discord</string>
 	<string name="open_discord_summary">Присоединиться к Discord</string>
-	<string name="open_crowdin_title">Crowdin</string>
-	<string name="open_crowdin_summary">Помочь с переводом</string>
 	<string name="preference_appearance_title">Интерфейс / Дизайн</string>
 	<string name="preference_appearance_summary">Язык, Тёмный режим</string>
 	<string name="force_dark_mode_title">Тёмный режим</string>
@@ -76,4 +72,5 @@
 	<string name="status_done">Готово</string>
 	<string name="sending_template">Отправка {0} файл(а/ов)</string>
 	<!-- #endregion -->
+	<string name="open_crowdin_summary">Помочь с переводом</string>
 </resources>

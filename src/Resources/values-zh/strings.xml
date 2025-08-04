@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string name="app_name">就近共享</string>
 	<string name="app_titlebar_title_default">传输数据到您的 Windows 10 / 11 电脑</string>
 	<string name="app_titlebar_title_receive">从您的 Windows 10 / 11 电脑接收数据</string>
 	<string name="app_titlebar_title_receive_setup">设置与信息</string>
@@ -37,6 +36,7 @@
 	<string name="category_about">关于</string>
 	<string name="request_permissions_title">请求权限</string>
 	<string name="request_permissions_summary">同意必要权限以使用本应用</string>
+	<string name="request_enable_bluetooth">开启蓝牙</string>
 	<string name="open_sponsor_title">赞助</string>
 	<string name="open_sponsor_summary">赞助此应用的开发者</string>
 	<string name="open_faq_title">帮助</string>
@@ -51,6 +51,7 @@
 	<string name="switch_language_summary">更改 App 的显示语言</string>
 	<string name="preference_cdp_title">连接</string>
 	<string name="preference_cdp_summary">配置发送和接收</string>
+	<string name="open_setup">设置 Windows 电脑</string>
 	<string name="open_setup_title">PC端设置</string>
 	<string name="open_setup_summary">PC端设置教程</string>
 	<string name="goto_mac_address_title">指定Mac地址</string>
