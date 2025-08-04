@@ -3,9 +3,7 @@ name: "CodeQL C#"
 on:
   push:
     branches: [ "main" ]
-    paths: ["**.cs", "**.xml"]
   pull_request:
-    paths: ["**.cs", "**.xml"]
   workflow_dispatch:
 
 jobs:
