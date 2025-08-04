@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using ShortDev.IO.ValueStream;
 using ShortDev.Microsoft.ConnectedDevices.Encryption;
 using ShortDev.Microsoft.ConnectedDevices.Exceptions;
 using ShortDev.Microsoft.ConnectedDevices.Internal;
