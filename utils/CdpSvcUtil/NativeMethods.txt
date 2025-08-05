@@ -1,0 +1,17 @@
+BOOL
+HMODULE
+DWORD
+LPVOID
+HRESULT
+
+S_OK
+
+GetEnvironmentVariableW
+GetLastError
+ERROR_ENVVAR_NOT_FOUND
+
+IsDebuggerPresent
+WaitForDebugger
+
+OutputDebugStringW
+DebugBreak
