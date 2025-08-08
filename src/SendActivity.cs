@@ -1,5 +1,4 @@
-﻿using Android.Bluetooth;
-using Android.Content;
+﻿using Android.Content;
 using Android.Content.PM;
 using Android.Runtime;
 using Android.Views;
@@ -13,19 +12,20 @@ using Google.Android.Material.ProgressIndicator;
 using Microsoft.Extensions.Logging;
 using NearShare.Droid;
 using NearShare.Utils;
+using NearShare.ViewModels;
 using ShortDev.Android.UI;
 using ShortDev.Microsoft.ConnectedDevices;
 using ShortDev.Microsoft.ConnectedDevices.NearShare;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
 using System.Collections.ObjectModel;
-using OperationCanceledException = System.OperationCanceledException;
+using System.ComponentModel;
 
 namespace NearShare;
 
 [IntentFilter([Intent.ActionProcessText], Categories = [Intent.CategoryDefault, Intent.CategoryBrowsable], DataMimeType = "text/plain", Label = "@string/app_name")]
 [IntentFilter([Intent.ActionSend, Intent.ActionSendMultiple], Categories = [Intent.CategoryDefault, Intent.CategoryBrowsable], DataMimeType = "*/*")]
 [Activity(Label = "@string/app_name", Exported = true, Theme = "@style/AppTheme.TranslucentOverlay", ConfigurationChanges = UIHelper.ConfigChangesFlags, LaunchMode = LaunchMode.SingleTask)]
-public sealed class SendActivity : AppCompatActivity
+public sealed partial class SendActivity : AppCompatActivity
 {
     NearShareSender _nearShareSender = null!;
 
@@ -184,10 +184,20 @@ public sealed class SendActivity : AppCompatActivity
     }
     #endregion
 
-    readonly CancellationTokenSource _transferCancellation = new();
-    private async void SendData(CdpDevice remoteSystem)
+    SendDataViewModel? _currentTransfer;
+    private void SendData(CdpDevice remoteSystem)
     {
         _discoverCancellationTokenSource.Cancel();
+
+        _currentTransfer = ParseIntentAsync() switch
+        {
+            ({ } files, null) => SendDataViewModel.SendFiles(_nearShareSender, remoteSystem, files),
+            (null, { } uri) => SendDataViewModel.SendUri(_nearShareSender, remoteSystem, uri),
+            _ => null
+        };
+
+        if (_currentTransfer is null)
+            return; // ToDo: Feedback?!
 
         _dialog.FindViewById<View>(Resource.Id.selectDeviceLayout)!.Visibility = ViewStates.Gone;
 
@@ -195,144 +205,109 @@ public sealed class SendActivity : AppCompatActivity
         sendingDataLayout.Visibility = ViewStates.Visible;
 
         sendingDataLayout.FindViewById<ImageView>(Resource.Id.deviceTypeImageView)!.SetImageResource(
-            remoteSystem.Type.IsMobile() ? Resource.Drawable.ic_fluent_phone_24_regular : Resource.Drawable.ic_fluent_desktop_24_regular
+            _currentTransfer.IsMobile ? Resource.Drawable.ic_fluent_phone_24_regular : Resource.Drawable.ic_fluent_desktop_24_regular
         );
 
         var transportTypeImage = sendingDataLayout.FindViewById<ImageView>(Resource.Id.transportTypeImageView)!;
-        transportTypeImage.SetImageResource(GetTransportIcon(remoteSystem.Endpoint.TransportType));
-        _nearShareSender.TransportUpgraded += OnTransportUpgrade;
+        transportTypeImage.SetImageResource(GetTransportIcon(_currentTransfer.CurrentTransportType));
 
         var deviceNameTextView = sendingDataLayout.FindViewById<TextView>(Resource.Id.deviceNameTextView)!;
         var progressIndicator = sendingDataLayout.FindViewById<CircularProgressIndicator>(Resource.Id.sendProgressIndicator)!;
         progressIndicator.Visibility = ViewStates.Visible;
         progressIndicator.SetProgressCompat(0, animated: false);
+        progressIndicator.SetIndicatorColor([
+            this.GetColorAttr(Resource.Attribute.colorPrimary)
+        ]);
+        progressIndicator.Indeterminate = true;
 
         deviceNameTextView.Text = remoteSystem.Name;
         StatusTextView.Text = GetString(Resource.String.wait_for_acceptance);
-        try
+
+        cancelButton.Visibility = ViewStates.Visible;
+
+        ViewModelObserver.Observe(this, _currentTransfer, OnChanged);
+        _currentTransfer.Start();
+
+        void OnChanged(SendDataViewModel viewModel, PropertyChangedEventArgs e)
         {
-            if (remoteSystem.Endpoint.TransportType == CdpTransportType.Rfcomm &&
-                _cdp.TryGetTransport(CdpTransportType.Rfcomm)?.IsEnabled == false)
+            switch (e.PropertyName)
             {
-                StartActivityForResult(new Intent(BluetoothAdapter.ActionRequestEnable), 42);
-                throw new TaskCanceledException("Bluetooth is disabled");
-            }
+                case nameof(SendDataViewModel.TotalBytes):
+                    progressIndicator.Indeterminate = false;
+                    progressIndicator.Max = viewModel.TotalBytes;
+                    break;
 
-            Progress<NearShareProgress>? progress = null;
+                case nameof(SendDataViewModel.ProgressBytes):
+                    progressIndicator.SetProgressCompat(viewModel.ProgressBytes, animated: true);
+                    break;
 
-            Task? transferPromise = null;
-            var (files, uri) = ParseIntentAsync();
-            if (files != null)
-            {
-                progress = new();
-                transferPromise = _nearShareSender.SendFilesAsync(
-                    remoteSystem,
-                    files,
-                    progress,
-                    _transferCancellation.Token
-                );
-            }
-            else if (uri != null)
-            {
-                transferPromise = _nearShareSender.SendUriAsync(
-                    remoteSystem,
-                    uri,
-                    _transferCancellation.Token
-                );
-            }
+                case nameof(SendDataViewModel.TotalFiles):
+                    var progressTemplate = GetString(Resource.String.sending_template);
+                    StatusTextView.Text = string.Format(
+                        progressTemplate,
+                        viewModel.TotalFiles
+                    );
+                    break;
 
-            if (progress != null)
-            {
-                cancelButton.Visibility = ViewStates.Visible;
+                case nameof(SendDataViewModel.CurrentTransportType):
+                    transportTypeImage.SetImageResource(GetTransportIcon(viewModel.CurrentTransportType));
+                    break;
 
-                progressIndicator.SetIndicatorColor([
-                    this.GetColorAttr(Resource.Attribute.colorPrimary)
-                ]);
-                progressIndicator.Indeterminate = true;
-
-                var progressTemplate = GetString(Resource.String.sending_template);
-                progress.ProgressChanged += (s, args) =>
-                {
-                    RunOnUiThread(() =>
+                case nameof(SendDataViewModel.State):
+                    const SendDataViewModel.States AllFinished = (SendDataViewModel.States)42;
+                    switch (viewModel.State)
                     {
-                        try
-                        {
-                            progressIndicator.Indeterminate = false;
-                            progressIndicator.Max = (int)args.TotalBytes;
-                            progressIndicator.SetProgressCompat((int)args.TransferedBytes, animated: true);
+                        case SendDataViewModel.States.InProgress:
+                            break;
 
-                            if (args.TotalFiles != 0 && args.TotalBytes != 0)
+                        case SendDataViewModel.States.Succeeded:
+                            progressIndicator.SetIndicatorColor([
+                                MaterialColors.HarmonizeWithPrimary(this,
+                                    ContextCompat.GetColor(this, Resource.Color.status_success)
+                                )
+                            ]);
+
+                            StatusTextView.Text = this.Localize(Resource.String.status_done);
+                            StatusTextView.PerformHapticFeedback(
+                                OperatingSystem.IsAndroidVersionAtLeast(30) ? FeedbackConstants.Confirm : FeedbackConstants.LongPress,
+                                FeedbackFlags.IgnoreGlobalSetting
+                            );
+                            this.PlaySound(Resource.Raw.ding);
+                            goto case AllFinished;
+
+                        case SendDataViewModel.States.Cancelled:
+                            StatusTextView.Text = this.Localize(Resource.String.status_cancelled);
+                            goto case AllFinished;
+
+                        case SendDataViewModel.States.Failed:
+                            progressIndicator.SetIndicatorColor([
+                                this.GetColorAttr(Resource.Attribute.colorError)
+                            ]);
+                            if (OperatingSystem.IsAndroidVersionAtLeast(30))
+                                StatusTextView.PerformHapticFeedback(FeedbackConstants.Reject, FeedbackFlags.IgnoreGlobalSetting);
+
+                            if (viewModel.Error is not { } ex)
                             {
-                                StatusTextView.Text = string.Format(
-                                    progressTemplate,
-                                    args.TotalFiles
-                                );
+                                StatusTextView.Text = this.Localize(Resource.String.generic_error_template);
                             }
-                        }
-                        catch (Exception ex)
-                        {
-                            System.Diagnostics.Debug.Fail(ex.Message);
-                        }
-                    });
-                };
+                            else
+                            {
+                                StatusTextView.Text = ex.GetType().Name;
+                                this.ShowErrorDialog(ex);
+                            }
+
+                            goto case AllFinished;
+
+                        case AllFinished:
+                            cancelButton.Visibility = ViewStates.Gone;
+                            readyButton.Visibility = ViewStates.Visible;
+
+                            progressIndicator.Indeterminate = false;
+                            progressIndicator.Progress = progressIndicator.Max;
+                            break;
+                    }
+                    break;
             }
-
-            if (transferPromise != null)
-                await transferPromise;
-
-            if (!Lifecycle.CurrentState.IsAtLeast(AndroidX.Lifecycle.Lifecycle.State.Started!))
-                return;
-
-            progressIndicator.SetIndicatorColor([
-                MaterialColors.HarmonizeWithPrimary(this,
-                    ContextCompat.GetColor(this, Resource.Color.status_success)
-                )
-            ]);
-
-            StatusTextView.Text = this.Localize(Resource.String.status_done);
-            StatusTextView.PerformHapticFeedback(
-                OperatingSystem.IsAndroidVersionAtLeast(30) ? FeedbackConstants.Confirm : FeedbackConstants.LongPress
-            , FeedbackFlags.IgnoreGlobalSetting);
-            this.PlaySound(Resource.Raw.ding);
-        }
-        catch (OperationCanceledException)
-        {
-            if (!Lifecycle.CurrentState.IsAtLeast(AndroidX.Lifecycle.Lifecycle.State.Started!))
-                return;
-
-            // Ignore cancellation
-            StatusTextView.Text = this.Localize(Resource.String.status_cancelled);
-        }
-        catch (Exception ex)
-        {
-            if (!Lifecycle.CurrentState.IsAtLeast(AndroidX.Lifecycle.Lifecycle.State.Started!))
-                return;
-
-            this.ShowErrorDialog(ex);
-
-            progressIndicator.SetIndicatorColor([
-                this.GetColorAttr(Resource.Attribute.colorError)
-            ]);
-            StatusTextView.Text = ex.GetType().Name;
-            if (OperatingSystem.IsAndroidVersionAtLeast(30))
-                StatusTextView.PerformHapticFeedback(FeedbackConstants.Reject, FeedbackFlags.IgnoreGlobalSetting);
-        }
-        finally
-        {
-            cancelButton.Visibility = ViewStates.Gone;
-            readyButton.Visibility = ViewStates.Visible;
-
-            progressIndicator.Indeterminate = false;
-            progressIndicator.Progress = progressIndicator.Max;
-
-            _nearShareSender.TransportUpgraded -= OnTransportUpgrade;
-        }
-
-        void OnTransportUpgrade(object? sender, CdpTransportType transportType)
-        {
-            RunOnUiThread(() =>
-                transportTypeImage.SetImageResource(GetTransportIcon(transportType))
-            );
         }
     }
 
@@ -409,7 +384,7 @@ public sealed class SendActivity : AppCompatActivity
     {
         try
         {
-            _transferCancellation.Cancel();
+            _currentTransfer?.Cancel();
         }
         catch { }
     }
@@ -419,7 +394,7 @@ public sealed class SendActivity : AppCompatActivity
         _discoverCancellationTokenSource.Cancel();
         try
         {
-            _transferCancellation.Cancel();
+            _currentTransfer?.Cancel();
         }
         catch { }
         _cdp?.Dispose();

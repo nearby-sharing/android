@@ -19,6 +19,7 @@
 		<AndroidPackageFormat>aab</AndroidPackageFormat>
 	</PropertyGroup>
 	<ItemGroup Label="Nuget">
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.7" />
 		<PackageReference Include="ShortDev.Rive.Android" Version="10.1.0.0" />
 		<PackageReference Include="Sentry" Version="5.13.0" />
@@ -29,6 +30,7 @@
 		<PackageReference Include="Xamarin.Google.Android.Material" Version="1.12.0.4" />
 	</ItemGroup>
 	<ItemGroup Label="Project References">
+		<ProjectReference Include="..\lib\NearShare.ViewModels\NearShare.ViewModels.csproj" />
 		<ProjectReference Include="..\lib\ShortDev.Android.Preferences\ShortDev.Android.Preferences.csproj" />
 		<ProjectReference Include="..\lib\ShortDev.Microsoft.ConnectedDevices.NearShare\ShortDev.Microsoft.ConnectedDevices.NearShare.csproj" />
 	</ItemGroup>

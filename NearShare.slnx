@@ -1,0 +1,27 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/build/">
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Build.targets" />
+  </Folder>
+  <Folder Name="/lib/">
+    <Project Path="lib/NearShare.ViewModels/NearShare.ViewModels.csproj" />
+    <Project Path="lib/ShortDev.Android.Preferences/ShortDev.Android.Preferences.csproj" />
+    <Project Path="lib/ShortDev.Microsoft.ConnectedDevices.NearShare/ShortDev.Microsoft.ConnectedDevices.NearShare.csproj" />
+    <Project Path="lib/ShortDev.Microsoft.ConnectedDevices/ShortDev.Microsoft.ConnectedDevices.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/ShortDev.Microsoft.ConnectedDevices.Test/ShortDev.Microsoft.ConnectedDevices.Test.csproj" />
+  </Folder>
+  <Folder Name="/utils/">
+    <File Path="utils/CdpDissector.lua" />
+    <Project Path="utils/CdpSvcUtil/CdpSvcUtil.csproj" />
+  </Folder>
+  <Project Path="src/NearShare.Android.csproj">
+    <Deploy />
+  </Project>
+</Solution>
