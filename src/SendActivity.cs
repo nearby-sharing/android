@@ -3,12 +3,12 @@ using Android.Content.PM;
 using Android.Runtime;
 using Android.Views;
 using AndroidX.AppCompat.App;
-using AndroidX.CoordinatorLayout.Widget;
 using AndroidX.Core.Content;
 using AndroidX.RecyclerView.Widget;
 using Google.Android.Material.BottomSheet;
 using Google.Android.Material.Color;
 using Google.Android.Material.ProgressIndicator;
+using Google.Android.Material.SideSheet;
 using Microsoft.Extensions.Logging;
 using NearShare.Droid;
 using NearShare.Utils;
@@ -24,12 +24,11 @@ namespace NearShare;
 
 [IntentFilter([Intent.ActionProcessText], Categories = [Intent.CategoryDefault, Intent.CategoryBrowsable], DataMimeType = "text/plain", Label = "@string/app_name")]
 [IntentFilter([Intent.ActionSend, Intent.ActionSendMultiple], Categories = [Intent.CategoryDefault, Intent.CategoryBrowsable], DataMimeType = "*/*")]
-[Activity(Label = "@string/app_name", Exported = true, Theme = "@style/AppTheme.TranslucentOverlay", ConfigurationChanges = UIHelper.ConfigChangesFlags, LaunchMode = LaunchMode.SingleTask)]
+[Activity(Label = "@string/app_name", Exported = true, Theme = "@style/AppTheme.DialogActivity", ConfigurationChanges = UIHelper.ConfigChangesFlags, LaunchMode = LaunchMode.Multiple)]
 public sealed partial class SendActivity : AppCompatActivity
 {
     NearShareSender _nearShareSender = null!;
 
-    BottomSheetDialog _dialog = null!;
     RecyclerView DeviceDiscoveryListView = null!;
     TextView StatusTextView = null!;
     Button cancelButton = null!;
@@ -43,38 +42,29 @@ public sealed partial class SendActivity : AppCompatActivity
         this.EnableEdgeToEdge();
         base.OnCreate(savedInstanceState);
 
-        SetContentView(new CoordinatorLayout(this)
-        {
-            LayoutParameters = new(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.MatchParent)
-        });
+        SetContentView(Resource.Layout.activity_share_dialog);
+        var sidesheetElement = FindViewById(Resource.Id.side_sheet)!;
+        SideSheetBehavior.From(sidesheetElement).Expand();
+        sidesheetElement.Click += (s, e) => { }; // Catch clicks so we don't get closed!
+        FindViewById(Resource.Id.touch_outside)!.Click += (s, e) => Finish();
 
-        _dialog = new(this);
-        _dialog.SetContentView(Resource.Layout.activity_share);
-        _dialog.DismissWithAnimation = true;
-        _dialog.Behavior.State = BottomSheetBehavior.StateExpanded;
-        _dialog.Behavior.FitToContents = true;
-        _dialog.Behavior.Draggable = false;
-        _dialog.Behavior.AddBottomSheetCallback(new FinishActivityBottomSheetCallback(this));
-        _dialog.Window?.ClearFlags(WindowManagerFlags.DimBehind);
-        _dialog.Show();
+        FindViewById<ViewGroup>(Resource.Id.rootLayout)!.EnableLayoutTransition();
 
-        _dialog.FindViewById<ViewGroup>(Resource.Id.rootLayout)!.EnableLayoutTransition();
+        StatusTextView = FindViewById<TextView>(Resource.Id.statusTextView)!;
 
-        StatusTextView = _dialog.FindViewById<TextView>(Resource.Id.statusTextView)!;
-
-        cancelButton = _dialog.FindViewById<Button>(Resource.Id.cancel_button)!;
+        cancelButton = FindViewById<Button>(Resource.Id.cancel_button)!;
         cancelButton.Click += CancelButton_Click;
 
-        readyButton = _dialog.FindViewById<Button>(Resource.Id.readyButton)!;
-        readyButton.Click += (s, e) => _dialog.Cancel();
+        readyButton = FindViewById<Button>(Resource.Id.readyButton)!;
+        readyButton.Click += (s, e) => Finish();
 
-        DeviceDiscoveryListView = _dialog.FindViewById<RecyclerView>(Resource.Id.deviceSelector)!;
-        DeviceDiscoveryListView.SetLayoutManager(new LinearLayoutManager(this, (int)Orientation.Horizontal, reverseLayout: false));
+        DeviceDiscoveryListView = FindViewById<RecyclerView>(Resource.Id.deviceSelector)!;
+        DeviceDiscoveryListView.SetLayoutManager(new GridLayoutManager(this, spanCount: 2, (int)Orientation.Vertical, reverseLayout: false));
         DeviceDiscoveryListView.SetAdapter(
             RemoteSystems.CreateAdapter(Resource.Layout.item_device, view => new RemoteSystemViewHolder(view) { Click = SendData })
         );
 
-        _emptyDeviceListView = _dialog.FindViewById<View>(Resource.Id.emptyDeviceListView)!;
+        _emptyDeviceListView = FindViewById<View>(Resource.Id.emptyDeviceListView)!;
 
         _loggerFactory = CdpUtils.CreateLoggerFactory(this);
         _logger = _loggerFactory.CreateLogger<SendActivity>();
@@ -199,9 +189,9 @@ public sealed partial class SendActivity : AppCompatActivity
         if (_currentTransfer is null)
             return; // ToDo: Feedback?!
 
-        _dialog.FindViewById<View>(Resource.Id.selectDeviceLayout)!.Visibility = ViewStates.Gone;
+        FindViewById<View>(Resource.Id.selectDeviceLayout)!.Visibility = ViewStates.Gone;
 
-        var sendingDataLayout = _dialog.FindViewById<View>(Resource.Id.sendingDataLayout)!;
+        var sendingDataLayout = FindViewById<View>(Resource.Id.sendingDataLayout)!;
         sendingDataLayout.Visibility = ViewStates.Visible;
 
         sendingDataLayout.FindViewById<ImageView>(Resource.Id.deviceTypeImageView)!.SetImageResource(
@@ -304,6 +294,8 @@ public sealed partial class SendActivity : AppCompatActivity
 
                             progressIndicator.Indeterminate = false;
                             progressIndicator.Progress = progressIndicator.Max;
+
+                            _currentTransfer = null;
                             break;
                     }
                     break;
@@ -387,6 +379,14 @@ public sealed partial class SendActivity : AppCompatActivity
             _currentTransfer?.Cancel();
         }
         catch { }
+    }
+
+    protected override void OnStop()
+    {
+        base.OnStop();
+
+        if (_currentTransfer is null)
+            Finish();
     }
 
     public override void Finish()

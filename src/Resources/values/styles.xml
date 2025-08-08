@@ -12,7 +12,7 @@
 		<!-- Navigation bar -->
 		<item name="android:navigationBarColor">@android:color/transparent</item>
 		<item name="android:windowLightNavigationBar">?attr/isLightTheme</item>
-		
+
 		<item name="preferenceTheme">@style/AppTheme.Preferences</item>
 		<item name="switchStyle">@style/Widget.Material3.CompoundButton.MaterialSwitch</item>
 		<item name="alertDialogTheme">@style/ThemeOverlay.Material3.MaterialAlertDialog</item>
@@ -22,15 +22,21 @@
 
 	<style name="AppTheme.Preferences" parent="@style/PreferenceTheme.SettingsLib" />
 
-	<style name="AppTheme.TranslucentOverlay" parent="AppTheme">
+	<style name="AppTheme.DialogActivity" parent="@style/Theme.Material3.DayNight.SideSheetDialog">
+		<item name="dynamicColorThemeOverlay">@style/ThemeOverlay.Material3.DynamicColors.DayNight</item>
+
+		<item name="sideSheetModalStyle">@style/Widget.Material3.SideSheet.Modal.Detached</item>
+
 		<item name="android:windowFrame">@null</item>
-		<item name="android:windowIsFloating">true</item>
+		<item name="android:windowIsFloating">false</item>
 		<item name="android:windowIsTranslucent">true</item>
-		<item name="android:windowNoTitle">true</item>
+		<item name="windowNoTitle">true</item>
 		<item name="android:background">@android:color/transparent</item>
 		<item name="android:windowBackground">@android:color/transparent</item>
 		<item name="android:statusBarColor">@android:color/transparent</item>
 		<item name="android:navigationBarColor">@android:color/transparent</item>
+		<item name="android:enforceStatusBarContrast">false</item>
+		<item name="android:enforceNavigationBarContrast">false</item>
 	</style>
 
 </resources>
