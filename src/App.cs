@@ -27,20 +27,21 @@ using RiveCore = Rive.Android.Core.Rive;
 namespace NearShare;
 
 [Application]
-public sealed class App : Application
+[MetaData(name: "io.sentry.additional-context", Value = "false")]
+public sealed class App(nint javaReference, JniHandleOwnership transfer) : Application(javaReference, transfer)
 {
-    public App(nint javaReference, JniHandleOwnership transfer) : base(javaReference, transfer)
+    public override void OnCreate()
     {
+        base.OnCreate();
+
         SentrySdk.Init(options =>
         {
             options.Dsn = "https://47f9f6c3642149a5af942e8484e64fe1@o646413.ingest.sentry.io/6437134";
             options.TracesSampleRate = 0.7;
+#if DEBUG
+            options.Debug = true;
+#endif
         });
-    }
-
-    public override void OnCreate()
-    {
-        base.OnCreate();
 
         AppCompatDelegate.DefaultNightMode = SettingsFragment.ShouldForceDarkMode(this) ? AppCompatDelegate.ModeNightYes : AppCompatDelegate.ModeNightFollowSystem;
 
