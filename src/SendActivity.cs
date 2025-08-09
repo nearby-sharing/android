@@ -24,7 +24,7 @@ namespace NearShare;
 
 [IntentFilter([Intent.ActionProcessText], Categories = [Intent.CategoryDefault, Intent.CategoryBrowsable], DataMimeType = "text/plain", Label = "@string/app_name")]
 [IntentFilter([Intent.ActionSend, Intent.ActionSendMultiple], Categories = [Intent.CategoryDefault, Intent.CategoryBrowsable], DataMimeType = "*/*")]
-[Activity(Label = "@string/app_name", Exported = true, Theme = "@style/AppTheme.DialogActivity", ConfigurationChanges = UIHelper.ConfigChangesFlags, LaunchMode = LaunchMode.Multiple)]
+[Activity(Label = "@string/app_name", Exported = true, Theme = "@style/AppTheme.DialogActivity", ConfigurationChanges = UIHelper.ConfigChangesFlags, LaunchMode = LaunchMode.SingleTask)]
 public sealed partial class SendActivity : AppCompatActivity
 {
     NearShareSender _nearShareSender = null!;
