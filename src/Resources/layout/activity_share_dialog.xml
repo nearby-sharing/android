@@ -43,7 +43,10 @@
 			app:layout_behavior="@string/side_sheet_behavior"
 			app:behavior_draggable="false">
 
-			<include layout="@layout/activity_share" />
+			<include
+				layout="@layout/activity_share"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent" />
 
 		</FrameLayout>
 
