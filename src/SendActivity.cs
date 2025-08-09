@@ -42,6 +42,9 @@ public sealed partial class SendActivity : AppCompatActivity
         this.EnableEdgeToEdge();
         base.OnCreate(savedInstanceState);
 
+        if (OperatingSystem.IsAndroidVersionAtLeast(29))
+            Window?.NavigationBarContrastEnforced = false;
+
         SetContentView(Resource.Layout.activity_share_dialog);
         var sidesheetElement = FindViewById(Resource.Id.side_sheet)!;
         SideSheetBehavior.From(sidesheetElement).Expand();
