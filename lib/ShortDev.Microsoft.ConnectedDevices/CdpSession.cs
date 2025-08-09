@@ -7,6 +7,7 @@ using ShortDev.Microsoft.ConnectedDevices.Session.Channels;
 using ShortDev.Microsoft.ConnectedDevices.Session.Connection;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
 using System.Collections.Concurrent;
+using System.ComponentModel;
 
 namespace ShortDev.Microsoft.ConnectedDevices;
 
@@ -92,12 +93,40 @@ public sealed class CdpSession : IDisposable
     #endregion
 
     #region SendMessage
-    public void SendMessage(CdpSocket socket, CommonHeader header, EndianWriter payloadWriter, bool supplyRequestId = false)
-        => SendMessage(socket, header, payloadWriter.Buffer.AsSpan(), supplyRequestId);
-
     uint _sequenceNumber = 0;
     ulong _requestId = 0;
     internal CdpCryptor? Cryptor { get; set; }
+
+    public void SendMessage<TMessageHeader, TMessage>(
+        CdpSocket socket,
+        CommonHeader header, in TMessageHeader messageHeader, in TMessage message,
+        bool supplyRequestId = false
+    ) where TMessageHeader : IBinaryWritable where TMessage : IBinaryWritable
+    {
+        SendMessage(socket, ref header, messageHeader, message, supplyRequestId: supplyRequestId);
+    }
+
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public void SendMessage<TMessageHeader, TMessage>(
+        CdpSocket socket,
+        ref CommonHeader header, in TMessageHeader messageHeader, in TMessage message,
+        bool supplyRequestId = false
+    ) where TMessageHeader : IBinaryWritable where TMessage : IBinaryWritable
+    {
+        var bufferSize = EndianWriter.CalcBinarySize(messageHeader) + EndianWriter.CalcBinarySize(message);
+        var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool, initialCapacity: (int)bufferSize);
+        try
+        {
+            messageHeader.Write(ref writer);
+            message.Write(ref writer);
+            SendMessage(socket, header, writer.Stream.WrittenSpan, supplyRequestId);
+        }
+        finally
+        {
+            writer.Dispose();
+        }
+    }
+
     public void SendMessage(CdpSocket socket, CommonHeader header, ReadOnlySpan<byte> payload, bool supplyRequestId = false)
     {
         if (header.Type == MessageType.Session && Cryptor == null)
@@ -121,11 +150,11 @@ public sealed class CdpSession : IDisposable
 
     #region HandleMessages
     bool _connectionEstablished = false;
-    internal void HandleMessage(CdpSocket socket, CommonHeader header, ref EndianReader reader)
+    internal void HandleMessage(CdpSocket socket, CommonHeader header, ref HeapEndianReader reader)
     {
         ThrowIfDisposed();
 
-        Cryptor?.Read(ref reader, header);
+        using var disposeToken = Cryptor?.Read(ref reader, header) ?? default;
         header.CorrectClientSessionBit();
 
         if (header.Type == MessageType.Connect)
@@ -158,10 +187,10 @@ public sealed class CdpSession : IDisposable
     }
 
     readonly ConcurrentDictionary<uint, CdpMessage> _msgRegistry = new();
-    void HandleSession(CommonHeader header, ref EndianReader reader)
+    void HandleSession(CommonHeader header, ref HeapEndianReader reader)
     {
         CdpMessage msg = _msgRegistry.GetOrAdd(header.SequenceNumber, id => new(header));
-        msg.AddFragment(reader.ReadToEnd()); // ToDo: Reduce allocations
+        msg.AddFragment(reader.Stream.ReadSlice((int)(reader.Stream.Length - reader.Stream.Position)));
 
         if (msg.IsComplete)
         {

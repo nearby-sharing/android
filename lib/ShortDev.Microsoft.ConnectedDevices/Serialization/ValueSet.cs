@@ -1,21 +1,21 @@
 ﻿using Bond;
 using Bond.IO.Unsafe;
 using Bond.Protocols;
-using ShortDev.Microsoft.ConnectedDevices.Messages;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Serialization;
 
-public partial class ValueSet : ICdpPayload<ValueSet>
+public partial class ValueSet : IBinaryWritable
 {
-    public static ValueSet Parse(ref EndianReader reader)
+    public static ValueSet Parse(ref HeapEndianReader reader)
     {
         // ToDo: We really should not re-allocated here!!
-        var data = reader.ReadToEnd().ToArray();
+        byte[] data = new byte[reader.Stream.Length - reader.Stream.Position];
+        reader.ReadBytes(data);
         CompactBinaryReader<InputBuffer> bondReader = new(new(data));
         return Deserialize<ValueSet>.From(bondReader);
     }
 
-    public void Write(EndianWriter writer)
+    public void Write<TWriter>(ref TWriter writer) where TWriter : struct, IEndianWriter, allows ref struct
     {
         OutputBuffer buffer = new();
         CompactBinaryWriter<OutputBuffer> bondWriter = new(buffer);
