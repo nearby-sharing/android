@@ -42,6 +42,8 @@ public sealed partial class SendActivity : AppCompatActivity
         this.EnableEdgeToEdge();
         base.OnCreate(savedInstanceState);
 
+        Window?.SetDimAmount(0.7f);
+
         if (OperatingSystem.IsAndroidVersionAtLeast(29))
             Window?.NavigationBarContrastEnforced = false;
 
