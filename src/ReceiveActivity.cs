@@ -1,14 +1,12 @@
 ﻿using Android.Bluetooth;
 using Android.Content;
 using Android.Content.PM;
-using Android.Runtime;
 using Android.Views;
 using AndroidX.AppCompat.App;
 using AndroidX.RecyclerView.Widget;
 using Google.Android.Material.Dialog;
 using Google.Android.Material.ProgressIndicator;
 using Microsoft.Extensions.Logging;
-using NearShare.Droid;
 using NearShare.Utils;
 using ShortDev.Android.UI;
 using ShortDev.Microsoft.ConnectedDevices;
@@ -30,6 +28,7 @@ public sealed class ReceiveActivity : AppCompatActivity
 
     PhysicalAddress? btAddress = null;
 
+    RequestPermissionsLauncher<ReceiveActivity> _requestPermissionsLauncher = null!;
     ILogger<ReceiveActivity> _logger = null!;
     ILoggerFactory _loggerFactory = null!;
     protected override void OnCreate(Bundle? savedInstanceState)
@@ -66,7 +65,7 @@ public sealed class ReceiveActivity : AppCompatActivity
         _loggerFactory = CdpUtils.CreateLoggerFactory(this);
         _logger = _loggerFactory.CreateLogger<ReceiveActivity>();
 
-        UIHelper.RequestReceivePermissions(this);
+        _requestPermissionsLauncher = this.RegisterPermissionRequest(UIHelper.ReceivePermissions);
     }
 
     sealed class TransferNotificationViewHolder : ViewHolder<TransferToken>
@@ -215,12 +214,50 @@ public sealed class ReceiveActivity : AppCompatActivity
         }
     }
 
+    protected override void OnStart()
+    {
+        base.OnStart();
+        InitializePlatformAsync();
+    }
+
+    async void InitializePlatformAsync()
+    {
+        if (_cdp is not null)
+            return;
+
+        if (await _requestPermissionsLauncher.RequestAsync() is PermissionResult.Denied(var denied))
+        {
+            if (!this.IsAtLeastStarted)
+                return;
+
+            this.ShowErrorDialog(new UnauthorizedAccessException($"Required permissions were not granted:{Environment.NewLine}{string.Join(Environment.NewLine, denied)}"));
+            return;
+        }
+
+        try
+        {
+            await Task.Run(InitializePlatform);
+        }
+        catch (Exception ex)
+        {
+            SentrySdk.CaptureException(ex);
+
+            if (!this.IsAtLeastStarted)
+                return;
+
+            this.ShowErrorDialog(ex);
+        }
+    }
+
     CancellationTokenSource? _cancellationTokenSource;
     ConnectedDevicesPlatform? _cdp;
-    void InitializeCDP()
+    void InitializePlatform()
     {
         if (btAddress == null)
-            throw new NullReferenceException(nameof(btAddress));
+            throw new InvalidOperationException("No bluetooth address");
+
+        if (_cdp is not null)
+            return;
 
         _cancellationTokenSource?.Dispose();
         _cancellationTokenSource = new();
@@ -240,13 +277,6 @@ public sealed class ReceiveActivity : AppCompatActivity
             Resource.String.visible_as_template,
             _cdp.DeviceInfo.Name
         );
-    }
-
-    public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
-    {
-        _logger.RequestPermissionResult(requestCode, permissions, grantResults);
-
-        InitializeCDP();
     }
 
     public override bool OnCreateOptionsMenu(IMenu? menu)

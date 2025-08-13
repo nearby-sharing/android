@@ -1,7 +1,7 @@
 ﻿using Android.Content;
 using Android.Content.PM;
-using Android.Runtime;
 using Android.Views;
+using AndroidX.Activity.Result;
 using AndroidX.AppCompat.App;
 using AndroidX.Core.Content;
 using AndroidX.RecyclerView.Widget;
@@ -10,7 +10,6 @@ using Google.Android.Material.Color;
 using Google.Android.Material.ProgressIndicator;
 using Google.Android.Material.SideSheet;
 using Microsoft.Extensions.Logging;
-using NearShare.Droid;
 using NearShare.Utils;
 using NearShare.ViewModels;
 using ShortDev.Android.UI;
@@ -35,6 +34,7 @@ public sealed partial class SendActivity : AppCompatActivity
     Button readyButton = null!;
     View _emptyDeviceListView = null!;
 
+    RequestPermissionsLauncher<SendActivity> _requestPermissionsLauncher = null!;
     ILogger<SendActivity> _logger = null!;
     ILoggerFactory _loggerFactory = null!;
     protected override void OnCreate(Bundle? savedInstanceState)
@@ -74,7 +74,7 @@ public sealed partial class SendActivity : AppCompatActivity
         _loggerFactory = CdpUtils.CreateLoggerFactory(this);
         _logger = _loggerFactory.CreateLogger<SendActivity>();
 
-        UIHelper.RequestSendPermissions(this);
+        _requestPermissionsLauncher = this.RegisterPermissionRequest(UIHelper.SendPermissions);
     }
 
     sealed class RemoteSystemViewHolder : ViewHolder<CdpDevice>
@@ -112,9 +112,23 @@ public sealed partial class SendActivity : AppCompatActivity
         }
     }
 
-    public override async void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
+    protected override void OnStart()
     {
-        _logger.RequestPermissionResult(requestCode, permissions, grantResults);
+        base.OnStart();
+        InitializePlatformAsync();
+    }
+
+    async void InitializePlatformAsync()
+    {
+        if (await _requestPermissionsLauncher.RequestAsync() is PermissionResult.Denied(var denied))
+        {
+            if (!this.IsAtLeastStarted)
+                return;
+
+            this.ShowErrorDialog(new UnauthorizedAccessException($"Required permissions were not granted:{Environment.NewLine}{string.Join(Environment.NewLine, denied)}"));
+            return;
+        }
+
         try
         {
             await Task.Run(InitializePlatform);
@@ -123,7 +137,7 @@ public sealed partial class SendActivity : AppCompatActivity
         {
             SentrySdk.CaptureException(ex);
 
-            if (!Lifecycle.CurrentState.IsAtLeast(AndroidX.Lifecycle.Lifecycle.State.Started!))
+            if (!this.IsAtLeastStarted)
                 return;
 
             this.ShowErrorDialog(ex);
@@ -135,6 +149,9 @@ public sealed partial class SendActivity : AppCompatActivity
     ConnectedDevicesPlatform _cdp = null!;
     void InitializePlatform()
     {
+        if (_cdp is not null)
+            return;
+
         _cdp = CdpUtils.Create(this, _loggerFactory);
         _nearShareSender = new NearShareSender(_cdp);
 

@@ -5,8 +5,8 @@ using NearShare.Settings;
 using Rive.Android.Core;
 using RiveCore = Rive.Android.Core.Rive;
 
-[assembly: UsesPermission(ManifestPermission.Bluetooth)]
-[assembly: UsesPermission(ManifestPermission.BluetoothAdmin)]
+[assembly: UsesPermission(ManifestPermission.Bluetooth, MaxSdkVersion = 30)]
+[assembly: UsesPermission(ManifestPermission.BluetoothAdmin, MaxSdkVersion = 30)]
 [assembly: UsesPermission(ManifestPermission.BluetoothScan)]
 [assembly: UsesPermission(ManifestPermission.BluetoothConnect)]
 [assembly: UsesPermission(ManifestPermission.BluetoothAdvertise)]
@@ -15,11 +15,11 @@ using RiveCore = Rive.Android.Core.Rive;
 [assembly: UsesPermission(ManifestPermission.AccessNetworkState)]
 [assembly: UsesPermission(ManifestPermission.AccessWifiState)]
 
-[assembly: UsesPermission(ManifestPermission.AccessFineLocation)]
-[assembly: UsesPermission(ManifestPermission.AccessCoarseLocation)]
+[assembly: UsesPermission(ManifestPermission.AccessFineLocation, MaxSdkVersion = 30)]
+[assembly: UsesPermission(ManifestPermission.AccessCoarseLocation, MaxSdkVersion = 30)]
 
-[assembly: UsesPermission(ManifestPermission.WriteExternalStorage)]
-[assembly: UsesPermission(ManifestPermission.ReadExternalStorage)]
+[assembly: UsesPermission(ManifestPermission.WriteExternalStorage, MaxSdkVersion = 29)]
+[assembly: UsesPermission(ManifestPermission.ReadExternalStorage, MaxSdkVersion = 29)]
 
 [assembly: UsesFeature("android.hardware.bluetooth", Required = false)]
 [assembly: UsesFeature("android.hardware.bluetooth_le", Required = false)]
