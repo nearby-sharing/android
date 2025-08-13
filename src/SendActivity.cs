@@ -1,7 +1,7 @@
-﻿using Android.Content;
+﻿using Android.Bluetooth;
+using Android.Content;
 using Android.Content.PM;
 using Android.Views;
-using AndroidX.Activity.Result;
 using AndroidX.AppCompat.App;
 using AndroidX.Core.Content;
 using AndroidX.RecyclerView.Widget;
@@ -35,6 +35,8 @@ public sealed partial class SendActivity : AppCompatActivity
     View _emptyDeviceListView = null!;
 
     RequestPermissionsLauncher<SendActivity> _requestPermissionsLauncher = null!;
+    IntentResultListener<SendActivity> _intentResultListener = null!;
+
     ILogger<SendActivity> _logger = null!;
     ILoggerFactory _loggerFactory = null!;
     protected override void OnCreate(Bundle? savedInstanceState)
@@ -74,7 +76,8 @@ public sealed partial class SendActivity : AppCompatActivity
         _loggerFactory = CdpUtils.CreateLoggerFactory(this);
         _logger = _loggerFactory.CreateLogger<SendActivity>();
 
-        _requestPermissionsLauncher = this.RegisterPermissionRequest(UIHelper.SendPermissions);
+        _requestPermissionsLauncher = new(this, UIHelper.SendPermissions);
+        _intentResultListener = new(this);
     }
 
     sealed class RemoteSystemViewHolder : ViewHolder<CdpDevice>
@@ -131,6 +134,8 @@ public sealed partial class SendActivity : AppCompatActivity
 
         try
         {
+            await _intentResultListener.LaunchAsync(new Intent(BluetoothAdapter.ActionRequestEnable));
+
             await Task.Run(InitializePlatform);
         }
         catch (Exception ex)

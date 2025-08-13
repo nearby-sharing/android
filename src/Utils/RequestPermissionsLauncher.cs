@@ -9,12 +9,6 @@ using Activity = Android.App.Activity;
 
 namespace NearShare.Utils;
 
-public static class Permissions
-{
-    public static RequestPermissionsLauncher<T> RegisterPermissionRequest<T>(this T activity, IReadOnlyList<string> permissions) where T : Activity, IActivityResultCaller
-        => new RequestPermissionsLauncher<T>(activity, permissions);
-}
-
 public sealed class RequestPermissionsLauncher<TActivity> where TActivity : Activity, IActivityResultCaller
 {
     readonly Activity _activity;

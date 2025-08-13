@@ -29,6 +29,8 @@ public sealed class ReceiveActivity : AppCompatActivity
     PhysicalAddress? btAddress = null;
 
     RequestPermissionsLauncher<ReceiveActivity> _requestPermissionsLauncher = null!;
+    IntentResultListener<ReceiveActivity> _intentResultListener = null!;
+
     ILogger<ReceiveActivity> _logger = null!;
     ILoggerFactory _loggerFactory = null!;
     protected override void OnCreate(Bundle? savedInstanceState)
@@ -65,7 +67,8 @@ public sealed class ReceiveActivity : AppCompatActivity
         _loggerFactory = CdpUtils.CreateLoggerFactory(this);
         _logger = _loggerFactory.CreateLogger<ReceiveActivity>();
 
-        _requestPermissionsLauncher = this.RegisterPermissionRequest(UIHelper.ReceivePermissions);
+        _requestPermissionsLauncher = new(this, UIHelper.ReceivePermissions);
+        _intentResultListener = new(this);
     }
 
     sealed class TransferNotificationViewHolder : ViewHolder<TransferToken>
@@ -222,9 +225,6 @@ public sealed class ReceiveActivity : AppCompatActivity
 
     async void InitializePlatformAsync()
     {
-        if (_cdp is not null)
-            return;
-
         if (await _requestPermissionsLauncher.RequestAsync() is PermissionResult.Denied(var denied))
         {
             if (!this.IsAtLeastStarted)
@@ -236,6 +236,8 @@ public sealed class ReceiveActivity : AppCompatActivity
 
         try
         {
+            await _intentResultListener.LaunchAsync(new Intent(BluetoothAdapter.ActionRequestEnable));
+
             await Task.Run(InitializePlatform);
         }
         catch (Exception ex)
