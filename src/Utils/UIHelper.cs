@@ -106,45 +106,38 @@ internal static class UIHelper
     }
 
     #region Permissions
-    private static readonly string[] _sendPermissions = [
+    public static string[] SendPermissions => OperatingSystem.IsAndroidVersionAtLeast(31) ? [
+        ManifestPermission.BluetoothScan,
+        ManifestPermission.BluetoothConnect
+    ] : [
         ManifestPermission.AccessFineLocation,
         ManifestPermission.AccessCoarseLocation
     ];
-    [SupportedOSPlatform("android31.0")]
-    private static readonly string[] _sendPermissionsApi31 = [
-        .. _sendPermissions,
-        ManifestPermission.BluetoothScan,
-        ManifestPermission.BluetoothConnect
-    ];
-    public static void RequestSendPermissions(Activity activity)
-        => ActivityCompat.RequestPermissions(
-                activity,
-                OperatingSystem.IsAndroidVersionAtLeast(31) ? _sendPermissionsApi31 : _sendPermissions,
-                0
-            );
 
-    private static readonly string[] _receivePermissions = [
-        ManifestPermission.AccessFineLocation,
-        ManifestPermission.AccessCoarseLocation,
+    public static void RequestSendPermissions(Activity activity)
+        => ActivityCompat.RequestPermissions(activity, SendPermissions, 0);
+
+    public static string[] ReceivePermissions => [
+        ..OperatingSystem.IsAndroidVersionAtLeast(31) ? [
+            ManifestPermission.BluetoothScan,
+            ManifestPermission.BluetoothConnect,
+            ManifestPermission.BluetoothAdvertise,
+        ] : (string[])[
+            ManifestPermission.AccessFineLocation,
+            ManifestPermission.AccessCoarseLocation
+            // ManifestPermission.AccessBackgroundLocation, See #109 and #41 // Api 29
+        ],
+
         ManifestPermission.AccessWifiState,
-        ManifestPermission.Bluetooth,
-        // ManifestPermission.AccessBackgroundLocation, See #109 and #41 // Api 29
-        ManifestPermission.ReadExternalStorage,
-        ManifestPermission.WriteExternalStorage
+
+        ..OperatingSystem.IsAndroidVersionAtLeast(29) ? Array.Empty<string>() : [
+            ManifestPermission.ReadExternalStorage,
+            ManifestPermission.WriteExternalStorage
+        ]
     ];
-    [SupportedOSPlatform("android31.0")]
-    private static readonly string[] _receivePermissionsApi31 = [
-        .. _receivePermissions,
-        ManifestPermission.BluetoothScan,
-        ManifestPermission.BluetoothConnect,
-        ManifestPermission.BluetoothAdvertise,
-    ];
+
     public static void RequestReceivePermissions(Activity activity)
-        => ActivityCompat.RequestPermissions(
-                activity,
-                OperatingSystem.IsAndroidVersionAtLeast(31) ? _receivePermissionsApi31 : _receivePermissions,
-                0
-            );
+        => ActivityCompat.RequestPermissions(activity, ReceivePermissions, 0);
     #endregion
 
     public static ISpanned LoadHtmlAsset(Activity activity, string assetPath)
