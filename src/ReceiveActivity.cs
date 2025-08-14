@@ -46,7 +46,7 @@ public sealed class ReceiveActivity : AppCompatActivity
 
         SetContentView(Resource.Layout.activity_receive);
 
-        UIHelper.SetupToolBar(this, GetString(Resource.String.app_titlebar_title_receive));
+        UIHelper.SetupToolBar(this, GetString(Resource.String.generic_receive));
 
         notificationsRecyclerView = FindViewById<RecyclerView>(Resource.Id.notificationsRecyclerView)!;
         notificationsRecyclerView.SetLayoutManager(new LinearLayoutManager(this));

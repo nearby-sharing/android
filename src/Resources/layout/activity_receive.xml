@@ -7,37 +7,30 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
-    <include
+	<include
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         layout="@layout/layout_appbar" />
 
-    <androidx.core.widget.NestedScrollView
+	<androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <LinearLayout
+		<LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="10dp">
 
-            <TextView
-                style="@style/TextAppearance.AppCompat.Headline"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/generic_receive" />
-
-            <TextView
+			<TextView
                 android:id="@+id/deviceInfoTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="10dp"
                 android:text="@string/visible_as_template"
                 android:paddingBottom="10dp" />
 
-            <Button
+			<Button
                 style="@style/Widget.Material3.Button.TonalButton"
                 android:id="@+id/openFAQButton"
                 android:layout_width="match_parent"
@@ -45,7 +38,7 @@
                 android:text="@string/open_faq_title"
                 app:icon="@drawable/ic_fluent_question_circle_24_regular" />
 
-            <TextView
+			<TextView
                 style="@style/TextAppearance.AppCompat.Title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -53,15 +46,15 @@
                 android:layout_marginBottom="3dp"
                 android:text="@string/generic_notifications" />
 
-            <androidx.recyclerview.widget.RecyclerView
+			<androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/notificationsRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingTop="10dp"
                 android:paddingBottom="10dp"/>
 
-        </LinearLayout>
+		</LinearLayout>
 
-    </androidx.core.widget.NestedScrollView>
+	</androidx.core.widget.NestedScrollView>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
