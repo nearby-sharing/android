@@ -4,11 +4,11 @@ using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using AndroidX.AppCompat.App;
-using AndroidX.Core.App;
 using Google.Android.Material.Card;
 using Google.Android.Material.Dialog;
 using Google.Android.Material.TextField;
 using NearShare.Utils;
+using ShortDev.Android.UI;
 
 namespace NearShare;
 
