@@ -20,6 +20,7 @@
   <Folder Name="/utils/">
     <File Path="utils/CdpDissector.lua" />
     <Project Path="utils/CdpSvcUtil/CdpSvcUtil.csproj" />
+    <Project Path="utils/LiveTraceClient/LiveTraceClient.csproj" Id="4c919098-d3e1-4d12-8c86-c1c63c98e57a" />
   </Folder>
   <Project Path="src/NearShare.Android.csproj">
     <Deploy />
