@@ -38,19 +38,19 @@ internal static class UIHelper
     }
 
     public static void OpenFAQ(Activity activity)
-        => DisplayWebSite(activity, "https://nearshare.shortdev.de/docs/FAQ");
+        => DisplayWebSite(activity, "https://nearshare.shortdev.de/faq");
 
     public static void OpenCrowdIn(Activity activity)
         => DisplayWebSite(activity, "https://translate.nearshare.shortdev.de/");
 
     public static void OpenSponsor(Activity activity)
-        => DisplayWebSite(activity, "https://nearshare.shortdev.de/docs/sponsor");
+        => DisplayWebSite(activity, "https://nearshare.shortdev.de/sponsor");
 
     public static void OpenDiscord(Activity activity)
-        => DisplayWebSite(activity, "https://nearshare.shortdev.de/docs/discord");
+        => DisplayWebSite(activity, "https://nearshare.shortdev.de/community");
 
     public static void OpenSetup(Activity activity)
-        => DisplayWebSite(activity, "https://nearshare.shortdev.de/docs/setup");
+        => DisplayWebSite(activity, "https://nearshare.shortdev.de/setup");
 
     public static void OpenCredits(Activity activity)
         => DisplayWebSite(activity, "https://nearshare.shortdev.de/CREDITS");
