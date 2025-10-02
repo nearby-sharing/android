@@ -38,7 +38,7 @@
             android:id="@+id/sendProgressIndicator"
             app:indicatorSize="70dp"
             app:trackCornerRadius="10dp"
-			android:visibility="invisible" />
+            android:visibility="invisible" />
 
         <Button
             android:id="@id/cancel_button"
@@ -70,10 +70,8 @@
         android:textAppearance="?attr/textAppearanceBodyMedium"
         android:text="@string/device_name"
         android:textColor="?attr/colorOnBackground"
-        android:singleLine="true"
-        android:ellipsize="marquee"
-        android:marqueeRepeatLimit="marquee_forever"
-        android:freezesText="false" />
+        android:maxLines="2"
+        android:ellipsize="start" />
 
     <TextView
         android:id="@+id/statusTextView"
