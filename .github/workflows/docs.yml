@@ -28,6 +28,9 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "9.x.x"
+          source-url: https://nuget.pkg.github.com/dotnet/index.json
+        env:
+          NUGET_AUTH_TOKEN: ${{ secrets.GPR_READ_TOKEN }}
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
@@ -38,7 +41,7 @@ jobs:
 
       - name: Install docfx
         run: |
-          dotnet tool update -g docfx
+          dotnet tool update -g docfx --version 2.78.4-preview.122
           echo "~/.dotnet/tools" >> $GITHUB_PATH
 
       - name: Build docs
