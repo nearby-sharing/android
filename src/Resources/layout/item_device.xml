@@ -8,13 +8,13 @@
     android:padding="10dp"
     android:gravity="center">
 
-    <RelativeLayout
+	<RelativeLayout
         android:layout_width="70dp"
         android:layout_height="70dp"
         android:layout_marginBottom="10dp"
         android:clipToPadding="false">
 
-        <androidx.cardview.widget.CardView
+		<androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_centerInParent="true"
@@ -22,16 +22,16 @@
             app:cardCornerRadius="50dp"
             app:cardElevation="0dp"
             app:cardBackgroundColor="?attr/colorSurfaceVariant">
-            <ImageView
+			<ImageView
                 android:id="@+id/deviceTypeImageView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:padding="12dp"
                 android:tint="?attr/colorOnSurface"
                 android:src="@drawable/ic_fluent_desktop_24_regular" />
-        </androidx.cardview.widget.CardView>
+		</androidx.cardview.widget.CardView>
 
-        <com.google.android.material.progressindicator.CircularProgressIndicator
+		<com.google.android.material.progressindicator.CircularProgressIndicator
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_centerInParent="true"
@@ -40,7 +40,7 @@
             app:trackCornerRadius="10dp"
 			android:visibility="invisible" />
 
-        <Button
+		<Button
             android:id="@id/cancel_button"
             style="?attr/materialIconButtonFilledTonalStyle"
             app:icon="@drawable/ic_fluent_dismiss_circle_24_regular"
@@ -50,7 +50,7 @@
             android:layout_margin="10dp"
             android:visibility="gone" />
 
-        <ImageView
+		<ImageView
             android:id="@+id/transportTypeImageView"
             android:layout_width="30dp"
             android:layout_height="30dp"
@@ -61,21 +61,19 @@
             android:backgroundTint="?android:attr/colorBackground"
             android:tint="?attr/colorOnBackground"
             android:src="@drawable/ic_fluent_question_circle_20_regular" />
-    </RelativeLayout>
+	</RelativeLayout>
 
-    <TextView
+	<TextView
         android:id="@+id/deviceNameTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?attr/textAppearanceBodyMedium"
         android:text="@string/device_name"
         android:textColor="?attr/colorOnBackground"
-        android:singleLine="true"
-        android:ellipsize="marquee"
-        android:marqueeRepeatLimit="marquee_forever"
-        android:freezesText="false" />
+        android:maxLines="2"
+		android:ellipsize="start" />
 
-    <TextView
+	<TextView
         android:id="@+id/statusTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
