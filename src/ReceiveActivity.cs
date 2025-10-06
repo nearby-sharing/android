@@ -260,6 +260,9 @@ public sealed class ReceiveActivity : AppCompatActivity
         {
             await _intentResultListener.LaunchAsync(new Intent(BluetoothAdapter.ActionRequestEnable));
 
+            if (!this.IsAtLeastStarted)
+                return;
+
             await Task.Run(InitializePlatform);
         }
         catch (Exception ex)
