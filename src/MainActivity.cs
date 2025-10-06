@@ -9,6 +9,7 @@ using Google.Android.Material.Dialog;
 using Google.Android.Material.TextField;
 using NearShare.Utils;
 using ShortDev.Android.UI;
+using System.Security;
 
 namespace NearShare;
 
@@ -172,8 +173,14 @@ public sealed class MainActivity : AppCompatActivity
     {
         try
         {
-            if (OperatingSystem.IsAndroidVersionAtLeast(31))
-                await _requestPermissionsLauncher.RequestAsync();
+            if (OperatingSystem.IsAndroidVersionAtLeast(31) && await _requestPermissionsLauncher.RequestAsync() is PermissionResult.Denied)
+            {
+                if (!this.IsAtLeastStarted)
+                    return;
+
+                this.ShowErrorDialog(new SecurityException("Bluetooth permission denied"));
+                return;
+            }
 
             StartActivityForResult(new Intent(BluetoothAdapter.ActionRequestEnable), 0);
         }
