@@ -16,6 +16,7 @@ using System.Collections.Frozen;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Net.NetworkInformation;
+using System.Runtime.CompilerServices;
 using SystemDebug = System.Diagnostics.Debug;
 
 namespace NearShare;
@@ -129,6 +130,7 @@ public sealed class ReceiveActivity : AppCompatActivity
             fileTransfer.Progress -= OnProgress;
         }
 
+        readonly ConditionalWeakTable<FileTransferToken, FrozenDictionary<uint, AndroidUri>> _uris = [];
         private void AcceptButton_Click(object? sender, EventArgs e)
         {
             if (_transfer is not FileTransferToken fileTransfer)
@@ -136,8 +138,11 @@ public sealed class ReceiveActivity : AppCompatActivity
 
             try
             {
-                var streams = fileTransfer.ToFrozenDictionary(x => x.Id, file => (Stream)_context.ContentResolver!.CreateMediaStoreStream(file.Name).stream);
-                fileTransfer.Accept(streams ?? throw new UnreachableException("Could not generated streams to accept"));
+                var streams = fileTransfer.ToFrozenDictionary(x => x.Id, file => _context.ContentResolver!.CreateMediaStoreStream(file.Name))
+                    ?? throw new UnreachableException("Could not generated streams to accept");
+
+                fileTransfer.Accept(streams.ToFrozenDictionary(x => x.Key, x => (Stream)x.Value.stream));
+                _uris.AddOrUpdate(fileTransfer, streams.ToFrozenDictionary(x => x.Key, x => x.Value.uri));
 
                 fileTransfer.Finished += () =>
                 {
@@ -201,10 +206,27 @@ public sealed class ReceiveActivity : AppCompatActivity
                     UIHelper.DisplayWebSite(_context, uriTransfer.Uri);
                     break;
 
+                case FileTransferToken { Files: [var singleFile] } fileTransfer:
+                    try
+                    {
+                        if (!_uris.TryGetValue(fileTransfer, out var lookup))
+                            throw new UnreachableException("No entry in weak-table");
+
+                        Intent viewFileIntent = new(Intent.ActionView);
+                        viewFileIntent.SetData(lookup[singleFile.Id]);
+                        viewFileIntent.AddFlags(ActivityFlags.GrantReadUriPermission);
+                        viewFileIntent.AddFlags(ActivityFlags.ClearTop);
+                        _context.StartActivity(viewFileIntent);
+                    }
+                    catch (Exception ex)
+                    {
+                        SentrySdk.CaptureException(ex);
+                        _context.ViewDownloads();
+                    }
+                    break;
+
                 case FileTransferToken:
                     _context.ViewDownloads();
-                    // ToDo: View single file
-                    //if (fileTransfer.Files.Count == 1)
                     break;
             }
         }
