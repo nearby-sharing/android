@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net9.0-android35.0</TargetFramework>
+		<TargetFramework>net10.0-android</TargetFramework>
 		<OutputType>Exe</OutputType>
 		<SupportedOSPlatformVersion>21</SupportedOSPlatformVersion>
 		<ApplicationId>de.shortdev.nearby_sharing_windows</ApplicationId>
@@ -20,12 +20,12 @@
 	</PropertyGroup>
 	<ItemGroup Label="Nuget">
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.10" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
 		<PackageReference Include="ShortDev.Rive.Android" Version="10.1.0.0" />
 		<PackageReference Include="Sentry" Version="5.16.2" />
 		<PackageReference Include="Serilog.Extensions.Logging.File" Version="3.0.0" />
-		<PackageReference Include="ShortDev.Android" Version="0.4.1-beta" />
-		<PackageReference Include="ShortDev.Android.FluentIcons" Version="1.1.203" />
+		<PackageReference Include="ShortDev.Android" Version="0.5.0-beta" />
+		<PackageReference Include="ShortDev.Android.FluentIcons" Version="1.1.311" />
 		<PackageReference Include="Xamarin.AndroidX.Browser" Version="1.9.0" />
 		<PackageReference Include="Xamarin.Google.Android.Material" Version="1.13.0" />
 	</ItemGroup>
