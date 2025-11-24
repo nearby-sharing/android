@@ -42,7 +42,11 @@ jobs:
           echo "~/.dotnet/tools" >> $GITHUB_PATH
 
       - name: Build docs
-        run: docfx docfx.json
+        run: |
+            dotnet --version
+            whereis docfx
+            docfx --version
+            docfx docfx.json
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
