@@ -5,7 +5,7 @@ using ShortDev.Microsoft.ConnectedDevices.Transports;
 namespace ShortDev.Microsoft.ConnectedDevices.Session.Channels;
 internal sealed class ClientChannelHandler(CdpSession session) : ChannelHandler(session)
 {
-    protected override void HandleMessageInternal(CdpSocket socket, CommonHeader header, ControlHeader controlHeader, ref EndianReader reader)
+    protected override void HandleMessageInternal(CdpSocket socket, CommonHeader header, ControlHeader controlHeader, ref HeapEndianReader reader)
     {
         if (controlHeader.MessageType != ControlMessageType.StartChannelResponse)
             return;
@@ -50,22 +50,24 @@ internal sealed class ClientChannelHandler(CdpSession session) : ChannelHandler(
 
     ulong SendChannelRequest(CdpSocket socket, string appId, string appName)
     {
-        EndianWriter writer = new(Endianness.BigEndian);
-        new ControlHeader()
-        {
-            MessageType = ControlMessageType.StartChannelRequest
-        }.Write(writer);
-        new StartChannelRequest()
-        {
-            Id = appId,
-            Name = appName
-        }.Write(writer);
-
         CommonHeader header = new()
         {
             Type = MessageType.Control
         };
-        Session.SendMessage(socket, header, writer, supplyRequestId: true);
+        Session.SendMessage(
+            socket,
+            ref header,
+            new ControlHeader()
+            {
+                MessageType = ControlMessageType.StartChannelRequest
+            },
+            new StartChannelRequest()
+            {
+                Id = appId,
+                Name = appName
+            },
+            supplyRequestId: true
+        );
 
         return header.RequestID;
     }

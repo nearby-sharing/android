@@ -1,4 +1,5 @@
-﻿using ShortDev.Microsoft.ConnectedDevices.Encryption;
+﻿using ShortDev.IO.Input;
+using ShortDev.Microsoft.ConnectedDevices.Encryption;
 using ShortDev.Microsoft.ConnectedDevices.Messages;
 using System.Diagnostics;
 
@@ -41,11 +42,17 @@ public static class MessageFragmenter
         }
         else
         {
-            EndianWriter writer = new(Endianness.BigEndian);
-            header.SetPayloadLength(payload.Length);
-            header.Write(writer);
-            writer.Write(payload);
-            sender.SendFragment(writer.Buffer.AsSpan());
+            var headerWriter = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
+            try
+            {
+                header.SetPayloadLength(payload.Length);
+                header.Write(ref headerWriter);
+                sender.SendFragment(headerWriter.Stream.WrittenSpan, payload);
+            }
+            finally
+            {
+                headerWriter.Dispose();
+            }
         }
     }
 }
@@ -55,5 +62,11 @@ public interface IFragmentSender
     /// <summary>
     /// Sends a binary fragment.
     /// </summary>
-    void SendFragment(ReadOnlySpan<byte> fragment);
+    void SendFragment(ReadOnlySpan<byte> message);
+
+    /// <summary>
+    /// Sends a binary fragment.
+    /// </summary>
+    void SendFragment(ReadOnlySpan<byte> header, ReadOnlySpan<byte> payload)
+        => SendFragment([.. header, .. payload]);
 }
