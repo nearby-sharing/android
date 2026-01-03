@@ -20,9 +20,9 @@
 	</PropertyGroup>
 	<ItemGroup Label="Nuget">
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.1" />
 		<PackageReference Include="ShortDev.Rive.Android" Version="10.1.0.0" />
-		<PackageReference Include="Sentry" Version="5.16.2" />
+		<PackageReference Include="Sentry" Version="6.0.0" />
 		<PackageReference Include="Serilog.Extensions.Logging.File" Version="3.0.0" />
 		<PackageReference Include="ShortDev.Android" Version="0.5.0-beta" />
 		<PackageReference Include="ShortDev.Android.FluentIcons" Version="1.1.311" />
