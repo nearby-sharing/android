@@ -1,130 +1,69 @@
-﻿using Android.Bluetooth;
-using Android.Content;
+﻿using Android.Content;
 using Android.OS;
 using Android.Runtime;
-using Android.Views;
+using Android.Service.QuickSettings;
 using AndroidX.AppCompat.App;
-using Google.Android.Material.Card;
-using Google.Android.Material.Dialog;
-using Google.Android.Material.TextField;
+using AndroidX.Core.View;
+using AndroidX.Navigation;
+using AndroidX.Navigation.UI;
+using Google.Android.Material.BottomNavigation;
 using NearShare.Utils;
-using ShortDev.Android.UI;
-using System.Security;
 
 namespace NearShare;
 
+[IntentFilter([TileService.ActionQsTilePreferences])]
 [Activity(Label = "@string/app_name", Theme = "@style/AppTheme", MainLauncher = true, ConfigurationChanges = UIHelper.ConfigChangesFlags)]
 public sealed class MainActivity : AppCompatActivity
 {
-    RequestPermissionsLauncher<MainActivity> _requestPermissionsLauncher;
+    NavController NavController => field ??= SupportFragmentManager.FindFragmentById(Resource.Id.nav_host_fragment)!.NavController;
+
     protected override void OnCreate(Bundle? savedInstanceState)
     {
         base.OnCreate(savedInstanceState);
+        WindowCompat.EnableEdgeToEdge(Window);
+
         SetContentView(Resource.Layout.activity_main);
+        SetSupportActionBar(FindViewById<AndroidX.AppCompat.Widget.Toolbar>(Resource.Id.toolbar));
 
-        UIHelper.SetupToolBar(this);
+        if (savedInstanceState is not null)
+            return;
 
-        Button sendButton = FindViewById<Button>(Resource.Id.sendButton)!;
-        sendButton.Click += SendButton_Click;
-
-        Button receiveButton = FindViewById<Button>(Resource.Id.receiveButton)!;
-        receiveButton.Click += ReceiveButton_Click;
-
-        FindViewById<MaterialCardView>(Resource.Id.sendFileCard)!.Click += SendButton_Click;
-        FindViewById<MaterialCardView>(Resource.Id.sendClipBoardCard)!.Click += SendClipBoard_Click;
-        FindViewById<MaterialCardView>(Resource.Id.sendTextCard)!.Click += SendText_Click;
-
-        FindViewById<MaterialCardView>(Resource.Id.enableBluetoothButton)!.Click += (_, _) => EnableBluetooth();
-        FindViewById<MaterialCardView>(Resource.Id.setupWindowButton)!.Click += (_, _) => UIHelper.OpenSetup(this);
-        FindViewById<MaterialCardView>(Resource.Id.openFAQButton)!.Click += (_, _) => UIHelper.OpenFAQ(this);
-        FindViewById<MaterialCardView>(Resource.Id.openCrowdinButton)!.Click += (_, _) => UIHelper.OpenCrowdIn(this);
-
-        _requestPermissionsLauncher = new(
-            this,
-            OperatingSystem.IsAndroidVersionAtLeast(31) ? [
-                ManifestPermission.BluetoothConnect
-            ] : Array.Empty<string>()
-        );
-    }
-
-    private void ReceiveButton_Click(object? sender, EventArgs e)
-    {
-        StartActivity(new Intent(this, typeof(ReceiveActivity)));
-    }
-
-    const int FilePickCode = 0x1;
-    private void SendButton_Click(object? sender, EventArgs e)
-    {
-        StartActivityForResult(
-            new Intent(Intent.ActionOpenDocument)
-                .SetType("*/*")
-                .AddCategory(Intent.CategoryOpenable)
-                .PutExtra(Intent.ExtraAllowMultiple, true),
-            FilePickCode
-        );
-    }
-
-    private void SendClipBoard_Click(object? sender, EventArgs e)
-    {
-        try
+        NavController.Graph = NavController.CreateGraph(id: 42, startDestination: Routes.Home, graph =>
         {
-            var clipboard = (ClipboardManager?)GetSystemService(ClipboardService);
-            if (clipboard is null)
-                return;
-
-            var clip = clipboard.PrimaryClip;
-            if (clip is null)
-                return;
-
-            List<string> values = [];
-            for (int i = 0; i < clip.ItemCount; i++)
+            graph.Fragment<HomeFragment>(Routes.Home, builder =>
             {
-                var value = clip.GetItemAt(0)?.CoerceToText(this);
-                if (value is not null)
-                    values.Add(value);
-            }
+                builder.Label = GetString(Resource.String.app_name);
+            });
 
-            if (values.Count == 0)
-                return;
-
-            Intent intent = new(this, typeof(SendActivity));
-            intent.SetAction(Intent.ActionSendMultiple);
-            intent.PutStringArrayListExtra(Intent.ExtraText, values);
-            StartActivity(intent);
-        }
-        catch (Exception ex)
-        {
-            this.ShowErrorDialog(ex);
-        }
-    }
-
-    private void SendText_Click(object? sender, EventArgs e)
-    {
-        try
-        {
-            TextInputEditText editText = new(this)
+            graph.Fragment<Receive.ReceiveFragment>(Routes.Receive, builder =>
             {
-                LayoutParameters = new(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.MatchParent)
-            };
-            new MaterialAlertDialogBuilder(this)
-                .SetTitle(Resource.String.share_text)!
-                .SetView(editText)!
-                .SetPositiveButton(Resource.String.generic_send, (s, e) =>
-                {
-                    Intent intent = new(this, typeof(SendActivity));
-                    intent.SetAction(Intent.ActionSend);
-                    intent.PutExtra(Intent.ExtraText, editText.Text);
-                    StartActivity(intent);
-                })
-                .SetNegativeButton(Resource.String.generic_cancel, (s, e) => { })
-                .Show();
-        }
-        catch (Exception ex)
-        {
-            this.ShowErrorDialog(ex);
-        }
+                builder.Label = GetString(Resource.String.generic_receive);
+            });
+            graph.Fragment<Receive.ReceiveSetupFragment>(Routes.ReceiveSetup, builder =>
+            {
+                builder.Label = GetString(Resource.String.app_titlebar_title_receive_setup);
+            });
+
+            graph.Fragment<Settings.SettingsHomepageFragment>(Routes.Settings, builder =>
+            {
+                builder.Label = GetString(Resource.String.generic_settings);
+            });
+            graph.Fragment<Settings.AppearanceFragment>(Routes.SettingsAppearance, builder =>
+            {
+                builder.Label = GetString(Resource.String.preference_appearance_title);
+            });
+            graph.Fragment<Settings.CdpFragment>(Routes.SettingsCdp, builder =>
+            {
+                builder.Label = GetString(Resource.String.preference_cdp_title);
+            });
+        });
+        NavigationUI.SetupActionBarWithNavController(this, NavController);
+        NavigationUI.SetupWithNavController(FindViewById<BottomNavigationView>(Resource.Id.bottom_navigation)!, NavController);
     }
 
+    public override bool OnSupportNavigateUp() => NavController.NavigateUp() || base.OnSupportNavigateUp();
+
+    public const int FilePickCode = 0x1;
     protected override void OnActivityResult(int requestCode, [GeneratedEnum] Result resultCode, Intent? data)
     {
         if (resultCode != Result.Ok || data == null)
@@ -160,38 +99,6 @@ public sealed class MainActivity : AppCompatActivity
                 return;
 
             StartActivity(intent);
-        }
-    }
-
-    public override bool OnCreateOptionsMenu(IMenu? menu)
-        => UIHelper.OnCreateOptionsMenu(this, menu);
-
-    public override bool OnOptionsItemSelected(IMenuItem item)
-        => UIHelper.OnOptionsItemSelected(this, item);
-
-    private async void EnableBluetooth()
-    {
-        try
-        {
-            if (OperatingSystem.IsAndroidVersionAtLeast(31) && await _requestPermissionsLauncher.RequestAsync() is PermissionResult.Denied)
-            {
-                if (!this.IsAtLeastStarted)
-                    return;
-
-                this.ShowErrorDialog(new SecurityException("Bluetooth permission denied"));
-                return;
-            }
-
-            StartActivityForResult(new Intent(BluetoothAdapter.ActionRequestEnable), 0);
-        }
-        catch (Exception ex)
-        {
-            SentrySdk.CaptureException(ex);
-
-            if (!this.IsAtLeastStarted)
-                return;
-
-            this.ShowErrorDialog(ex);
         }
     }
 }

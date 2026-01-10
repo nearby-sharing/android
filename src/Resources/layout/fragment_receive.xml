@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<androidx.core.widget.NestedScrollView
+	xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+    android:clipToPadding="false">
+
+	<LinearLayout
+		android:orientation="vertical"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:padding="10dp">
+
+		<TextView
+			android:id="@+id/deviceInfoTextView"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text="@string/visible_as_template"
+			android:paddingBottom="10dp" />
+
+		<Button
+			style="@style/Widget.Material3.Button.TonalButton"
+			android:id="@+id/openFaqButton"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text="@string/open_faq_title"
+			app:icon="@drawable/ic_fluent_question_circle_24_regular" />
+
+		<TextView
+			style="@style/TextAppearance.AppCompat.Title"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="10dp"
+			android:layout_marginBottom="13dp"
+			android:text="@string/generic_notifications" />
+
+		<androidx.recyclerview.widget.RecyclerView
+			android:id="@+id/notificationsRecyclerView"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:clipToPadding="false" />
+
+	</LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

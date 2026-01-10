@@ -9,16 +9,16 @@ using Activity = Android.App.Activity;
 
 namespace NearShare.Utils;
 
-public sealed class RequestPermissionsLauncher<TActivity> where TActivity : Activity, IActivityResultCaller
+public sealed class RequestPermissionsLauncher
 {
     readonly Activity _activity;
     readonly ActivityResultLauncher _launcher;
     readonly ResultCallback _callback;
     readonly string[] _permissions;
-    public RequestPermissionsLauncher(TActivity activity, IReadOnlyList<string> permissions)
+    public RequestPermissionsLauncher(IActivityResultCaller resultCaller, Activity activity, IReadOnlyList<string> permissions)
     {
         _activity = activity;
-        _launcher = activity.RegisterForActivityResult(
+        _launcher = resultCaller.RegisterForActivityResult(
            new ActivityResultContracts.RequestMultiplePermissions(),
            _callback = new()
         );

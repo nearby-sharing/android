@@ -1,14 +1,16 @@
 ﻿using Android.Bluetooth;
 using Android.Content;
-using Android.Content.PM;
 using Android.Views;
-using AndroidX.AppCompat.App;
+using AndroidX.Fragment.App;
+using AndroidX.Navigation;
 using AndroidX.RecyclerView.Widget;
 using Google.Android.Material.Dialog;
 using Google.Android.Material.ProgressIndicator;
 using Microsoft.Extensions.Logging;
 using NearShare.Utils;
+using ShortDev.Android.Lifecycle;
 using ShortDev.Android.UI;
+using ShortDev.Android.Views;
 using ShortDev.Microsoft.ConnectedDevices;
 using ShortDev.Microsoft.ConnectedDevices.NearShare;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
@@ -19,40 +21,40 @@ using System.Net.NetworkInformation;
 using System.Runtime.CompilerServices;
 using SystemDebug = System.Diagnostics.Debug;
 
-namespace NearShare;
+namespace NearShare.Receive;
 
-[Activity(Label = "@string/app_name", Theme = "@style/AppTheme", ConfigurationChanges = UIHelper.ConfigChangesFlags, LaunchMode = LaunchMode.SingleTask)]
-public sealed class ReceiveActivity : AppCompatActivity
+public sealed class ReceiveFragment : Fragment
 {
-    RecyclerView notificationsRecyclerView = null!;
+    readonly SynchronizationContext _syncContext = SynchronizationContext.Current ?? throw new InvalidOperationException("No synchronization context");
     readonly ObservableCollection<TransferToken> _notifications = [];
 
     PhysicalAddress? btAddress = null;
 
-    RequestPermissionsLauncher<ReceiveActivity> _requestPermissionsLauncher = null!;
-    IntentResultListener<ReceiveActivity> _intentResultListener = null!;
+    RequestPermissionsLauncher _requestPermissionsLauncher = null!;
+    IntentResultListener _intentResultListener = null!;
 
-    ILogger<ReceiveActivity> _logger = null!;
+    public override View? OnCreateView(LayoutInflater inflater, ViewGroup? container, Bundle? savedInstanceState)
+        => inflater.Inflate(Resource.Layout.fragment_receive, container, false);
+
+    ILogger<ReceiveFragment> _logger = null!;
     ILoggerFactory _loggerFactory = null!;
-    protected override void OnCreate(Bundle? savedInstanceState)
+    ViewBindings _viewBindings = null!;
+    public override void OnViewCreated(View view, Bundle? savedInstanceState)
     {
-        base.OnCreate(savedInstanceState);
+        _viewBindings = new(view);
 
-        if (ReceiveSetupActivity.IsSetupRequired(this) || !ReceiveSetupActivity.TryGetBtAddress(this, out btAddress))
+        var ctx = RequireContext();
+        if (ReceiveSetupFragment.IsSetupRequired(ctx) || !ReceiveSetupFragment.TryGetBtAddress(ctx, out btAddress))
         {
-            StartActivity(new Intent(this, typeof(ReceiveSetupActivity)));
-
-            Finish();
+            this.NavController.Navigate(Routes.ReceiveSetup, NavOptions.Create(builder =>
+            {
+                builder.InvokePopUpTo(Routes.Receive, options => options.Inclusive = true);
+            }));
             return;
         }
 
-        SetContentView(Resource.Layout.activity_receive);
-
-        UIHelper.SetupToolBar(this, GetString(Resource.String.generic_receive));
-
-        notificationsRecyclerView = FindViewById<RecyclerView>(Resource.Id.notificationsRecyclerView)!;
-        notificationsRecyclerView.SetLayoutManager(new LinearLayoutManager(this));
-        notificationsRecyclerView.SetAdapter(
+        _viewBindings.NotificationsRecyclerView.SetLayoutManager(new LinearLayoutManager(ctx));
+        _viewBindings.NotificationsRecyclerView.SetAdapter(
             _notifications.CreateAdapter(
                 Resource.Layout.item_transfer_notification,
                 view => new TransferNotificationViewHolder(view)
@@ -63,13 +65,15 @@ public sealed class ReceiveActivity : AppCompatActivity
             )
         );
 
-        FindViewById<Button>(Resource.Id.openFAQButton)!.Click += (s, e) => UIHelper.OpenFAQ(this);
+        _viewBindings.OpenFaqButton.Click += (s, e) => UIHelper.OpenFAQ(ctx);
 
-        _loggerFactory = CdpUtils.CreateLoggerFactory(this);
-        _logger = _loggerFactory.CreateLogger<ReceiveActivity>();
+        _loggerFactory = CdpUtils.CreateLoggerFactory(ctx);
+        _logger = _loggerFactory.CreateLogger<ReceiveFragment>();
 
-        _requestPermissionsLauncher = new(this, UIHelper.ReceivePermissions);
+        _requestPermissionsLauncher = new(this, RequireActivity(), UIHelper.ReceivePermissions);
         _intentResultListener = new(this);
+
+        InitializePlatformAsync();
     }
 
     sealed class TransferNotificationViewHolder : ViewHolder<TransferToken>
@@ -239,20 +243,14 @@ public sealed class ReceiveActivity : AppCompatActivity
         }
     }
 
-    protected override void OnStart()
-    {
-        base.OnStart();
-        InitializePlatformAsync();
-    }
-
     async void InitializePlatformAsync()
     {
         if (await _requestPermissionsLauncher.RequestAsync() is PermissionResult.Denied(var denied))
         {
-            if (!this.IsAtLeastStarted)
+            if (!Lifecycle.IsAtLeastStarted)
                 return;
 
-            this.ShowErrorDialog(new UnauthorizedAccessException($"Required permissions were not granted:{Environment.NewLine}{string.Join(Environment.NewLine, denied)}"));
+            RequireContext().ShowErrorDialog(new UnauthorizedAccessException($"Required permissions were not granted:{Environment.NewLine}{string.Join(Environment.NewLine, denied)}"));
             return;
         }
 
@@ -260,7 +258,7 @@ public sealed class ReceiveActivity : AppCompatActivity
         {
             await _intentResultListener.LaunchAsync(new Intent(BluetoothAdapter.ActionRequestEnable));
 
-            if (!this.IsAtLeastStarted)
+            if (!Lifecycle.IsAtLeastStarted)
                 return;
 
             await Task.Run(InitializePlatform);
@@ -272,7 +270,7 @@ public sealed class ReceiveActivity : AppCompatActivity
             if (!this.IsAtLeastStarted)
                 return;
 
-            this.ShowErrorDialog(ex);
+            Context?.ShowErrorDialog(ex);
         }
     }
 
@@ -286,12 +284,14 @@ public sealed class ReceiveActivity : AppCompatActivity
         if (_cdp is not null)
             return;
 
+        var ctx = RequireContext();
+
         _cancellationTokenSource?.Dispose();
         _cancellationTokenSource = new();
 
         SystemDebug.Assert(_cdp == null);
 
-        _cdp = CdpUtils.Create(this, _loggerFactory);
+        _cdp = CdpUtils.Create(ctx, _loggerFactory);
 
         _cdp.Listen(_cancellationTokenSource.Token);
         _cdp.Advertise(_cancellationTokenSource.Token);
@@ -300,28 +300,32 @@ public sealed class ReceiveActivity : AppCompatActivity
         NearShareReceiver.ReceivedUri += OnTransfer;
         NearShareReceiver.FileTransfer += OnTransfer;
 
-        FindViewById<TextView>(Resource.Id.deviceInfoTextView)!.Text = this.Localize(
+        _viewBindings.DeviceInfoTextView.Text = ctx.Localize(
             Resource.String.visible_as_template,
             _cdp.DeviceInfo.Name
         );
     }
 
-    public override bool OnCreateOptionsMenu(IMenu? menu)
-        => UIHelper.OnCreateOptionsMenu(this, menu);
-
-    public override bool OnOptionsItemSelected(IMenuItem item)
-        => UIHelper.OnOptionsItemSelected(this, item);
-
-    public override void Finish()
-    {
-        _cancellationTokenSource?.Cancel();
-        _cdp?.Dispose();
-        NearShareReceiver.Unregister();
-        base.Finish();
-    }
+    // ToDo: Fix cancellation on finish
+    //public override void Finish()
+    //{
+    //    _cancellationTokenSource?.Cancel();
+    //    _cdp?.Dispose();
+    //    NearShareReceiver.Unregister();
+    //    base.Finish();
+    //}
 
     void OnTransfer(TransferToken transfer)
         => RunOnUiThread(() => _notifications.Add(transfer));
+
+    void RunOnUiThread(Action action) => _syncContext.Post(static action => ((Action)action!)(), action);
+
+    sealed class ViewBindings(View view)
+    {
+        public TextView DeviceInfoTextView { get; } = view.FindRequiredViewById<TextView>(Resource.Id.deviceInfoTextView);
+        public Button OpenFaqButton { get; } = view.FindRequiredViewById<Button>(Resource.Id.openFaqButton);
+        public RecyclerView NotificationsRecyclerView { get; } = view.FindRequiredViewById<RecyclerView>(Resource.Id.notificationsRecyclerView);
+    }
 }
 
 static class Extensions
