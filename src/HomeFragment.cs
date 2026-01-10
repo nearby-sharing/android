@@ -1,13 +1,13 @@
 ﻿using Android.Bluetooth;
 using Android.Content;
+using Android.OS;
 using Android.Views;
-using AndroidX.Fragment.App;
 using Google.Android.Material.Card;
 using Google.Android.Material.Dialog;
 using Google.Android.Material.TextField;
 using NearShare.Utils;
-using ShortDev.Android.Views;
 using ShortDev.Android.Lifecycle;
+using ShortDev.Android.Views;
 using System.Security;
 
 namespace NearShare;
@@ -49,15 +49,56 @@ internal sealed class HomeFragment : Fragment
     }
 
     #region Transfer Setup
-    private void SendButton_Click(object? sender, EventArgs e)
+    private async void SendButton_Click(object? sender, EventArgs e)
     {
-        StartActivityForResult(
-            new Intent(Intent.ActionOpenDocument)
-                .SetType("*/*")
-                .AddCategory(Intent.CategoryOpenable)
-                .PutExtra(Intent.ExtraAllowMultiple, true),
-            MainActivity.FilePickCode
-        );
+        var ctx = RequireContext();
+
+        Intent? result;
+        try
+        {
+            result = await DelegateActivity.Launch(
+                ctx,
+                new Intent(Intent.ActionOpenDocument)
+                    .SetType("*/*")
+                    .AddCategory(Intent.CategoryOpenable)
+                    .PutExtra(Intent.ExtraAllowMultiple, true)
+            );
+        }
+        catch
+        {
+            return;
+        }
+        if (result is null)
+            return;
+
+        await Lifecycle.WaitUntilResumed();
+
+        Intent intent = new(ctx, typeof(SendActivity));
+        if (result is { Data: { } data })
+        {
+            intent.SetAction(Intent.ActionSend);
+            intent.PutExtra(Intent.ExtraStream, data);
+        }
+        else if (result is { ClipData: { } clipData })
+        {
+            intent.SetAction(Intent.ActionSendMultiple);
+
+            List<IParcelable> uriList = [];
+            for (int i = 0; i < clipData.ItemCount; i++)
+            {
+                var item = clipData.GetItemAt(i);
+                if (item?.Uri == null)
+                    continue;
+
+                uriList.Add(item.Uri);
+            }
+
+            intent.PutParcelableArrayListExtra(Intent.ExtraStream, uriList);
+        }
+        else
+            return;
+
+        StartActivity(intent);
     }
 
     private void SendClipBoard_Click(object? sender, EventArgs e)
@@ -138,7 +179,7 @@ internal sealed class HomeFragment : Fragment
                 return;
             }
 
-            StartActivityForResult(new Intent(BluetoothAdapter.ActionRequestEnable), 0);
+            StartActivity(new Intent(BluetoothAdapter.ActionRequestEnable));
         }
         catch (Exception ex)
         {

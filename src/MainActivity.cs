@@ -1,6 +1,4 @@
 ﻿using Android.Content;
-using Android.OS;
-using Android.Runtime;
 using Android.Service.QuickSettings;
 using AndroidX.AppCompat.App;
 using AndroidX.Core.View;
@@ -59,43 +57,4 @@ public sealed class MainActivity : AppCompatActivity
     }
 
     public override bool OnSupportNavigateUp() => NavController.NavigateUp() || base.OnSupportNavigateUp();
-
-    public const int FilePickCode = 0x1;
-    protected override void OnActivityResult(int requestCode, [GeneratedEnum] Result resultCode, Intent? data)
-    {
-        if (resultCode != Result.Ok || data == null)
-            return;
-
-        if (requestCode == FilePickCode)
-        {
-            Intent intent = new(this, typeof(SendActivity));
-
-            var clipData = data.ClipData;
-            if (data.Data != null)
-            {
-                intent.SetAction(Intent.ActionSend);
-                intent.PutExtra(Intent.ExtraStream, data.Data);
-            }
-            else if (clipData != null)
-            {
-                intent.SetAction(Intent.ActionSendMultiple);
-
-                List<IParcelable> uriList = [];
-                for (int i = 0; i < clipData.ItemCount; i++)
-                {
-                    var item = clipData.GetItemAt(i);
-                    if (item?.Uri == null)
-                        continue;
-
-                    uriList.Add(item.Uri);
-                }
-
-                intent.PutParcelableArrayListExtra(Intent.ExtraStream, uriList);
-            }
-            else
-                return;
-
-            StartActivity(intent);
-        }
-    }
 }

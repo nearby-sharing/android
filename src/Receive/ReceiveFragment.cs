@@ -1,7 +1,6 @@
 ﻿using Android.Bluetooth;
 using Android.Content;
 using Android.Views;
-using AndroidX.Fragment.App;
 using AndroidX.Navigation;
 using AndroidX.RecyclerView.Widget;
 using Google.Android.Material.Dialog;
