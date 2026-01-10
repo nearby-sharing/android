@@ -5,13 +5,13 @@ using AndroidX.Activity.Result.Contract;
 
 namespace NearShare.Utils;
 
-public sealed class IntentResultListener<TActivity> where TActivity : Activity, IActivityResultCaller
+public sealed class IntentResultListener
 {
     readonly ResultCallback _callback;
     readonly ActivityResultLauncher _launcher;
-    public IntentResultListener(TActivity activity)
+    public IntentResultListener(IActivityResultCaller resultCaller)
     {
-        _launcher = activity.RegisterForActivityResult(
+        _launcher = resultCaller.RegisterForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             _callback = new()
         );
