@@ -1,6 +1,4 @@
-﻿using Android.Content;
-using AndroidX.Preference;
-using NearShare.Receive;
+﻿using AndroidX.Preference;
 using NearShare.Utils;
 
 namespace NearShare.Settings;
@@ -19,7 +17,7 @@ internal sealed class CdpFragment : SettingsFragment
         ((EditTextPreference)PreferenceScreen!.FindPreference("device_name")!).DialogLayoutResource = Resource.Layout.settingslib_preference_dialog_edittext;
 
         PreferenceScreen!.FindPreference("goto_mac_address")!.PreferenceClick +=
-            (s, e) => StartActivity(new Intent(Activity!, typeof(ReceiveSetupFragment)));
+            (s, e) => this.NavController.Navigate(Routes.ReceiveSetup);
         PreferenceScreen!.FindPreference("open_setup")!.PreferenceClick +=
             (s, e) => UIHelper.OpenSetup(Activity!);
     }
