@@ -25,9 +25,6 @@ public sealed class MainActivity : AppCompatActivity
         SetContentView(Resource.Layout.activity_main);
         SetSupportActionBar(FindViewById<AndroidX.AppCompat.Widget.Toolbar>(Resource.Id.toolbar));
 
-        if (savedInstanceState is not null)
-            return;
-
         NavController.Graph = NavController.CreateGraph(id: 42, startDestination: Routes.Home, graph =>
         {
             graph.Fragment<HomeFragment>(Routes.Home, builder =>
