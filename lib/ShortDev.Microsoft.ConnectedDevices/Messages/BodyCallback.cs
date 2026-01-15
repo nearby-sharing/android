@@ -1,3 +1,5 @@
-﻿namespace ShortDev.Microsoft.ConnectedDevices.Messages;
+﻿using ShortDev.IO.ValueStream;
 
-public delegate void BodyCallback(EndianWriter writer);
+namespace ShortDev.Microsoft.ConnectedDevices.Messages;
+
+public delegate void BodyCallback(ref EndianWriter<HeapOutputStream> writer);

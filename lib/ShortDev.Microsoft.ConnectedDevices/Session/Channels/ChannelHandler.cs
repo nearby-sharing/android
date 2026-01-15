@@ -11,7 +11,7 @@ internal abstract class ChannelHandler(CdpSession session) : IDisposable
 
     public CdpSession Session { get; } = session;
 
-    public void HandleControl(CdpSocket socket, CommonHeader header, ref EndianReader reader)
+    public void HandleControl(CdpSocket socket, CommonHeader header, ref HeapEndianReader reader)
     {
         var controlHeader = ControlHeader.Parse(ref reader);
         _logger.ReceivedControlMessage(
@@ -23,7 +23,7 @@ internal abstract class ChannelHandler(CdpSession session) : IDisposable
         HandleMessageInternal(socket, header, controlHeader, ref reader);
     }
 
-    protected abstract void HandleMessageInternal(CdpSocket socket, CommonHeader header, ControlHeader controlHeader, ref EndianReader reader);
+    protected abstract void HandleMessageInternal(CdpSocket socket, CommonHeader header, ControlHeader controlHeader, ref HeapEndianReader reader);
 
     #region Registry
     protected readonly AutoKeyRegistry<ulong, CdpChannel> _channelRegistry = [];

@@ -29,8 +29,8 @@ internal abstract class UpgradeHandler(CdpSession session, EndpointInfo initialE
     public bool IsUpgradeSupported
         => (/* ToDo: header131Value & */ _session.ClientCapabilities & _session.HostCapabilities & PeerCapabilities.UpgradeSupport) != 0;
 
-    public bool TryHandleConnect(CdpSocket socket, ConnectionHeader connectionHeader, ref EndianReader reader)
+    public bool TryHandleConnect(CdpSocket socket, ConnectionHeader connectionHeader, ref HeapEndianReader reader)
         => TryHandleConnectInternal(socket, connectionHeader, ref reader);
 
-    protected abstract bool TryHandleConnectInternal(CdpSocket socket, ConnectionHeader connectionHeader, ref EndianReader reader);
+    protected abstract bool TryHandleConnectInternal(CdpSocket socket, ConnectionHeader connectionHeader, ref HeapEndianReader reader);
 }

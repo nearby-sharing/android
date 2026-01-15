@@ -19,15 +19,15 @@ public sealed class CdpEncryptionInfo
             EncryptionParams = encryptionParams
         };
 
-    public static CdpEncryptionInfo FromRemote(byte[] publicX, byte[] publicY, CdpNonce nonce, CdpEncryptionParams encryptionParams)
+    public static CdpEncryptionInfo FromRemote(ReadOnlyMemory<byte> publicX, ReadOnlyMemory<byte> publicY, CdpNonce nonce, CdpEncryptionParams encryptionParams)
     {
         var diffieHellman = ECDiffieHellman.Create(new ECParameters()
         {
             Curve = encryptionParams.Curve,
             Q = new ECPoint()
             {
-                X = publicX,
-                Y = publicY
+                X = publicX.ToArray(),
+                Y = publicY.ToArray()
             }
         });
         return new()

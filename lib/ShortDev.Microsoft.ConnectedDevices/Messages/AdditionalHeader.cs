@@ -10,7 +10,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Messages;
 /// </summary>
 /// <param name="Type"></param>
 /// <param name="Value"></param>
-public record AdditionalHeader(AdditionalHeaderType Type, ReadOnlyMemory<byte> Value)
+public readonly record struct AdditionalHeader(AdditionalHeaderType Type, ReadOnlyMemory<byte> Value)
 {
     public static AdditionalHeader CreateCorrelationHeader()
         => FromCorrelationVector(new CorrelationVectorV1());

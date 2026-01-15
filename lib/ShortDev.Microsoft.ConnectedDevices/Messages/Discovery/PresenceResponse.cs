@@ -1,9 +1,10 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Messages.Connection;
+using System.Diagnostics;
 using System.Security.Cryptography;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages.Discovery;
 
-public class PresenceResponse : ICdpPayload<PresenceResponse>
+public readonly record struct PresenceResponse : IBinaryWritable, IBinaryParsable<PresenceResponse>
 {
     public required ConnectionMode ConnectionMode { get; init; }
 
@@ -13,25 +14,25 @@ public class PresenceResponse : ICdpPayload<PresenceResponse>
 
     public required int DeviceIdSalt { get; init; }
 
-    public required byte[] DeviceIdHash { get; init; }
+    public required DeviceIdHash DeviceIdHash { get; init; }
 
-    public static PresenceResponse Parse(ref EndianReader reader)
+    public static PresenceResponse Parse<TReader>(ref TReader reader) where TReader : struct, IEndianReader, allows ref struct
         => new()
         {
             ConnectionMode = (ConnectionMode)reader.ReadInt16(),
             DeviceType = (DeviceType)reader.ReadInt16(),
             DeviceName = reader.ReadStringWithLength(),
             DeviceIdSalt = reader.ReadInt32(),
-            DeviceIdHash = reader.ReadBytes(32).ToArray()
+            DeviceIdHash = reader.Read<DeviceIdHash>()
         };
 
-    public void Write(EndianWriter writer)
+    public void Write<TWriter>(ref TWriter writer) where TWriter : struct, IEndianWriter, allows ref struct
     {
         writer.Write((short)ConnectionMode);
         writer.Write((short)DeviceType);
         writer.WriteWithLength(DeviceName);
         writer.Write((int)DeviceIdSalt);
-        writer.Write(DeviceIdHash);
+        writer.Write<DeviceIdHash>(DeviceIdHash);
     }
 
     static readonly HashAlgorithm _hashAlgorithm = SHA256.Create();
@@ -39,15 +40,16 @@ public class PresenceResponse : ICdpPayload<PresenceResponse>
     {
         var salt = RandomNumberGenerator.GetInt32(int.MaxValue);
 
-        using MemoryStream stream = new();
-        EndianWriter writer = new(Endianness.LittleEndian);
+        using var writer = EndianWriter.Create(Endianness.LittleEndian, ConnectedDevicesPlatform.MemoryPool);
 
         // ToDo: Wrong
         writer.Write(salt);
         writer.Write(deviceInfo.GetDeduplicationHint());
 
-        writer.CopyTo(stream);
-        var hash = _hashAlgorithm.ComputeHash(stream);
+        Debug.Assert(_hashAlgorithm.HashSize / 8 == 32);
+
+        DeviceIdHash hash = default;
+        _hashAlgorithm.TryComputeHash(writer.Stream.WrittenSpan, hash, out _);
 
         return new()
         {

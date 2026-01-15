@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ShortDev.Microsoft.ConnectedDevices.Messages;
+﻿namespace ShortDev.Microsoft.ConnectedDevices.Messages;
 
 [Flags]
 public enum PeerCapabilities : ulong

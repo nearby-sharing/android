@@ -2,12 +2,12 @@
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages.Control;
 
-public sealed class StartChannelResponse : ICdpPayload<StartChannelResponse>
+public readonly record struct StartChannelResponse : IBinaryWritable, IBinaryParsable<StartChannelResponse>
 {
-    public static StartChannelResponse Parse(ref EndianReader reader)
+    public static StartChannelResponse Parse<TReader>(ref TReader reader) where TReader : struct, IEndianReader, allows ref struct
        => new()
        {
-           Result = (ChannelResult)reader.ReadByte(),
+           Result = (ChannelResult)reader.ReadUInt8(),
            ChannelId = reader.ReadUInt64()
        };
 
@@ -20,7 +20,7 @@ public sealed class StartChannelResponse : ICdpPayload<StartChannelResponse>
             throw new CdpProtocolException($"Could not create channel. {Result}");
     }
 
-    public void Write(EndianWriter writer)
+    public void Write<TWriter>(ref TWriter writer) where TWriter : struct, IEndianWriter, allows ref struct
     {
         writer.Write((byte)Result);
         writer.Write(ChannelId);
