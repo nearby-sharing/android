@@ -3,6 +3,7 @@ using Android.Content;
 using Android.OS;
 using Microsoft.Extensions.Logging;
 using NearShare.Handlers;
+using NearShare.Receive;
 using NearShare.Settings;
 using ShortDev.Microsoft.ConnectedDevices;
 using ShortDev.Microsoft.ConnectedDevices.Encryption;
@@ -36,7 +37,7 @@ internal static class CdpUtils
         var btService = (BluetoothManager)context.GetSystemService(Context.BluetoothService)!;
         var btAdapter = btService.Adapter ?? throw new NullReferenceException("Could not get bt adapter");
 
-        if (!ReceiveSetupActivity.TryGetBtAddress(context, out var btAddress))
+        if (!ReceiveSetupFragment.TryGetBtAddress(context, out var btAddress))
             btAddress = PhysicalAddress.None;
 
         LocalDeviceInfo deviceInfo = new()

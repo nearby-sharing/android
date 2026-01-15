@@ -6,6 +6,7 @@ using BLeScanResult = Android.Bluetooth.LE.ScanResult;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
 using System.Net.NetworkInformation;
 using ShortDev.Microsoft.ConnectedDevices.Transports.Bluetooth;
+using NearShare.Receive;
 
 namespace NearShare.Handlers;
 

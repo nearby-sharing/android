@@ -9,8 +9,6 @@ using AndroidX.AppCompat.App;
 using AndroidX.Browser.CustomTabs;
 using AndroidX.Core.App;
 using Google.Android.Material.Dialog;
-using NearShare.Settings;
-using System.Runtime.Versioning;
 using AlertDialog = AndroidX.AppCompat.App.AlertDialog;
 using CompatToolbar = AndroidX.AppCompat.Widget.Toolbar;
 
@@ -20,43 +18,26 @@ internal static class UIHelper
 {
     public const ConfigChanges ConfigChangesFlags = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.Density;
 
-    public static bool OnCreateOptionsMenu(Activity activity, IMenu? menu)
-    {
-        activity.MenuInflater.Inflate(Resource.Menu.menu_main, menu);
-        return true;
-    }
+    public static void OpenFAQ(Context ctx)
+        => DisplayWebSite(ctx, "https://nearshare.shortdev.de/faq");
 
-    public static bool OnOptionsItemSelected(Activity activity, IMenuItem item)
-    {
-        switch (item.ItemId)
-        {
-            case Resource.Id.action_settings:
-                activity.StartActivity(new Intent(activity, typeof(SettingsActivity)));
-                return true;
-        }
-        return false;
-    }
+    public static void OpenCrowdIn(Context ctx)
+        => DisplayWebSite(ctx, "https://translate.nearshare.shortdev.de/");
 
-    public static void OpenFAQ(Activity activity)
-        => DisplayWebSite(activity, "https://nearshare.shortdev.de/faq");
+    public static void OpenSponsor(Context ctx)
+        => DisplayWebSite(ctx, "https://nearshare.shortdev.de/sponsor");
 
-    public static void OpenCrowdIn(Activity activity)
-        => DisplayWebSite(activity, "https://translate.nearshare.shortdev.de/");
+    public static void OpenDiscord(Context ctx)
+        => DisplayWebSite(ctx, "https://nearshare.shortdev.de/community");
 
-    public static void OpenSponsor(Activity activity)
-        => DisplayWebSite(activity, "https://nearshare.shortdev.de/sponsor");
+    public static void OpenSetup(Context ctx)
+        => DisplayWebSite(ctx, "https://nearshare.shortdev.de/setup");
 
-    public static void OpenDiscord(Activity activity)
-        => DisplayWebSite(activity, "https://nearshare.shortdev.de/community");
+    public static void OpenCredits(Context ctx)
+        => DisplayWebSite(ctx, "https://nearshare.shortdev.de/CREDITS");
 
-    public static void OpenSetup(Activity activity)
-        => DisplayWebSite(activity, "https://nearshare.shortdev.de/setup");
-
-    public static void OpenCredits(Activity activity)
-        => DisplayWebSite(activity, "https://nearshare.shortdev.de/CREDITS");
-
-    public static void OpenGitHub(Activity activity)
-        => DisplayWebSite(activity, "https://github.com/nearby-sharing/android/");
+    public static void OpenGitHub(Context ctx)
+        => DisplayWebSite(ctx, "https://github.com/nearby-sharing/android/");
 
     public static void DisplayWebSite(Context context, string url)
     {
@@ -140,14 +121,14 @@ internal static class UIHelper
         => ActivityCompat.RequestPermissions(activity, ReceivePermissions, 0);
     #endregion
 
-    public static ISpanned LoadHtmlAsset(Activity activity, string assetPath)
+    public static ISpanned LoadHtmlAsset(Context ctx, string assetPath)
     {
-        string langCode = activity.GetString(Resource.String.assets_prefix);
+        string langCode = ctx.GetString(Resource.String.assets_prefix);
         string fileName = $"{assetPath}.html";
-        if (!activity.Assets!.List($"{langCode}/")!.Contains(fileName))
+        if (!ctx.Assets!.List($"{langCode}/")!.Contains(fileName))
             langCode = "en";
 
-        using var stream = activity.Assets!.Open($"{langCode}/{fileName}");
+        using var stream = ctx.Assets!.Open($"{langCode}/{fileName}");
         using StreamReader reader = new(stream);
 
         ISpanned? result;
@@ -158,7 +139,7 @@ internal static class UIHelper
         return result ?? throw new NullReferenceException("\"Html.FromHtml\" returned \"null\"");
     }
 
-    public static string Localize(this Activity activity, int resId, params object[] args)
+    public static string Localize(this Context activity, int resId, params object[] args)
         => string.Format(activity.GetString(resId), args);
 
     public static void EnableLayoutTransition(this ViewGroup view, bool animateParentHierarchy = false)
