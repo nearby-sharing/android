@@ -28,7 +28,10 @@ public enum AdditionalHeaderType : byte
 
     // Extended Headers
 
-    Header129 = 0x81,
+    /// <summary>
+    /// <see cref="HostSettings"/>
+    /// </summary>
+    ChannelHostSettings = 0x81,
     /// <summary>
     /// <see cref="Messages.PeerCapabilities"/>
     /// </summary>

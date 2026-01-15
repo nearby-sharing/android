@@ -27,7 +27,7 @@ internal sealed class ClientConnectHandler(CdpSession session, ClientUpgradeHand
         {
             Type = MessageType.Connect,
             AdditionalHeaders = {
-                AdditionalHeader.FromUInt32(AdditionalHeaderType.Header129, 0x70_00_00_03),
+                AdditionalHeader.FromUInt32(AdditionalHeaderType.ChannelHostSettings, 0x70_00_00_03),
                 AdditionalHeader.FromUInt64(AdditionalHeaderType.PeerCapabilities, (ulong)PeerCapabilities.All),
                 AdditionalHeader.FromUInt64(AdditionalHeaderType.Header131, upgradeSupported ? 7u : 6u)
             }
