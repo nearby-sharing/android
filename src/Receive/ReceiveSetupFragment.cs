@@ -1,28 +1,29 @@
 ﻿using Android.Bluetooth;
 using Android.Content;
 using Android.Views;
-using AndroidX.AppCompat.App;
 using Google.Android.Material.TextField;
 using NearShare.Utils;
+using ShortDev.Android.Views;
 using ShortDev.Microsoft.ConnectedDevices;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.NetworkInformation;
 
-namespace NearShare;
+namespace NearShare.Receive;
 
-[Activity(Label = "@string/app_name", Theme = "@style/AppTheme", ConfigurationChanges = UIHelper.ConfigChangesFlags)]
-public sealed class ReceiveSetupActivity : AppCompatActivity
+public sealed class ReceiveSetupFragment : Fragment
 {
-    protected override void OnCreate(Bundle? savedInstanceState)
+    public override View? OnCreateView(LayoutInflater inflater, ViewGroup? container, Bundle? savedInstanceState)
+        => inflater.Inflate(Resource.Layout.fragment_receive_setup, container, false);
+
+    ViewBindings _viewBindings = null!;
+    public override void OnViewCreated(View view, Bundle? savedInstanceState)
     {
-        base.OnCreate(savedInstanceState);
+        _viewBindings = new(view);
 
-        SetContentView(Resource.Layout.activity_mac_address);
-        UIHelper.SetupToolBar(this, GetString(Resource.String.app_titlebar_title_receive_setup));
+        var ctx = RequireContext();
+        var preferences = GetPreferences(ctx);
 
-        var preferences = GetPreferences(this);
-
-        var service = (BluetoothManager)GetSystemService(BluetoothService)!;
+        var service = (BluetoothManager)ctx.GetSystemService(Context.BluetoothService)!;
         string? btAddress = null;
         try
         {
@@ -34,34 +35,31 @@ public sealed class ReceiveSetupActivity : AppCompatActivity
             btAddress = preferences.GetString(Preference_MacAddress, null);
         }
 
-        FindViewById<TextView>(Resource.Id.infoTextView)!.TextFormatted = UIHelper.LoadHtmlAsset(this, "MacAddressInfo");
-        FindViewById<Button>(Resource.Id.launchSettingsButton)!.Click += (s, e) => StartActivity(new Intent(Android.Provider.Settings.ActionDeviceInfoSettings));
+        _viewBindings.InfoTextView.TextFormatted = UIHelper.LoadHtmlAsset(ctx, "MacAddressInfo");
+        _viewBindings.LaunchSettingsButton.Click += (s, e) => StartActivity(new Intent(Android.Provider.Settings.ActionDeviceInfoSettings));
 
-        var inputLayout = FindViewById<TextInputLayout>(Resource.Id.btMacAddressTextInputLayout)!;
-        inputLayout.EditText!.Text = btAddress;
+        _viewBindings.InputLayout.EditText!.Text = btAddress;
 
-        FindViewById<Button>(Resource.Id.backButton)!.Click += (s, e) => OnBackPressedDispatcher.OnBackPressed();
-        FindViewById<Button>(Resource.Id.nextButton)!.Click += (s, e) =>
+        _viewBindings.SaveButton.Click += (s, e) =>
         {
-            var addressStr = inputLayout.EditText!.Text;
+            var addressStr = _viewBindings.InputLayout.EditText!.Text;
             if (
                 string.IsNullOrEmpty(addressStr) ||
                 !PhysicalAddress.TryParse(addressStr?.Replace(":", "").ToUpper(), out var address) ||
                 address == null
             )
             {
-                inputLayout.Error = "Invalid address!";
+                _viewBindings.InputLayout.Error = "Invalid address!";
             }
             else
             {
-                inputLayout.Error = null;
+                _viewBindings.InputLayout.Error = null;
 
                 preferences?.Edit()!
                     .PutString(Preference_MacAddress, address.ToStringFormatted())!
                     .Commit();
 
-                StartActivity(new Intent(this, typeof(ReceiveActivity)));
-                Finish();
+                this.NavController.NavigateUp();
             }
         };
     }
@@ -70,8 +68,7 @@ public sealed class ReceiveSetupActivity : AppCompatActivity
 
     static string? GetBtAddressInternal(BluetoothAdapter adapter)
     {
-        if (adapter == null)
-            throw new ArgumentNullException(nameof(adapter));
+        ArgumentNullException.ThrowIfNull(adapter);
 
         var mServiceField = adapter.Class.GetDeclaredFields().FirstOrDefault((x) => x.Name.Contains("service", StringComparison.OrdinalIgnoreCase)) ?? throw new MissingFieldException("No service field found!");
         mServiceField.Accessible = true;
@@ -108,9 +105,11 @@ public sealed class ReceiveSetupActivity : AppCompatActivity
         return PhysicalAddress.TryParse(addressStr.Replace(":", "").ToUpper(), out btAddress);
     }
 
-    public override bool OnCreateOptionsMenu(IMenu? menu)
-        => UIHelper.OnCreateOptionsMenu(this, menu);
-
-    public override bool OnOptionsItemSelected(IMenuItem item)
-        => UIHelper.OnOptionsItemSelected(this, item);
+    sealed class ViewBindings(View view)
+    {
+        public TextView InfoTextView { get; } = view.FindRequiredViewById<TextView>(Resource.Id.infoTextView);
+        public Button LaunchSettingsButton { get; } = view.FindRequiredViewById<Button>(Resource.Id.launchSettingsButton);
+        public TextInputLayout InputLayout { get; } = view.FindRequiredViewById<TextInputLayout>(Resource.Id.btMacAddressTextInputLayout);
+        public Button SaveButton { get; } = view.FindRequiredViewById<Button>(Resource.Id.saveButton);
+    }
 }
