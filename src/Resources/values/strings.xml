@@ -11,6 +11,7 @@
 	<string name="generic_back">Back</string>
 	<string name="generic_next">Next</string>
 	<string name="generic_cancel">Cancel</string>
+	<string name="generic_save">Save</string>
 
 	<string name="generic_send">Send</string>
 	<string name="generic_receive">Receive</string>

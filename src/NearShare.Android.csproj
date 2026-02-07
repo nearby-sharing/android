@@ -2,7 +2,7 @@
 	<PropertyGroup>
 		<TargetFramework>net10.0-android</TargetFramework>
 		<OutputType>Exe</OutputType>
-		<SupportedOSPlatformVersion>21</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion>23</SupportedOSPlatformVersion>
 		<ApplicationId>de.shortdev.nearby_sharing_windows</ApplicationId>
 		<ApplicationVersion>40</ApplicationVersion>
 		<ApplicationDisplayVersion>1.10.1</ApplicationDisplayVersion>
@@ -24,9 +24,11 @@
 		<PackageReference Include="ShortDev.Rive.Android" Version="10.1.0.0" />
 		<PackageReference Include="Sentry" Version="6.0.0" />
 		<PackageReference Include="Serilog.Extensions.Logging.File" Version="3.0.0" />
-		<PackageReference Include="ShortDev.Android" Version="0.5.0-beta" />
+		<PackageReference Include="ShortDev.Android" Version="0.6.0-beta" />
 		<PackageReference Include="ShortDev.Android.FluentIcons" Version="1.1.311" />
 		<PackageReference Include="Xamarin.AndroidX.Browser" Version="1.9.0" />
+		<PackageReference Include="Xamarin.AndroidX.Navigation.Fragment" Version="2.9.6" />
+		<PackageReference Include="Xamarin.AndroidX.Navigation.UI" Version="2.9.6" />
 		<PackageReference Include="Xamarin.Google.Android.Material" Version="1.13.0" />
 	</ItemGroup>
 	<ItemGroup Label="Project References">

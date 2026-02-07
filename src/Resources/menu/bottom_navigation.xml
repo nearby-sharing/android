@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+	<item
+		android:id="@+id/home"
+		android:enabled="true"
+		android:icon="@drawable/ic_fluent_send_copy_24_regular"
+		android:title="@string/generic_send"/>
+	<item
+		android:id="@+id/receive"
+		android:enabled="true"
+		android:icon="@drawable/ic_fluent_mail_inbox_24_regular"
+		android:title="@string/generic_receive"/>
+	<item
+		android:id="@+id/settings"
+		android:enabled="true"
+		android:icon="@drawable/ic_fluent_settings_24_regular"
+		android:title="@string/generic_settings"/>
+</menu>

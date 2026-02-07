@@ -12,6 +12,7 @@ using Google.Android.Material.SideSheet;
 using Microsoft.Extensions.Logging;
 using NearShare.Utils;
 using NearShare.ViewModels;
+using ShortDev.Android.Lifecycle;
 using ShortDev.Android.UI;
 using ShortDev.Microsoft.ConnectedDevices;
 using ShortDev.Microsoft.ConnectedDevices.NearShare;
@@ -34,8 +35,8 @@ public sealed partial class SendActivity : AppCompatActivity
     Button readyButton = null!;
     View _emptyDeviceListView = null!;
 
-    RequestPermissionsLauncher<SendActivity> _requestPermissionsLauncher = null!;
-    IntentResultListener<SendActivity> _intentResultListener = null!;
+    RequestPermissionsLauncher _requestPermissionsLauncher = null!;
+    IntentResultListener _intentResultListener = null!;
 
     ILogger<SendActivity> _logger = null!;
     ILoggerFactory _loggerFactory = null!;
@@ -76,7 +77,7 @@ public sealed partial class SendActivity : AppCompatActivity
         _loggerFactory = CdpUtils.CreateLoggerFactory(this);
         _logger = _loggerFactory.CreateLogger<SendActivity>();
 
-        _requestPermissionsLauncher = new(this, UIHelper.SendPermissions);
+        _requestPermissionsLauncher = new(this, this, UIHelper.SendPermissions);
         _intentResultListener = new(this);
     }
 

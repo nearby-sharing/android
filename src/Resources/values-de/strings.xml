@@ -8,6 +8,7 @@
 	<string name="generic_back">Zurück</string>
 	<string name="generic_next">Weiter</string>
 	<string name="generic_cancel">Abbruch</string>
+	<string name="generic_save">Speichern</string>
 	<string name="generic_send">Senden</string>
 	<string name="generic_receive">Empfangen</string>
 	<string name="generic_status_template">Status: {0}</string>
