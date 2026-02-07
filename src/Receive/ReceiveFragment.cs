@@ -302,14 +302,13 @@ public sealed class ReceiveFragment : Fragment
         );
     }
 
-    // ToDo: Fix cancellation on finish
-    //public override void Finish()
-    //{
-    //    _cancellationTokenSource?.Cancel();
-    //    _cdp?.Dispose();
-    //    NearShareReceiver.Unregister();
-    //    base.Finish();
-    //}
+    public override void OnDestroy()
+    {
+        _cancellationTokenSource?.Cancel();
+        _cdp?.Dispose();
+        NearShareReceiver.Unregister();
+        base.OnDestroy();
+    }
 
     void OnTransfer(TransferToken transfer)
         => RunOnUiThread(() => _notifications.Add(transfer));
