@@ -45,10 +45,7 @@ public sealed class ReceiveFragment : Fragment
         var ctx = RequireContext();
         if (ReceiveSetupFragment.IsSetupRequired(ctx) || !ReceiveSetupFragment.TryGetBtAddress(ctx, out btAddress))
         {
-            this.NavController.Navigate(Routes.ReceiveSetup, NavOptions.Create(builder =>
-            {
-                builder.InvokePopUpTo(Routes.Receive, options => options.Inclusive = true);
-            }));
+            this.NavController.Navigate(Routes.ReceiveSetup);
             return;
         }
 
