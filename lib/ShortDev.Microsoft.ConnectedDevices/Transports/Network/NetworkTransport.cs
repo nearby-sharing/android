@@ -107,7 +107,7 @@ public sealed class NetworkTransport(
             DiscoveryMessageReceived -= OnMessage;
         }
 
-        void OnMessage(IPAddress address, DiscoveryHeader header, EndianReader reader)
+        void OnMessage(IPAddress address, DiscoveryHeader header, ref HeapEndianReader reader)
         {
             if (header.Type != DiscoveryType.PresenceRequest)
                 return;
@@ -143,7 +143,7 @@ public sealed class NetworkTransport(
             }
         }
 
-        void OnMessage(IPAddress address, DiscoveryHeader header, EndianReader reader)
+        void OnMessage(IPAddress address, DiscoveryHeader header, ref HeapEndianReader reader)
         {
             if (header.Type != DiscoveryType.PresenceResponse)
                 return;
@@ -160,7 +160,7 @@ public sealed class NetworkTransport(
         }
     }
 
-    delegate void DiscoveryMessageReceivedHandler(IPAddress address, DiscoveryHeader header, EndianReader reader);
+    delegate void DiscoveryMessageReceivedHandler(IPAddress address, DiscoveryHeader header, ref HeapEndianReader reader);
     event DiscoveryMessageReceivedHandler? DiscoveryMessageReceived;
 
     bool _isListening;
@@ -194,12 +194,12 @@ public sealed class NetworkTransport(
 
         void HandleMsg(UdpReceiveResult result)
         {
-            EndianReader reader = new(Endianness.BigEndian, result.Buffer);
+            var reader = EndianReader.FromMemory(Endianness.BigEndian, result.Buffer);
             if (!CommonHeader.TryParse(ref reader, out var headers, out _) || headers.Type != MessageType.Discovery)
                 return;
 
             DiscoveryHeader discoveryHeaders = DiscoveryHeader.Parse(ref reader);
-            DiscoveryMessageReceived?.Invoke(result.RemoteEndPoint.Address, discoveryHeaders, reader);
+            DiscoveryMessageReceived?.Invoke(result.RemoteEndPoint.Address, discoveryHeaders, ref reader);
         }
     }
     #endregion
@@ -211,14 +211,21 @@ public sealed class NetworkTransport(
             Type = MessageType.Discovery,
         };
 
-        EndianWriter payloadWriter = new(Endianness.BigEndian);
-        new DiscoveryHeader()
+        var payloadWriter = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
+        try
         {
-            Type = DiscoveryType.PresenceRequest
-        }.Write(payloadWriter);
+            new DiscoveryHeader()
+            {
+                Type = DiscoveryType.PresenceRequest
+            }.Write(ref payloadWriter);
 
-        new UdpFragmentSender(_udpclient, new IPEndPoint(IPAddress.Broadcast, UdpPort))
-            .SendMessage(header, payloadWriter.Buffer.AsSpan());
+            new UdpFragmentSender(_udpclient, new IPEndPoint(IPAddress.Broadcast, UdpPort))
+                .SendMessage(header, payloadWriter.Stream.WrittenSpan);
+        }
+        finally
+        {
+            payloadWriter.Dispose();
+        }
     }
 
     void SendPresenceResponse(IPAddress device, PresenceResponse response)
@@ -228,15 +235,22 @@ public sealed class NetworkTransport(
             Type = MessageType.Discovery
         };
 
-        EndianWriter payloadWriter = new(Endianness.BigEndian);
-        new DiscoveryHeader()
+        var payloadWriter = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
+        try
         {
-            Type = DiscoveryType.PresenceResponse
-        }.Write(payloadWriter);
-        response.Write(payloadWriter);
+            new DiscoveryHeader()
+            {
+                Type = DiscoveryType.PresenceResponse
+            }.Write(ref payloadWriter);
+            response.Write(ref payloadWriter);
 
-        new UdpFragmentSender(_udpclient, new IPEndPoint(device, UdpPort))
-            .SendMessage(header, payloadWriter.Buffer.AsSpan());
+            new UdpFragmentSender(_udpclient, new IPEndPoint(device, UdpPort))
+                .SendMessage(header, payloadWriter.Stream.WrittenSpan);
+        }
+        finally
+        {
+            payloadWriter.Dispose();
+        }
     }
 
     sealed class UdpFragmentSender(UdpClient client, IPEndPoint receiver) : IFragmentSender

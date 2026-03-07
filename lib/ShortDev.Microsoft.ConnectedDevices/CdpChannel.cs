@@ -3,6 +3,7 @@ using ShortDev.Microsoft.ConnectedDevices.Messages.Control;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Session;
 using ShortDev.Microsoft.ConnectedDevices.Session.Channels;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
+using System.Buffers;
 
 namespace ShortDev.Microsoft.ConnectedDevices;
 
@@ -49,7 +50,7 @@ public sealed class CdpChannel : IDisposable
     /// </summary>
     public ulong ChannelId { get; }
 
-    public void SendBinaryMessage(BodyCallback bodyCallback, uint msgId, List<AdditionalHeader>? headers = null)
+    public void SendBinaryMessage(BodyCallback bodyCallback, uint msgId)
     {
         CommonHeader header = new()
         {
@@ -57,17 +58,22 @@ public sealed class CdpChannel : IDisposable
             ChannelId = ChannelId
         };
 
-        if (headers != null)
-            header.AdditionalHeaders = headers;
-
-        EndianWriter writer = new(Endianness.BigEndian);
-        new BinaryMsgHeader()
+        var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
+        try
         {
-            MessageId = msgId
-        }.Write(writer);
-        bodyCallback(writer);
+            new BinaryMsgHeader()
+            {
+                MessageId = msgId
+            }.Write(ref writer);
+            bodyCallback(ref writer);
 
-        Session.SendMessage(Socket, header, writer);
+            using SpeedMeassure speedMeassure = new((uint)writer.Stream.WrittenSpan.Length);
+            Session.SendMessage(Socket, header, writer.Stream.WrittenSpan);
+        }
+        finally
+        {
+            writer.Dispose();
+        }
     }
 
     void IDisposable.Dispose()
