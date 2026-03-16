@@ -64,7 +64,7 @@ public sealed class RequestPermissionsLauncher
         public void OnActivityResult(Java.Lang.Object? result)
         {
             if (result is not IMap map)
-                throw new InvalidOperationException("Expected result to be of type IMap");
+                throw new InvalidOperationException($"Expected result to be of type {nameof(IMap)}, instead got {result?.GetType().Name ?? "null"}");
 
             List<string> deniedPermissions = [];
             foreach (Java.Lang.Object? entryObj in map.EntrySet())
