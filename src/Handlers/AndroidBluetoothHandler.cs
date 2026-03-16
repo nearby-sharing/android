@@ -100,24 +100,31 @@ public sealed class AndroidBluetoothHandler(BluetoothAdapter adapter, PhysicalAd
         if (Adapter == null)
             throw new InvalidOperationException($"{nameof(Adapter)} is null");
 
-        using var listener = Adapter.ListenUsingInsecureRfcommWithServiceRecord(
-            options.ServiceName,
-            Java.Util.UUID.FromString(options.ServiceId)
+        var listener = Adapter.ListenUsingInsecureRfcommWithServiceRecord(
+           options.ServiceName,
+           Java.Util.UUID.FromString(options.ServiceId)
         )!;
 
-        cancellationToken.Register(() => listener.Close());
-
-        while (!cancellationToken.IsCancellationRequested)
+        try
         {
-            var socket = await listener.AcceptAsync();
-            if (cancellationToken.IsCancellationRequested)
-            {
-                socket?.Dispose();
-                return;
-            }
+            cancellationToken.Register(listener.Close);
 
-            if (socket != null)
-                options!.SocketConnected!(socket.ToCdp());
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                var socket = await listener.AcceptAsync();
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    socket?.Dispose();
+                    return;
+                }
+
+                if (socket != null)
+                    options!.SocketConnected!(socket.ToCdp());
+            }
+        }
+        finally
+        {
+            listener?.Close();
         }
     }
     #endregion
