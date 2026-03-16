@@ -10,6 +10,7 @@ using NearShare.Utils;
 namespace NearShare;
 
 [IntentFilter([TileService.ActionQsTilePreferences])]
+[IntentFilter([Intent.ActionApplicationPreferences])]
 [Activity(Label = "@string/app_name", Theme = "@style/AppTheme", MainLauncher = true, ConfigurationChanges = UIHelper.ConfigChangesFlags)]
 public sealed class MainActivity : AppCompatActivity
 {
@@ -54,6 +55,16 @@ public sealed class MainActivity : AppCompatActivity
         });
         NavigationUI.SetupActionBarWithNavController(this, NavController);
         NavigationUI.SetupWithNavController(FindViewById<BottomNavigationView>(Resource.Id.bottom_navigation)!, NavController);
+
+        switch (Intent?.Action)
+        {
+            case TileService.ActionQsTilePreferences:
+                NavController.Navigate(Routes.Receive);
+                break;
+            case Intent.ActionApplicationPreferences:
+                NavController.Navigate(Routes.Settings);
+                break;
+        }
     }
 
     public override bool OnSupportNavigateUp() => NavController.NavigateUp() || base.OnSupportNavigateUp();
