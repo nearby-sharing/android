@@ -15,6 +15,7 @@
     <Project Path="lib/ShortDev.Microsoft.ConnectedDevices/ShortDev.Microsoft.ConnectedDevices.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/ShortDev.Microsoft.ConnectedDevices.Benchmarks/ShortDev.Microsoft.ConnectedDevices.Benchmarks.csproj" />
     <Project Path="tests/ShortDev.Microsoft.ConnectedDevices.Test/ShortDev.Microsoft.ConnectedDevices.Test.csproj" />
   </Folder>
   <Folder Name="/utils/">
