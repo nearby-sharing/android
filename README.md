@@ -7,12 +7,10 @@ outputFileName: index.html
 
 This repo contains a fully functional implementation of the [`MS-CDP`](https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-cdp) and `NearShare` protocol that powers the `Windows 10+` built-in sharing functionality (Aka [`Project Rome`](https://github.com/microsoft/project-rome)).
 
-> [!NOTE]
-> This repository contains a fully functional `Android` app that serves as a frontend of `libCdp`.  
-> You can visit [nearshare.shortdev.de](https://nearshare.shortdev.de) for download and setup instructions.
-
-> [!TIP]
-> For other platforms have a look at the [other repositories](https://github.com/nearby-sharing)!
+<a href="https://play.google.com/store/apps/details?id=de.shortdev.nearby_sharing_windows" target="_blank" rel="noopener noreferrer"><img src="https://cdn.shortdev.de/badges/google-play.svg?cb=2" width="200"/></a>
+<a href="https://fdroid.nearshare.shortdev.de/fdroid/repo/" target="_blank" rel="noopener noreferrer"><img src="https://cdn.shortdev.de/badges/fdroid.svg?cb=2" width="200"/></a>
+<a href="https://github.com/nearby-sharing/android/releases/latest" target="_blank" rel="noopener noreferrer"><img src="https://cdn.shortdev.de/badges/github-releases.svg" width="200"/></a>
+<a href="https://nearshare.shortdev.de/download/" target="_blank" rel="noopener noreferrer"><img src="https://cdn.shortdev.de/badges/other-platforms.svg" width="200"/></a>
 
 ## Building
 
