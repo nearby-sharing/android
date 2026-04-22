@@ -34,6 +34,10 @@ public sealed class App(nint javaReference, JniHandleOwnership transfer) : Appli
     {
         base.OnCreate();
 
+#if DEBUG
+        Utils.StrictModeHelper.EnableStrictMode();
+#endif
+
         SentrySdk.Init(options =>
         {
             options.Dsn = "https://47f9f6c3642149a5af942e8484e64fe1@o646413.ingest.sentry.io/6437134";
