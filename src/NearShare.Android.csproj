@@ -19,17 +19,17 @@
 		<AndroidPackageFormat>aab</AndroidPackageFormat>
 	</PropertyGroup>
 	<ItemGroup Label="Nuget">
-		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.1" />
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.7" />
 		<PackageReference Include="ShortDev.Rive.Android" Version="10.1.0.0" />
-		<PackageReference Include="Sentry" Version="6.0.0" />
+		<PackageReference Include="Sentry" Version="6.5.0" />
 		<PackageReference Include="Serilog.Extensions.Logging.File" Version="3.0.0" />
 		<PackageReference Include="ShortDev.Android" Version="0.6.0-beta" />
 		<PackageReference Include="ShortDev.Android.FluentIcons" Version="1.1.311" />
-		<PackageReference Include="Xamarin.AndroidX.Browser" Version="1.9.0" />
-		<PackageReference Include="Xamarin.AndroidX.Navigation.Fragment" Version="2.9.6" />
-		<PackageReference Include="Xamarin.AndroidX.Navigation.UI" Version="2.9.6" />
-		<PackageReference Include="Xamarin.Google.Android.Material" Version="1.13.0" />
+		<PackageReference Include="Xamarin.AndroidX.Browser" Version="1.10.0" />
+		<PackageReference Include="Xamarin.AndroidX.Navigation.Fragment" Version="2.9.8" />
+		<PackageReference Include="Xamarin.AndroidX.Navigation.UI" Version="2.9.8" />
+		<PackageReference Include="Xamarin.Google.Android.Material" Version="1.13.0.2" />
 	</ItemGroup>
 	<ItemGroup Label="Project References">
 		<ProjectReference Include="..\lib\NearShare.ViewModels\NearShare.ViewModels.csproj" />

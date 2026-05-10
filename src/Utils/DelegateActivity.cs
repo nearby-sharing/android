@@ -3,6 +3,7 @@ using AndroidX.Activity;
 using AndroidX.Activity.Result;
 using AndroidX.Activity.Result.Contract;
 using System.Collections.Concurrent;
+using ActivityFlags = Android.Content.ActivityFlags;
 
 namespace NearShare.Utils;
 
