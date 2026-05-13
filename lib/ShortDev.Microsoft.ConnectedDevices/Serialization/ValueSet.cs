@@ -1,5 +1,4 @@
-﻿using Bond;
-using Bond.IO.Unsafe;
+﻿using Bond.IO.Unsafe;
 using Bond.Protocols;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Serialization;
@@ -12,14 +11,14 @@ public partial class ValueSet : IBinaryWritable
         byte[] data = new byte[reader.Stream.Length - reader.Stream.Position];
         reader.ReadBytes(data);
         CompactBinaryReader<InputBuffer> bondReader = new(new(data));
-        return Deserialize<ValueSet>.From(bondReader);
+        return (ValueSet)ValueSetHelper.Deserialize(bondReader);
     }
 
     public void Write<TWriter>(ref TWriter writer) where TWriter : struct, IEndianWriter, allows ref struct
     {
         OutputBuffer buffer = new();
         CompactBinaryWriter<OutputBuffer> bondWriter = new(buffer);
-        Serialize.To(bondWriter, this);
+        ValueSetHelper.Serialize(this, bondWriter);
         writer.Write(buffer.Data);
     }
 
