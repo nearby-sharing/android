@@ -2,5 +2,5 @@
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages.Connection.DeviceInfo;
 
-[JsonSerializable(typeof(CdpDeviceInfo), GenerationMode = JsonSourceGenerationMode.Serialization)]
+[JsonSerializable(typeof(CdpDeviceInfo))]
 internal sealed partial class DeviceInfoJsonContext : JsonSerializerContext;
