@@ -13,9 +13,8 @@
 	<PropertyGroup>
 		<RootNamespace>NearShare</RootNamespace>
 	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+	<PropertyGroup Condition="'$(Configuration)'=='Release'">
 		<RunAOTCompilation>False</RunAOTCompilation>
-		<PublishTrimmed>false</PublishTrimmed>
 		<AndroidPackageFormat>aab</AndroidPackageFormat>
 	</PropertyGroup>
 	<ItemGroup Label="Nuget">
