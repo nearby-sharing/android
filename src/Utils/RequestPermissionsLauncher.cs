@@ -63,19 +63,12 @@ public sealed class RequestPermissionsLauncher
     {
         public void OnActivityResult(Java.Lang.Object? result)
         {
-            if (result is not IMap map)
-                throw new InvalidOperationException($"Expected result to be of type {nameof(IMap)}, instead got {result?.GetType().Name ?? "null"}");
+            var results = result.JavaCast<JavaDictionary<string, bool>>();
 
             List<string> deniedPermissions = [];
-            foreach (Java.Lang.Object? entryObj in map.EntrySet())
+            foreach (var (permission, grantedValue) in results ?? [])
             {
-                var entry = entryObj.JavaCast<IMapEntry>();
-                if (entry is null)
-                    continue;
-
-                var permission = (string?)entry.Key;
-                var grantedValue = entry.Value;
-                if (grantedValue is null || (bool)grantedValue is true)
+                if (grantedValue is true)
                     continue;
 
                 deniedPermissions.Add(
