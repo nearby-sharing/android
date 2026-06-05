@@ -59,7 +59,7 @@ internal static class UIHelper
 
         try
         {
-            Intent intent = new(Android.Provider.Settings.ActionAppLocaleSettings);
+            Intent intent = new(global::Android.Provider.Settings.ActionAppLocaleSettings);
             intent.SetData(AndroidUri.FromParts("package", activity.PackageName, null));
             activity.StartActivity(intent);
         }
@@ -92,7 +92,10 @@ internal static class UIHelper
         ManifestPermission.BluetoothConnect
     ] : [
         ManifestPermission.AccessFineLocation,
-        ManifestPermission.AccessCoarseLocation
+        ManifestPermission.AccessCoarseLocation,
+        // WiFiDirect
+        ManifestPermission.AccessWifiState,
+        ManifestPermission.ChangeWifiState
     ];
 
     public static void RequestSendPermissions(Activity activity)

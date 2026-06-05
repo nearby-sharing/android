@@ -34,13 +34,12 @@ public sealed class MainActivity : AppCompatActivity
             graph.Fragment<Receive.ReceiveFragment>(Routes.Receive, builder =>
             {
                 builder.Label = GetString(Resource.String.generic_receive);
-                builder.DeepLink("nearshare://receive");
             });
             graph.Fragment<Receive.ReceiveSetupFragment>(Routes.ReceiveSetup, builder =>
             {
                 builder.Label = GetString(Resource.String.app_titlebar_title_receive_setup);
             });
-            
+
             graph.Fragment<Settings.SettingsHomepageFragment>(Routes.Settings, builder =>
             {
                 builder.Label = GetString(Resource.String.generic_settings);
@@ -60,7 +59,7 @@ public sealed class MainActivity : AppCompatActivity
         switch (Intent?.Action)
         {
             case TileService.ActionQsTilePreferences:
-                NavController.Navigate(Routes.SettingsCdp);
+                NavController.Navigate(Routes.Receive);
                 break;
             case Intent.ActionApplicationPreferences:
                 NavController.Navigate(Routes.Settings);

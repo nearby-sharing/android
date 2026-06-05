@@ -9,6 +9,7 @@
     <File Path="Directory.Build.targets" />
   </Folder>
   <Folder Name="/lib/">
+    <Project Path="lib/NearShare.Android.WiFiDirect/NearShare.Android.WiFiDirect.csproj" />
     <Project Path="lib/NearShare.ViewModels/NearShare.ViewModels.csproj" />
     <Project Path="lib/ShortDev.Android.Preferences/ShortDev.Android.Preferences.csproj" />
     <Project Path="lib/ShortDev.Microsoft.ConnectedDevices.NearShare/ShortDev.Microsoft.ConnectedDevices.NearShare.csproj" />

@@ -36,7 +36,7 @@ public sealed class ReceiveSetupFragment : Fragment
         }
 
         _viewBindings.InfoTextView.TextFormatted = UIHelper.LoadHtmlAsset(ctx, "MacAddressInfo");
-        _viewBindings.LaunchSettingsButton.Click += (s, e) => StartActivity(new Intent(Android.Provider.Settings.ActionDeviceInfoSettings));
+        _viewBindings.LaunchSettingsButton.Click += (s, e) => StartActivity(new Intent(global::Android.Provider.Settings.ActionDeviceInfoSettings));
 
         _viewBindings.InputLayout.EditText!.Text = btAddress;
 

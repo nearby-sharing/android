@@ -10,11 +10,12 @@ public sealed class ReceiveTileService : TileService
 {
     public override void OnClick()
     {
-        Intent intent = new(Intent.ActionView, AndroidUri.Parse("nearshare://receive")!, this, typeof(MainActivity));
+        Intent intent = new(this, typeof(MainActivity));
+        intent.AddFlags(ActivityFlags.NewTask);
 
         if (OperatingSystem.IsAndroidVersionAtLeast(34))
             StartActivityAndCollapse(
-                PendingIntent.GetActivity(this, 0, intent, PendingIntentFlags.Immutable | PendingIntentFlags.UpdateCurrent) ?? throw new InvalidOperationException("Could not create PendingIntent")
+                PendingIntent.GetActivity(this, 0, intent, PendingIntentFlags.Immutable) ?? throw new InvalidOperationException("Could not create PendingIntent")
             );
         else if (OperatingSystem.IsAndroidVersionAtLeast(24))
             StartActivityAndCollapse(intent);

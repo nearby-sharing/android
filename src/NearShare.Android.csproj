@@ -4,8 +4,8 @@
 		<OutputType>Exe</OutputType>
 		<SupportedOSPlatformVersion>23</SupportedOSPlatformVersion>
 		<ApplicationId>de.shortdev.nearby_sharing_windows</ApplicationId>
-		<ApplicationVersion>42</ApplicationVersion>
-		<ApplicationDisplayVersion>1.11.1</ApplicationDisplayVersion>
+		<ApplicationVersion>41</ApplicationVersion>
+		<ApplicationDisplayVersion>1.11.0</ApplicationDisplayVersion>
 		<UseAndroidCrypto>true</UseAndroidCrypto>
 		<AndroidErrorOnCustomJavaObject>false</AndroidErrorOnCustomJavaObject>
 		<RuntimeIdentifiers>android-arm;android-arm64;android-x86;android-x64</RuntimeIdentifiers>
@@ -19,7 +19,7 @@
 	</PropertyGroup>
 	<ItemGroup Label="Nuget">
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.8" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.7" />
 		<PackageReference Include="ShortDev.Rive.Android" Version="10.1.0.0" />
 		<PackageReference Include="Sentry" Version="6.5.0" />
 		<PackageReference Include="Serilog.Extensions.Logging.File" Version="3.0.0" />
@@ -28,9 +28,10 @@
 		<PackageReference Include="Xamarin.AndroidX.Browser" Version="1.10.0" />
 		<PackageReference Include="Xamarin.AndroidX.Navigation.Fragment" Version="2.9.8" />
 		<PackageReference Include="Xamarin.AndroidX.Navigation.UI" Version="2.9.8" />
-		<PackageReference Include="Xamarin.Google.Android.Material" Version="1.14.0" />
+		<PackageReference Include="Xamarin.Google.Android.Material" Version="1.13.0.2" />
 	</ItemGroup>
 	<ItemGroup Label="Project References">
+		<ProjectReference Include="..\lib\NearShare.Android.WiFiDirect\NearShare.Android.WiFiDirect.csproj" />
 		<ProjectReference Include="..\lib\NearShare.ViewModels\NearShare.ViewModels.csproj" />
 		<ProjectReference Include="..\lib\ShortDev.Android.Preferences\ShortDev.Android.Preferences.csproj" />
 		<ProjectReference Include="..\lib\ShortDev.Microsoft.ConnectedDevices.NearShare\ShortDev.Microsoft.ConnectedDevices.NearShare.csproj" />

@@ -28,7 +28,7 @@ public sealed class RequestPermissionsLauncher
     public async Task<PermissionResult> RequestAsync()
     {
         var deniedPermissions = _permissions
-            .Where(x => ContextCompat.CheckSelfPermission(_activity, x) == Android.Content.PM.Permission.Denied)
+            .Where(x => ContextCompat.CheckSelfPermission(_activity, x) == PackagePermission.Denied)
             .ToArray();
 
         if (deniedPermissions.Length == 0)
@@ -63,12 +63,19 @@ public sealed class RequestPermissionsLauncher
     {
         public void OnActivityResult(Java.Lang.Object? result)
         {
-            var results = result.JavaCast<JavaDictionary<string, bool>>();
+            if (result is not IMap map)
+                throw new InvalidOperationException($"Expected result to be of type {nameof(IMap)}, instead got {result?.GetType().Name ?? "null"}");
 
             List<string> deniedPermissions = [];
-            foreach (var (permission, grantedValue) in results ?? [])
+            foreach (Java.Lang.Object? entryObj in map.EntrySet())
             {
-                if (grantedValue is true)
+                var entry = entryObj.JavaCast<IMapEntry>();
+                if (entry is null)
+                    continue;
+
+                var permission = (string?)entry.Key;
+                var grantedValue = entry.Value;
+                if (grantedValue is null || (bool)grantedValue is true)
                     continue;
 
                 deniedPermissions.Add(

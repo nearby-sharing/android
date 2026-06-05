@@ -1,0 +1,221 @@
+﻿using Android.Content;
+using Android.Net;
+using Android.Net.Wifi;
+using Android.Net.Wifi.P2p;
+using Android.Runtime;
+using NearShare.Android.WiFiDirect;
+using ShortDev.Microsoft.ConnectedDevices.Transports.WiFiDirect;
+using System.Net;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
+using System.Runtime.CompilerServices;
+using System.Runtime.Versioning;
+using static Android.Net.Wifi.P2p.WifiP2pManager;
+
+namespace NearShare.WiFiDirect;
+
+internal sealed class AndroidWiFiDirectHandler : IWiFiDirectHandler
+{
+    readonly WiFiDirectContext _context;
+    readonly WiFiDirectCallbackReceiver _receiver;
+    public AndroidWiFiDirectHandler(Context context)
+    {
+        _context = WiFiDirectContext.Create(context);
+        _receiver = new(_context);
+    }
+
+    public bool IsEnabled => _receiver.State == WifiP2pState.Enabled;
+
+    public PhysicalAddress MacAddress { get; } = PhysicalAddress.Parse("8c:b8:4a:5d:47:50");
+
+    public async Task<IPAddress> ConnectAsync(string address, GroupInfo groupInfo, CancellationToken cancellationToken = default)
+    {
+        await _context.ConnectAsync(
+            new WifiP2pConfig.Builder()
+                .SetDeviceAddress( global::Android.Net.MacAddress.FromString(address))
+                .SetNetworkName(groupInfo.Ssid)
+                .SetPassphrase(Convert.ToHexString(groupInfo.PreSharedKey.Span))
+                .set
+                .Build(),
+            cancellationToken
+        );
+        return null!;
+    }
+
+    public async Task<IPAddress> ConnectAsync2(string address, GroupInfo groupInfo, CancellationToken cancellationToken = default)
+    {
+        var wifiManager = (WifiManager)_context.Context.GetSystemService(Context.WifiService)!;
+
+        if (!OperatingSystem.IsAndroidVersionAtLeast(29))
+        {
+            WifiConfiguration wifiConfiguration = new()
+            {
+                Ssid = $"\"{groupInfo.Ssid}\"",
+                PreSharedKey = Convert.ToHexString(groupInfo.PreSharedKey.Span),
+            };
+
+            wifiManager.AddNetwork(wifiConfiguration);
+            wifiManager.EnableNetwork(wifiConfiguration.NetworkId, true);
+            wifiManager.Reconnect();
+
+            // ToDo: Get GO IP address
+            return null;
+        }
+
+        // ToDo: Show info of disconnection
+        // wifiManager.IsStaConcurrencyForLocalOnlyConnectionsSupported
+
+        var connectivity = (ConnectivityManager)_context.Context.GetSystemService(Context.ConnectivityService)!;
+
+        var specifier = new WifiNetworkSpecifier.Builder()
+            .SetSsid(groupInfo.Ssid)
+            .SetWpa2Passphrase("ThisIsNotTheActualPassphrase")
+            .Build();
+
+        var config = (WifiConfiguration)specifier.Class
+            .GetDeclaredField("wifiConfiguration")
+            .Get(specifier)!;
+
+#pragma warning disable CA1422 // Validate platform compatibility
+        global::System.Diagnostics.Debug.Print($"config.PreSharedKey = {config.PreSharedKey}");
+        config.PreSharedKey = Convert.ToHexStringLower(groupInfo.PreSharedKey.Span);
+        global::System.Diagnostics.Debug.Print($"config.PreSharedKey = {config.PreSharedKey}");
+#pragma warning restore CA1422 // Validate platform compatibility
+
+        var request = new NetworkRequest.Builder()
+            .AddTransportType(TransportType.Wifi)!
+            .SetNetworkSpecifier(specifier)!
+            .RemoveCapability(NetCapability.Internet)!
+            .Build()!;
+
+        ConnectRequestCallback result = new(connectivity);
+        connectivity.RequestNetwork(request, result);
+        try
+        {
+            return await result;
+        }
+        finally
+        {
+            connectivity.UnregisterNetworkCallback(result);
+        }
+    }
+
+    [SupportedOSPlatform("android29.0")]
+    sealed class ConnectRequestCallback(ConnectivityManager connectivityManager) : ConnectivityManager.NetworkCallback
+    {
+        readonly TaskCompletionSource<IPAddress> _promise = new();
+        readonly ConnectivityManager _connectivityManager = connectivityManager;
+        public override void OnAvailable(Network network)
+        {
+            _connectivityManager.BindProcessToNetwork(network);
+
+            // ToDo: Get GO IP address
+            var linkProps = _connectivityManager.GetLinkProperties(network);
+
+        }
+
+        public override void OnBlockedStatusChanged(Network network, bool blocked)
+        {
+            base.OnBlockedStatusChanged(network, blocked);
+        }
+
+        public override void OnCapabilitiesChanged(Network network, NetworkCapabilities networkCapabilities)
+        {
+            base.OnCapabilitiesChanged(network, networkCapabilities);
+        }
+
+        public override void OnLinkPropertiesChanged(Network network, LinkProperties linkProperties)
+        {
+            base.OnLinkPropertiesChanged(network, linkProperties);
+        }
+
+        public override void OnLosing(Network network, int maxMsToLive)
+        {
+            base.OnLosing(network, maxMsToLive);
+        }
+
+        public override void OnLost(Network network)
+        {
+            base.OnLost(network);
+        }
+
+        public override void OnUnavailable()
+            => _promise.TrySetException(new InvalidOperationException("Network is unavailable"));
+
+        public TaskAwaiter<IPAddress> GetAwaiter()
+            => _promise.Task.GetAwaiter();
+    }
+
+    public async Task<GroupInfo> CreateAutonomousGroup()
+    {
+        if (!OperatingSystem.IsAndroidVersionAtLeast(26))
+            throw new InvalidOperationException("Not supported on OS < 29");
+
+        var wifiManager = (WifiManager)_context.Context.GetSystemService(Context.WifiService)!;
+        var hotspot = await wifiManager.StartLocalOnlyHotspot();
+
+        TcpListener listener = new(IPAddress.Any, 5160);
+        listener.Start();
+        listener.BeginAcceptTcpClient(result =>
+        {
+
+        }, null);
+
+        if (hotspot is null)
+            throw new InvalidOperationException("Could not create WiFi-Direct group");
+
+        if (OperatingSystem.IsAndroidVersionAtLeast(33))
+            return GroupInfo.Create(hotspot.SoftApConfiguration.WifiSsid?.ToString() ?? "", hotspot.SoftApConfiguration.Passphrase ?? "");
+        else
+            return GroupInfo.Create(hotspot.WifiConfiguration?.Ssid ?? "", hotspot.WifiConfiguration?.PreSharedKey ?? "");
+    }
+
+    public void AddGroupAllowedDevice(PhysicalAddress allowedAddress)
+    {
+        if (!OperatingSystem.IsAndroidVersionAtLeast(33))
+            return;
+
+        WiFiDirectRequestApprover approver = new(null, _context);
+        _context.Manager.AddExternalApprover(
+            _context.Channel,
+            global::Android.Net.MacAddress.FromBytes(allowedAddress.GetAddressBytes()),
+            approver
+        );
+    }
+
+    [SupportedOSPlatform("android34.0")]
+    static void ForceJoinGroup(WifiP2pConfig config)
+    {
+        try
+        {
+            var field = config.Class.GetDeclaredField("mJoinExistingGroup");
+            field.Accessible = true;
+            field.SetBoolean(config, true);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.Print(ex.GetType().Name + Environment.NewLine + ex.Message);
+        }
+
+        System.Diagnostics.Debug.Print(config.ToString());
+    }
+
+    public void Dispose()
+    {
+        _receiver.Dispose();
+        _context.Dispose();
+    }
+}
+
+sealed class ActionListener : Java.Lang.Object, IActionListener
+{
+    readonly TaskCompletionSource _promise = new();
+    public void OnFailure([GeneratedEnum] WifiP2pFailureReason reason)
+        => _promise.SetException(new InvalidOperationException(reason.ToString()));
+
+    public void OnSuccess()
+        => _promise.SetResult();
+
+    public TaskAwaiter GetAwaiter()
+        => _promise.Task.GetAwaiter();
+}

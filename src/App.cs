@@ -13,7 +13,10 @@ using RiveCore = Rive.Android.Core.Rive;
 
 [assembly: UsesPermission(ManifestPermission.Internet)]
 [assembly: UsesPermission(ManifestPermission.AccessNetworkState)]
+[assembly: UsesPermission(ManifestPermission.ChangeNetworkState)]
 [assembly: UsesPermission(ManifestPermission.AccessWifiState)]
+[assembly: UsesPermission(ManifestPermission.ChangeWifiState)]
+[assembly: UsesPermission(ManifestPermission.NearbyWifiDevices)]
 
 [assembly: UsesPermission(ManifestPermission.AccessFineLocation, MaxSdkVersion = 30)]
 [assembly: UsesPermission(ManifestPermission.AccessCoarseLocation, MaxSdkVersion = 30)]

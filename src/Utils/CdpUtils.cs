@@ -5,10 +5,12 @@ using Microsoft.Extensions.Logging;
 using NearShare.Handlers;
 using NearShare.Receive;
 using NearShare.Settings;
+using NearShare.WiFiDirect;
 using ShortDev.Microsoft.ConnectedDevices;
 using ShortDev.Microsoft.ConnectedDevices.Encryption;
 using ShortDev.Microsoft.ConnectedDevices.Transports.Bluetooth;
 using ShortDev.Microsoft.ConnectedDevices.Transports.Network;
+using ShortDev.Microsoft.ConnectedDevices.Transports.WiFiDirect;
 using System.Net.NetworkInformation;
 
 namespace NearShare.Utils;
@@ -55,7 +57,11 @@ internal static class CdpUtils
         cdp.AddTransport<BluetoothTransport>(new(bluetoothHandler));
 
         AndroidNetworkHandler networkHandler = new(context);
+        NetworkTransport networkTransport = new(networkHandler);
         cdp.AddTransport<NetworkTransport>(new(networkHandler));
+
+        AndroidWiFiDirectHandler wifiDirectHandler = new(context);
+        cdp.AddTransport<WiFiDirectTransport>(new(wifiDirectHandler, networkTransport));
 
         return cdp;
     }
