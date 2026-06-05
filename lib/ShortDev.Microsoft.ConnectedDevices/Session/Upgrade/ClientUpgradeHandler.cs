@@ -3,8 +3,11 @@ using ShortDev.Microsoft.ConnectedDevices.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.TransportUpgrade;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
+using ShortDev.Microsoft.ConnectedDevices.Transports.Network;
+using ShortDev.Microsoft.ConnectedDevices.Transports.WiFiDirect;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using MessageType = ShortDev.Microsoft.ConnectedDevices.Messages.MessageType;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Session.Upgrade;
 internal sealed class ClientUpgradeHandler(CdpSession session, EndpointInfo initialEndpoint) : UpgradeHandler(session, initialEndpoint)
@@ -37,8 +40,6 @@ internal sealed class ClientUpgradeHandler(CdpSession session, EndpointInfo init
         return false;
     }
 
-    static readonly IReadOnlyList<EndpointMetadata> UpgradeEndpoints = [EndpointMetadata.Tcp];
-
     UpgradeInstance? _currentUpgrade;
     public async ValueTask<CdpSocket> UpgradeAsync(CdpSocket oldSocket)
     {
@@ -47,8 +48,21 @@ internal sealed class ClientUpgradeHandler(CdpSession session, EndpointInfo init
 
         try
         {
-            _logger.SendingUpgradeRequest(_currentUpgrade.Id, UpgradeEndpoints);
+            List<EndpointMetadata> endpoints = [];
 
+            var networkTransport = _session.Platform.TryGetTransport<NetworkTransport>();
+            if (networkTransport is not null)
+            {
+                endpoints.Add(EndpointMetadata.Tcp);
+            }
+
+            var wifiDirectTransport = _session.Platform.TryGetTransport<WiFiDirectTransport>();
+            if (wifiDirectTransport is not null)
+            {
+                endpoints.Add(wifiDirectTransport.CreateUpgradeRequest());
+            }
+
+            _logger.SendingUpgradeRequest(_currentUpgrade.Id, endpoints);
             _session.SendMessage(
                 oldSocket,
                 new CommonHeader()
@@ -63,7 +77,7 @@ internal sealed class ClientUpgradeHandler(CdpSession session, EndpointInfo init
                 new UpgradeRequest()
                 {
                     UpgradeId = _currentUpgrade.Id,
-                    Endpoints = UpgradeEndpoints
+                    Endpoints = endpoints
                 }
             );
 
@@ -83,37 +97,38 @@ internal sealed class ClientUpgradeHandler(CdpSession session, EndpointInfo init
         var msg = UpgradeResponse.Parse(ref reader);
         _logger.UpgradeResponse(_currentUpgrade.Id, msg.Endpoints);
 
-        FindNewEndpoint();
-
-        async void FindNewEndpoint()
-        {
-            var tasks = await Task.WhenAll(msg.Endpoints.Select(async endpoint =>
-            {
-                if (endpoint.TransportType != CdpTransportType.Tcp)
-                    return null; // ToDo: Only Tcp upgrade supported by Windows ?!
-
-                if (!int.TryParse(endpoint.Service, out var port))
-                    return null;
-
-                return await _session.Platform.TryCreateSocketAsync(endpoint, UpgradeInstance.Timeout).ConfigureAwait(false);
-            })).ConfigureAwait(false);
-
-            if (_currentUpgrade == null)
-                return;
-
-            if (!_currentUpgrade.TryChooseSocket(tasks.FirstOrDefault(x => x != null)))
-                return;
-
-            SendUpgradFinalization(oldSocket);
-
-            // Cancel after timeout if upgrade has not finished yet
-            await Task.Delay(UpgradeInstance.Timeout).ConfigureAwait(false);
-
-            _currentUpgrade?.TrySetCanceled();
-        }
+        HandleUpgradeResponse(oldSocket, msg);
     }
 
-    void SendUpgradFinalization(CdpSocket socket)
+    async void HandleUpgradeResponse(CdpSocket oldSocket, UpgradeResponse msg)
+    {
+        var tasks = await Task.WhenAll(msg.Endpoints.Select(endpoint =>
+        {
+            if (endpoint.TransportType != CdpTransportType.WifiDirect)
+                return Task.FromResult<CdpSocket?>(null);
+
+            var metadata = msg.MetaData.FirstOrDefault(x => x.Type == endpoint.TransportType);
+            return _session.Platform.TryCreateSocketAsync(endpoint, metadata, UpgradeInstance.Timeout);
+        }));
+
+        if (_currentUpgrade == null)
+            return;
+
+        if (!_currentUpgrade.TryChooseSocket(tasks.FirstOrDefault(x => x != null)))
+            return;
+
+        var wifiDirectTransport = _session.Platform.TryGetTransport<WiFiDirectTransport>();
+        SendUpgradFinalization(oldSocket, [
+            wifiDirectTransport?.CreateUpgradeFinalization() ?? EndpointMetadata.Tcp
+        ]);
+
+        // Cancel after timeout if upgrade has not finished yet
+        await Task.Delay(UpgradeInstance.Timeout);
+
+        _currentUpgrade?.TrySetCanceled();
+    }
+
+    void SendUpgradFinalization(CdpSocket socket, IReadOnlyList<EndpointMetadata> endpoints)
     {
         _session.SendMessage(
             socket,
@@ -126,7 +141,7 @@ internal sealed class ClientUpgradeHandler(CdpSession session, EndpointInfo init
                 ConnectionMode = ConnectionMode.Proximal,
                 MessageType = ConnectionType.UpgradeFinalization
             },
-            new EndpointMetadataArray([EndpointMetadata.Tcp])
+            new EndpointMetadataArray(endpoints)
         );
     }
 
@@ -189,7 +204,7 @@ internal sealed class ClientUpgradeHandler(CdpSession session, EndpointInfo init
 
     sealed class UpgradeInstance
     {
-        public static readonly TimeSpan Timeout = TimeSpan.FromSeconds(2);
+        public static readonly TimeSpan Timeout = TimeSpan.FromSeconds(10);
 
         public Guid Id { get; } = Guid.NewGuid();
 
