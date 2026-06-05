@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.TransportUpgrade;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
 using System.Diagnostics.CodeAnalysis;
 
@@ -132,7 +133,7 @@ public sealed partial class ConnectedDevicesPlatform(LocalDeviceInfo deviceInfo,
         return socket;
     }
 
-    internal async Task<CdpSocket?> TryCreateSocketAsync(EndpointInfo endpoint, TimeSpan connectTimeout)
+    internal async Task<CdpSocket?> TryCreateSocketAsync(EndpointInfo endpoint, EndpointMetadata? metadata, TimeSpan connectTimeout)
     {
         if (TryGetKnownSocket(endpoint, out var knownSocket))
             return knownSocket;
@@ -141,7 +142,7 @@ public sealed partial class ConnectedDevicesPlatform(LocalDeviceInfo deviceInfo,
         if (transport == null)
             return null;
 
-        var socket = await transport.TryConnectAsync(endpoint, connectTimeout).ConfigureAwait(false);
+        var socket = await transport.TryConnectAsync(endpoint, metadata, connectTimeout).ConfigureAwait(false);
         if (socket == null)
             return null;
 

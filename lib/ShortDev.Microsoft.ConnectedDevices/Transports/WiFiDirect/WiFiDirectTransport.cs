@@ -1,0 +1,72 @@
+﻿using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.TransportUpgrade;
+using ShortDev.Microsoft.ConnectedDevices.Transports.Network;
+using System.Text;
+using static ShortDev.Microsoft.ConnectedDevices.Transports.WiFiDirect.MetaDataWriter;
+
+namespace ShortDev.Microsoft.ConnectedDevices.Transports.WiFiDirect;
+
+public sealed class WiFiDirectTransport(IWiFiDirectHandler handler, NetworkTransport networkTransport) : ICdpTransport
+{
+    readonly IWiFiDirectHandler _handler = handler;
+    readonly NetworkTransport _networkTransport = networkTransport;
+
+    public CdpTransportType TransportType { get; } = CdpTransportType.WifiDirect;
+
+    public Task<CdpSocket> ConnectAsync(EndpointInfo endpoint, CancellationToken cancellation = default)
+        => throw new NotImplementedException();
+
+    public async Task<CdpSocket> ConnectAsync(EndpointInfo endpoint, EndpointMetadata? metadata, CancellationToken cancellation = default)
+    {
+        ArgumentNullException.ThrowIfNull(metadata);
+
+        ParseHostResponse(metadata.Value.Data, out var address, out var ssid, out var sharedKey);
+
+        var hostIp = await _handler.ConnectAsync(endpoint.Address, new(ssid, sharedKey), cancellation);
+        return await _networkTransport.ConnectAsync(new EndpointInfo(CdpTransportType.Tcp, hostIp.ToString(), "5160"), cancellation);
+    }
+
+    // ToDo: Cannot listen
+    public Task Listen(CancellationToken cancellationToken)
+        => Task.CompletedTask;
+
+    public event DeviceConnectedEventHandler? DeviceConnected;
+    public EndpointInfo GetEndpoint()
+        => new(CdpTransportType.WifiDirect, _handler.MacAddress.ToStringFormatted(), "");
+
+    #region Upgrade
+    internal EndpointMetadata CreateUpgradeRequest()
+    {
+        const GroupRole rolePreference = GroupRole.Client;
+
+        var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
+        WriteHeader(ref writer, MessageType.ClientAvailableForUpgrade, _handler.MacAddress);
+        WriteField(ref writer, MessageValueType.RolePreference, [(byte)rolePreference]);
+        return new(CdpTransportType.WifiDirect, writer.Stream.WrittenMemory.ToArray());
+    }
+
+    internal async ValueTask<EndpointMetadata> CreateUpgradeResponse()
+    {
+        const GroupRole roleDecision = GroupRole.GroupOwner;
+
+        var groupInfo = await _handler.CreateAutonomousGroup();
+        // ToDo: _handler.AddGroupAllowedDevice
+
+        var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
+        WriteHeader(ref writer, MessageType.HostGetUpgradeEndpoints, _handler.MacAddress);
+        WriteField(ref writer, MessageValueType.RoleDecision, [(byte)roleDecision]);
+        WriteField(ref writer, MessageValueType.GOPreSharedKey, groupInfo.PreSharedKey.Span);
+        WriteField(ref writer, MessageValueType.GOSSID, Encoding.UTF8.GetBytes(groupInfo.Ssid));
+        return new(CdpTransportType.WifiDirect, writer.Stream.WrittenMemory.ToArray());
+    }
+
+    internal EndpointMetadata CreateUpgradeFinalization()
+    {
+        var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
+        WriteHeader(ref writer, MessageType.ClientFinalizeUpgrade, _handler.MacAddress);
+        return new(CdpTransportType.WifiDirect, writer.Stream.WrittenMemory.ToArray());
+    }
+    #endregion
+
+    public void Dispose()
+        => _handler.Dispose();
+}
