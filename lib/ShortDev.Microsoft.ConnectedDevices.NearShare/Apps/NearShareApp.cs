@@ -4,17 +4,16 @@ using ShortDev.Microsoft.ConnectedDevices.Messages;
 using ShortDev.Microsoft.ConnectedDevices.NearShare.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Serialization;
 using System.Collections;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace ShortDev.Microsoft.ConnectedDevices.NearShare.Apps;
 
-internal sealed class NearShareApp(ConnectedDevicesPlatform cdp) : CdpAppBase(cdp)
+internal sealed class NearShareApp(CdpChannel channel) : CdpAppBase(channel)
 {
     const uint PartitionSize = 102400u; // 131072u
     public static string Name { get; } = "NearSharePlatform";
 
-    readonly ILogger<NearShareApp> _logger = cdp.CreateLogger<NearShareApp>();
+    readonly ILogger<NearShareApp> _logger = channel.Session.Platform.CreateLogger<NearShareApp>();
 
     public required string Id { get; init; }
 

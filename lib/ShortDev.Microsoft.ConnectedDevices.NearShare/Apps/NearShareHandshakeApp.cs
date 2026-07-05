@@ -3,7 +3,7 @@ using ShortDev.Microsoft.ConnectedDevices.Serialization;
 
 namespace ShortDev.Microsoft.ConnectedDevices.NearShare.Apps;
 
-public class NearShareHandshakeApp(ConnectedDevicesPlatform cdp) : CdpAppBase(cdp), ICdpAppId
+public class NearShareHandshakeApp(CdpChannel channel) : CdpAppBase(channel), ICdpAppId
 {
     public static string Id { get; } = "0D472C30-80B5-4722-A279-0F3B97F0DCF2";
 
@@ -17,7 +17,7 @@ public class NearShareHandshakeApp(ConnectedDevicesPlatform cdp) : CdpAppBase(cd
         CdpAppRegistration.RegisterApp(
             id,
             NearShareApp.Name,
-            cdp => new NearShareApp(cdp)
+            channel => new NearShareApp(channel)
             {
                 Id = id
             }

@@ -3,6 +3,7 @@ using ShortDev.Microsoft.ConnectedDevices.Messages.Control;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Session.Channels;
+
 internal sealed class ClientChannelHandler(CdpSession session) : ChannelHandler(session)
 {
     protected override void HandleMessageInternal(CdpSocket socket, CommonHeader header, ControlHeader controlHeader, ref HeapEndianReader reader)
@@ -36,14 +37,14 @@ internal sealed class ClientChannelHandler(CdpSession session) : ChannelHandler(
         return promise.Task;
     }
 
-    public async Task<CdpChannel> CreateChannelAsync(string appId, string appName, CdpAppBase handler, CdpSocket socket, CancellationToken cancellationToken = default)
+    public async Task<CdpChannel> CreateChannelAsync(string appId, string appName, CdpSocket socket, CancellationToken cancellationToken = default)
     {
         var requestId = SendChannelRequest(socket, appId, appName);
 
         var response = await WaitForChannelResponse(requestId, cancellationToken).ConfigureAwait(false);
         response.ThrowOnError();
 
-        var channel = CdpChannel.CreateClientChannel(this, socket, response, handler);
+        var channel = CdpChannel.CreateClientChannel(this, socket, response);
         _channelRegistry.Add(channel.ChannelId, channel);
         return channel;
     }

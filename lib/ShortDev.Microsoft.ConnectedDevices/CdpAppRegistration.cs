@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 
 namespace ShortDev.Microsoft.ConnectedDevices;
 
@@ -12,19 +11,17 @@ public static class CdpAppRegistration
     /// <summary>
     /// Signature of a <see cref="CdpAppBase"/> factory.
     /// </summary>
-    public delegate T CdpAppFactory<out T>(ConnectedDevicesPlatform cdp) where T : CdpAppBase;
+    public delegate T CdpAppFactory<out T>(CdpChannel channel) where T : CdpAppBase;
 
-    record AppId(string Id, string Name, CdpAppFactory<CdpAppBase> Factory);
+    private readonly record struct AppId(string Id, string Name, CdpAppFactory<CdpAppBase> Factory);
 
-    static readonly ConcurrentDictionary<string, AppId> _registration = new();
+    private static readonly ConcurrentDictionary<string, AppId> _registration = new(StringComparer.OrdinalIgnoreCase);
 
     public static void RegisterApp<TApp>(CdpAppFactory<TApp> factory) where TApp : CdpAppBase, ICdpAppId
         => RegisterApp(TApp.Id, TApp.Name, factory);
 
     public static void RegisterApp(string id, string name, CdpAppFactory<CdpAppBase> factory)
     {
-        id = id.ToLower();
-
         AppId appId = new(id, name, factory);
         _registration.AddOrUpdate(id, appId, (_, _) => appId);
     }
@@ -33,17 +30,13 @@ public static class CdpAppRegistration
         => TryUnregisterApp(TApp.Id);
 
     public static bool TryUnregisterApp(string id)
-    {
-        id = id.ToLower();
-        return _registration.TryRemove(id, out _);
-    }
+        => _registration.TryRemove(id, out _);
 
-    internal static CdpAppBase InstantiateApp(string id, string name, ConnectedDevicesPlatform cdp)
+    internal static CdpAppBase InstantiateApp(string id, string name, CdpChannel channel)
     {
         ArgumentException.ThrowIfNullOrEmpty(id);
         ArgumentException.ThrowIfNullOrEmpty(name);
 
-        id = id.ToLower();
-        return _registration[id].Factory(cdp);
+        return _registration[id].Factory(channel);
     }
 }

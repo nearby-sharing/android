@@ -3,6 +3,7 @@ using ShortDev.Microsoft.ConnectedDevices.Messages.Control;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Session.Channels;
+
 internal sealed class HostChannelHandler(CdpSession session) : ChannelHandler(session)
 {
     protected override void HandleMessageInternal(CdpSocket socket, CommonHeader header, ControlHeader controlHeader, ref HeapEndianReader reader)
@@ -20,7 +21,7 @@ internal sealed class HostChannelHandler(CdpSession session) : ChannelHandler(se
         ));
         header.RequestID = 0;
 
-        _channelRegistry.Create(channelId => CdpChannel.CreateServerChannel(this, socket, request, channelId), out var channelId);
+        _channelRegistry.Create(channelId => CdpChannel.CreateServerChannel(this, socket, request, channelId, out _), out var channelId);
 
         header.Flags = 0;
         Session.SendMessage(

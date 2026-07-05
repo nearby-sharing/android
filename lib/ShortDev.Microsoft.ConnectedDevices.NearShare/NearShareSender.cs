@@ -23,15 +23,15 @@ public sealed class NearShareSender(ConnectedDevicesPlatform platform)
 
         Guid operationId = Guid.NewGuid();
 
-        HandshakeHandler handshake = new(Platform);
-        using var handShakeChannel = await session.StartClientChannelAsync(handshake, cancellationToken).ConfigureAwait(false);
+        using var handShakeChannel = await session.StartClientChannelAsync<HandshakeHandler>(cancellationToken).ConfigureAwait(false);
+        HandshakeHandler handshake = new(handShakeChannel);
         var handshakeResultMsg = await handshake.Execute(operationId).ConfigureAwait(false);
 
         // ToDo: CorrelationVector
         // var cv = handshakeResultMsg.Header.TryGetCorrelationVector() ?? throw new InvalidDataException("No Correlation Vector");
 
-        SenderStateMachine senderStateMachine = new(Platform);
-        var channel = await session.StartClientChannelAsync(operationId.ToString("D").ToUpper(), NearShareApp.Name, senderStateMachine, cancellationToken).ConfigureAwait(false);
+        var channel = await session.StartClientChannelAsync(operationId.ToString("D").ToUpper(), NearShareApp.Name, cancellationToken).ConfigureAwait(false);
+        SenderStateMachine senderStateMachine = new(channel);
         return senderStateMachine;
     }
 
@@ -50,7 +50,7 @@ public sealed class NearShareSender(ConnectedDevicesPlatform platform)
         await senderStateMachine.SendFilesAsync(files, progress, cancellationToken).ConfigureAwait(false);
     }
 
-    sealed class HandshakeHandler(ConnectedDevicesPlatform cdp) : CdpAppBase(cdp), ICdpAppId
+    sealed class HandshakeHandler(CdpChannel channel) : CdpAppBase(channel), ICdpAppId
     {
         public static string Id { get; } = NearShareHandshakeApp.Id;
         public static string Name { get; } = NearShareHandshakeApp.Name;
@@ -81,7 +81,7 @@ public sealed class NearShareSender(ConnectedDevicesPlatform platform)
         }
     }
 
-    sealed class SenderStateMachine(ConnectedDevicesPlatform cdp) : CdpAppBase(cdp)
+    sealed class SenderStateMachine(CdpChannel channel) : CdpAppBase(channel)
     {
         readonly TaskCompletionSource _promise = new();
         public async Task SendUriAsync(Uri uri)
