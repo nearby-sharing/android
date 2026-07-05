@@ -1,4 +1,4 @@
-﻿namespace ShortDev.Microsoft.ConnectedDevices.Messages.Session.AppControl;
+﻿namespace ShortDev.Microsoft.ConnectedDevices.AppControl.Messages;
 
 public enum LaunchLocation : short
 {
