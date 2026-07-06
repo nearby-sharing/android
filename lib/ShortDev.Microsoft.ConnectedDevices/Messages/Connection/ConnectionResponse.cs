@@ -7,7 +7,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Messages.Connection;
 /// The host responds with a connection response message including device information. <br/>
 /// Only the Result is sent if the Result is anything other than <see cref="ConnectionResult.Pending"/>.
 /// </summary>
-public readonly record struct ConnectionResponse : IBinaryWritable, IBinaryParsable<ConnectionResponse>
+public readonly record struct ConnectionResponse : IBinaryWritable<ConnectionResponse>, IBinaryParsable<ConnectionResponse>
 {
     /// <summary>
     /// The result of the connection request.

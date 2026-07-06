@@ -7,7 +7,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Messages;
 /// <summary>
 /// The <see cref="CommonHeader"/> is common for all Messages.
 /// </summary>
-public sealed class CommonHeader : IBinaryWritable, IBinaryParsable<CommonHeader>
+public sealed class CommonHeader : IBinaryWritable<CommonHeader>, IBinaryParsable<CommonHeader>
 {
     public static CommonHeader Parse<TReader>(ref TReader reader) where TReader : struct, IEndianReader, allows ref struct
     {
@@ -124,6 +124,8 @@ public sealed class CommonHeader : IBinaryWritable, IBinaryParsable<CommonHeader
             sizeof(byte) + // AdditionalHeaderType.None
             sizeof(byte); // 0
     }
+
+    ulong IBinaryWritable<CommonHeader>.MinimumSize => (ulong)CalcSize();
 
     /// <summary>
     /// Entire message length in bytes including signature.

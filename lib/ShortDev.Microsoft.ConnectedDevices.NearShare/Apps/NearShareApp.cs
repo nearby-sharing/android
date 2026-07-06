@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using ShortDev.Microsoft.ConnectedDevices.Exceptions;
-using ShortDev.Microsoft.ConnectedDevices.Messages;
+using ShortDev.Microsoft.ConnectedDevices.Messages.Session;
 using ShortDev.Microsoft.ConnectedDevices.NearShare.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Serialization;
 using System.Collections;
@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 
 namespace ShortDev.Microsoft.ConnectedDevices.NearShare.Apps;
 
-internal sealed class NearShareApp(CdpChannel channel) : CdpAppBase(channel)
+internal sealed class NearShareApp(CdpChannel channel) : CdpBondApp(channel)
 {
     const uint PartitionSize = 102400u; // 131072u
     public static string Name { get; } = "NearSharePlatform";
@@ -18,9 +18,8 @@ internal sealed class NearShareApp(CdpChannel channel) : CdpAppBase(channel)
     public required string Id { get; init; }
 
     uint _messageId = 0;
-    public override void HandleMessage(CdpMessage msg)
+    protected override void HandleMessage(in BinaryMsgHeader binaryHeader, ValueSet payload)
     {
-        msg.ReadBinary(out ValueSet payload, out var binaryHeader);
         _messageId = binaryHeader.MessageId;
 
         if (!payload.ContainsKey("ControlMessage"))
@@ -30,7 +29,7 @@ internal sealed class NearShareApp(CdpChannel channel) : CdpAppBase(channel)
         switch (msgType)
         {
             case NearShareControlMsgType.StartTransfer:
-                HandleStartTransfer(msg, payload);
+                HandleStartTransfer(payload);
                 return;
             case NearShareControlMsgType.FetchDataResponse:
                 HandleFetchDataResponse(payload);
@@ -40,7 +39,7 @@ internal sealed class NearShareApp(CdpChannel channel) : CdpAppBase(channel)
     }
 
     FileTransferToken? _fileTransferToken;
-    void HandleStartTransfer(CdpMessage msg, ValueSet payload)
+    void HandleStartTransfer(ValueSet payload)
     {
         var dataKind = (DataKind)payload.Get<uint>("DataKind");
         switch (dataKind)
@@ -51,7 +50,7 @@ internal sealed class NearShareApp(CdpChannel channel) : CdpAppBase(channel)
 
                     _logger.ReceivingFile(
                         fileNames,
-                        msg.Header.SessionId,
+                        Channel.Session.SessionId.AsNumber(),
                         Channel.Socket.TransportType
                     );
 
@@ -82,7 +81,7 @@ internal sealed class NearShareApp(CdpChannel channel) : CdpAppBase(channel)
 
                     _logger.ReceivedUrl(
                         uri,
-                        msg.Header.SessionId,
+                        Channel.Session.SessionId.AsNumber(),
                         Channel.Socket.TransportType
                     );
 

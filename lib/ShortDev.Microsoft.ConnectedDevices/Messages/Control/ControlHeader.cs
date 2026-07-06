@@ -1,6 +1,6 @@
 ﻿namespace ShortDev.Microsoft.ConnectedDevices.Messages.Control;
 
-public readonly record struct ControlHeader : IBinaryWritable, IBinaryParsable<ControlHeader>
+public readonly record struct ControlHeader : IBinaryWritable<ControlHeader>, IBinaryParsable<ControlHeader>
 {
     public required ControlMessageType MessageType { get; init; }
 

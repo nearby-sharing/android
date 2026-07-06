@@ -1,6 +1,4 @@
-﻿using ShortDev.IO.ValueStream;
-using ShortDev.Microsoft.ConnectedDevices.Exceptions;
-using ShortDev.Microsoft.ConnectedDevices.Messages;
+﻿using ShortDev.Microsoft.ConnectedDevices.Exceptions;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Session;
 using ShortDev.Microsoft.ConnectedDevices.NearShare.Apps;
 using ShortDev.Microsoft.ConnectedDevices.NearShare.Messages;
@@ -25,7 +23,7 @@ public sealed class NearShareSender(ConnectedDevicesPlatform platform)
 
         using var handShakeChannel = await session.StartClientChannelAsync<HandshakeHandler>(cancellationToken).ConfigureAwait(false);
         HandshakeHandler handshake = new(handShakeChannel);
-        var handshakeResultMsg = await handshake.Execute(operationId).ConfigureAwait(false);
+        await handshake.Execute(operationId).ConfigureAwait(false);
 
         // ToDo: CorrelationVector
         // var cv = handshakeResultMsg.Header.TryGetCorrelationVector() ?? throw new InvalidDataException("No Correlation Vector");
@@ -50,38 +48,37 @@ public sealed class NearShareSender(ConnectedDevicesPlatform platform)
         await senderStateMachine.SendFilesAsync(files, progress, cancellationToken).ConfigureAwait(false);
     }
 
-    sealed class HandshakeHandler(CdpChannel channel) : CdpAppBase(channel), ICdpAppId
+    sealed class HandshakeHandler(CdpChannel channel) : CdpBondApp(channel), ICdpAppId
     {
         public static string Id { get; } = NearShareHandshakeApp.Id;
         public static string Name { get; } = NearShareHandshakeApp.Name;
 
-        readonly TaskCompletionSource<CdpMessage> _promise = new();
+        readonly TaskCompletionSource _promise = new();
 
-        public Task<CdpMessage> Execute(Guid operationId)
+        public Task Execute(Guid operationId)
         {
             ValueSet msg = new();
             msg.Add("ControlMessage", (uint)NearShareControlMsgType.HandShakeRequest);
             msg.Add("MaxPlatformVersion", 1u);
             msg.Add("MinPlatformVersion", 1u);
             msg.Add("OperationId", operationId);
-            SendValueSet(msg, msgId: 0);
+            SendValueSet(msg, messageId: 0);
 
             return _promise.Task;
         }
 
-        public override void HandleMessage(CdpMessage msg)
+        protected override void HandleMessage(in BinaryMsgHeader header, ValueSet payload)
         {
-            msg.ReadBinary(out ValueSet payload, out _);
             var handshakeResult = payload.Get<uint>("VersionHandShakeResult");
 
             if (handshakeResult != 1)
                 _promise.SetException(new CdpProtocolException("Handshake failed"));
 
-            _promise.SetResult(msg);
+            _promise.SetResult();
         }
     }
 
-    sealed class SenderStateMachine(CdpChannel channel) : CdpAppBase(channel)
+    sealed class SenderStateMachine(CdpChannel channel) : CdpBondApp(channel)
     {
         readonly TaskCompletionSource _promise = new();
         public async Task SendUriAsync(Uri uri)
@@ -149,12 +146,11 @@ public sealed class NearShareSender(ConnectedDevicesPlatform platform)
             return sum;
         }
 
-        public override void HandleMessage(CdpMessage msg)
+        protected override void HandleMessage(in BinaryMsgHeader header, ValueSet payload)
         {
             if (_fileCancellationToken?.IsCancellationRequested == true)
                 return;
 
-            msg.ReadBinary(out ValueSet payload, out var header);
             try
             {
                 var controlMsg = (NearShareControlMsgType)payload.Get<uint>("ControlMessage");
@@ -187,12 +183,12 @@ public sealed class NearShareSender(ConnectedDevicesPlatform platform)
             var length = payload.Get<uint>("BlobSize");
 
             var fileProvider = _files?[(int)contentId] ?? throw new NullReferenceException("Could not access files to transfer");
-            Channel.SendBinaryMessage((ref EndianWriter<HeapOutputStream> writer) =>
+            SendBinaryMessage(new DataResponseMessage()
             {
-                FetchDataResponse.Write(ref writer, contentId, start, (int)length, out var blob);
-                Debug.Assert(blob.Length == length);
-
-                fileProvider.ReadBlob(start, blob);
+                FileProvider = fileProvider,
+                ContentId = contentId,
+                Start = start,
+                Length = length
             }, header.MessageId);
 
             _fileProgress?.Report(new()
@@ -202,5 +198,25 @@ public sealed class NearShareSender(ConnectedDevicesPlatform platform)
                 TotalFiles = (uint)_files.Count
             });
         }
+
+        private readonly struct DataResponseMessage : IBinaryWritable<DataResponseMessage>
+        {
+            public required CdpFileProvider FileProvider { get; init; }
+            public required uint ContentId { get; init; }
+            public required ulong Start { get; init; }
+            public required uint Length { get; init; }
+
+            // ToDo: Add the size of the rest of the message
+            ulong IBinaryWritable<DataResponseMessage>.MinimumSize => Length;
+
+            public void Write<TWriter>(ref TWriter writer) where TWriter : struct, IEndianWriter, allows ref struct
+            {
+                FetchDataResponse.Write(ref writer, ContentId, Start, (int)Length, out var blob);
+                Debug.Assert(blob.Length == Length);
+
+                FileProvider.ReadBlob(Start, blob);
+            }
+        }
+
     }
 }

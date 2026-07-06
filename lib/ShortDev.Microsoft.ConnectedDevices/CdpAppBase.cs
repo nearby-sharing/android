@@ -1,5 +1,4 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Messages;
-using ShortDev.Microsoft.ConnectedDevices.Serialization;
 
 namespace ShortDev.Microsoft.ConnectedDevices;
 
@@ -31,9 +30,6 @@ public abstract class CdpAppBase : IDisposable
     /// </summary>
     /// <param name="msg">Received message</param>
     public abstract void HandleMessage(CdpMessage msg);
-
-    protected void SendValueSet(ValueSet request, uint msgId)
-        => Channel.SendBinaryMessage(request.Write, msgId);
 
     public virtual void Dispose()
     {

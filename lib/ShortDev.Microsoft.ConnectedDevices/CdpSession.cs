@@ -101,7 +101,7 @@ public sealed class CdpSession : IDisposable
         CdpSocket socket,
         CommonHeader header, in TMessageHeader messageHeader, in TMessage message,
         bool supplyRequestId = false
-    ) where TMessageHeader : IBinaryWritable where TMessage : IBinaryWritable
+    ) where TMessageHeader : IBinaryWritable<TMessageHeader> where TMessage : IBinaryWritable<TMessage>
     {
         SendMessage(socket, ref header, messageHeader, message, supplyRequestId: supplyRequestId);
     }
@@ -111,9 +111,9 @@ public sealed class CdpSession : IDisposable
         CdpSocket socket,
         ref CommonHeader header, in TMessageHeader messageHeader, in TMessage message,
         bool supplyRequestId = false
-    ) where TMessageHeader : IBinaryWritable where TMessage : IBinaryWritable
+    ) where TMessageHeader : IBinaryWritable<TMessageHeader> where TMessage : IBinaryWritable<TMessage>
     {
-        var bufferSize = EndianWriter.CalcBinarySize(messageHeader) + EndianWriter.CalcBinarySize(message);
+        var bufferSize = messageHeader.MinimumSize + message.MinimumSize;
         var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool, initialCapacity: (int)bufferSize);
         try
         {

@@ -7,6 +7,9 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using ShortDev.IO.Bond;
+using ShortDev.IO.Bond.Expressions;
+
 namespace ShortDev.Microsoft.ConnectedDevices.Serialization
 {
 
@@ -14,17 +17,18 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
     public class ValueSetHelper
     {
 
-        public static void Serialize(object obj, Bond.Protocols.CompactBinaryWriter<Bond.IO.Unsafe.OutputBuffer> writer)
+        public static void Serialize<TWriter>(object obj, ref TWriter writer)
+            where TWriter : struct, IProtocolWriter, allows ref struct
         {
             ValueSet _a81d8cc4_ValueSet_obj;
             _a81d8cc4_ValueSet_obj = ((ValueSet)(obj));
             writer.WriteStructBegin(null);
             if ((_a81d8cc4_ValueSet_obj.Entries.Count != 0))
             {
-                writer.WriteFieldBegin(Bond.BondDataType.BT_MAP, 1, null);
+                writer.WriteFieldBegin(BondDataType.BT_MAP, 1, null);
                 System.Collections.Generic.IEnumerator<System.Collections.Generic.KeyValuePair<string, PropertyValue>> _1c41c4fd_enumerator;
                 _1c41c4fd_enumerator = _a81d8cc4_ValueSet_obj.Entries.GetEnumerator();
-                writer.WriteContainerBegin(_a81d8cc4_ValueSet_obj.Entries.Count, Bond.BondDataType.BT_WSTRING, Bond.BondDataType.BT_STRUCT);
+                writer.WriteContainerBegin(_a81d8cc4_ValueSet_obj.Entries.Count, BondDataType.BT_WSTRING, BondDataType.BT_STRUCT);
                 for (
                 ; ;
                 )
@@ -37,47 +41,47 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
                         PropertyValue _278a22e4_PropertyValue_obj;
                         _278a22e4_PropertyValue_obj = ((PropertyValue)(_be093af8_obj));
                         writer.WriteStructBegin(null);
-                        writer.WriteFieldBegin(Bond.BondDataType.BT_INT32, 0, null);
+                        writer.WriteFieldBegin(BondDataType.BT_INT32, 0, null);
                         writer.WriteInt32(((int)(_278a22e4_PropertyValue_obj.Type)));
                         writer.WriteFieldEnd();
                         if ((_278a22e4_PropertyValue_obj.Int32Value != 0))
                         {
-                            writer.WriteFieldBegin(Bond.BondDataType.BT_INT32, 103, null);
+                            writer.WriteFieldBegin(BondDataType.BT_INT32, 103, null);
                             writer.WriteInt32(_278a22e4_PropertyValue_obj.Int32Value);
                             writer.WriteFieldEnd();
                         }
                         else
                         {
-                            writer.WriteFieldOmitted(Bond.BondDataType.BT_INT32, 103, null);
+                            writer.WriteFieldOmitted(BondDataType.BT_INT32, 103, null);
                         }
                         if ((_278a22e4_PropertyValue_obj.UInt32Value != 0u))
                         {
-                            writer.WriteFieldBegin(Bond.BondDataType.BT_UINT32, 104, null);
+                            writer.WriteFieldBegin(BondDataType.BT_UINT32, 104, null);
                             writer.WriteUInt32(_278a22e4_PropertyValue_obj.UInt32Value);
                             writer.WriteFieldEnd();
                         }
                         else
                         {
-                            writer.WriteFieldOmitted(Bond.BondDataType.BT_UINT32, 104, null);
+                            writer.WriteFieldOmitted(BondDataType.BT_UINT32, 104, null);
                         }
                         if ((_278a22e4_PropertyValue_obj.UInt64Value != 0ul))
                         {
-                            writer.WriteFieldBegin(Bond.BondDataType.BT_UINT64, 106, null);
+                            writer.WriteFieldBegin(BondDataType.BT_UINT64, 106, null);
                             writer.WriteUInt64(_278a22e4_PropertyValue_obj.UInt64Value);
                             writer.WriteFieldEnd();
                         }
                         else
                         {
-                            writer.WriteFieldOmitted(Bond.BondDataType.BT_UINT64, 106, null);
+                            writer.WriteFieldOmitted(BondDataType.BT_UINT64, 106, null);
                         }
                         if ((_278a22e4_PropertyValue_obj.GuidArrayValue.Count != 0))
                         {
-                            writer.WriteFieldBegin(Bond.BondDataType.BT_LIST, 114, null);
+                            writer.WriteFieldBegin(BondDataType.BT_LIST, 114, null);
                             int _a0aa934b_index;
                             int _a0aa934b_count;
                             _a0aa934b_index = -1;
                             _a0aa934b_count = _278a22e4_PropertyValue_obj.GuidArrayValue.Count;
-                            writer.WriteContainerBegin(_a0aa934b_count, Bond.BondDataType.BT_STRUCT);
+                            writer.WriteContainerBegin(_a0aa934b_count, BondDataType.BT_STRUCT);
                             for (
                             ; ;
                             )
@@ -93,43 +97,43 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
                                     writer.WriteStructBegin(null);
                                     if ((_3b39fc71_UUID_obj.Data1 != 0u))
                                     {
-                                        writer.WriteFieldBegin(Bond.BondDataType.BT_UINT32, 0, null);
+                                        writer.WriteFieldBegin(BondDataType.BT_UINT32, 0, null);
                                         writer.WriteUInt32(_3b39fc71_UUID_obj.Data1);
                                         writer.WriteFieldEnd();
                                     }
                                     else
                                     {
-                                        writer.WriteFieldOmitted(Bond.BondDataType.BT_UINT32, 0, null);
+                                        writer.WriteFieldOmitted(BondDataType.BT_UINT32, 0, null);
                                     }
                                     if ((_3b39fc71_UUID_obj.Data2 != 0))
                                     {
-                                        writer.WriteFieldBegin(Bond.BondDataType.BT_UINT16, 1, null);
+                                        writer.WriteFieldBegin(BondDataType.BT_UINT16, 1, null);
                                         writer.WriteUInt16(_3b39fc71_UUID_obj.Data2);
                                         writer.WriteFieldEnd();
                                     }
                                     else
                                     {
-                                        writer.WriteFieldOmitted(Bond.BondDataType.BT_UINT16, 1, null);
+                                        writer.WriteFieldOmitted(BondDataType.BT_UINT16, 1, null);
                                     }
                                     if ((_3b39fc71_UUID_obj.Data3 != 0))
                                     {
-                                        writer.WriteFieldBegin(Bond.BondDataType.BT_UINT16, 2, null);
+                                        writer.WriteFieldBegin(BondDataType.BT_UINT16, 2, null);
                                         writer.WriteUInt16(_3b39fc71_UUID_obj.Data3);
                                         writer.WriteFieldEnd();
                                     }
                                     else
                                     {
-                                        writer.WriteFieldOmitted(Bond.BondDataType.BT_UINT16, 2, null);
+                                        writer.WriteFieldOmitted(BondDataType.BT_UINT16, 2, null);
                                     }
                                     if ((_3b39fc71_UUID_obj.Data4 != 0ul))
                                     {
-                                        writer.WriteFieldBegin(Bond.BondDataType.BT_UINT64, 3, null);
+                                        writer.WriteFieldBegin(BondDataType.BT_UINT64, 3, null);
                                         writer.WriteUInt64(_3b39fc71_UUID_obj.Data4);
                                         writer.WriteFieldEnd();
                                     }
                                     else
                                     {
-                                        writer.WriteFieldOmitted(Bond.BondDataType.BT_UINT64, 3, null);
+                                        writer.WriteFieldOmitted(BondDataType.BT_UINT64, 3, null);
                                     }
                                     writer.WriteStructEnd();
                                 }
@@ -143,26 +147,26 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
                         }
                         else
                         {
-                            writer.WriteFieldOmitted(Bond.BondDataType.BT_LIST, 114, null);
+                            writer.WriteFieldOmitted(BondDataType.BT_LIST, 114, null);
                         }
                         if ((_278a22e4_PropertyValue_obj.StringValue != ""))
                         {
-                            writer.WriteFieldBegin(Bond.BondDataType.BT_STRING, 119, null);
+                            writer.WriteFieldBegin(BondDataType.BT_STRING, 119, null);
                             writer.WriteString(_278a22e4_PropertyValue_obj.StringValue);
                             writer.WriteFieldEnd();
                         }
                         else
                         {
-                            writer.WriteFieldOmitted(Bond.BondDataType.BT_STRING, 119, null);
+                            writer.WriteFieldOmitted(BondDataType.BT_STRING, 119, null);
                         }
                         if ((_278a22e4_PropertyValue_obj.UInt8ArrayValue.Count != 0))
                         {
-                            writer.WriteFieldBegin(Bond.BondDataType.BT_LIST, 200, null);
+                            writer.WriteFieldBegin(BondDataType.BT_LIST, 200, null);
                             int _14d70d4f_index;
                             int _14d70d4f_count;
                             _14d70d4f_index = -1;
                             _14d70d4f_count = _278a22e4_PropertyValue_obj.UInt8ArrayValue.Count;
-                            writer.WriteContainerBegin(_14d70d4f_count, Bond.BondDataType.BT_UINT8);
+                            writer.WriteContainerBegin(_14d70d4f_count, BondDataType.BT_UINT8);
                             for (
                             ; ;
                             )
@@ -183,16 +187,16 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
                         }
                         else
                         {
-                            writer.WriteFieldOmitted(Bond.BondDataType.BT_LIST, 200, null);
+                            writer.WriteFieldOmitted(BondDataType.BT_LIST, 200, null);
                         }
                         if ((_278a22e4_PropertyValue_obj.UInt32ArrayValue.Count != 0))
                         {
-                            writer.WriteFieldBegin(Bond.BondDataType.BT_LIST, 204, null);
+                            writer.WriteFieldBegin(BondDataType.BT_LIST, 204, null);
                             int _0117c42f_index;
                             int _0117c42f_count;
                             _0117c42f_index = -1;
                             _0117c42f_count = _278a22e4_PropertyValue_obj.UInt32ArrayValue.Count;
-                            writer.WriteContainerBegin(_0117c42f_count, Bond.BondDataType.BT_UINT32);
+                            writer.WriteContainerBegin(_0117c42f_count, BondDataType.BT_UINT32);
                             for (
                             ; ;
                             )
@@ -213,16 +217,16 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
                         }
                         else
                         {
-                            writer.WriteFieldOmitted(Bond.BondDataType.BT_LIST, 204, null);
+                            writer.WriteFieldOmitted(BondDataType.BT_LIST, 204, null);
                         }
                         if ((_278a22e4_PropertyValue_obj.UInt64ArrayValue.Count != 0))
                         {
-                            writer.WriteFieldBegin(Bond.BondDataType.BT_LIST, 206, null);
+                            writer.WriteFieldBegin(BondDataType.BT_LIST, 206, null);
                             int _ff128d9a_index;
                             int _ff128d9a_count;
                             _ff128d9a_index = -1;
                             _ff128d9a_count = _278a22e4_PropertyValue_obj.UInt64ArrayValue.Count;
-                            writer.WriteContainerBegin(_ff128d9a_count, Bond.BondDataType.BT_UINT64);
+                            writer.WriteContainerBegin(_ff128d9a_count, BondDataType.BT_UINT64);
                             for (
                             ; ;
                             )
@@ -243,16 +247,16 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
                         }
                         else
                         {
-                            writer.WriteFieldOmitted(Bond.BondDataType.BT_LIST, 206, null);
+                            writer.WriteFieldOmitted(BondDataType.BT_LIST, 206, null);
                         }
                         if ((_278a22e4_PropertyValue_obj.StringArrayValue.Count != 0))
                         {
-                            writer.WriteFieldBegin(Bond.BondDataType.BT_LIST, 219, null);
+                            writer.WriteFieldBegin(BondDataType.BT_LIST, 219, null);
                             int _0d92c7eb_index;
                             int _0d92c7eb_count;
                             _0d92c7eb_index = -1;
                             _0d92c7eb_count = _278a22e4_PropertyValue_obj.StringArrayValue.Count;
-                            writer.WriteContainerBegin(_0d92c7eb_count, Bond.BondDataType.BT_STRING);
+                            writer.WriteContainerBegin(_0d92c7eb_count, BondDataType.BT_STRING);
                             for (
                             ; ;
                             )
@@ -273,7 +277,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
                         }
                         else
                         {
-                            writer.WriteFieldOmitted(Bond.BondDataType.BT_LIST, 219, null);
+                            writer.WriteFieldOmitted(BondDataType.BT_LIST, 219, null);
                         }
                         writer.WriteStructEnd();
                     }
@@ -287,21 +291,22 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
             }
             else
             {
-                writer.WriteFieldOmitted(Bond.BondDataType.BT_MAP, 1, null);
+                writer.WriteFieldOmitted(BondDataType.BT_MAP, 1, null);
             }
             writer.WriteStructEnd();
         }
 
-        public static object Deserialize(Bond.Protocols.CompactBinaryReader<Bond.IO.Unsafe.InputBuffer> reader)
+        public static object Deserialize<TReader>(ref TReader reader)
+            where TReader : struct, ITaggedProtocolReader, allows ref struct
         {
             ValueSet _7aa17938_ValueSet_result;
             _7aa17938_ValueSet_result = new ValueSet();
             int _4dde9690_depth;
-            _4dde9690_depth = Bond.MaxDepthChecker.ValidateDepthForIncrement();
+            _4dde9690_depth = MaxDepthChecker.ValidateDepthForIncrement();
             try
             {
-                Bond.MaxDepthChecker.SetDepth((_4dde9690_depth + 1));
-                Bond.BondDataType _c7f2a99e_fieldType;
+                MaxDepthChecker.SetDepth((_4dde9690_depth + 1));
+                BondDataType _c7f2a99e_fieldType;
                 ushort _c7f2a99e_fieldId;
                 reader.ReadStructBegin();
                 reader.ReadFieldBegin(out _c7f2a99e_fieldType, out _c7f2a99e_fieldId);
@@ -313,20 +318,20 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
                     {
                         if ((_c7f2a99e_fieldId == 1))
                         {
-                            if ((_c7f2a99e_fieldType == Bond.BondDataType.BT_MAP))
+                            if ((_c7f2a99e_fieldType == BondDataType.BT_MAP))
                             {
                                 int _90463c3d_depth;
-                                _90463c3d_depth = Bond.MaxDepthChecker.ValidateDepthForIncrement();
+                                _90463c3d_depth = MaxDepthChecker.ValidateDepthForIncrement();
                                 try
                                 {
-                                    Bond.MaxDepthChecker.SetDepth((_90463c3d_depth + 1));
+                                    MaxDepthChecker.SetDepth((_90463c3d_depth + 1));
                                     int _fa06a779_count;
-                                    Bond.BondDataType _fa06a779_keyType;
-                                    Bond.BondDataType _fa06a779_valueType;
+                                    BondDataType _fa06a779_keyType;
+                                    BondDataType _fa06a779_valueType;
                                     reader.ReadContainerBegin(out _fa06a779_count, out _fa06a779_keyType, out _fa06a779_valueType);
-                                    if ((_fa06a779_keyType == Bond.BondDataType.BT_WSTRING))
+                                    if ((_fa06a779_keyType == BondDataType.BT_WSTRING))
                                     {
-                                        if ((_fa06a779_valueType == Bond.BondDataType.BT_STRUCT))
+                                        if ((_fa06a779_valueType == BondDataType.BT_STRUCT))
                                         {
                                             string _391bf79b_ValueSet_result_Entries_key;
                                             PropertyValue _391bf79b_ValueSet_result_Entries_value;
@@ -341,11 +346,11 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
                                                     _391bf79b_ValueSet_result_Entries_key = reader.ReadWString();
                                                     _391bf79b_ValueSet_result_Entries_value = new PropertyValue();
                                                     int _00a83d10_depth;
-                                                    _00a83d10_depth = Bond.MaxDepthChecker.ValidateDepthForIncrement();
+                                                    _00a83d10_depth = MaxDepthChecker.ValidateDepthForIncrement();
                                                     try
                                                     {
-                                                        Bond.MaxDepthChecker.SetDepth((_00a83d10_depth + 1));
-                                                        Bond.BondDataType _2db82cf6_fieldType;
+                                                        MaxDepthChecker.SetDepth((_00a83d10_depth + 1));
+                                                        BondDataType _2db82cf6_fieldType;
                                                         ushort _2db82cf6_fieldId;
                                                         reader.ReadStructBegin();
                                                         reader.ReadFieldBegin(out _2db82cf6_fieldType, out _2db82cf6_fieldId);
@@ -357,25 +362,25 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
                                                             {
                                                                 if ((_2db82cf6_fieldId == 0))
                                                                 {
-                                                                    if ((_2db82cf6_fieldType == Bond.BondDataType.BT_INT32))
+                                                                    if ((_2db82cf6_fieldType == BondDataType.BT_INT32))
                                                                     {
                                                                         _391bf79b_ValueSet_result_Entries_value.Type = ((PropertyType)(reader.ReadInt32()));
                                                                     }
                                                                     else
                                                                     {
-                                                                        if ((_2db82cf6_fieldType == Bond.BondDataType.BT_INT16))
+                                                                        if ((_2db82cf6_fieldType == BondDataType.BT_INT16))
                                                                         {
                                                                             _391bf79b_ValueSet_result_Entries_value.Type = ((PropertyType)(reader.ReadInt16()));
                                                                         }
                                                                         else
                                                                         {
-                                                                            if ((_2db82cf6_fieldType == Bond.BondDataType.BT_INT8))
+                                                                            if ((_2db82cf6_fieldType == BondDataType.BT_INT8))
                                                                             {
                                                                                 _391bf79b_ValueSet_result_Entries_value.Type = ((PropertyType)(reader.ReadInt8()));
                                                                             }
                                                                             else
                                                                             {
-                                                                                Bond.Expressions.ThrowExpression.ThrowInvalidTypeException(Bond.BondDataType.BT_INT32, _2db82cf6_fieldType);
+                                                                                ThrowExpression.ThrowInvalidTypeException(BondDataType.BT_INT32, _2db82cf6_fieldType);
                                                                             }
                                                                         }
                                                                     }
@@ -387,7 +392,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
                                                                 {
                                                                     if ((_2db82cf6_fieldId > 0))
                                                                     {
-                                                                        Bond.Expressions.ThrowExpression.ThrowRequiredFieldMissingException("PropertyValue", "Type");
+                                                                        ThrowExpression.ThrowRequiredFieldMissingException("PropertyValue", "Type");
                                                                         break;
                                                                     }
                                                                     else
@@ -404,7 +409,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
                                                             }
                                                             else
                                                             {
-                                                                Bond.Expressions.ThrowExpression.ThrowRequiredFieldMissingException("PropertyValue", "Type");
+                                                                ThrowExpression.ThrowRequiredFieldMissingException("PropertyValue", "Type");
                                                                 break;
                                                             }
                                                         }
@@ -416,25 +421,25 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
                                                             {
                                                                 if ((_2db82cf6_fieldId == 103))
                                                                 {
-                                                                    if ((_2db82cf6_fieldType == Bond.BondDataType.BT_INT32))
+                                                                    if ((_2db82cf6_fieldType == BondDataType.BT_INT32))
                                                                     {
                                                                         _391bf79b_ValueSet_result_Entries_value.Int32Value = reader.ReadInt32();
                                                                     }
                                                                     else
                                                                     {
-                                                                        if ((_2db82cf6_fieldType == Bond.BondDataType.BT_INT16))
+                                                                        if ((_2db82cf6_fieldType == BondDataType.BT_INT16))
                                                                         {
                                                                             _391bf79b_ValueSet_result_Entries_value.Int32Value = ((int)(reader.ReadInt16()));
                                                                         }
                                                                         else
                                                                         {
-                                                                            if ((_2db82cf6_fieldType == Bond.BondDataType.BT_INT8))
+                                                                            if ((_2db82cf6_fieldType == BondDataType.BT_INT8))
                                                                             {
                                                                                 _391bf79b_ValueSet_result_Entries_value.Int32Value = ((int)(reader.ReadInt8()));
                                                                             }
                                                                             else
                                                                             {
-                                                                                Bond.Expressions.ThrowExpression.ThrowInvalidTypeException(Bond.BondDataType.BT_INT32, _2db82cf6_fieldType);
+                                                                                ThrowExpression.ThrowInvalidTypeException(BondDataType.BT_INT32, _2db82cf6_fieldType);
                                                                             }
                                                                         }
                                                                     }
@@ -473,25 +478,25 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
                                                             {
                                                                 if ((_2db82cf6_fieldId == 104))
                                                                 {
-                                                                    if ((_2db82cf6_fieldType == Bond.BondDataType.BT_UINT32))
+                                                                    if ((_2db82cf6_fieldType == BondDataType.BT_UINT32))
                                                                     {
                                                                         _391bf79b_ValueSet_result_Entries_value.UInt32Value = reader.ReadUInt32();
                                                                     }
                                                                     else
                                                                     {
-                                                                        if ((_2db82cf6_fieldType == Bond.BondDataType.BT_UINT16))
+                                                                        if ((_2db82cf6_fieldType == BondDataType.BT_UINT16))
                                                                         {
                                                                             _391bf79b_ValueSet_result_Entries_value.UInt32Value = ((uint)(reader.ReadUInt16()));
                                                                         }
                                                                         else
                                                                         {
-                                                                            if ((_2db82cf6_fieldType == Bond.BondDataType.BT_UINT8))
+                                                                            if ((_2db82cf6_fieldType == BondDataType.BT_UINT8))
                                                                             {
                                                                                 _391bf79b_ValueSet_result_Entries_value.UInt32Value = ((uint)(reader.ReadUInt8()));
                                                                             }
                                                                             else
                                                                             {
-                                                                                Bond.Expressions.ThrowExpression.ThrowInvalidTypeException(Bond.BondDataType.BT_UINT32, _2db82cf6_fieldType);
+                                                                                ThrowExpression.ThrowInvalidTypeException(BondDataType.BT_UINT32, _2db82cf6_fieldType);
                                                                             }
                                                                         }
                                                                     }
@@ -530,31 +535,31 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
                                                             {
                                                                 if ((_2db82cf6_fieldId == 106))
                                                                 {
-                                                                    if ((_2db82cf6_fieldType == Bond.BondDataType.BT_UINT64))
+                                                                    if ((_2db82cf6_fieldType == BondDataType.BT_UINT64))
                                                                     {
                                                                         _391bf79b_ValueSet_result_Entries_value.UInt64Value = reader.ReadUInt64();
                                                                     }
                                                                     else
                                                                     {
-                                                                        if ((_2db82cf6_fieldType == Bond.BondDataType.BT_UINT32))
+                                                                        if ((_2db82cf6_fieldType == BondDataType.BT_UINT32))
                                                                         {
                                                                             _391bf79b_ValueSet_result_Entries_value.UInt64Value = ((ulong)(reader.ReadUInt32()));
                                                                         }
                                                                         else
                                                                         {
-                                                                            if ((_2db82cf6_fieldType == Bond.BondDataType.BT_UINT16))
+                                                                            if ((_2db82cf6_fieldType == BondDataType.BT_UINT16))
                                                                             {
                                                                                 _391bf79b_ValueSet_result_Entries_value.UInt64Value = ((ulong)(reader.ReadUInt16()));
                                                                             }
                                                                             else
                                                                             {
-                                                                                if ((_2db82cf6_fieldType == Bond.BondDataType.BT_UINT8))
+                                                                                if ((_2db82cf6_fieldType == BondDataType.BT_UINT8))
                                                                                 {
                                                                                     _391bf79b_ValueSet_result_Entries_value.UInt64Value = ((ulong)(reader.ReadUInt8()));
                                                                                 }
                                                                                 else
                                                                                 {
-                                                                                    Bond.Expressions.ThrowExpression.ThrowInvalidTypeException(Bond.BondDataType.BT_UINT64, _2db82cf6_fieldType);
+                                                                                    ThrowExpression.ThrowInvalidTypeException(BondDataType.BT_UINT64, _2db82cf6_fieldType);
                                                                                 }
                                                                             }
                                                                         }
@@ -594,17 +599,17 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
                                                             {
                                                                 if ((_2db82cf6_fieldId == 114))
                                                                 {
-                                                                    if ((_2db82cf6_fieldType == Bond.BondDataType.BT_LIST))
+                                                                    if ((_2db82cf6_fieldType == BondDataType.BT_LIST))
                                                                     {
                                                                         int _0bf12c4c_depth;
-                                                                        _0bf12c4c_depth = Bond.MaxDepthChecker.ValidateDepthForIncrement();
+                                                                        _0bf12c4c_depth = MaxDepthChecker.ValidateDepthForIncrement();
                                                                         try
                                                                         {
-                                                                            Bond.MaxDepthChecker.SetDepth((_0bf12c4c_depth + 1));
+                                                                            MaxDepthChecker.SetDepth((_0bf12c4c_depth + 1));
                                                                             int _4b52afdb_count;
-                                                                            Bond.BondDataType _4b52afdb_elementType;
+                                                                            BondDataType _4b52afdb_elementType;
                                                                             reader.ReadContainerBegin(out _4b52afdb_count, out _4b52afdb_elementType);
-                                                                            if ((_4b52afdb_elementType == Bond.BondDataType.BT_STRUCT))
+                                                                            if ((_4b52afdb_elementType == BondDataType.BT_STRUCT))
                                                                             {
                                                                                 UUID _255a4846_ValueSet_result_Entries_value_GuidArrayValue_item;
                                                                                 int _49775e32_ValueSet_result_Entries_value_GuidArrayValue_count;
@@ -624,11 +629,11 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
                                                                                     {
                                                                                         _255a4846_ValueSet_result_Entries_value_GuidArrayValue_item = new UUID();
                                                                                         int _41c94fad_depth;
-                                                                                        _41c94fad_depth = Bond.MaxDepthChecker.ValidateDepthForIncrement();
+                                                                                        _41c94fad_depth = MaxDepthChecker.ValidateDepthForIncrement();
                                                                                         try
                                                                                         {
-                                                                                            Bond.MaxDepthChecker.SetDepth((_41c94fad_depth + 1));
-                                                                                            Bond.BondDataType _6eae1f75_fieldType;
+                                                                                            MaxDepthChecker.SetDepth((_41c94fad_depth + 1));
+                                                                                            BondDataType _6eae1f75_fieldType;
                                                                                             ushort _6eae1f75_fieldId;
                                                                                             reader.ReadStructBegin();
                                                                                             reader.ReadFieldBegin(out _6eae1f75_fieldType, out _6eae1f75_fieldId);
@@ -640,25 +645,25 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
                                                                                                 {
                                                                                                     if ((_6eae1f75_fieldId == 0))
                                                                                                     {
-                                                                                                        if ((_6eae1f75_fieldType == Bond.BondDataType.BT_UINT32))
+                                                                                                        if ((_6eae1f75_fieldType == BondDataType.BT_UINT32))
                                                                                                         {
                                                                                                             _255a4846_ValueSet_result_Entries_value_GuidArrayValue_item.Data1 = reader.ReadUInt32();
                                                                                                         }
                                                                                                         else
                                                                                                         {
-                                                                                                            if ((_6eae1f75_fieldType == Bond.BondDataType.BT_UINT16))
+                                                                                                            if ((_6eae1f75_fieldType == BondDataType.BT_UINT16))
                                                                                                             {
                                                                                                                 _255a4846_ValueSet_result_Entries_value_GuidArrayValue_item.Data1 = ((uint)(reader.ReadUInt16()));
                                                                                                             }
                                                                                                             else
                                                                                                             {
-                                                                                                                if ((_6eae1f75_fieldType == Bond.BondDataType.BT_UINT8))
+                                                                                                                if ((_6eae1f75_fieldType == BondDataType.BT_UINT8))
                                                                                                                 {
                                                                                                                     _255a4846_ValueSet_result_Entries_value_GuidArrayValue_item.Data1 = ((uint)(reader.ReadUInt8()));
                                                                                                                 }
                                                                                                                 else
                                                                                                                 {
-                                                                                                                    Bond.Expressions.ThrowExpression.ThrowInvalidTypeException(Bond.BondDataType.BT_UINT32, _6eae1f75_fieldType);
+                                                                                                                    ThrowExpression.ThrowInvalidTypeException(BondDataType.BT_UINT32, _6eae1f75_fieldType);
                                                                                                                 }
                                                                                                             }
                                                                                                         }
@@ -697,19 +702,19 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
                                                                                                 {
                                                                                                     if ((_6eae1f75_fieldId == 1))
                                                                                                     {
-                                                                                                        if ((_6eae1f75_fieldType == Bond.BondDataType.BT_UINT16))
+                                                                                                        if ((_6eae1f75_fieldType == BondDataType.BT_UINT16))
                                                                                                         {
                                                                                                             _255a4846_ValueSet_result_Entries_value_GuidArrayValue_item.Data2 = reader.ReadUInt16();
                                                                                                         }
                                                                                                         else
                                                                                                         {
-                                                                                                            if ((_6eae1f75_fieldType == Bond.BondDataType.BT_UINT8))
+                                                                                                            if ((_6eae1f75_fieldType == BondDataType.BT_UINT8))
                                                                                                             {
                                                                                                                 _255a4846_ValueSet_result_Entries_value_GuidArrayValue_item.Data2 = ((ushort)(reader.ReadUInt8()));
                                                                                                             }
                                                                                                             else
                                                                                                             {
-                                                                                                                Bond.Expressions.ThrowExpression.ThrowInvalidTypeException(Bond.BondDataType.BT_UINT16, _6eae1f75_fieldType);
+                                                                                                                ThrowExpression.ThrowInvalidTypeException(BondDataType.BT_UINT16, _6eae1f75_fieldType);
                                                                                                             }
                                                                                                         }
                                                                                                         reader.ReadFieldEnd();
@@ -747,19 +752,19 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
                                                                                                 {
                                                                                                     if ((_6eae1f75_fieldId == 2))
                                                                                                     {
-                                                                                                        if ((_6eae1f75_fieldType == Bond.BondDataType.BT_UINT16))
+                                                                                                        if ((_6eae1f75_fieldType == BondDataType.BT_UINT16))
                                                                                                         {
                                                                                                             _255a4846_ValueSet_result_Entries_value_GuidArrayValue_item.Data3 = reader.ReadUInt16();
                                                                                                         }
                                                                                                         else
                                                                                                         {
-                                                                                                            if ((_6eae1f75_fieldType == Bond.BondDataType.BT_UINT8))
+                                                                                                            if ((_6eae1f75_fieldType == BondDataType.BT_UINT8))
                                                                                                             {
                                                                                                                 _255a4846_ValueSet_result_Entries_value_GuidArrayValue_item.Data3 = ((ushort)(reader.ReadUInt8()));
                                                                                                             }
                                                                                                             else
                                                                                                             {
-                                                                                                                Bond.Expressions.ThrowExpression.ThrowInvalidTypeException(Bond.BondDataType.BT_UINT16, _6eae1f75_fieldType);
+                                                                                                                ThrowExpression.ThrowInvalidTypeException(BondDataType.BT_UINT16, _6eae1f75_fieldType);
                                                                                                             }
                                                                                                         }
                                                                                                         reader.ReadFieldEnd();
@@ -797,31 +802,31 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
                                                                                                 {
                                                                                                     if ((_6eae1f75_fieldId == 3))
                                                                                                     {
-                                                                                                        if ((_6eae1f75_fieldType == Bond.BondDataType.BT_UINT64))
+                                                                                                        if ((_6eae1f75_fieldType == BondDataType.BT_UINT64))
                                                                                                         {
                                                                                                             _255a4846_ValueSet_result_Entries_value_GuidArrayValue_item.Data4 = reader.ReadUInt64();
                                                                                                         }
                                                                                                         else
                                                                                                         {
-                                                                                                            if ((_6eae1f75_fieldType == Bond.BondDataType.BT_UINT32))
+                                                                                                            if ((_6eae1f75_fieldType == BondDataType.BT_UINT32))
                                                                                                             {
                                                                                                                 _255a4846_ValueSet_result_Entries_value_GuidArrayValue_item.Data4 = ((ulong)(reader.ReadUInt32()));
                                                                                                             }
                                                                                                             else
                                                                                                             {
-                                                                                                                if ((_6eae1f75_fieldType == Bond.BondDataType.BT_UINT16))
+                                                                                                                if ((_6eae1f75_fieldType == BondDataType.BT_UINT16))
                                                                                                                 {
                                                                                                                     _255a4846_ValueSet_result_Entries_value_GuidArrayValue_item.Data4 = ((ulong)(reader.ReadUInt16()));
                                                                                                                 }
                                                                                                                 else
                                                                                                                 {
-                                                                                                                    if ((_6eae1f75_fieldType == Bond.BondDataType.BT_UINT8))
+                                                                                                                    if ((_6eae1f75_fieldType == BondDataType.BT_UINT8))
                                                                                                                     {
                                                                                                                         _255a4846_ValueSet_result_Entries_value_GuidArrayValue_item.Data4 = ((ulong)(reader.ReadUInt8()));
                                                                                                                     }
                                                                                                                     else
                                                                                                                     {
-                                                                                                                        Bond.Expressions.ThrowExpression.ThrowInvalidTypeException(Bond.BondDataType.BT_UINT64, _6eae1f75_fieldType);
+                                                                                                                        ThrowExpression.ThrowInvalidTypeException(BondDataType.BT_UINT64, _6eae1f75_fieldType);
                                                                                                                     }
                                                                                                                 }
                                                                                                             }
@@ -857,9 +862,9 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
                                                                                             ; ;
                                                                                             )
                                                                                             {
-                                                                                                if ((_6eae1f75_fieldType != Bond.BondDataType.BT_STOP))
+                                                                                                if ((_6eae1f75_fieldType != BondDataType.BT_STOP))
                                                                                                 {
-                                                                                                    if ((_6eae1f75_fieldType == Bond.BondDataType.BT_STOP_BASE))
+                                                                                                    if ((_6eae1f75_fieldType == BondDataType.BT_STOP_BASE))
                                                                                                     {
                                                                                                     }
                                                                                                     else
@@ -878,7 +883,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
                                                                                         }
                                                                                         finally
                                                                                         {
-                                                                                            Bond.MaxDepthChecker.SetDepth(_41c94fad_depth);
+                                                                                            MaxDepthChecker.SetDepth(_41c94fad_depth);
                                                                                         }
                                                                                         _391bf79b_ValueSet_result_Entries_value.GuidArrayValue.Add(_255a4846_ValueSet_result_Entries_value_GuidArrayValue_item);
                                                                                     }
@@ -890,18 +895,18 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
                                                                             }
                                                                             else
                                                                             {
-                                                                                Bond.Expressions.ThrowExpression.ThrowInvalidTypeException(Bond.BondDataType.BT_STRUCT, _4b52afdb_elementType);
+                                                                                ThrowExpression.ThrowInvalidTypeException(BondDataType.BT_STRUCT, _4b52afdb_elementType);
                                                                             }
                                                                             reader.ReadContainerEnd();
                                                                         }
                                                                         finally
                                                                         {
-                                                                            Bond.MaxDepthChecker.SetDepth(_0bf12c4c_depth);
+                                                                            MaxDepthChecker.SetDepth(_0bf12c4c_depth);
                                                                         }
                                                                     }
                                                                     else
                                                                     {
-                                                                        Bond.Expressions.ThrowExpression.ThrowInvalidTypeException(Bond.BondDataType.BT_LIST, _2db82cf6_fieldType);
+                                                                        ThrowExpression.ThrowInvalidTypeException(BondDataType.BT_LIST, _2db82cf6_fieldType);
                                                                     }
                                                                     reader.ReadFieldEnd();
                                                                     reader.ReadFieldBegin(out _2db82cf6_fieldType, out _2db82cf6_fieldId);
@@ -938,13 +943,13 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
                                                             {
                                                                 if ((_2db82cf6_fieldId == 119))
                                                                 {
-                                                                    if ((_2db82cf6_fieldType == Bond.BondDataType.BT_STRING))
+                                                                    if ((_2db82cf6_fieldType == BondDataType.BT_STRING))
                                                                     {
                                                                         _391bf79b_ValueSet_result_Entries_value.StringValue = reader.ReadString();
                                                                     }
                                                                     else
                                                                     {
-                                                                        Bond.Expressions.ThrowExpression.ThrowInvalidTypeException(Bond.BondDataType.BT_STRING, _2db82cf6_fieldType);
+                                                                        ThrowExpression.ThrowInvalidTypeException(BondDataType.BT_STRING, _2db82cf6_fieldType);
                                                                     }
                                                                     reader.ReadFieldEnd();
                                                                     reader.ReadFieldBegin(out _2db82cf6_fieldType, out _2db82cf6_fieldId);
@@ -981,17 +986,17 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
                                                             {
                                                                 if ((_2db82cf6_fieldId == 200))
                                                                 {
-                                                                    if ((_2db82cf6_fieldType == Bond.BondDataType.BT_LIST))
+                                                                    if ((_2db82cf6_fieldType == BondDataType.BT_LIST))
                                                                     {
                                                                         int _46fafc9f_depth;
-                                                                        _46fafc9f_depth = Bond.MaxDepthChecker.ValidateDepthForIncrement();
+                                                                        _46fafc9f_depth = MaxDepthChecker.ValidateDepthForIncrement();
                                                                         try
                                                                         {
-                                                                            Bond.MaxDepthChecker.SetDepth((_46fafc9f_depth + 1));
+                                                                            MaxDepthChecker.SetDepth((_46fafc9f_depth + 1));
                                                                             int _3b964678_count;
-                                                                            Bond.BondDataType _3b964678_elementType;
+                                                                            BondDataType _3b964678_elementType;
                                                                             reader.ReadContainerBegin(out _3b964678_count, out _3b964678_elementType);
-                                                                            if ((_3b964678_elementType == Bond.BondDataType.BT_UINT8))
+                                                                            if ((_3b964678_elementType == BondDataType.BT_UINT8))
                                                                             {
                                                                                 byte _2b58c582_ValueSet_result_Entries_value_UInt8ArrayValue_item;
                                                                                 int _a60e5e17_ValueSet_result_Entries_value_UInt8ArrayValue_count;
@@ -1020,18 +1025,18 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
                                                                             }
                                                                             else
                                                                             {
-                                                                                Bond.Expressions.ThrowExpression.ThrowInvalidTypeException(Bond.BondDataType.BT_UINT8, _3b964678_elementType);
+                                                                                ThrowExpression.ThrowInvalidTypeException(BondDataType.BT_UINT8, _3b964678_elementType);
                                                                             }
                                                                             reader.ReadContainerEnd();
                                                                         }
                                                                         finally
                                                                         {
-                                                                            Bond.MaxDepthChecker.SetDepth(_46fafc9f_depth);
+                                                                            MaxDepthChecker.SetDepth(_46fafc9f_depth);
                                                                         }
                                                                     }
                                                                     else
                                                                     {
-                                                                        Bond.Expressions.ThrowExpression.ThrowInvalidTypeException(Bond.BondDataType.BT_LIST, _2db82cf6_fieldType);
+                                                                        ThrowExpression.ThrowInvalidTypeException(BondDataType.BT_LIST, _2db82cf6_fieldType);
                                                                     }
                                                                     reader.ReadFieldEnd();
                                                                     reader.ReadFieldBegin(out _2db82cf6_fieldType, out _2db82cf6_fieldId);
@@ -1068,17 +1073,17 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
                                                             {
                                                                 if ((_2db82cf6_fieldId == 204))
                                                                 {
-                                                                    if ((_2db82cf6_fieldType == Bond.BondDataType.BT_LIST))
+                                                                    if ((_2db82cf6_fieldType == BondDataType.BT_LIST))
                                                                     {
                                                                         int _8c96f4cd_depth;
-                                                                        _8c96f4cd_depth = Bond.MaxDepthChecker.ValidateDepthForIncrement();
+                                                                        _8c96f4cd_depth = MaxDepthChecker.ValidateDepthForIncrement();
                                                                         try
                                                                         {
-                                                                            Bond.MaxDepthChecker.SetDepth((_8c96f4cd_depth + 1));
+                                                                            MaxDepthChecker.SetDepth((_8c96f4cd_depth + 1));
                                                                             int _49eced37_count;
-                                                                            Bond.BondDataType _49eced37_elementType;
+                                                                            BondDataType _49eced37_elementType;
                                                                             reader.ReadContainerBegin(out _49eced37_count, out _49eced37_elementType);
-                                                                            if ((_49eced37_elementType == Bond.BondDataType.BT_UINT32))
+                                                                            if ((_49eced37_elementType == BondDataType.BT_UINT32))
                                                                             {
                                                                                 uint _33267384_ValueSet_result_Entries_value_UInt32ArrayValue_item;
                                                                                 int _1ee17e9d_ValueSet_result_Entries_value_UInt32ArrayValue_count;
@@ -1107,7 +1112,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
                                                                             }
                                                                             else
                                                                             {
-                                                                                if ((_49eced37_elementType == Bond.BondDataType.BT_UINT16))
+                                                                                if ((_49eced37_elementType == BondDataType.BT_UINT16))
                                                                                 {
                                                                                     uint _9c1fba9b_ValueSet_result_Entries_value_UInt32ArrayValue_item;
                                                                                     int _e95911f5_ValueSet_result_Entries_value_UInt32ArrayValue_count;
@@ -1136,7 +1141,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
                                                                                 }
                                                                                 else
                                                                                 {
-                                                                                    if ((_49eced37_elementType == Bond.BondDataType.BT_UINT8))
+                                                                                    if ((_49eced37_elementType == BondDataType.BT_UINT8))
                                                                                     {
                                                                                         uint _6623eaea_ValueSet_result_Entries_value_UInt32ArrayValue_item;
                                                                                         int _c2886692_ValueSet_result_Entries_value_UInt32ArrayValue_count;
@@ -1165,7 +1170,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
                                                                                     }
                                                                                     else
                                                                                     {
-                                                                                        Bond.Expressions.ThrowExpression.ThrowInvalidTypeException(Bond.BondDataType.BT_UINT32, _49eced37_elementType);
+                                                                                        ThrowExpression.ThrowInvalidTypeException(BondDataType.BT_UINT32, _49eced37_elementType);
                                                                                     }
                                                                                 }
                                                                             }
@@ -1173,12 +1178,12 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
                                                                         }
                                                                         finally
                                                                         {
-                                                                            Bond.MaxDepthChecker.SetDepth(_8c96f4cd_depth);
+                                                                            MaxDepthChecker.SetDepth(_8c96f4cd_depth);
                                                                         }
                                                                     }
                                                                     else
                                                                     {
-                                                                        Bond.Expressions.ThrowExpression.ThrowInvalidTypeException(Bond.BondDataType.BT_LIST, _2db82cf6_fieldType);
+                                                                        ThrowExpression.ThrowInvalidTypeException(BondDataType.BT_LIST, _2db82cf6_fieldType);
                                                                     }
                                                                     reader.ReadFieldEnd();
                                                                     reader.ReadFieldBegin(out _2db82cf6_fieldType, out _2db82cf6_fieldId);
@@ -1215,17 +1220,17 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
                                                             {
                                                                 if ((_2db82cf6_fieldId == 206))
                                                                 {
-                                                                    if ((_2db82cf6_fieldType == Bond.BondDataType.BT_LIST))
+                                                                    if ((_2db82cf6_fieldType == BondDataType.BT_LIST))
                                                                     {
                                                                         int _092f826d_depth;
-                                                                        _092f826d_depth = Bond.MaxDepthChecker.ValidateDepthForIncrement();
+                                                                        _092f826d_depth = MaxDepthChecker.ValidateDepthForIncrement();
                                                                         try
                                                                         {
-                                                                            Bond.MaxDepthChecker.SetDepth((_092f826d_depth + 1));
+                                                                            MaxDepthChecker.SetDepth((_092f826d_depth + 1));
                                                                             int _068a9826_count;
-                                                                            Bond.BondDataType _068a9826_elementType;
+                                                                            BondDataType _068a9826_elementType;
                                                                             reader.ReadContainerBegin(out _068a9826_count, out _068a9826_elementType);
-                                                                            if ((_068a9826_elementType == Bond.BondDataType.BT_UINT64))
+                                                                            if ((_068a9826_elementType == BondDataType.BT_UINT64))
                                                                             {
                                                                                 ulong _286a4476_ValueSet_result_Entries_value_UInt64ArrayValue_item;
                                                                                 int _abf48c3b_ValueSet_result_Entries_value_UInt64ArrayValue_count;
@@ -1254,7 +1259,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
                                                                             }
                                                                             else
                                                                             {
-                                                                                if ((_068a9826_elementType == Bond.BondDataType.BT_UINT32))
+                                                                                if ((_068a9826_elementType == BondDataType.BT_UINT32))
                                                                                 {
                                                                                     ulong _a60035a6_ValueSet_result_Entries_value_UInt64ArrayValue_item;
                                                                                     int _85c958cc_ValueSet_result_Entries_value_UInt64ArrayValue_count;
@@ -1283,7 +1288,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
                                                                                 }
                                                                                 else
                                                                                 {
-                                                                                    if ((_068a9826_elementType == Bond.BondDataType.BT_UINT16))
+                                                                                    if ((_068a9826_elementType == BondDataType.BT_UINT16))
                                                                                     {
                                                                                         ulong _64ac5d95_ValueSet_result_Entries_value_UInt64ArrayValue_item;
                                                                                         int _c9948e78_ValueSet_result_Entries_value_UInt64ArrayValue_count;
@@ -1312,7 +1317,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
                                                                                     }
                                                                                     else
                                                                                     {
-                                                                                        if ((_068a9826_elementType == Bond.BondDataType.BT_UINT8))
+                                                                                        if ((_068a9826_elementType == BondDataType.BT_UINT8))
                                                                                         {
                                                                                             ulong _a8668c04_ValueSet_result_Entries_value_UInt64ArrayValue_item;
                                                                                             int _473a9e9b_ValueSet_result_Entries_value_UInt64ArrayValue_count;
@@ -1341,7 +1346,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
                                                                                         }
                                                                                         else
                                                                                         {
-                                                                                            Bond.Expressions.ThrowExpression.ThrowInvalidTypeException(Bond.BondDataType.BT_UINT64, _068a9826_elementType);
+                                                                                            ThrowExpression.ThrowInvalidTypeException(BondDataType.BT_UINT64, _068a9826_elementType);
                                                                                         }
                                                                                     }
                                                                                 }
@@ -1350,12 +1355,12 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
                                                                         }
                                                                         finally
                                                                         {
-                                                                            Bond.MaxDepthChecker.SetDepth(_092f826d_depth);
+                                                                            MaxDepthChecker.SetDepth(_092f826d_depth);
                                                                         }
                                                                     }
                                                                     else
                                                                     {
-                                                                        Bond.Expressions.ThrowExpression.ThrowInvalidTypeException(Bond.BondDataType.BT_LIST, _2db82cf6_fieldType);
+                                                                        ThrowExpression.ThrowInvalidTypeException(BondDataType.BT_LIST, _2db82cf6_fieldType);
                                                                     }
                                                                     reader.ReadFieldEnd();
                                                                     reader.ReadFieldBegin(out _2db82cf6_fieldType, out _2db82cf6_fieldId);
@@ -1392,17 +1397,17 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
                                                             {
                                                                 if ((_2db82cf6_fieldId == 219))
                                                                 {
-                                                                    if ((_2db82cf6_fieldType == Bond.BondDataType.BT_LIST))
+                                                                    if ((_2db82cf6_fieldType == BondDataType.BT_LIST))
                                                                     {
                                                                         int _3df22921_depth;
-                                                                        _3df22921_depth = Bond.MaxDepthChecker.ValidateDepthForIncrement();
+                                                                        _3df22921_depth = MaxDepthChecker.ValidateDepthForIncrement();
                                                                         try
                                                                         {
-                                                                            Bond.MaxDepthChecker.SetDepth((_3df22921_depth + 1));
+                                                                            MaxDepthChecker.SetDepth((_3df22921_depth + 1));
                                                                             int _9c542f93_count;
-                                                                            Bond.BondDataType _9c542f93_elementType;
+                                                                            BondDataType _9c542f93_elementType;
                                                                             reader.ReadContainerBegin(out _9c542f93_count, out _9c542f93_elementType);
-                                                                            if ((_9c542f93_elementType == Bond.BondDataType.BT_STRING))
+                                                                            if ((_9c542f93_elementType == BondDataType.BT_STRING))
                                                                             {
                                                                                 string _f9c18fe1_ValueSet_result_Entries_value_StringArrayValue_item;
                                                                                 int _b47fb1bf_ValueSet_result_Entries_value_StringArrayValue_count;
@@ -1431,18 +1436,18 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
                                                                             }
                                                                             else
                                                                             {
-                                                                                Bond.Expressions.ThrowExpression.ThrowInvalidTypeException(Bond.BondDataType.BT_STRING, _9c542f93_elementType);
+                                                                                ThrowExpression.ThrowInvalidTypeException(BondDataType.BT_STRING, _9c542f93_elementType);
                                                                             }
                                                                             reader.ReadContainerEnd();
                                                                         }
                                                                         finally
                                                                         {
-                                                                            Bond.MaxDepthChecker.SetDepth(_3df22921_depth);
+                                                                            MaxDepthChecker.SetDepth(_3df22921_depth);
                                                                         }
                                                                     }
                                                                     else
                                                                     {
-                                                                        Bond.Expressions.ThrowExpression.ThrowInvalidTypeException(Bond.BondDataType.BT_LIST, _2db82cf6_fieldType);
+                                                                        ThrowExpression.ThrowInvalidTypeException(BondDataType.BT_LIST, _2db82cf6_fieldType);
                                                                     }
                                                                     reader.ReadFieldEnd();
                                                                     reader.ReadFieldBegin(out _2db82cf6_fieldType, out _2db82cf6_fieldId);
@@ -1475,9 +1480,9 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
                                                         ; ;
                                                         )
                                                         {
-                                                            if ((_2db82cf6_fieldType != Bond.BondDataType.BT_STOP))
+                                                            if ((_2db82cf6_fieldType != BondDataType.BT_STOP))
                                                             {
-                                                                if ((_2db82cf6_fieldType == Bond.BondDataType.BT_STOP_BASE))
+                                                                if ((_2db82cf6_fieldType == BondDataType.BT_STOP_BASE))
                                                                 {
                                                                 }
                                                                 else
@@ -1496,7 +1501,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
                                                     }
                                                     finally
                                                     {
-                                                        Bond.MaxDepthChecker.SetDepth(_00a83d10_depth);
+                                                        MaxDepthChecker.SetDepth(_00a83d10_depth);
                                                     }
                                                     _7aa17938_ValueSet_result.Entries[_391bf79b_ValueSet_result_Entries_key] = _391bf79b_ValueSet_result_Entries_value;
                                                 }
@@ -1508,23 +1513,23 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
                                         }
                                         else
                                         {
-                                            Bond.Expressions.ThrowExpression.ThrowInvalidTypeException(Bond.BondDataType.BT_STRUCT, _fa06a779_valueType);
+                                            ThrowExpression.ThrowInvalidTypeException(BondDataType.BT_STRUCT, _fa06a779_valueType);
                                         }
                                     }
                                     else
                                     {
-                                        Bond.Expressions.ThrowExpression.ThrowInvalidTypeException(Bond.BondDataType.BT_WSTRING, _fa06a779_keyType);
+                                        ThrowExpression.ThrowInvalidTypeException(BondDataType.BT_WSTRING, _fa06a779_keyType);
                                     }
                                     reader.ReadContainerEnd();
                                 }
                                 finally
                                 {
-                                    Bond.MaxDepthChecker.SetDepth(_90463c3d_depth);
+                                    MaxDepthChecker.SetDepth(_90463c3d_depth);
                                 }
                             }
                             else
                             {
-                                Bond.Expressions.ThrowExpression.ThrowInvalidTypeException(Bond.BondDataType.BT_MAP, _c7f2a99e_fieldType);
+                                ThrowExpression.ThrowInvalidTypeException(BondDataType.BT_MAP, _c7f2a99e_fieldType);
                             }
                             reader.ReadFieldEnd();
                             reader.ReadFieldBegin(out _c7f2a99e_fieldType, out _c7f2a99e_fieldId);
@@ -1557,9 +1562,9 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
                 ; ;
                 )
                 {
-                    if ((_c7f2a99e_fieldType != Bond.BondDataType.BT_STOP))
+                    if ((_c7f2a99e_fieldType != BondDataType.BT_STOP))
                     {
-                        if ((_c7f2a99e_fieldType == Bond.BondDataType.BT_STOP_BASE))
+                        if ((_c7f2a99e_fieldType == BondDataType.BT_STOP_BASE))
                         {
                         }
                         else
@@ -1578,7 +1583,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Serialization
             }
             finally
             {
-                Bond.MaxDepthChecker.SetDepth(_4dde9690_depth);
+                MaxDepthChecker.SetDepth(_4dde9690_depth);
             }
             return ((object)(_7aa17938_ValueSet_result));
         }

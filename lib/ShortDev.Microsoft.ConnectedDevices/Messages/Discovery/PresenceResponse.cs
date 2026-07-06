@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Messages.Discovery;
 
-public readonly record struct PresenceResponse : IBinaryWritable, IBinaryParsable<PresenceResponse>
+public readonly record struct PresenceResponse : IBinaryWritable<PresenceResponse>, IBinaryParsable<PresenceResponse>
 {
     public required ConnectionMode ConnectionMode { get; init; }
 

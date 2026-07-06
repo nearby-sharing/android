@@ -1,6 +1,6 @@
 ﻿namespace ShortDev.Microsoft.ConnectedDevices.Messages.Discovery;
 
-public readonly record struct DiscoveryHeader : IBinaryWritable, IBinaryParsable<DiscoveryHeader>
+public readonly record struct DiscoveryHeader : IBinaryWritable<DiscoveryHeader>, IBinaryParsable<DiscoveryHeader>
 {
     public static DiscoveryHeader Parse<TReader>(ref TReader reader) where TReader : struct, IEndianReader, allows ref struct
         => new()

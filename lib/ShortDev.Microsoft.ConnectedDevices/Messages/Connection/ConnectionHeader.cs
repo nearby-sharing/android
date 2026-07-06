@@ -3,7 +3,7 @@
 /// <summary>
 /// The <see cref="ConnectionHeader"/> is common for all Connection Messages.
 /// </summary>
-public readonly record struct ConnectionHeader : IBinaryWritable, IBinaryParsable<ConnectionHeader>
+public readonly record struct ConnectionHeader : IBinaryWritable<ConnectionHeader>, IBinaryParsable<ConnectionHeader>
 {
     /// <summary>
     /// Indicates the current connection type.

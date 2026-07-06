@@ -1,25 +1,22 @@
-﻿using Bond.IO.Unsafe;
-using Bond.Protocols;
+﻿using ShortDev.IO.Bond;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Serialization;
 
-public partial class ValueSet : IBinaryWritable
+public partial class ValueSet : IBinaryWritable<ValueSet>
 {
-    public static ValueSet Parse(ref HeapEndianReader reader)
+    // The Bond serialization does not work with the size calculator
+    ulong IBinaryWritable<ValueSet>.MinimumSize { get; } = 0;
+
+    public static ValueSet Parse<TReader>(ref TReader reader) where TReader : struct, IEndianReader, allows ref struct
     {
-        // ToDo: We really should not re-allocated here!!
-        byte[] data = new byte[reader.Stream.Length - reader.Stream.Position];
-        reader.ReadBytes(data);
-        CompactBinaryReader<InputBuffer> bondReader = new(new(data));
-        return (ValueSet)ValueSetHelper.Deserialize(bondReader);
+        CompactBinaryReader<TReader> bondReader = new(ref reader);
+        return (ValueSet)ValueSetHelper.Deserialize(ref bondReader);
     }
 
     public void Write<TWriter>(ref TWriter writer) where TWriter : struct, IEndianWriter, allows ref struct
     {
-        OutputBuffer buffer = new();
-        CompactBinaryWriter<OutputBuffer> bondWriter = new(buffer);
-        ValueSetHelper.Serialize(this, bondWriter);
-        writer.Write(buffer.Data);
+        CompactBinaryWriter<TWriter> bondWriter = new(ref writer);
+        ValueSetHelper.Serialize(this, ref bondWriter);
     }
 
     /// <summary>

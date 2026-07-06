@@ -11,8 +11,7 @@
 	<ItemGroup>
 		<PackageReference Include="ShortDev.Microsoft.CorrelationVector" Version="2.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.8" />
-		<PackageReference Include="Bond.Core.CSharp" Version="13.0.2" />
-		<PackageReference Include="ShortDev.IO" Version="0.2.0-alpha.1" />
+		<PackageReference Include="ShortDev.IO" Version="0.4.0-alpha" />
 	</ItemGroup>
 
 	<ItemGroup Label="Global Usings">

@@ -1,8 +1,8 @@
 ﻿using ShortDev.Microsoft.ConnectedDevices.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Control;
-using ShortDev.Microsoft.ConnectedDevices.Messages.Session;
 using ShortDev.Microsoft.ConnectedDevices.Session.Channels;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
+using System.Runtime.CompilerServices;
 
 namespace ShortDev.Microsoft.ConnectedDevices;
 
@@ -49,30 +49,24 @@ public sealed class CdpChannel : IDisposable
     internal void HandleMessage(CdpMessage msg)
         => MessageReceived?.Invoke(this, msg);
 
-    public void SendBinaryMessage(BodyCallback bodyCallback, uint msgId)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void SendMessage<TMessage>(in TMessage message) where TMessage : IBinaryWritable<TMessage>
+        => SendMessage(in EmptyMessage.Instance, in message);
+
+    public void SendMessage<THeader, TMessage>(in THeader header, in TMessage message)
+        where THeader : IBinaryWritable<THeader>
+        where TMessage : IBinaryWritable<TMessage>
     {
-        CommonHeader header = new()
-        {
-            Type = MessageType.Session,
-            ChannelId = ChannelId
-        };
-
-        var writer = EndianWriter.Create(Endianness.BigEndian, ConnectedDevicesPlatform.MemoryPool);
-        try
-        {
-            new BinaryMsgHeader()
+        Session.SendMessage(
+            Socket,
+            new CommonHeader()
             {
-                MessageId = msgId
-            }.Write(ref writer);
-            bodyCallback(ref writer);
-
-            using SpeedMeassure speedMeassure = new((uint)writer.Stream.WrittenSpan.Length);
-            Session.SendMessage(Socket, header, writer.Stream.WrittenSpan);
-        }
-        finally
-        {
-            writer.Dispose();
-        }
+                Type = MessageType.Session,
+                ChannelId = ChannelId
+            },
+            in header,
+            in message
+        );
     }
 
     void IDisposable.Dispose()

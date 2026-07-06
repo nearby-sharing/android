@@ -6,7 +6,7 @@ namespace ShortDev.Microsoft.ConnectedDevices.Messages.Connection;
 /// <summary>
 /// Client initiates a connection request with a host device.
 /// </summary>
-public readonly record struct ConnectionRequest : IBinaryWritable, IBinaryParsable<ConnectionRequest>
+public readonly record struct ConnectionRequest : IBinaryWritable<ConnectionRequest>, IBinaryParsable<ConnectionRequest>
 {
     /// <summary>
     /// The type of elliptical curve used.
