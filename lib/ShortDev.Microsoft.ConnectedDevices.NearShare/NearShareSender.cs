@@ -21,15 +21,13 @@ public sealed class NearShareSender(ConnectedDevicesPlatform platform)
 
         Guid operationId = Guid.NewGuid();
 
-        using var handShakeChannel = await session.StartClientChannelAsync<HandshakeHandler>(cancellationToken).ConfigureAwait(false);
-        HandshakeHandler handshake = new(handShakeChannel);
+        using var handshake = await session.StartClientChannelAsync<HandshakeHandler>(cancellationToken).ConfigureAwait(false);
         await handshake.Execute(operationId).ConfigureAwait(false);
 
         // ToDo: CorrelationVector
         // var cv = handshakeResultMsg.Header.TryGetCorrelationVector() ?? throw new InvalidDataException("No Correlation Vector");
 
-        var channel = await session.StartClientChannelAsync(operationId.ToString("D").ToUpper(), NearShareApp.Name, cancellationToken).ConfigureAwait(false);
-        SenderStateMachine senderStateMachine = new(channel);
+        var senderStateMachine = await session.StartClientChannelAsync<SenderStateMachine>(operationId.ToString("D").ToUpper(), NearShareApp.Name, cancellationToken).ConfigureAwait(false);
         return senderStateMachine;
     }
 
@@ -48,7 +46,7 @@ public sealed class NearShareSender(ConnectedDevicesPlatform platform)
         await senderStateMachine.SendFilesAsync(files, progress, cancellationToken).ConfigureAwait(false);
     }
 
-    sealed class HandshakeHandler(CdpChannel channel) : CdpBondApp(channel), ICdpAppId
+    sealed class HandshakeHandler(CdpChannel channel) : CdpBondApp(channel), ICdpAppFactory<HandshakeHandler>, ICdpAppId
     {
         public static string Id { get; } = NearShareHandshakeApp.Id;
         public static string Name { get; } = NearShareHandshakeApp.Name;
@@ -76,9 +74,11 @@ public sealed class NearShareSender(ConnectedDevicesPlatform platform)
 
             _promise.SetResult();
         }
+
+        static HandshakeHandler ICdpAppFactory<HandshakeHandler>.Create(CdpChannel channel) => new(channel);
     }
 
-    sealed class SenderStateMachine(CdpChannel channel) : CdpBondApp(channel)
+    sealed class SenderStateMachine(CdpChannel channel) : CdpBondApp(channel), ICdpAppFactory<SenderStateMachine>
     {
         readonly TaskCompletionSource _promise = new();
         public async Task SendUriAsync(Uri uri)
@@ -198,6 +198,8 @@ public sealed class NearShareSender(ConnectedDevicesPlatform platform)
                 TotalFiles = (uint)_files.Count
             });
         }
+
+        static SenderStateMachine ICdpAppFactory<SenderStateMachine>.Create(CdpChannel channel) => new(channel);
 
         private readonly struct DataResponseMessage : IBinaryWritable<DataResponseMessage>
         {

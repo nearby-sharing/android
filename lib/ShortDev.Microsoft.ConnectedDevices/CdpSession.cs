@@ -207,8 +207,19 @@ public sealed class CdpSession : IDisposable
     }
     #endregion
 
-    public Task<CdpChannel> StartClientChannelAsync<TApp>(CancellationToken cancellationToken = default) where TApp : ICdpAppId
-        => StartClientChannelAsync(TApp.Id, TApp.Name, cancellationToken);
+    public async Task<TApp> StartClientChannelAsync<TApp>(CancellationToken cancellationToken = default)
+        where TApp : CdpAppBase, ICdpAppFactory<TApp>, ICdpAppId
+    {
+        var channel = await StartClientChannelAsync(TApp.Id, TApp.Name, cancellationToken).ConfigureAwait(false);
+        return TApp.Create(channel);
+    }
+
+    public async Task<TApp> StartClientChannelAsync<TApp>(string appId, string appName, CancellationToken cancellationToken = default)
+        where TApp : CdpAppBase, ICdpAppFactory<TApp>
+    {
+        var channel = await StartClientChannelAsync(appId, appName, cancellationToken).ConfigureAwait(false);
+        return TApp.Create(channel);
+    }
 
     public async Task<CdpChannel> StartClientChannelAsync(string appId, string appName, CancellationToken cancellationToken = default)
     {

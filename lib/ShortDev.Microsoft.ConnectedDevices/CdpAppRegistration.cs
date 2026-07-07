@@ -17,6 +17,9 @@ public static class CdpAppRegistration
 
     private static readonly ConcurrentDictionary<string, AppId> _registration = new(StringComparer.OrdinalIgnoreCase);
 
+    public static void RegisterApp<TApp>() where TApp : CdpAppBase, ICdpAppFactory<TApp>, ICdpAppId
+        => RegisterApp(TApp.Id, TApp.Name, TApp.Create);
+
     public static void RegisterApp<TApp>(CdpAppFactory<TApp> factory) where TApp : CdpAppBase, ICdpAppId
         => RegisterApp(TApp.Id, TApp.Name, factory);
 
@@ -39,4 +42,10 @@ public static class CdpAppRegistration
 
         return _registration[id].Factory(channel);
     }
+}
+
+public interface ICdpAppFactory<out TApp>
+    where TApp : CdpAppBase
+{
+    static abstract TApp Create(CdpChannel channel);
 }
