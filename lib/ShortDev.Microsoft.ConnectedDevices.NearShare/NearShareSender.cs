@@ -21,7 +21,7 @@ public sealed class NearShareSender(ConnectedDevicesPlatform platform)
 
         Guid operationId = Guid.NewGuid();
 
-        using var handshake = await session.StartClientChannelAsync<HandshakeHandler>(cancellationToken).ConfigureAwait(false);
+        var handshake = await session.StartClientChannelAsync<HandshakeHandler>(cancellationToken).ConfigureAwait(false);
         await handshake.Execute(operationId).ConfigureAwait(false);
 
         // ToDo: CorrelationVector

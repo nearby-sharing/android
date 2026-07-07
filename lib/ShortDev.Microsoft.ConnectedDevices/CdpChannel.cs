@@ -74,6 +74,8 @@ public sealed class CdpChannel : IDisposable
 
     public void Dispose(bool closeSession = false, bool closeSocket = false)
     {
+        MessageReceived = null;
+
         _handler.UnregisterChannel(this);
         if (closeSocket)
             Socket.Dispose(); // ToDo: Heartbeat!
@@ -81,12 +83,8 @@ public sealed class CdpChannel : IDisposable
             Session.Dispose(); // ToDo: Heartbeat!
     }
 
-    internal static CdpChannel CreateServerChannel(ChannelHandler handler, CdpSocket socket, StartChannelRequest request, ulong channelId, out CdpAppBase app)
-    {
-        CdpChannel channel = new(handler, channelId, socket);
-        app = CdpAppRegistration.InstantiateApp(request.Id, request.Name, channel);
-        return channel;
-    }
+    internal static CdpChannel CreateServerChannel(ChannelHandler handler, CdpSocket socket, ulong channelId)
+        => new(handler, channelId, socket);
 
     internal static CdpChannel CreateClientChannel(ChannelHandler handler, CdpSocket socket, StartChannelResponse response)
         => new(handler, response.ChannelId, socket);

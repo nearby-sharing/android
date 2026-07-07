@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ShortDev.Microsoft.ConnectedDevices;
 
@@ -41,6 +42,21 @@ public static class CdpAppRegistration
         ArgumentException.ThrowIfNullOrEmpty(name);
 
         return _registration[id].Factory(channel);
+    }
+
+    internal static bool TryGetAppFactory(string id, string name, [MaybeNullWhen(false)] out CdpAppFactory<CdpAppBase> factory)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(id);
+        ArgumentException.ThrowIfNullOrEmpty(name);
+
+        if (!_registration.TryGetValue(id, out var appId))
+        {
+            factory = null;
+            return false;
+        }
+
+        factory = appId.Factory;
+        return true;
     }
 }
 

@@ -20,10 +20,20 @@ internal sealed class HostChannelHandler(CdpSession session) : ChannelHandler(se
             new byte[] { 0x30, 0x0, 0x0, 0x1 }
         ));
         header.RequestID = 0;
-
-        _channelRegistry.Create(channelId => CdpChannel.CreateServerChannel(this, socket, request, channelId, out _), out var channelId);
-
         header.Flags = 0;
+
+        (ChannelResult result, ulong channelId) result;
+        if (!CdpAppRegistration.TryGetAppFactory(request.Id, request.Name, out var appFactory))
+        {
+            result = (ChannelResult.Failure_NotFound, 0);
+        }
+        else
+        {
+            var channel = _channelRegistry.Create(channelId => CdpChannel.CreateServerChannel(this, socket, channelId), out var channelId);
+            appFactory(channel);
+            result = (ChannelResult.Success, channelId);
+        }
+
         Session.SendMessage(
             socket,
             ref header,
@@ -33,8 +43,8 @@ internal sealed class HostChannelHandler(CdpSession session) : ChannelHandler(se
             },
             new StartChannelResponse()
             {
-                Result = ChannelResult.Success,
-                ChannelId = channelId
+                Result = result.result,
+                ChannelId = result.channelId
             }
         );
     }
