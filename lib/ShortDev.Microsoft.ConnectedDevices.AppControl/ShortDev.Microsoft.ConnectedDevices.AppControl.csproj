@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<IsAotCompatible>true</IsAotCompatible>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\ShortDev.Microsoft.ConnectedDevices\ShortDev.Microsoft.ConnectedDevices.csproj" />
+	</ItemGroup>
+
+	<ItemGroup Label="Global Usings">
+		<Using Include="ShortDev.IO" />
+		<Using Include="ShortDev.IO.Input" />
+		<Using Include="ShortDev.IO.Output" />
+	</ItemGroup>
+
+</Project>

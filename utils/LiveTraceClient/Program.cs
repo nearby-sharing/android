@@ -1,16 +1,17 @@
-﻿using ShortDev.Microsoft.ConnectedDevices;
-using ShortDev.Microsoft.ConnectedDevices.Messages;
-using ShortDev.Microsoft.ConnectedDevices.Transports;
-using System.IO.Pipes;
-using System.Security.AccessControl;
-using System.Security.Principal;
-using ShortDev.IO;
+﻿using ShortDev.IO;
 using ShortDev.IO.Input;
+using ShortDev.Microsoft.ConnectedDevices;
+using ShortDev.Microsoft.ConnectedDevices.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection;
-using ShortDev.Microsoft.ConnectedDevices.Messages.Control;
+using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.Authentication;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.DeviceInfo;
 using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.TransportUpgrade;
-using ShortDev.Microsoft.ConnectedDevices.Messages.Connection.Authentication;
+using ShortDev.Microsoft.ConnectedDevices.Messages.Control;
+using ShortDev.Microsoft.ConnectedDevices.Transports;
+using System.IO.Pipes;
+using System.Runtime.InteropServices;
+using System.Security.AccessControl;
+using System.Security.Principal;
 
 const string pipeName = "CDPInOut";
 
@@ -75,9 +76,9 @@ static void HandleMessage(ReadOnlySpan<byte> message)
     if (!CommonHeader.TryParse(ref reader, out var header, out var ex))
         throw ex;
 
-    if (header.Type == MessageType.Session)
+    if (header.Type == MessageType.Discovery)
     {
-        Console.WriteLine("Session message - skipping detailed parsing.");
+        Console.WriteLine("Discovery message - skipping detailed parsing.");
         return;
     }
 
@@ -160,5 +161,40 @@ static void HandleMessage(ReadOnlySpan<byte> message)
                     break;
             }
             break;
+
+        case MessageType.Session:
+            var msg = Session.GetMessage(header);
+            msg.AddFragment(reader.Stream.ReadSlice((int)(reader.Stream.Length - reader.Stream.Position)));
+            if (msg.IsComplete)
+            {
+                Console.WriteLine($"SessionId={header.SessionId:X}, ChannelId={header.ChannelId:X}");
+                Console.WriteLine(Convert.ToHexString(msg.Content.Span));
+            }
+            break;
+    }
+}
+
+sealed class Session
+{
+    private static readonly Dictionary<(uint sessionId, uint sequenceNumber, ulong requestId), CdpMessage> Messages = [];
+    public static CdpMessage GetMessage(CommonHeader header)
+    {
+        var localSessionId = SessionId.Parse(header.SessionId).LocalSessionId;
+        var sequenceNumber = header.SequenceNumber;
+        var requestId = header.RequestID;
+
+        return Messages.GetOrAdd((localSessionId, sequenceNumber, requestId), id => new(header));
+    }
+}
+
+static class Extensions
+{
+    public static TValue GetOrAdd<TKey, TValue>(this Dictionary<TKey, TValue> @this, TKey key, Func<TKey, TValue> factory)
+        where TKey : notnull
+    {
+        ref var value = ref CollectionsMarshal.GetValueRefOrAddDefault(@this, key, out var exists);
+        if (!exists || value is null)
+            value = factory(key);
+        return value;
     }
 }
