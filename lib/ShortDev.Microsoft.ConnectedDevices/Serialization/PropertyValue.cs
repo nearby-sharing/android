@@ -1,97 +1,61 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.Diagnostics;
 
 namespace ShortDev.Microsoft.ConnectedDevices.Serialization;
 
 [DebuggerDisplay("Type = {Type}, Value = {Get()}")]
-public partial class PropertyValue
+public partial struct PropertyValue
 {
-    internal object Get()
+    internal readonly object? Get()
     {
         return Type switch
         {
-            PropertyType.PropertyType_Empty => throw new NullReferenceException(),
-            PropertyType.PropertyType_UInt8Array => UInt8ArrayValue,
+            PropertyType.PropertyType_Empty => null,
+            PropertyType.PropertyType_UInt8 => UInt8Value,
+            PropertyType.PropertyType_Int16 => Int16Value,
+            PropertyType.PropertyType_UInt16 => UInt16Value,
             PropertyType.PropertyType_Int32 => Int32Value,
             PropertyType.PropertyType_UInt32 => UInt32Value,
-            PropertyType.PropertyType_UInt32Array => UInt32ArrayValue,
+            PropertyType.PropertyType_Int64 => Int64Value,
             PropertyType.PropertyType_UInt64 => UInt64Value,
-            PropertyType.PropertyType_UInt64Array => UInt64ArrayValue,
+            PropertyType.PropertyType_Float => FloatValue,
+            PropertyType.PropertyType_Double => DoubleValue,
+            PropertyType.PropertyType_Char => (char)CharValue,
+            PropertyType.PropertyType_Boolean => BooleanValue,
+            PropertyType.PropertyType_WString => WStringValue,
+            PropertyType.PropertyType_DateTimeOffset => DateTimeOffset.FromFileTime(DateTimeOffsetValue),
+            PropertyType.PropertyType_TimeSpan => TimeSpan.FromTicks(TimeSpanValue),
+            PropertyType.PropertyType_Guid => GuidValue?.ToGuid() ?? default,
+            PropertyType.PropertyType_Point => PointValue,
+            PropertyType.PropertyType_Size => SizeValue,
+            PropertyType.PropertyType_Rect => RectValue,
+            PropertyType.PropertyType_ValueSet => ValueSetValue,
+
             PropertyType.PropertyType_String => StringValue,
+
+            PropertyType.PropertyType_UInt8Array => UInt8ArrayValue,
+            PropertyType.PropertyType_Int16Array => Int16ArrayValue,
+            PropertyType.PropertyType_UInt16Array => UInt16ArrayValue,
+            PropertyType.PropertyType_Int32Array => Int32ArrayValue,
+            PropertyType.PropertyType_UInt32Array => UInt32ArrayValue,
+            PropertyType.PropertyType_Int64Array => Int64ArrayValue,
+            PropertyType.PropertyType_UInt64Array => UInt64ArrayValue,
+            PropertyType.PropertyType_FloatArray => FloatArrayValue,
+            PropertyType.PropertyType_DoubleArray => DoubleArrayValue,
+            PropertyType.PropertyType_CharArray => CharArrayValue.ConvertAll(static x => unchecked((char)x)),
+            PropertyType.PropertyType_BooleanArray => BooleanArrayValue.ConvertAll(static x => x != 0),
+            PropertyType.PropertyType_WStringArray => WStringArrayValue,
+            PropertyType.PropertyType_DateTimeOffsetArray => DateTimeOffsetArrayValue.ConvertAll(DateTimeOffset.FromFileTime),
+            PropertyType.PropertyType_TimeSpanArray => TimeSpanArrayValue.ConvertAll(TimeSpan.FromTicks),
+            PropertyType.PropertyType_GuidArray => GuidArrayValue.ConvertAll(static x => x.ToGuid()),
+            PropertyType.PropertyType_PointArray => PointArrayValue,
+            PropertyType.PropertyType_SizeArray => SizeArrayValue,
+            PropertyType.PropertyType_RectArray => RectArrayValue,
+
             PropertyType.PropertyType_StringArray => StringArrayValue,
-            PropertyType.PropertyType_GuidArray => GuidArrayValue,
-            _ => throw new NotImplementedException(),
+            _ => throw new UnreachableException("Invalid property type"),
         };
     }
 
-    public T Get<T>()
-    {
-        var value = Get();
-        if (typeof(T) == typeof(Guid))
-            return (T)(object)((List<UUID>)value)[0].ToGuid();
-
-        return (T)value;
-    }
-
-    public static PropertyValue Create<T>(T value)
-    {
-        PropertyValue result = new();
-        result.Set(value);
-        return result;
-    }
-
-    public void Set<T>(T value)
-    {
-        if (value is Guid guidValue)
-            SetInternal(new[] { guidValue });
-        else
-            SetInternal(value);
-    }
-
-    void SetInternal<T>(T value)
-    {
-        switch (value)
-        {
-            case IEnumerable<byte> uint8ArrayValue:
-                Type = PropertyType.PropertyType_UInt8Array;
-                this.UInt8ArrayValue = uint8ArrayValue.ToList();
-                break;
-            case int int32Value:
-                Type = PropertyType.PropertyType_Int32;
-                this.Int32Value = int32Value;
-                break;
-            case uint uint32Value:
-                Type = PropertyType.PropertyType_UInt32;
-                this.UInt32Value = uint32Value;
-                break;
-            case IEnumerable<uint> uint32ArrayValue:
-                Type = PropertyType.PropertyType_UInt32Array;
-                this.UInt32ArrayValue = uint32ArrayValue.ToList();
-                break;
-            case ulong uint64Value:
-                Type = PropertyType.PropertyType_UInt64;
-                this.UInt64Value = uint64Value;
-                break;
-            case IEnumerable<ulong> uint64ArrayValue:
-                Type = PropertyType.PropertyType_UInt64Array;
-                this.UInt64ArrayValue = uint64ArrayValue.ToList();
-                break;
-            case string stringValue:
-                Type = PropertyType.PropertyType_String;
-                this.StringValue = stringValue;
-                break;
-            case IEnumerable<string> stringArrayValue:
-                Type = PropertyType.PropertyType_StringArray;
-                this.StringArrayValue = stringArrayValue.ToList();
-                break;
-            case IEnumerable<Guid> guidArrayValue:
-                Type = PropertyType.PropertyType_GuidArray;
-                this.GuidArrayValue = guidArrayValue.Select(UUID.FromGuid).ToList();
-                break;
-            default:
-                throw new NotImplementedException();
-        }
-    }
+    public readonly T? Get<T>()
+        => (T?)Get();
 }

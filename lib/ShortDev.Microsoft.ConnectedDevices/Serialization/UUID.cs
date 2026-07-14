@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-
-namespace ShortDev.Microsoft.ConnectedDevices.Serialization;
+﻿namespace ShortDev.Microsoft.ConnectedDevices.Serialization;
 
 public partial class UUID
 {

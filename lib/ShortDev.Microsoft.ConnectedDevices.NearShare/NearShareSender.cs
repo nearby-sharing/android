@@ -4,8 +4,8 @@ using ShortDev.Microsoft.ConnectedDevices.NearShare.Apps;
 using ShortDev.Microsoft.ConnectedDevices.NearShare.Messages;
 using ShortDev.Microsoft.ConnectedDevices.Serialization;
 using ShortDev.Microsoft.ConnectedDevices.Transports;
-using System.Buffers;
 using System.Diagnostics;
+using System.Text;
 
 namespace ShortDev.Microsoft.ConnectedDevices.NearShare;
 
@@ -83,12 +83,14 @@ public sealed class NearShareSender(ConnectedDevicesPlatform platform)
         readonly TaskCompletionSource _promise = new();
         public async Task SendUriAsync(Uri uri)
         {
-            ValueSet valueSet = new();
-            valueSet.Add("ControlMessage", (uint)NearShareControlMsgType.StartTransfer);
-            valueSet.Add("DataKind", (uint)DataKind.Uri);
-            valueSet.Add("BytesToSend", 0);
-            valueSet.Add("FileCount", 0);
-            valueSet.Add("Uri", uri.ToString());
+            ValueSet valueSet = new()
+            {
+                { "ControlMessage", (uint)NearShareControlMsgType.StartTransfer },
+                { "DataKind", (uint)DataKind.Uri },
+                { "BytesToSend", (ulong)0uL },
+                { "FileCount", (uint)0u },
+                { "Uri", uri.ToString(), Encoding.UTF8 }
+            };
             SendValueSet(valueSet, 10);
 
             await _promise.Task.ConfigureAwait(false);
@@ -107,14 +109,16 @@ public sealed class NearShareSender(ConnectedDevicesPlatform platform)
             uint fileCount = (uint)files.Count;
             _bytesToSend = CalcBytesToSend(files);
 
-            ValueSet valueSet = new();
-            valueSet.Add("ControlMessage", (uint)NearShareControlMsgType.StartTransfer);
-            valueSet.Add("DataKind", (uint)DataKind.File);
-            valueSet.Add<ulong>("BytesToSend", _bytesToSend);
-            valueSet.Add<uint>("FileCount", fileCount);
-            valueSet.Add<uint[]>("ContentIds", GenerateContentIds(fileCount));
-            valueSet.Add<ulong[]>("ContentSizes", files.Select(x => x.FileSize).ToArray());
-            valueSet.Add<string[]>("FileNames", files.Select(x => x.FileName).ToArray());
+            ValueSet valueSet = new()
+            {
+                { "ControlMessage", (uint)NearShareControlMsgType.StartTransfer },
+                { "DataKind", (uint)DataKind.File },
+                { "BytesToSend", (ulong)_bytesToSend },
+                { "FileCount", (uint)fileCount },
+                { "ContentIds", GenerateContentIds(fileCount).ToList<uint>() },
+                { "ContentSizes", files.Select(x => x.FileSize).ToList<ulong>() },
+                { "FileNames", Encoding.UTF8, [.. files.Select(x => x.FileName)] }
+            };
             SendValueSet(valueSet, 10);
 
             cancellationToken.Register(() =>
@@ -122,8 +126,10 @@ public sealed class NearShareSender(ConnectedDevicesPlatform platform)
                 if (!_promise.TrySetCanceled())
                     return;
 
-                ValueSet request = new();
-                request.Add("ControlMessage", (uint)NearShareControlMsgType.CancelTransfer);
+                ValueSet request = new()
+                {
+                    { "ControlMessage", (uint)NearShareControlMsgType.CancelTransfer }
+                };
                 SendValueSet(request, 11);
             });
 

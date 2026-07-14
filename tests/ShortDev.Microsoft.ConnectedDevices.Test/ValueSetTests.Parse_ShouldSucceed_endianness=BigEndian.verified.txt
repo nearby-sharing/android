@@ -1,0 +1,355 @@
+﻿{
+  CorrelationId: {
+    Type: PropertyType_WString,
+    BooleanValue: false,
+    WStringValue: QRUYfgjbmECU3sHCtBv5sg.0,
+    StringValue: 
+  },
+  InputData: {
+    Type: PropertyType_ValueSet,
+    BooleanValue: false,
+    WStringValue: ,
+    ValueSetValue: {
+      System.Boolean: {
+        Type: PropertyType_Boolean,
+        BooleanValue: true,
+        WStringValue: ,
+        StringValue: 
+      },
+      System.Boolean[]: {
+        Type: PropertyType_BooleanArray,
+        BooleanValue: false,
+        WStringValue: ,
+        StringValue: ,
+        BooleanArrayValue: [
+          1
+        ]
+      },
+      System.Byte: {
+        Type: PropertyType_UInt8,
+        UInt8Value: 42,
+        BooleanValue: false,
+        WStringValue: ,
+        StringValue: 
+      },
+      System.Byte[]: {
+        Type: PropertyType_UInt8Array,
+        BooleanValue: false,
+        WStringValue: ,
+        StringValue: ,
+        UInt8ArrayValue: [
+          42
+        ]
+      },
+      System.Char: {
+        Type: PropertyType_Char,
+        CharValue: 42,
+        BooleanValue: false,
+        WStringValue: ,
+        StringValue: 
+      },
+      System.Char[]: {
+        Type: PropertyType_CharArray,
+        BooleanValue: false,
+        WStringValue: ,
+        StringValue: ,
+        CharArrayValue: [
+          42
+        ]
+      },
+      System.DateTimeOffset: {
+        Type: PropertyType_DateTimeOffset,
+        BooleanValue: false,
+        WStringValue: ,
+        DateTimeOffsetValue: 134280160322683014,
+        StringValue: 
+      },
+      System.DateTimeOffset[]: {
+        Type: PropertyType_DateTimeOffsetArray,
+        BooleanValue: false,
+        WStringValue: ,
+        StringValue: ,
+        DateTimeOffsetArrayValue: [
+          134280160323480711
+        ]
+      },
+      System.Double: {
+        Type: PropertyType_Double,
+        DoubleValue: 42.0,
+        BooleanValue: false,
+        WStringValue: ,
+        StringValue: 
+      },
+      System.Double[]: {
+        Type: PropertyType_DoubleArray,
+        BooleanValue: false,
+        WStringValue: ,
+        StringValue: ,
+        DoubleArrayValue: [
+          42.0
+        ]
+      },
+      System.Guid: {
+        Type: PropertyType_Guid,
+        BooleanValue: false,
+        WStringValue: ,
+        GuidValue: {
+          Data1: 3906712752,
+          Data2: 19905,
+          Data3: 19159,
+          Data4: 657623231473326519
+        },
+        StringValue: 
+      },
+      System.Guid[]: {
+        Type: PropertyType_GuidArray,
+        BooleanValue: false,
+        WStringValue: ,
+        StringValue: ,
+        GuidArrayValue: [
+          {
+            Data1: 1906838282,
+            Data2: 17181,
+            Data3: 18487,
+            Data4: 14327943387269763742
+          }
+        ]
+      },
+      System.Int16: {
+        Type: PropertyType_Int16,
+        Int16Value: 42,
+        BooleanValue: false,
+        WStringValue: ,
+        StringValue: 
+      },
+      System.Int16[]: {
+        Type: PropertyType_Int16Array,
+        BooleanValue: false,
+        WStringValue: ,
+        StringValue: ,
+        Int16ArrayValue: [
+          42
+        ]
+      },
+      System.Int32: {
+        Type: PropertyType_Int32,
+        Int32Value: 42,
+        BooleanValue: false,
+        WStringValue: ,
+        StringValue: 
+      },
+      System.Int32[]: {
+        Type: PropertyType_Int32Array,
+        BooleanValue: false,
+        WStringValue: ,
+        StringValue: ,
+        Int32ArrayValue: [
+          42
+        ]
+      },
+      System.Int64: {
+        Type: PropertyType_Int64,
+        Int64Value: 42,
+        BooleanValue: false,
+        WStringValue: ,
+        StringValue: 
+      },
+      System.Int64[]: {
+        Type: PropertyType_Int64Array,
+        BooleanValue: false,
+        WStringValue: ,
+        StringValue: ,
+        Int64ArrayValue: [
+          42
+        ]
+      },
+      System.Single: {
+        Type: PropertyType_Float,
+        FloatValue: 42.0,
+        BooleanValue: false,
+        WStringValue: ,
+        StringValue: 
+      },
+      System.Single[]: {
+        Type: PropertyType_FloatArray,
+        BooleanValue: false,
+        WStringValue: ,
+        StringValue: ,
+        FloatArrayValue: [
+          42.0
+        ]
+      },
+      System.String: {
+        Type: PropertyType_WString,
+        BooleanValue: false,
+        WStringValue: 42,
+        StringValue: 
+      },
+      System.String[]: {
+        Type: PropertyType_WStringArray,
+        BooleanValue: false,
+        WStringValue: ,
+        StringValue: ,
+        WStringArrayValue: [
+          42
+        ]
+      },
+      System.TimeSpan: {
+        Type: PropertyType_TimeSpan,
+        BooleanValue: false,
+        WStringValue: ,
+        TimeSpanValue: 808322716449,
+        StringValue: 
+      },
+      System.TimeSpan[]: {
+        Type: PropertyType_TimeSpanArray,
+        BooleanValue: false,
+        WStringValue: ,
+        StringValue: ,
+        TimeSpanArrayValue: [
+          808323544731
+        ]
+      },
+      System.UInt16: {
+        Type: PropertyType_UInt16,
+        UInt16Value: 42,
+        BooleanValue: false,
+        WStringValue: ,
+        StringValue: 
+      },
+      System.UInt16[]: {
+        Type: PropertyType_UInt16Array,
+        BooleanValue: false,
+        WStringValue: ,
+        StringValue: ,
+        UInt16ArrayValue: [
+          42
+        ]
+      },
+      System.UInt32: {
+        Type: PropertyType_UInt32,
+        UInt32Value: 42,
+        BooleanValue: false,
+        WStringValue: ,
+        StringValue: 
+      },
+      System.UInt32[]: {
+        Type: PropertyType_UInt32Array,
+        BooleanValue: false,
+        WStringValue: ,
+        StringValue: ,
+        UInt32ArrayValue: [
+          42
+        ]
+      },
+      System.UInt64: {
+        Type: PropertyType_UInt64,
+        UInt64Value: 42,
+        BooleanValue: false,
+        WStringValue: ,
+        StringValue: 
+      },
+      System.UInt64[]: {
+        Type: PropertyType_UInt64Array,
+        BooleanValue: false,
+        WStringValue: ,
+        StringValue: ,
+        UInt64ArrayValue: [
+          42
+        ]
+      },
+      Windows.Foundation.Collections.ValueSet: {
+        Type: PropertyType_ValueSet,
+        BooleanValue: false,
+        WStringValue: ,
+        ValueSetValue: {
+          test: {
+            Type: PropertyType_Int32,
+            Int32Value: 42,
+            BooleanValue: false,
+            WStringValue: ,
+            StringValue: 
+          }
+        },
+        StringValue: 
+      },
+      Windows.Foundation.Point: {
+        Type: PropertyType_Point,
+        BooleanValue: false,
+        WStringValue: ,
+        PointValue: {
+          X: 120.0,
+          Y: 121.0
+        },
+        StringValue: 
+      },
+      Windows.Foundation.Point[]: {
+        Type: PropertyType_PointArray,
+        BooleanValue: false,
+        WStringValue: ,
+        StringValue: ,
+        PointArrayValue: [
+          {
+            X: 120.0,
+            Y: 121.0
+          }
+        ]
+      },
+      Windows.Foundation.Rect: {
+        Type: PropertyType_Rect,
+        BooleanValue: false,
+        WStringValue: ,
+        RectValue: {
+          X: 120.0,
+          Y: 121.0,
+          Width: 119.0,
+          Height: 104.0
+        },
+        StringValue: 
+      },
+      Windows.Foundation.Rect[]: {
+        Type: PropertyType_RectArray,
+        BooleanValue: false,
+        WStringValue: ,
+        StringValue: ,
+        RectArrayValue: [
+          {
+            X: 120.0,
+            Y: 121.0,
+            Width: 119.0,
+            Height: 104.0
+          }
+        ]
+      },
+      Windows.Foundation.Size: {
+        Type: PropertyType_Size,
+        BooleanValue: false,
+        WStringValue: ,
+        SizeValue: {
+          Width: 119.0,
+          Height: 104.0
+        },
+        StringValue: 
+      },
+      Windows.Foundation.Size[]: {
+        Type: PropertyType_SizeArray,
+        BooleanValue: false,
+        WStringValue: ,
+        StringValue: ,
+        SizeArrayValue: [
+          {
+            Width: 119.0,
+            Height: 104.0
+          }
+        ]
+      }
+    },
+    StringValue: 
+  },
+  PreferredApplicationIds: {
+    Type: PropertyType_WStringArray,
+    BooleanValue: false,
+    WStringValue: ,
+    StringValue: 
+  }
+}

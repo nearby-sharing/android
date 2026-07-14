@@ -367,3 +367,6 @@ FodyWeavers.xsd
 
 # Docfx
 _site/
+
+# Verify
+*.received.*

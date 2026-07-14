@@ -46,7 +46,7 @@ internal sealed class NearShareApp(CdpChannel channel) : CdpBondApp(channel)
         {
             case DataKind.File:
                 {
-                    var fileNames = payload.Get<List<string>>("FileNames");
+                    var fileNames = payload.Get<List<string>>("FileNames") ?? [];
 
                     _logger.ReceivingFile(
                         fileNames,
@@ -55,8 +55,8 @@ internal sealed class NearShareApp(CdpChannel channel) : CdpBondApp(channel)
                     );
 
                     var bytesToSend = payload.Get<ulong>("BytesToSend");
-                    var contentIds = payload.Get<IList<uint>>("ContentIds");
-                    var contentSizes = payload.Get<IList<ulong>>("ContentSizes");
+                    var contentIds = payload.Get<IList<uint>>("ContentIds") ?? [];
+                    var contentSizes = payload.Get<IList<ulong>>("ContentSizes") ?? [];
 
                     var files = new FileShareInfo[fileNames.Count];
                     for (int i = 0; i < files.Length; i++)
@@ -77,7 +77,7 @@ internal sealed class NearShareApp(CdpChannel channel) : CdpBondApp(channel)
                 }
             case DataKind.Uri:
                 {
-                    var uri = payload.Get<string>("Uri");
+                    var uri = payload.Get<string>("Uri") ?? "";
 
                     _logger.ReceivedUrl(
                         uri,
@@ -122,11 +122,13 @@ internal sealed class NearShareApp(CdpChannel channel) : CdpBondApp(channel)
 
             void RequestBlob(ulong requestedPosition, uint contentId, uint size = PartitionSize)
             {
-                ValueSet request = new();
-                request.Add("ControlMessage", (uint)NearShareControlMsgType.FetchDataRequest);
-                request.Add("BlobPosition", requestedPosition);
-                request.Add("BlobSize", size);
-                request.Add("ContentId", contentId);
+                ValueSet request = new()
+                {
+                    { "ControlMessage", (uint)NearShareControlMsgType.FetchDataRequest },
+                    { "BlobPosition", requestedPosition },
+                    { "BlobSize", size },
+                    { "ContentId", contentId }
+                };
                 SendValueSet(request, _messageId);
             }
         }
@@ -139,7 +141,7 @@ internal sealed class NearShareApp(CdpChannel channel) : CdpBondApp(channel)
 
         var contentId = payload.Get<uint>("ContentId");
         var position = payload.Get<ulong>("BlobPosition");
-        var blob = payload.Get<List<byte>>("DataBlob");
+        var blob = payload.Get<List<byte>>("DataBlob") ?? [];
         var blobSize = (ulong)blob.Count;
 
         if (blobSize > PartitionSize) // ToDo: position > _bytesToSend
@@ -174,8 +176,10 @@ internal sealed class NearShareApp(CdpChannel channel) : CdpBondApp(channel)
         {
             try
             {
-                ValueSet request = new();
-                request.Add("ControlMessage", (uint)NearShareControlMsgType.CancelTransfer);
+                ValueSet request = new()
+                {
+                    { "ControlMessage", (uint)NearShareControlMsgType.CancelTransfer }
+                };
                 SendValueSet(request, _messageId);
             }
             finally
@@ -195,8 +199,10 @@ internal sealed class NearShareApp(CdpChannel channel) : CdpBondApp(channel)
         {
             try
             {
-                ValueSet request = new();
-                request.Add("ControlMessage", (uint)NearShareControlMsgType.CompleteTransfer);
+                ValueSet request = new()
+                {
+                    { "ControlMessage", (uint)NearShareControlMsgType.CompleteTransfer }
+                };
                 SendValueSet(request, _messageId);
             }
             finally
