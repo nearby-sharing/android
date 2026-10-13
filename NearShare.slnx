@@ -11,6 +11,7 @@
   <Folder Name="/lib/">
     <Project Path="lib/NearShare.ViewModels/NearShare.ViewModels.csproj" />
     <Project Path="lib/ShortDev.Android.Preferences/ShortDev.Android.Preferences.csproj" />
+    <Project Path="lib/ShortDev.Microsoft.ConnectedDevices.AppControl/ShortDev.Microsoft.ConnectedDevices.AppControl.csproj" />
     <Project Path="lib/ShortDev.Microsoft.ConnectedDevices.NearShare/ShortDev.Microsoft.ConnectedDevices.NearShare.csproj" />
     <Project Path="lib/ShortDev.Microsoft.ConnectedDevices/ShortDev.Microsoft.ConnectedDevices.csproj" />
   </Folder>
