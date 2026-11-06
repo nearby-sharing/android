@@ -12,6 +12,7 @@ using RiveCore = Rive.Android.Core.Rive;
 [assembly: UsesPermission(ManifestPermission.BluetoothAdvertise)]
 
 [assembly: UsesPermission(ManifestPermission.Internet)]
+[assembly: UsesPermission(ManifestPermission.AccessLocalNetwork)]
 [assembly: UsesPermission(ManifestPermission.AccessNetworkState)]
 [assembly: UsesPermission(ManifestPermission.AccessWifiState)]
 

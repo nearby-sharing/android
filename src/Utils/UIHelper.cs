@@ -87,12 +87,18 @@ internal static class UIHelper
     }
 
     #region Permissions
-    public static string[] SendPermissions => OperatingSystem.IsAndroidVersionAtLeast(31) ? [
-        ManifestPermission.BluetoothScan,
-        ManifestPermission.BluetoothConnect
-    ] : [
-        ManifestPermission.AccessFineLocation,
-        ManifestPermission.AccessCoarseLocation
+    public static string[] SendPermissions => [
+        ..OperatingSystem.IsAndroidVersionAtLeast(31) ? [
+            ManifestPermission.BluetoothScan,
+            ManifestPermission.BluetoothConnect
+        ] : (string[])[
+            ManifestPermission.AccessFineLocation,
+            ManifestPermission.AccessCoarseLocation
+        ],
+
+        ..OperatingSystem.IsAndroidVersionAtLeast(37) ? [
+            ManifestPermission.AccessLocalNetwork
+        ] : Array.Empty<string>()
     ];
 
     public static void RequestSendPermissions(Activity activity)
@@ -114,7 +120,11 @@ internal static class UIHelper
         ..OperatingSystem.IsAndroidVersionAtLeast(29) ? Array.Empty<string>() : [
             ManifestPermission.ReadExternalStorage,
             ManifestPermission.WriteExternalStorage
-        ]
+        ],
+
+        ..OperatingSystem.IsAndroidVersionAtLeast(37) ? [
+            ManifestPermission.AccessLocalNetwork
+        ] : Array.Empty<string>()
     ];
 
     public static void RequestReceivePermissions(Activity activity)
