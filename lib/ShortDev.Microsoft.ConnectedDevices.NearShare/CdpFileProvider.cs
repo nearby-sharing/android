@@ -7,7 +7,7 @@ public sealed class CdpFileProvider : IDisposable
     readonly Stream _buffer;
     private CdpFileProvider(string fileName, Stream buffer)
     {
-        FileName = fileName;
+        FileName = SanitizeFileName(fileName);
         _buffer = buffer;
     }
 
@@ -51,5 +51,23 @@ public sealed class CdpFileProvider : IDisposable
     public void Dispose()
     {
         _buffer.Dispose();
+    }
+
+    private static string SanitizeFileName(string value)
+    {
+        value = Path.GetFileName(value);
+        return string.Create(length: value.Length, value.AsSpan(), static (dest, src) =>
+        {
+            for (int i = 0; i < dest.Length; i++)
+            {
+                dest[i] = src[i] switch
+                {
+                    (>= (char)1 and <= (char)31) or
+                    '\"' or '<' or '>' or '|' or '\0' or
+                    ':' or '*' or '?' or '\\' or '/' => '_',
+                    var c => c,
+                };
+            }
+        });
     }
 }
