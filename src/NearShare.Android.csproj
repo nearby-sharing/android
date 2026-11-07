@@ -22,7 +22,6 @@
 	<ItemGroup Label="Nuget">
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.14" />
-		<PackageReference Include="ShortDev.Rive.Android" Version="10.1.0.0" />
 		<PackageReference Include="Sentry" Version="6.12.1" />
 		<PackageReference Include="Serilog.Extensions.Logging.File" Version="3.0.0" />
 		<PackageReference Include="ShortDev.Android" Version="0.6.0-beta" />

@@ -14,12 +14,14 @@
 		android:padding="10dp">
 
 		<!-- Welcome animation -->
-		<app.rive.runtime.kotlin.RiveAnimationView
+		<ImageView
+			android:id="@+id/welcomeImageView"
 			android:layout_width="300dp"
 			android:layout_height="300dp"
 			android:layout_gravity="center"
 			android:layout_margin="10dp"
-			app:riveResource="@raw/animation_welcome" />
+			android:tint="@null"
+			android:src="@drawable/animation_welcome" />
 
 		<!-- Send / Receive buttons -->
 		<LinearLayout

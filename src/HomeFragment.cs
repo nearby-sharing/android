@@ -1,5 +1,6 @@
 ﻿using Android.Bluetooth;
 using Android.Content;
+using Android.Graphics.Drawables;
 using Android.OS;
 using Android.Views;
 using Google.Android.Material.Card;
@@ -46,6 +47,8 @@ internal sealed class HomeFragment : Fragment
         _viewBindings.SetupWindowsCard.Click += delegate { UIHelper.OpenSetup(RequireActivity()); };
         _viewBindings.OpenFaqCard.Click += delegate { UIHelper.OpenFAQ(RequireActivity()); };
         _viewBindings.OpenCrowdinCard.Click += delegate { UIHelper.OpenCrowdIn(RequireActivity()); };
+
+        (_viewBindings.WelcomeImageView.Drawable as IAnimatable)?.Start();
     }
 
     #region Transfer Setup
@@ -194,6 +197,8 @@ internal sealed class HomeFragment : Fragment
 
     sealed class ViewBindings(View view)
     {
+        public ImageView WelcomeImageView { get; } = view.FindRequiredViewById<ImageView>(Resource.Id.welcomeImageView);
+
         public Button SendButton { get; } = view.FindRequiredViewById<Button>(Resource.Id.sendButton);
 
         public MaterialCardView SendFileCard { get; } = view.FindRequiredViewById<MaterialCardView>(Resource.Id.sendFileCard);

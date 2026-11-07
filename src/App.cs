@@ -2,8 +2,6 @@
 using AndroidX.AppCompat.App;
 using Google.Android.Material.Color;
 using NearShare.Settings;
-using Rive.Android.Core;
-using RiveCore = Rive.Android.Core.Rive;
 
 [assembly: UsesPermission(ManifestPermission.Bluetooth, MaxSdkVersion = 30)]
 [assembly: UsesPermission(ManifestPermission.BluetoothAdmin, MaxSdkVersion = 30)]
@@ -51,14 +49,5 @@ public sealed class App(nint javaReference, JniHandleOwnership transfer) : Appli
         AppCompatDelegate.DefaultNightMode = SettingsFragment.ShouldForceDarkMode(this) ? AppCompatDelegate.ModeNightYes : AppCompatDelegate.ModeNightFollowSystem;
 
         DynamicColors.ApplyToActivitiesIfAvailable(this);
-
-        try
-        {
-            RiveCore.Instance.Init(ApplicationContext!, defaultRenderer: RendererType.Rive!);
-        }
-        catch (Exception ex)
-        {
-            SentrySdk.CaptureException(ex);
-        }
     }
 }
