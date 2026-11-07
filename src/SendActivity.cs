@@ -207,12 +207,21 @@ public sealed partial class SendActivity : AppCompatActivity
     {
         _discoverCancellationTokenSource.Cancel();
 
-        _currentTransfer = ParseIntentAsync() switch
+        try
         {
-            ({ } files, null) => SendDataViewModel.SendFiles(_nearShareSender, remoteSystem, files),
-            (null, { } uri) => SendDataViewModel.SendUri(_nearShareSender, remoteSystem, uri),
-            _ => null
-        };
+            _currentTransfer = IntentParser.ShareIntent(this, Intent) switch
+            {
+                CdpFileProvider file => SendDataViewModel.SendFiles(_nearShareSender, remoteSystem, [file]),
+                IReadOnlyList<CdpFileProvider> files => SendDataViewModel.SendFiles(_nearShareSender, remoteSystem, files),
+                Uri uri => SendDataViewModel.SendUri(_nearShareSender, remoteSystem, uri),
+                _ => null
+            };
+        }
+        catch (Exception ex)
+        {
+            _currentTransfer = null;
+            _logger.FailedToParseShareIntent(ex, Intent);
+        }
 
         if (_currentTransfer is null)
             return; // ToDo: Feedback?!
@@ -328,75 +337,6 @@ public sealed partial class SendActivity : AppCompatActivity
                     }
                     break;
             }
-        }
-    }
-
-    (IReadOnlyList<CdpFileProvider>? files, Uri? uri) ParseIntentAsync()
-    {
-        ArgumentNullException.ThrowIfNull(Intent);
-
-        if (Intent.Action == Intent.ActionProcessText && OperatingSystem.IsAndroidVersionAtLeast(23))
-        {
-            return (
-                files: [SendText(Intent.GetStringExtra(Intent.ExtraProcessText))],
-                null
-            );
-        }
-
-        if (Intent.Action == Intent.ActionSendMultiple)
-        {
-            if (Intent.HasExtra(Intent.ExtraText))
-            {
-                return (
-                    files: (Intent.GetStringArrayListExtra(Intent.ExtraText) ?? throw new InvalidDataException("Could not get extra files from intent"))
-                        .Select(SendText)
-                        .ToArray(),
-                    null
-                );
-            }
-
-            return (
-                files: (Intent.GetParcelableArrayListExtra<AndroidUri>(Intent.ExtraStream) ?? throw new InvalidDataException("Could not get extra files from intent"))
-                    .Select(ContentResolver!.CreateNearShareFileFromContentUri)
-                    .ToArray(),
-                null
-            );
-        }
-
-        if (Intent.Action == Intent.ActionSend)
-        {
-            if (Intent.HasExtra(Intent.ExtraStream))
-            {
-                AndroidUri fileUri = Intent.GetParcelableExtra<AndroidUri>(Intent.ExtraStream) ?? throw new InvalidDataException("Could not get ExtraStream");
-                return (
-                    files: [ContentResolver!.CreateNearShareFileFromContentUri(fileUri)],
-                    null
-                );
-            }
-
-            var text = Intent.GetStringExtra(Intent.ExtraText) ?? "";
-            if (Uri.IsWellFormedUriString(text, UriKind.Absolute))
-            {
-                return (
-                    null,
-                    uri: new(text)
-                );
-            }
-
-            return (
-                files: [SendText(text)],
-                null
-            );
-        }
-
-        return (null, null);
-
-        static CdpFileProvider SendText(string? text)
-        {
-            return CdpFileProvider.FromContent(
-                $"Text-Transfer-{DateTime.Now:dd_MM_yyyy-HH_mm_ss}.txt",
-                text ?? throw new NullReferenceException("Text was null")
-            );
         }
     }
 
