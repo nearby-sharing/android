@@ -9,17 +9,38 @@ internal static class FileUtils
 {
     public static CdpFileProvider CreateNearShareFileFromContentUri(this ContentResolver contentResolver, AndroidUri contentUri)
     {
-        var fileName = contentResolver.QueryContentName(contentUri);
+        var fileName = contentResolver.QueryContentName(contentUri) ?? $"transfer-{DateTime.Now:dd_MM_yyyy-HH_mm_ss}.dat";
 
-        var stream = contentResolver.OpenInputStream(contentUri) ?? throw new IOException("Could not open input stream");
-        return CdpFileProvider.FromStream(fileName, stream);
+        var stream = contentResolver.OpenInputStream(contentUri)
+            ?? throw new IOException($"Could not open input stream for {contentUri}");
+
+        try
+        {
+            return CdpFileProvider.FromStream(fileName, stream);
+        }
+        catch
+        {
+            stream.Dispose();
+            throw;
+        }
     }
 
-    public static string QueryContentName(this ContentResolver resolver, AndroidUri contentUri)
+    public static string? QueryContentName(this ContentResolver resolver, AndroidUri contentUri)
     {
-        using var returnCursor = resolver.Query(contentUri, [IOpenableColumns.DisplayName], null, null, null) ?? throw new InvalidOperationException("Could not open content cursor");
-        returnCursor.MoveToFirst();
-        return returnCursor.GetString(0) ?? throw new IOException("Could not query content name");
+        string? name = null;
+
+        using var returnCursor = resolver.Query(contentUri, [IOpenableColumns.DisplayName], null, null, null);
+        if (returnCursor?.MoveToFirst() == true)
+        {
+            var nameIndex = returnCursor.GetColumnIndex(IOpenableColumns.DisplayName);
+            if (nameIndex >= 0)
+                name = returnCursor.GetString(nameIndex);
+        }
+
+        if (string.IsNullOrEmpty(name))
+            name = Path.GetFileName(contentUri.LastPathSegment);
+
+        return name;
     }
 
     public static (AndroidUri uri, FileStream stream) CreateMediaStoreStream(this ContentResolver resolver, string fileName)

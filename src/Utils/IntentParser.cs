@@ -110,9 +110,8 @@ internal static class IntentParser
 
         static CdpFileProvider FileFromString(string value)
         {
-            // TODO: Ensure unique names
             return CdpFileProvider.FromContent(
-                $"Text-Transfer-{DateTime.Now:dd_MM_yyyy-HH_mm_ss}.txt",
+                $"transfer-{DateTime.Now:dd_MM_yyyy-HH_mm_ss}.txt",
                 value
             );
         }
