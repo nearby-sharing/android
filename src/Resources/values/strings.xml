@@ -25,6 +25,8 @@
 	<string name="device_name">Device Name</string>
 	<!-- #endregion -->
 
+	<string name="empty_clipboard">Clipboard is empty</string>
+
 	<!-- #region activity_mac_address.xml -->
 	<string name="launch_settings">Open Settings</string>
 	<string name="bt_mac_address">Bluetooth Mac Address</string>

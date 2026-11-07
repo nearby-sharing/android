@@ -18,6 +18,7 @@
 	<string name="generic_settings">Einstellungen</string>
 	<string name="device_name">Geräte Name</string>
 	<!-- #endregion -->
+	<string name="empty_clipboard">Die Zwischenablage ist leer</string>
 	<!-- #region activity_mac_address.xml -->
 	<string name="launch_settings">Öffne Einstellungen</string>
 	<string name="bt_mac_address">Bluetooth Mac-Adresse</string>

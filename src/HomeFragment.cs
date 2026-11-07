@@ -111,11 +111,11 @@ internal sealed class HomeFragment : Fragment
         {
             var clipboard = (ClipboardManager?)ctx.GetSystemService(Context.ClipboardService);
             if (clipboard is null)
-                return;
+                goto emptyClipboard;
 
             var clip = clipboard.PrimaryClip;
             if (clip is null)
-                return;
+                goto emptyClipboard;
 
             List<string> values = [];
             for (int i = 0; i < clip.ItemCount; i++)
@@ -126,7 +126,7 @@ internal sealed class HomeFragment : Fragment
             }
 
             if (values.Count == 0)
-                return;
+                goto emptyClipboard;
 
             Intent intent = new(ctx, typeof(SendActivity));
             intent.SetAction(Intent.ActionSendMultiple);
@@ -137,6 +137,11 @@ internal sealed class HomeFragment : Fragment
         {
             ctx.ShowErrorDialog(ex);
         }
+
+        return;
+
+    emptyClipboard:
+        Toast.MakeText(ctx, ctx.Localize(Resource.String.empty_clipboard), ToastLength.Short)!.Show();
     }
 
     private void SendText_Click(object? sender, EventArgs e)
