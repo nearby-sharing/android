@@ -1,7 +1,6 @@
 ﻿using Android.Bluetooth;
 using Android.Content;
 using Android.Graphics.Drawables;
-using Android.OS;
 using Android.Views;
 using Google.Android.Material.Card;
 using Google.Android.Material.Dialog;
@@ -85,18 +84,8 @@ internal sealed class HomeFragment : Fragment
         else if (result is { ClipData: { } clipData })
         {
             intent.SetAction(Intent.ActionSendMultiple);
-
-            List<IParcelable> uriList = [];
-            for (int i = 0; i < clipData.ItemCount; i++)
-            {
-                var item = clipData.GetItemAt(i);
-                if (item?.Uri == null)
-                    continue;
-
-                uriList.Add(item.Uri);
-            }
-
-            intent.PutParcelableArrayListExtra(Intent.ExtraStream, uriList);
+            intent.AddFlags(ActivityFlags.GrantReadUriPermission);
+            intent.ClipData = clipData;
         }
         else
             return;
@@ -110,38 +99,22 @@ internal sealed class HomeFragment : Fragment
         try
         {
             var clipboard = (ClipboardManager?)ctx.GetSystemService(Context.ClipboardService);
-            if (clipboard is null)
-                goto emptyClipboard;
-
-            var clip = clipboard.PrimaryClip;
-            if (clip is null)
-                goto emptyClipboard;
-
-            List<string> values = [];
-            for (int i = 0; i < clip.ItemCount; i++)
+            if (clipboard?.PrimaryClip is not { ItemCount: > 0 } clip)
             {
-                var value = clip.GetItemAt(0)?.CoerceToText(ctx);
-                if (value is not null)
-                    values.Add(value);
+                Toast.MakeText(ctx, ctx.Localize(Resource.String.empty_clipboard), ToastLength.Short)!.Show();
+                return;
             }
-
-            if (values.Count == 0)
-                goto emptyClipboard;
 
             Intent intent = new(ctx, typeof(SendActivity));
             intent.SetAction(Intent.ActionSendMultiple);
-            intent.PutStringArrayListExtra(Intent.ExtraText, values);
+            intent.AddFlags(ActivityFlags.GrantReadUriPermission);
+            intent.ClipData = clip;
             StartActivity(intent);
         }
         catch (Exception ex)
         {
             ctx.ShowErrorDialog(ex);
         }
-
-        return;
-
-    emptyClipboard:
-        Toast.MakeText(ctx, ctx.Localize(Resource.String.empty_clipboard), ToastLength.Short)!.Show();
     }
 
     private void SendText_Click(object? sender, EventArgs e)
