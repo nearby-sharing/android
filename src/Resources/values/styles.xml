@@ -14,8 +14,8 @@
 		<item name="android:windowLightNavigationBar">?attr/isLightTheme</item>
 
 		<item name="preferenceTheme">@style/AppTheme.Preferences</item>
-		<item name="switchStyle">@style/Widget.Material3.CompoundButton.MaterialSwitch</item>
-		<item name="alertDialogTheme">@style/ThemeOverlay.Material3.MaterialAlertDialog</item>
+		<item name="switchStyle">?attr/materialSwitchStyle</item>
+		<item name="alertDialogTheme">?attr/materialAlertDialogTheme</item>
 		<item name="dialogCornerRadius">28dp</item>
 		<item name="android:tint">?attr/colorOnSurface</item>
 	</style>
@@ -37,6 +37,29 @@
 		<item name="android:navigationBarColor">@android:color/transparent</item>
 		<item name="android:enforceStatusBarContrast">false</item>
 		<item name="android:enforceNavigationBarContrast">false</item>
+	</style>
+
+	<style name="AppTheme.Material3Expressive.MaterialButtonGroup.Connected" parent="@style/Widget.Material3Expressive.MaterialButtonGroup.Connected">
+		<item name="materialThemeOverlay">@style/ThemeOverlay.Material3Expressive.MaterialButtonGroup.Overflow</item>
+	</style>
+
+	<style name="AppTheme.Material3Expressive.ListItemCard" parent="@style/Widget.Material3.ListItemCardView.Segmented">
+		<item name="cardBackgroundColor">?attr/colorSurfaceContainerHighest</item>
+		<item name="shapeAppearance">?attr/listItemShapeAppearanceMiddle</item>
+		<item name="android:layout_marginBottom">2dp</item>
+		<item name="android:minHeight">56dp</item>
+		<item name="android:gravity">center_vertical</item>
+	</style>
+
+	<style name="AppTheme.Material3Expressive.ListItemHeader" parent="">
+		<item name="android:minHeight">?attr/minTouchTargetSize</item>
+		<item name="android:padding">18dp</item>
+		<item name="android:gravity">center_vertical|start</item>
+		<item name="android:maxLines">1</item>
+		<item name="android:textAlignment">viewStart</item>
+		<item name="android:paddingHorizontal">8dp</item>
+		<item name="android:textAppearance">@style/TextAppearance.AppCompat.Caption</item>
+		<item name="android:textColor">?android:textColorPrimary</item>
 	</style>
 
 </resources>

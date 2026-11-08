@@ -23,7 +23,13 @@
 	<string name="generic_notifications">Notifications</string>
 	<string name="generic_settings">Settings</string>
 	<string name="device_name">Device Name</string>
+
+	<string name="quick_actions">Quick Actions</string>
 	<!-- #endregion -->
+
+	<string name="send_file">File</string>
+	<string name="send_clipboard">Clipboard</string>
+	<string name="send_text">Text</string>
 
 	<string name="empty_clipboard">Clipboard is empty</string>
 

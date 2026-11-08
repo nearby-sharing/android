@@ -17,7 +17,11 @@
 	<string name="generic_notifications">Benachrichtigungen</string>
 	<string name="generic_settings">Einstellungen</string>
 	<string name="device_name">Geräte Name</string>
+	<string name="quick_actions">Schnellzugriff</string>
 	<!-- #endregion -->
+	<string name="send_file">Datei</string>
+	<string name="send_clipboard">Einfügen</string>
+	<string name="send_text">Text</string>
 	<string name="empty_clipboard">Die Zwischenablage ist leer</string>
 	<!-- #region activity_mac_address.xml -->
 	<string name="launch_settings">Öffne Einstellungen</string>
