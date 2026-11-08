@@ -221,6 +221,11 @@ public sealed partial class SendActivity : AppCompatActivity
         {
             _currentTransfer = null;
             _logger.FailedToParseShareIntent(ex, Intent);
+
+            if (!this.IsAtLeastStarted)
+                return;
+
+            this.ShowErrorDialog(ex);
         }
 
         if (_currentTransfer is null)
