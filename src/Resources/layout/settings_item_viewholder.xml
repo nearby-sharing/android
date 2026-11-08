@@ -1,0 +1,83 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.listitem.ListItemLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_height="wrap_content"
+	android:layout_width="match_parent"
+	android:paddingHorizontal="8dp">
+
+	<com.google.android.material.listitem.ListItemCardView
+		style="?attr/listItemCardViewSegmentedStyle"
+		android:id="@+id/settings_item_card"
+		android:clickable="true"
+		android:focusable="true"
+		android:layout_height="wrap_content"
+		android:layout_width="match_parent"
+		android:minHeight="56dp"
+		app:cardBackgroundColor="?attr/colorSurfaceContainer">
+
+		<LinearLayout
+			android:gravity="center_vertical"
+			android:layout_height="wrap_content"
+			android:layout_width="match_parent"
+			android:orientation="horizontal"
+			tools:ignore="UseCompoundDrawables"
+			android:duplicateParentState="true">
+
+			<ImageView
+                style="@style/Widget.Material3.ImageView.ListItem.LeadingIcon"
+                android:id="@+id/settings_item_icon"
+                android:layout_height="48dp"
+                android:layout_width="48dp"
+				android:padding="12dp"
+				android:scaleType="centerCrop"
+				android:background="@drawable/material_shape_cookie_9"
+				android:backgroundTint="?attr/colorSurfaceContainerHighest" />
+
+			<LinearLayout
+				android:layout_height="wrap_content"
+				android:layout_width="0dp"
+				android:layout_weight="1"
+				android:orientation="vertical"
+				android:layout_marginStart="12dp"
+				android:duplicateParentState="true">
+
+				<TextView
+					style="@style/Widget.Material3.TextView.ListItem.LabelText"
+					android:id="@+id/settings_item_label"
+					android:layout_height="wrap_content"
+					android:layout_width="wrap_content"
+					android:duplicateParentState="true" />
+
+				<TextView
+					style="@style/Widget.Material3.TextView.ListItem.SupportingText"
+					android:id="@+id/settings_item_supporting_text"
+					android:layout_height="wrap_content"
+					android:layout_width="wrap_content"
+					android:textAlignment="viewStart"
+					android:duplicateParentState="true" />
+
+			</LinearLayout>
+
+			<com.google.android.material.materialswitch.MaterialSwitch
+				android:id="@+id/settings_item_switch"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				style="@style/Widget.Material3.Switch.ListItem"
+				android:layout_marginStart="12dp"/>
+
+			<ImageView
+				style="@style/Widget.Material3.ImageView.ListItem.TrailingIcon"
+				android:id="@+id/settings_item_edit_indicator"
+				android:layout_width="32dp"
+				android:layout_height="32dp"
+				android:layout_marginStart="16dp"
+				android:scaleType="center"
+				app:srcCompat="@drawable/ic_fluent_edit_24_regular" />
+
+		</LinearLayout>
+
+	</com.google.android.material.listitem.ListItemCardView>
+
+</com.google.android.material.listitem.ListItemLayout>

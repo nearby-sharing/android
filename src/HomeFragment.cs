@@ -120,10 +120,8 @@ internal sealed class HomeFragment : Fragment
         var ctx = RequireContext();
         try
         {
-            TextInputEditText editText = new(ctx)
-            {
-                LayoutParameters = new(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.MatchParent)
-            };
+            var editText = (EditText)LayoutInflater.Inflate(Resource.Layout.dialog_view_edittext, root: null, attachToRoot: false)!;
+            editText.SetSingleLine(false);
             new MaterialAlertDialogBuilder(ctx)
                 .SetTitle(Resource.String.share_text)!
                 .SetView(editText)!
