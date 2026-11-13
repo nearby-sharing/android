@@ -1,13 +1,13 @@
-﻿namespace ShortDev.Microsoft.ConnectedDevices.Messages.Session.AppControl;
+﻿namespace ShortDev.Microsoft.ConnectedDevices.AppControl.Messages;
 
-public readonly record struct LaunchUriForTargetRequest() : IBinaryWritable, IBinaryParsable<LaunchUriForTargetRequest>
+public readonly record struct LaunchUriForTargetRequest() : IBinaryWritable<LaunchUriForTargetRequest>, IBinaryParsable<LaunchUriForTargetRequest>
 {
     public static LaunchUriForTargetRequest Parse<TReader>(ref TReader reader) where TReader : struct, IEndianReader, allows ref struct
         => new()
         {
             Uri = reader.ReadStringWithLength(),
             LaunchLocation = (LaunchLocation)reader.ReadInt16(),
-            RequestID = reader.ReadInt64(),
+            RequestID = reader.ReadUInt64(),
             PackageId = reader.ReadStringWithLength(),
             InstanceId = reader.ReadInt16(),
             AlternateId = reader.ReadStringWithLength(),
@@ -25,7 +25,7 @@ public readonly record struct LaunchUriForTargetRequest() : IBinaryWritable, IBi
     /// A 64-bit arbitrary number identifying the request. <br/>
     /// The response ID in the response payload can then be used to correlate responses to requests.
     /// </summary>
-    public required long RequestID { get; init; }
+    public required ulong RequestID { get; init; }
     /// <summary>
     /// The ID of the package of the app that hosts the app service.
     /// </summary>

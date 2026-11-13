@@ -1,6 +1,6 @@
-﻿namespace ShortDev.Microsoft.ConnectedDevices.Messages.Session.AppControl;
+﻿namespace ShortDev.Microsoft.ConnectedDevices.AppControl.Messages;
 
-public readonly record struct AppControlHeader : IBinaryWritable, IBinaryParsable<AppControlHeader>
+public readonly record struct AppControlHeader : IBinaryWritable<AppControlHeader>, IBinaryParsable<AppControlHeader>
 {
     public required AppControlType MessageType { get; init; }
 

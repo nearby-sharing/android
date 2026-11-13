@@ -13,6 +13,8 @@ public sealed class CdpMessage(CommonHeader header)
         }
     };
 
+    public ReadOnlyMemory<byte> Content => _buffer.WrittenMemory;
+
     public CommonHeader Header { get; } = header;
 
     public uint Id
