@@ -4,7 +4,6 @@ using Android.Content.Res;
 using Android.Graphics;
 using Android.Views;
 using AndroidX.Core.Content;
-using AndroidX.Preference;
 using AndroidX.RecyclerView.Widget;
 using Google.Android.Material.Dialog;
 using Google.Android.Material.ListItem;
@@ -24,7 +23,8 @@ internal abstract class SettingsFragment : Fragment
     internal const string DeviceNameName = "device_name";
 
     public static ISharedPreferences GetPreferences(Context context)
-        => PreferenceManager.GetDefaultSharedPreferences(context)!;
+        => context.GetSharedPreferences($"{context.PackageName}_preferences", FileCreationMode.Private)
+        ?? throw new InvalidOperationException("Could not get shared prefs");
 
     public static bool ShouldForceDarkMode(Context context)
         => GetPreferences(context).GetBoolean(ForceDarkModeName, false);

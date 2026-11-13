@@ -13,14 +13,11 @@
 		<item name="android:navigationBarColor">@android:color/transparent</item>
 		<item name="android:windowLightNavigationBar">?attr/isLightTheme</item>
 
-		<item name="preferenceTheme">@style/AppTheme.Preferences</item>
 		<item name="switchStyle">?attr/materialSwitchStyle</item>
 		<item name="alertDialogTheme">?attr/materialAlertDialogTheme</item>
 		<item name="dialogCornerRadius">28dp</item>
 		<item name="android:tint">?attr/colorOnSurface</item>
 	</style>
-
-	<style name="AppTheme.Preferences" parent="@style/PreferenceTheme.SettingsLib" />
 
 	<style name="AppTheme.DialogActivity" parent="@style/Theme.Material3.DayNight.SideSheetDialog">
 		<item name="dynamicColorThemeOverlay">@style/ThemeOverlay.Material3Expressive.DynamicColors.DayNight</item>
