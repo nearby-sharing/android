@@ -37,7 +37,7 @@ internal sealed class SettingsHomepageFragment : SettingsFragment
                 ),
                 Title = Resource.String.open_faq_title,
                 Summary = Resource.String.open_faq_summary,
-                Click = () => UIHelper.OpenSponsor(Activity!),
+                Click = () => UIHelper.OpenFAQ(Activity!),
             },
             new Setting.Card()
             {
@@ -57,7 +57,7 @@ internal sealed class SettingsHomepageFragment : SettingsFragment
                 ),
                 Title = Resource.String.open_sponsor_title,
                 Summary = Resource.String.open_sponsor_summary,
-                Click = () => UIHelper.OpenFAQ(Activity!),
+                Click = () => UIHelper.OpenSponsor(Activity!),
             },
         },
 
