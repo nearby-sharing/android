@@ -72,9 +72,9 @@
 						<aapt:attr name="android:fillColor">
 							<gradient
 								android:type="radial"
-								android:centerX="230"
-								android:centerY="230"
-								android:gradientRadius="115">
+								android:centerX="0"
+								android:centerY="330"
+								android:gradientRadius="266">
 								<item
 									android:color="#FFCB7DF8"
 									android:offset="0"/>
@@ -142,20 +142,20 @@
                     android:propertyName="translateX"
                     android:duration="2000"
                     android:valueFrom="0"
-                    android:valueTo="7.5"
+                    android:valueTo="10"
 					android:repeatCount="infinite"
 					android:repeatMode="reverse"
                     android:valueType="floatType"
-                    android:interpolator="@android:anim/linear_interpolator"/>
+                    android:interpolator="@android:interpolator/accelerate_decelerate"/>
 				<objectAnimator
                     android:propertyName="translateY"
                     android:duration="2000"
                     android:valueFrom="0"
-                    android:valueTo="7.5"
+                    android:valueTo="10"
 					android:repeatCount="infinite"
 					android:repeatMode="reverse"
                     android:valueType="floatType"
-                    android:interpolator="@android:anim/linear_interpolator"/>
+                    android:interpolator="@android:interpolator/accelerate_decelerate"/>
 			</set>
 		</aapt:attr>
 	</target>

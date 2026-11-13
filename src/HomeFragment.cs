@@ -2,8 +2,8 @@
 using Android.Content;
 using Android.Graphics.Drawables;
 using Android.Views;
-using Google.Android.Material.Card;
 using Google.Android.Material.Dialog;
+using Google.Android.Material.ListItem;
 using Google.Android.Material.TextField;
 using NearShare.Utils;
 using ShortDev.Android.Lifecycle;
@@ -35,8 +35,6 @@ internal sealed class HomeFragment : Fragment
     public override void OnViewCreated(View view, Bundle? savedInstanceState)
     {
         _viewBindings = new(view);
-
-        _viewBindings.SendButton.Click += SendButton_Click;
 
         _viewBindings.SendFileCard.Click += SendButton_Click;
         _viewBindings.SendClipBoardCard.Click += SendClipBoard_Click;
@@ -122,10 +120,8 @@ internal sealed class HomeFragment : Fragment
         var ctx = RequireContext();
         try
         {
-            TextInputEditText editText = new(ctx)
-            {
-                LayoutParameters = new(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.MatchParent)
-            };
+            var editText = (EditText)LayoutInflater.Inflate(Resource.Layout.dialog_view_edittext, root: null, attachToRoot: false)!;
+            editText.SetSingleLine(false);
             new MaterialAlertDialogBuilder(ctx)
                 .SetTitle(Resource.String.share_text)!
                 .SetView(editText)!
@@ -177,15 +173,13 @@ internal sealed class HomeFragment : Fragment
     {
         public ImageView WelcomeImageView { get; } = view.FindRequiredViewById<ImageView>(Resource.Id.welcomeImageView);
 
-        public Button SendButton { get; } = view.FindRequiredViewById<Button>(Resource.Id.sendButton);
+        public Button SendFileCard { get; } = view.FindRequiredViewById<Button>(Resource.Id.sendFileButton);
+        public Button SendClipBoardCard { get; } = view.FindRequiredViewById<Button>(Resource.Id.sendClipBoardButton);
+        public Button SendTextCard { get; } = view.FindRequiredViewById<Button>(Resource.Id.sendTextButton);
 
-        public MaterialCardView SendFileCard { get; } = view.FindRequiredViewById<MaterialCardView>(Resource.Id.sendFileCard);
-        public MaterialCardView SendClipBoardCard { get; } = view.FindRequiredViewById<MaterialCardView>(Resource.Id.sendClipBoardCard);
-        public MaterialCardView SendTextCard { get; } = view.FindRequiredViewById<MaterialCardView>(Resource.Id.sendTextCard);
-
-        public MaterialCardView EnableBluetoothCard { get; } = view.FindRequiredViewById<MaterialCardView>(Resource.Id.enableBluetoothCard);
-        public MaterialCardView SetupWindowsCard { get; } = view.FindRequiredViewById<MaterialCardView>(Resource.Id.setupWindowsCard);
-        public MaterialCardView OpenFaqCard { get; } = view.FindRequiredViewById<MaterialCardView>(Resource.Id.openFaqCard);
-        public MaterialCardView OpenCrowdinCard { get; } = view.FindRequiredViewById<MaterialCardView>(Resource.Id.openCrowdinCard);
+        public ListItemCardView EnableBluetoothCard { get; } = view.FindRequiredViewById<ListItemCardView>(Resource.Id.enableBluetoothCard);
+        public ListItemCardView SetupWindowsCard { get; } = view.FindRequiredViewById<ListItemCardView>(Resource.Id.setupWindowsCard);
+        public ListItemCardView OpenFaqCard { get; } = view.FindRequiredViewById<ListItemCardView>(Resource.Id.openFaqCard);
+        public ListItemCardView OpenCrowdinCard { get; } = view.FindRequiredViewById<ListItemCardView>(Resource.Id.openCrowdinCard);
     }
 }
