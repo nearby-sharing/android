@@ -42,28 +42,25 @@ internal static class IntentParser
             }
         }
 
-        if (items.Count == 0)
+        foreach (var uri in intent.GetParcelableArrayListExtra<AndroidUri>(Intent.ExtraStream) ?? [])
+            items.Add(ShareItem.Create(uri));
+
+        foreach (var text in GetTextList(intent, Intent.ExtraText) ?? [])
         {
-            foreach (var uri in intent.GetParcelableArrayListExtra<AndroidUri>(Intent.ExtraStream) ?? [])
-                items.Add(ShareItem.Create(uri));
+            if (string.IsNullOrEmpty(text))
+                continue;
 
-            foreach (var text in GetTextList(intent, Intent.ExtraText) ?? [])
-            {
-                if (string.IsNullOrEmpty(text))
-                    continue;
-
-                items.Add(ShareItem.Create(text));
-            }
-
-            if (intent.GetParcelableExtra<AndroidUri>(Intent.ExtraStream) is { } extraUri)
-                items.Add(ShareItem.Create(extraUri));
-
-            if (GetTextExtra(intent, Intent.ExtraText) is { Length: > 0 } extraText)
-                items.Add(ShareItem.Create(extraText));
-
-            if (intent.Data is { } data)
-                items.Add(ShareItem.Create(data));
+            items.Add(ShareItem.Create(text));
         }
+
+        if (intent.GetParcelableExtra<AndroidUri>(Intent.ExtraStream) is { } extraUri)
+            items.Add(ShareItem.Create(extraUri));
+
+        if (GetTextExtra(intent, Intent.ExtraText) is { Length: > 0 } extraText)
+            items.Add(ShareItem.Create(extraText));
+
+        if (intent.Data is { } data)
+            items.Add(ShareItem.Create(data));
 
         return items.ToList() switch
         {
@@ -121,7 +118,14 @@ internal static class IntentParser
     {
         public sealed record Text(string Value) : ShareItem;
         public sealed record Url(Uri Value) : ShareItem;
-        public sealed record File(AndroidUri Uri) : ShareItem;
+        public sealed record File(AndroidUri Uri) : ShareItem
+        {
+            public bool Equals(File? other)
+                => other?.Uri.Equals(Uri) == true;
+
+            public override int GetHashCode()
+                => Uri.GetHashCode();
+        }
 
         public static ShareItem Create(string value)
             => FromText(value) switch
