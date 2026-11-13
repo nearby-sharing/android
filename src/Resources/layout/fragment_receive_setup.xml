@@ -34,7 +34,7 @@
 			android:layout_height="wrap_content"
 			android:text="@string/launch_settings"
 			app:icon="@drawable/ic_fluent_window_new_24_regular"
-			app:shapeAppearanceOverlay="?attr/listItemShapeAppearanceFirst" />
+			app:shapeAppearance="?attr/listItemShapeAppearanceFirst" />
 
 		<com.google.android.material.textfield.TextInputLayout
 			style="?attr/textInputFilledStyle"
@@ -57,7 +57,7 @@
 			android:layout_height="wrap_content"
 			android:text="@string/generic_save"
 			app:icon="@drawable/ic_fluent_save_24_regular"
-			app:shapeAppearanceOverlay="?attr/listItemShapeAppearanceLast" />
+			app:shapeAppearance="?attr/listItemShapeAppearanceLast" />
 
 	</LinearLayout>
 

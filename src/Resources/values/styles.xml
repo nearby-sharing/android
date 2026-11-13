@@ -1,6 +1,6 @@
 <resources>
-	<style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
-		<item name="dynamicColorThemeOverlay">@style/ThemeOverlay.Material3.DynamicColors.DayNight</item>
+	<style name="AppTheme" parent="Theme.Material3Expressive.DayNight.NoActionBar">
+		<item name="dynamicColorThemeOverlay">@style/ThemeOverlay.Material3Expressive.DynamicColors.DayNight</item>
 
 		<!-- Title bar -->
 		<item name="elevationOverlayEnabled">false</item>
@@ -23,7 +23,7 @@
 	<style name="AppTheme.Preferences" parent="@style/PreferenceTheme.SettingsLib" />
 
 	<style name="AppTheme.DialogActivity" parent="@style/Theme.Material3.DayNight.SideSheetDialog">
-		<item name="dynamicColorThemeOverlay">@style/ThemeOverlay.Material3.DynamicColors.DayNight</item>
+		<item name="dynamicColorThemeOverlay">@style/ThemeOverlay.Material3Expressive.DynamicColors.DayNight</item>
 
 		<item name="sideSheetModalStyle">@style/Widget.Material3.SideSheet.Modal.Detached</item>
 
