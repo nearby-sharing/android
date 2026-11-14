@@ -1,12 +1,12 @@
 ﻿using Android.Bluetooth;
 using Android.Bluetooth.LE;
 using Android.Runtime;
-using ShortDev.Microsoft.ConnectedDevices;
-using BLeScanResult = Android.Bluetooth.LE.ScanResult;
-using ShortDev.Microsoft.ConnectedDevices.Transports;
-using System.Net.NetworkInformation;
-using ShortDev.Microsoft.ConnectedDevices.Transports.Bluetooth;
 using NearShare.Receive;
+using ShortDev.Microsoft.ConnectedDevices;
+using ShortDev.Microsoft.ConnectedDevices.Transports;
+using ShortDev.Microsoft.ConnectedDevices.Transports.Bluetooth;
+using System.Net.NetworkInformation;
+using BLeScanResult = Android.Bluetooth.LE.ScanResult;
 
 namespace NearShare.Handlers;
 
@@ -43,18 +43,66 @@ public sealed class AndroidBluetoothHandler(BluetoothAdapter adapter, PhysicalAd
     {
         public event Action<BLeScanResult>? OnFoundDevice;
 
+        private readonly System.Timers.Timer _timer = new() { Enabled = false, Interval = 50 };
+        public BluetoothLeScannerCallback()
+        {
+            _timer.Elapsed += OnElapsed;
+        }
+
+        private int _delivering = 0;
+        private readonly Lock _lock = new();
+        private List<BLeScanResult> _pendingResults = [];
+
+        private void OnElapsed(object? sender, System.Timers.ElapsedEventArgs e)
+        {
+            // Skip this tick if the previous delivery is still running.
+            if (Interlocked.CompareExchange(ref _delivering, 1, 0) != 0)
+                return;
+
+            try
+            {
+                List<BLeScanResult> results;
+
+                lock (_lock)
+                {
+                    if (_pendingResults.Count == 0)
+                        return;
+
+                    results = _pendingResults;
+                    _pendingResults = [];
+                }
+
+                results.Sort((a, b) => b.Rssi.CompareTo(a.Rssi));
+
+                foreach (var result in results)
+                    OnFoundDevice?.Invoke(result);
+            }
+            finally
+            {
+                Volatile.Write(ref _delivering, 0);
+            }
+        }
+
         public override void OnScanResult([GeneratedEnum] ScanCallbackType callbackType, BLeScanResult? result)
         {
-            if (result != null)
-                OnFoundDevice?.Invoke(result);
+            if (result == null)
+                return;
+
+            lock (_lock)
+                _pendingResults.Add(result);
+
+            _timer.Start();
         }
 
         public override void OnBatchScanResults(IList<BLeScanResult>? results)
         {
-            if (results != null)
-                foreach (var result in results)
-                    if (result != null)
-                        OnFoundDevice?.Invoke(result);
+            if (results == null)
+                return;
+
+            lock (_lock)
+                _pendingResults.AddRange(results);
+
+            _timer.Start();
         }
     }
 

@@ -67,7 +67,9 @@ public sealed partial class SendActivity : AppCompatActivity
         readyButton.Click += (s, e) => Finish();
 
         DeviceDiscoveryListView = FindViewById<RecyclerView>(Resource.Id.deviceSelector)!;
-        DeviceDiscoveryListView.SetLayoutManager(new GridLayoutManager(this, spanCount: 2, (int)Orientation.Vertical, reverseLayout: false));
+        DeviceDiscoveryListView.SetLayoutManager(new GridLayoutManager(this, spanCount: 2, (int)Orientation.Vertical, reverseLayout: true));
+        DeviceDiscoveryListView.LayoutDirection = LayoutDirection.Rtl;
+        DeviceDiscoveryListView.SetItemAnimator(new NoMoveDefaultItemAnimator());
         DeviceDiscoveryListView.SetAdapter(
             RemoteSystems.CreateAdapter(Resource.Layout.item_device, view => new RemoteSystemViewHolder(view) { Click = SendData })
         );
@@ -172,33 +174,14 @@ public sealed partial class SendActivity : AppCompatActivity
         {
             lock (RemoteSystems)
             {
-                var newIndex = FindIndex(RemoteSystems, device);
-                var oldIndex = RemoteSystems.IndexOf(device);
-                if (oldIndex != -1)
-                {
-                    // ToDo: Move if signal strength changed
-                    // Currently might flicker
-                    // RemoteSystems.Move(oldIndex, newIndex);
+                if (RemoteSystems.Contains(device))
                     return;
-                }
 
-                RemoteSystems.Insert(newIndex, device);
+                RemoteSystems.Add(device);
                 _emptyDeviceListView.Visibility = ViewStates.Gone;
                 this.PlaySound(Resource.Raw.pop);
             }
         });
-
-        static int FindIndex(IReadOnlyList<CdpDevice> devices, CdpDevice newDevice)
-        {
-            for (int i = 0; i < devices.Count; i++)
-            {
-                if (devices[i].Rssi > newDevice.Rssi)
-                    continue;
-
-                return i;
-            }
-            return 0;
-        }
     }
     #endregion
 
@@ -396,6 +379,18 @@ public sealed partial class SendActivity : AppCompatActivity
                 return;
 
             activity.Finish();
+        }
+    }
+
+    sealed class NoMoveDefaultItemAnimator : DefaultItemAnimator
+    {
+        public override bool AnimateMove(
+            RecyclerView.ViewHolder holder,
+            int fromX, int fromY,
+            int toX, int toY)
+        {
+            DispatchMoveFinished(holder);
+            return false;
         }
     }
 }
