@@ -4,7 +4,7 @@ using Android.Graphics.Drawables;
 using Android.Views;
 using Google.Android.Material.Dialog;
 using Google.Android.Material.ListItem;
-using Google.Android.Material.TextField;
+using Java.Interop;
 using NearShare.Utils;
 using ShortDev.Android.Lifecycle;
 using ShortDev.Android.Views;
@@ -45,7 +45,7 @@ internal sealed class HomeFragment : Fragment
         _viewBindings.OpenFaqCard.Click += delegate { UIHelper.OpenFAQ(RequireActivity()); };
         _viewBindings.OpenCrowdinCard.Click += delegate { UIHelper.OpenCrowdIn(RequireActivity()); };
 
-        (_viewBindings.WelcomeImageView.Drawable as IAnimatable)?.Start();
+        _viewBindings.WelcomeImageView.Drawable.JavaAs<IAnimatable>()?.Start();
     }
 
     #region Transfer Setup
