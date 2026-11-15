@@ -61,7 +61,7 @@ public sealed class ReceiveFragment : Fragment
             )
         );
 
-        _viewBindings.OpenFaqButton.Click += (s, e) => UIHelper.OpenFAQ(ctx);
+        _viewBindings.OpenFaqButton.Click += (s, e) => UIHelper.OpenFAQ(ctx, hash: "receive");
 
         _loggerFactory = CdpUtils.CreateLoggerFactory(ctx);
         _logger = _loggerFactory.CreateLogger<ReceiveFragment>();

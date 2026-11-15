@@ -18,8 +18,8 @@ internal static class UIHelper
 {
     public const ConfigChanges ConfigChangesFlags = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.Density;
 
-    public static void OpenFAQ(Context ctx)
-        => DisplayWebSite(ctx, "https://nearshare.shortdev.de/faq");
+    public static void OpenFAQ(Context ctx, string hash = "")
+        => DisplayWebSite(ctx, $"https://nearshare.shortdev.de/faq#{hash}");
 
     public static void OpenCrowdIn(Context ctx)
         => DisplayWebSite(ctx, "https://translate.nearshare.shortdev.de/");
