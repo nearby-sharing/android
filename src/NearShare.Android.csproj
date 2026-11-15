@@ -4,10 +4,8 @@
 		<OutputType>Exe</OutputType>
 		<SupportedOSPlatformVersion>24</SupportedOSPlatformVersion>
 		<ApplicationId>de.shortdev.nearby_sharing_windows</ApplicationId>
-		<ApplicationVersion>42</ApplicationVersion>
-		<ApplicationDisplayVersion>1.11.1</ApplicationDisplayVersion>
-		<UseAndroidCrypto>true</UseAndroidCrypto>
-		<AndroidErrorOnCustomJavaObject>false</AndroidErrorOnCustomJavaObject>
+		<ApplicationVersion>43</ApplicationVersion>
+		<ApplicationDisplayVersion>1.11.2</ApplicationDisplayVersion>
 		<RuntimeIdentifiers>android-arm;android-arm64;android-x64</RuntimeIdentifiers>
 		<!-- TODO: CoreCLR does not support x86 on android -->
 		<!--<RuntimeIdentifiers>android-arm;android-arm64;android-x86;android-x64</RuntimeIdentifiers>-->
