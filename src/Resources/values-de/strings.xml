@@ -64,6 +64,8 @@
 	<string name="goto_mac_address_summary">Mac-Adresse für dieses Geräte angeben</string>
 	<string name="device_name_title">Geräte Name</string>
 	<string name="device_name_summary">Lege fest, wie andere dich sehen</string>
+	<string name="ignore_files_when_sending_uri_title">Links alleine senden</string>
+	<string name="ignore_files_when_sending_uri_summary">Dateien wie favicons werden beim Teilen von Webseiten ignoriert</string>
 	<string name="show_credits_title">Mitwirkende anzeigen</string>
 	<!-- #endregion -->
 	<!-- #region ReceiveActivity.cs -->

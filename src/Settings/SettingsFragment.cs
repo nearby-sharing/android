@@ -21,6 +21,8 @@ internal abstract class SettingsFragment : Fragment
 {
     internal const string ForceDarkModeName = "force_dark_mode";
     internal const string DeviceNameName = "device_name";
+    internal const string IgnoreFilesWhenSendUri = "ignore_files_when_send_uri";
+    internal const bool IgnoreFilesWhenSendUriDefault = true;
 
     public static ISharedPreferences GetPreferences(Context context)
         => context.GetSharedPreferences($"{context.PackageName}_preferences", FileCreationMode.Private)
@@ -28,6 +30,9 @@ internal abstract class SettingsFragment : Fragment
 
     public static bool ShouldForceDarkMode(Context context)
         => GetPreferences(context).GetBoolean(ForceDarkModeName, false);
+
+    public static bool ShouldIgnoreFilesWhenSendUri(Context context)
+        => GetPreferences(context).GetBoolean(IgnoreFilesWhenSendUri, IgnoreFilesWhenSendUriDefault);
 
     public static string GetDeviceName(Context context, BluetoothAdapter adapter)
     {
@@ -216,7 +221,7 @@ internal closed record Setting
         public Action<bool>? OnChange { get; init; }
 
         public bool GetValue(Context context)
-            => SettingsFragment.GetPreferences(context).GetBoolean(Key, defValue: false);
+            => SettingsFragment.GetPreferences(context).GetBoolean(Key, defValue: DefaultValue);
 
         public void SetValue(Context context, bool value)
             => SettingsFragment.GetPreferences(context).Edit()!

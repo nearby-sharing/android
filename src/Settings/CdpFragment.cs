@@ -16,8 +16,19 @@ internal sealed class CdpFragment : SettingsFragment
                 Click = () => UIHelper.OpenSetup(Activity!)
             },
         },
+        new SettingsGroup(Resource.String.category_general) {
+            new Setting.Bool(IgnoreFilesWhenSendUri) {
+                DefaultValue = IgnoreFilesWhenSendUriDefault,
+                Icon = new(
+                    Resource.Drawable.ic_fluent_link_24_regular, Resource.Color.m3_ref_palette_cyan30,
+                    Resource.Drawable.material_shape_cookie_4, Resource.Color.m3_ref_palette_cyan90
+                ),
+                Title = Resource.String.ignore_files_when_sending_uri_title,
+                Summary = Resource.String.ignore_files_when_sending_uri_summary,
+            },
+        },
         new SettingsGroup(Resource.String.category_setup) {
-            new Setting.String(SettingsFragment.DeviceNameName) {
+            new Setting.String(DeviceNameName) {
                 Icon = new(
                     Resource.Drawable.ic_fluent_rename_24_regular, Resource.Color.m3_ref_palette_cyan30,
                     Resource.Drawable.material_shape_cookie_4, Resource.Color.m3_ref_palette_cyan90

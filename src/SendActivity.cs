@@ -10,6 +10,7 @@ using Google.Android.Material.Color;
 using Google.Android.Material.ProgressIndicator;
 using Google.Android.Material.SideSheet;
 using Microsoft.Extensions.Logging;
+using NearShare.Settings;
 using NearShare.Utils;
 using NearShare.ViewModels;
 using ShortDev.Android.Lifecycle;
@@ -192,7 +193,11 @@ public sealed partial class SendActivity : AppCompatActivity
 
         try
         {
-            _currentTransfer = IntentParser.ShareIntent(this, Intent) switch
+            ParseShareIntentOptions options = new()
+            {
+                IgnoreFilesWhenSendingUri = SettingsFragment.ShouldIgnoreFilesWhenSendUri(this)
+            };
+            _currentTransfer = IntentParser.ShareIntent(this, Intent, in options) switch
             {
                 CdpFileProvider file => SendDataViewModel.SendFiles(_nearShareSender, remoteSystem, [file]),
                 IReadOnlyList<CdpFileProvider> files => SendDataViewModel.SendFiles(_nearShareSender, remoteSystem, files),

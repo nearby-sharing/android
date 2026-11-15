@@ -93,6 +93,9 @@
 	<string name="device_name_title">Device Name</string>
 	<string name="device_name_summary">Change how others see you</string>
 
+	<string name="ignore_files_when_sending_uri_title">Send links alone</string>
+	<string name="ignore_files_when_sending_uri_summary">Ignore files like favicons when sharing websites</string>
+
 	<string name="show_credits_title">Show credits</string>
 	<!-- #endregion -->
 

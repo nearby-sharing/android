@@ -5,7 +5,7 @@ namespace NearShare.Utils;
 
 internal static class IntentParser
 {
-    public static ParseShareIntentResult? ShareIntent(Context context, Intent? intent)
+    public static ParseShareIntentResult? ShareIntent(Context context, Intent? intent, in ParseShareIntentOptions options)
     {
         var resolver = context.ContentResolver!;
 
@@ -62,6 +62,12 @@ internal static class IntentParser
         if (intent.Data is { } data)
             items.Add(ShareItem.Create(data));
 
+        if (options.IgnoreFilesWhenSendingUri && GetSingleUrl(items) is { } singleUrl)
+        {
+            items.Clear();
+            items.Add(singleUrl);
+        }
+
         return items.ToList() switch
         {
             [] => null,
@@ -112,6 +118,22 @@ internal static class IntentParser
                 value
             );
         }
+
+        static ShareItem.Url? GetSingleUrl(IEnumerable<ShareItem> items)
+        {
+            ShareItem.Url? result = null;
+            foreach (var item in items)
+            {
+                if (item is not ShareItem.Url url)
+                    continue;
+
+                if (result != null)
+                    return null;
+
+                result = url;
+            }
+            return result;
+        }
     }
 
     private closed record ShareItem
@@ -156,6 +178,11 @@ internal static class IntentParser
 
         public readonly union TextOrUrl(Text, Url);
     }
+}
+
+public readonly record struct ParseShareIntentOptions
+{
+    public required bool IgnoreFilesWhenSendingUri { get; init; }
 }
 
 public readonly union ParseShareIntentResult(IReadOnlyList<CdpFileProvider>, CdpFileProvider?, Uri?);
