@@ -16,7 +16,9 @@
 		<RootNamespace>NearShare</RootNamespace>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)'=='Release'">
-		<RunAOTCompilation>False</RunAOTCompilation>
+		<PublishAot>true</PublishAot>
+		<AndroidLinkTool>r8</AndroidLinkTool>
+		<AndroidLinkResources>true</AndroidLinkResources>
 		<AndroidPackageFormat>aab</AndroidPackageFormat>
 	</PropertyGroup>
 	<ItemGroup Label="Nuget">
