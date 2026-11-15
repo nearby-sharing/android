@@ -148,7 +148,7 @@ internal static class IntentParser
 
         public static TextOrUrl FromText(string value)
         {
-            if (Uri.TryCreate(value, UriKind.Absolute, out var uri))
+            if (Uri.TryCreate(value, UriKind.Absolute, out var uri) && uri.Scheme.All(char.IsAsciiLetter))
                 return new Url(uri);
 
             return new Text(value);
