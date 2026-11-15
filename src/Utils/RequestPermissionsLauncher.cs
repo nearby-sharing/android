@@ -3,6 +3,7 @@ using Android.Runtime;
 using AndroidX.Activity.Result;
 using AndroidX.Activity.Result.Contract;
 using AndroidX.Core.Content;
+using System.Diagnostics.CodeAnalysis;
 
 namespace NearShare.Utils;
 
@@ -64,7 +65,10 @@ public sealed class RequestPermissionsLauncher
             });
         }
 
-        private static IDictionary<TKey, TValue>? ToDictionary<TKey, TValue>(Java.Lang.Object? obj)
+        private static IDictionary<TKey, TValue>? ToDictionary<
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.NonPublicConstructors)] TKey,
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.NonPublicConstructors)] TValue>
+            (Java.Lang.Object? obj)
         {
             if (obj == null)
                 return null;

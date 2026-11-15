@@ -24,7 +24,7 @@
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="11.0.0" />
 		<PackageReference Include="Sentry" Version="7.0.0" />
 		<PackageReference Include="Serilog.Extensions.Logging.File" Version="3.0.0" />
-		<PackageReference Include="ShortDev.Android" Version="0.6.0-beta" />
+		<PackageReference Include="ShortDev.Android" Version="0.6.1-beta" />
 		<PackageReference Include="ShortDev.Android.FluentIcons" Version="1.1.311" />
 		<PackageReference Include="Xamarin.AndroidX.Browser" Version="1.10.0.1" />
 		<PackageReference Include="Xamarin.AndroidX.Navigation.Fragment" Version="2.10.2" />
